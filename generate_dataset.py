@@ -1,8 +1,8 @@
 import csv
 import json
 
-input_file = 'subject_questions.csv'
-output_file = 'formatted_questions.jsonl'
+input_file = 'data/subject_questions.csv'
+output_file = 'data/formatted_questions.jsonl'
 
 system_content = "This assistant generates questions for competitive exams."
 
