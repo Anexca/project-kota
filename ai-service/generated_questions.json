@@ -1,0 +1,173 @@
+{
+  "Chemistry": [
+    {
+      "answer": "Atom",
+      "explanation": "An atom is the smallest unit of an element that retains the chemical properties of that element.",
+      "options": [
+        "Atom",
+        "Molecule",
+        "Compound",
+        "Ion"
+      ],
+      "question": "What is the smallest unit of an element?"
+    },
+    {
+      "answer": "A compound is a substance formed by the chemical combination of two or more elements in a fixed ratio, while a mixture is a combination of two or more substances that are not chemically bonded.",
+      "explanation": "Compounds have a fixed composition, while mixtures can have varying compositions.",
+      "options": [
+        "A compound is a substance formed by the chemical combination of two or more elements in a fixed ratio, while a mixture is a combination of two or more substances that are not chemically bonded.",
+        "A mixture is a substance formed by the chemical combination of two or more elements in a fixed ratio, while a compound is a combination of two or more substances that are not chemically bonded.",
+        "A compound and a mixture are the same thing.",
+        "None of the above"
+      ],
+      "question": "What is the difference between a compound and a mixture?"
+    },
+    {
+      "answer": "A measure of the acidity or alkalinity of a solution.",
+      "explanation": "The pH scale ranges from 0 to 14, with 7 being neutral, values below 7 being acidic, and values above 7 being alkaline.",
+      "options": [
+        "A measure of the acidity or alkalinity of a solution.",
+        "A measure of the temperature of a solution.",
+        "A measure of the concentration of a solution.",
+        "None of the above"
+      ],
+      "question": "What is the pH scale?"
+    },
+    {
+      "answer": "Mass cannot be created or destroyed in ordinary chemical reactions.",
+      "explanation": "This law states that the total mass of the reactants before a chemical reaction must equal the total mass of the products after the reaction.",
+      "options": [
+        "Mass cannot be created or destroyed in ordinary chemical reactions.",
+        "Mass is always increasing in chemical reactions.",
+        "Mass is always decreasing in chemical reactions.",
+        "None of the above"
+      ],
+      "question": "What is the law of conservation of mass?"
+    },
+    {
+      "answer": "An endothermic reaction absorbs heat from the surroundings, while an exothermic reaction releases heat to the surroundings.",
+      "explanation": "Endothermic reactions feel cold, while exothermic reactions feel hot.",
+      "options": [
+        "An endothermic reaction absorbs heat from the surroundings, while an exothermic reaction releases heat to the surroundings.",
+        "An exothermic reaction absorbs heat from the surroundings, while an endothermic reaction releases heat to the surroundings.",
+        "Endothermic and exothermic reactions are the same thing.",
+        "None of the above"
+      ],
+      "question": "What is the difference between an endothermic and an exothermic reaction?"
+    }
+  ],
+  "Mathematics": [
+    {
+      "answer": "(base x height) / 2",
+      "explanation": "The area of a triangle is half the product of its base and height.",
+      "options": [
+        "(base x height) / 2",
+        "base x height",
+        "length x width",
+        "pi x radius squared"
+      ],
+      "question": "What is the formula for the area of a triangle?"
+    },
+    {
+      "answer": "a^2 + b^2 = c^2",
+      "explanation": "This theorem states that in a right triangle, the square of the hypotenuse (the side opposite the right angle) is equal to the sum of the squares of the other two sides.",
+      "options": [
+        "a^2 + b^2 = c^2",
+        "a + b = c",
+        "a - b = c",
+        "None of the above"
+      ],
+      "question": "What is the Pythagorean theorem?"
+    },
+    {
+      "answer": "(4/3) x pi x radius^3",
+      "explanation": "The volume of a sphere is four-thirds times pi times the cube of its radius.",
+      "options": [
+        "(4/3) x pi x radius^3",
+        "4 x pi x radius^2",
+        "pi x radius^2",
+        "None of the above"
+      ],
+      "question": "What is the formula for the volume of a sphere?"
+    },
+    {
+      "answer": "A prime number has exactly two factors: 1 and itself, while a composite number has more than two factors.",
+      "explanation": "Examples of prime numbers include 2, 3, 5, 7, etc., while examples of composite numbers include 4, 6, 8, 9, etc.",
+      "options": [
+        "A prime number has exactly two factors: 1 and itself, while a composite number has more than two factors.",
+        "A composite number has exactly two factors: 1 and itself, while a prime number has more than two factors.",
+        "Prime numbers and composite numbers are the same thing.",
+        "None of the above"
+      ],
+      "question": "What is the difference between a prime number and a composite number?"
+    },
+    {
+      "answer": "(change in y) / (change in x)",
+      "explanation": "The slope of a line measures its steepness and direction.",
+      "options": [
+        "(change in y) / (change in x)",
+        "(change in x) / (change in y)",
+        "y = mx + c",
+        "None of the above"
+      ],
+      "question": "What is the formula for the slope of a line?"
+    }
+  ],
+  "Physics": [
+    {
+      "answer": "Newton",
+      "explanation": "Force is measured in Newtons (N).",
+      "options": [
+        "Newton",
+        "Kilogram",
+        "Meter",
+        "Second"
+      ],
+      "question": "What is the unit of measurement for force?"
+    },
+    {
+      "answer": "Energy cannot be created or destroyed, only transformed.",
+      "explanation": "The law of conservation of energy states that energy cannot be created or destroyed, only transformed from one form to another.",
+      "options": [
+        "Energy cannot be created or destroyed, only transformed.",
+        "Energy is always increasing.",
+        "Energy is always decreasing.",
+        "Energy is constant."
+      ],
+      "question": "What is the law of conservation of energy?"
+    },
+    {
+      "answer": "All of the above",
+      "explanation": "The speed of light in a vacuum is approximately 299,792,458 meters per second, which is equivalent to 300,000,000 m/s and 186,282 miles per second.",
+      "options": [
+        "299,792,458 m/s",
+        "300,000,000 m/s",
+        "186,282 miles per second",
+        "All of the above"
+      ],
+      "question": "What is the speed of light in a vacuum?"
+    },
+    {
+      "answer": "Mass is the amount of matter in an object, while weight is the force of gravity on that object.",
+      "explanation": "Mass is a fundamental property of an object, while weight is a force that depends on the object's mass and the gravitational field it is in.",
+      "options": [
+        "Mass is the amount of matter in an object, while weight is the force of gravity on that object.",
+        "Mass is the force of gravity on an object, while weight is the amount of matter in that object.",
+        "Mass and weight are the same thing.",
+        "None of the above"
+      ],
+      "question": "What is the difference between mass and weight?"
+    },
+    {
+      "answer": "An object immersed in a fluid experiences an upward buoyant force equal to the weight of the fluid displaced by the object.",
+      "explanation": "This is Archimedes' principle, which explains why objects float or sink in fluids.",
+      "options": [
+        "An object immersed in a fluid experiences an upward buoyant force equal to the weight of the fluid displaced by the object.",
+        "An object immersed in a fluid experiences a downward buoyant force equal to the weight of the fluid displaced by the object.",
+        "An object immersed in a fluid experiences a buoyant force that is always greater than the weight of the fluid displaced by the object.",
+        "None of the above"
+      ],
+      "question": "What is the principle of buoyancy?"
+    }
+  ]
+}
