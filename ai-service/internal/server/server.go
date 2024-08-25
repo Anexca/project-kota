@@ -23,7 +23,7 @@ type Server struct {
 func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 
-	questionService := services.NewQuestionService(genAiClient)
+	questionService := services.NewQuestionService(genAiClient, redisClient)
 	redisService := services.NewRedisService(redisClient)
 
 	NewServer := &Server{

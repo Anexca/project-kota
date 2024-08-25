@@ -27,14 +27,10 @@ func (r *RedisService) Store(ctx context.Context, key string, value any) error {
 	return status.Err()
 }
 
-func (r *RedisService) Get(ctx context.Context, key string) (any, error) {
+func (r *RedisService) Get(ctx context.Context, key string) (string, error) {
 	val, err := r.client.Get(ctx, key).Result()
 	if err != nil {
-		if err == redis.Nil {
-			return nil, fmt.Errorf("key %v does not exist", key)
-		} else {
-			return nil, err
-		}
+		return "", err
 	}
 
 	return val, nil
