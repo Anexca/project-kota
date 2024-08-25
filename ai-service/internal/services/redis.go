@@ -1,79 +1,47 @@
-package database
+package services
 
 import (
 	"context"
 	"fmt"
 	"log"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/redis/go-redis/v9"
 )
 
-type Service interface {
-	Health() map[string]string
+type RedisService struct {
+	client *redis.Client
 }
 
-type service struct {
-	db *redis.Client
-}
-
-var (
-	address  = os.Getenv("DB_ADDRESS")
-	port     = os.Getenv("DB_PORT")
-	password = os.Getenv("DB_PASSWORD")
-	database = os.Getenv("DB_DATABASE")
-)
-
-func New() Service {
-	num, err := strconv.Atoi(database)
-	if err != nil {
-		log.Fatalf(fmt.Sprintf("database incorrect %v", err))
+func NewRedisService(redisClient *redis.Client) *RedisService {
+	return &RedisService{
+		client: redisClient,
 	}
-
-	fullAddress := fmt.Sprintf("%s:%s", address, port)
-
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     fullAddress,
-		Password: password,
-		DB:       num,
-		// Note: It's important to add this for a secure connection. Most cloud services that offer Redis should already have this configured in their services.
-		// For manual setup, please refer to the Redis documentation: https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/
-		// TLSConfig: &tls.Config{
-		// 	MinVersion:   tls.VersionTLS12,
-		// },
-	})
-
-	s := &service{db: rdb}
-
-	return s
 }
 
-// Health returns the health status and statistics of the Redis server.
-func (s *service) Health() map[string]string {
+func (s *RedisService) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) // Default is now 5s
 	defer cancel()
 
 	stats := make(map[string]string)
 
 	// Check Redis health and populate the stats map
-	stats = s.checkRedisHealth(ctx, stats)
+	stats = s.CheckRedisHealth(ctx, stats)
 
 	return stats
 }
 
-// checkRedisHealth checks the health of the Redis server and adds the relevant statistics to the stats map.
-func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
+// CheckRedisHealth checks the health of the Redis server and adds the relevant statistics to the stats map.
+func (s *RedisService) CheckRedisHealth(ctx context.Context, stats map[string]string) map[string]string {
 	// Ping the Redis server to check its availability.
-	pong, err := s.db.Ping(ctx).Result()
+	pong, err := s.client.Ping(ctx).Result()
 	// Note: By extracting and simplifying like this, `log.Fatalf(fmt.Sprintf("db down: %v", err))`
 	// can be changed into a standard error instead of a fatal error.
 	if err != nil {
-		log.Fatalf(fmt.Sprintf("db down: %v", err))
+		log.Fatalf("db down: %v", err)
 	}
 
 	// Redis is up
@@ -82,7 +50,7 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	stats["redis_ping_response"] = pong
 
 	// Retrieve Redis server information.
-	info, err := s.db.Info(ctx).Result()
+	info, err := s.client.Info(ctx).Result()
 	if err != nil {
 		stats["redis_message"] = fmt.Sprintf("Failed to retrieve Redis info: %v", err)
 		return stats
@@ -92,7 +60,7 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	redisInfo := parseRedisInfo(info)
 
 	// Get the pool stats of the Redis client.
-	poolStats := s.db.PoolStats()
+	poolStats := s.client.PoolStats()
 
 	// Prepare the stats map with Redis server information and pool statistics.
 	// Note: The "stats" map in the code uses string keys and values,
@@ -122,19 +90,19 @@ func (s *service) checkRedisHealth(ctx context.Context, stats map[string]string)
 	stats["redis_active_connections"] = strconv.FormatUint(activeConns, 10)
 
 	// Calculate the pool size percentage.
-	poolSize := s.db.Options().PoolSize
+	poolSize := s.client.Options().PoolSize
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 	poolSizePercentage := float64(connectedClients) / float64(poolSize) * 100
 	stats["redis_pool_size_percentage"] = fmt.Sprintf("%.2f%%", poolSizePercentage)
 
 	// Evaluate Redis stats and update the stats map with relevant messages.
-	return s.evaluateRedisStats(redisInfo, stats)
+	return s.EvaluateRedisStats(redisInfo, stats)
 }
 
-// evaluateRedisStats evaluates the Redis server statistics and updates the stats map with relevant messages.
-func (s *service) evaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
-	poolSize := s.db.Options().PoolSize
-	poolStats := s.db.PoolStats()
+// EvaluateRedisStats evaluates the Redis server statistics and updates the stats map with relevant messages.
+func (s *RedisService) EvaluateRedisStats(redisInfo, stats map[string]string) map[string]string {
+	poolSize := s.client.Options().PoolSize
+	poolStats := s.client.PoolStats()
 	connectedClients, _ := strconv.Atoi(redisInfo["connected_clients"])
 	highConnectionThreshold := int(float64(poolSize) * 0.8)
 

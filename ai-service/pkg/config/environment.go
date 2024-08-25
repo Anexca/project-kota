@@ -1,30 +1,37 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"errors"
+	"os"
+	"strconv"
 )
 
 type Environment struct {
-	ServerPort    string `viper:"PORT"`
-	RedisPort     string `viper:"REDIS_PORT"`
-	RedisAddress  string `viper:"REDIS_ADDRESS"`
-	RedisPassword string `viper:"REDIS_PASSWORD"`
-	RedisDatabase string `viper:"REDIS_DATABASE"`
+	ServerPort    string
+	RedisPort     string
+	RedisAddress  string
+	RedisPassword string
+	RedisDatabase int
 }
 
 func LoadEnvironment() (*Environment, error) {
-	viper.SetConfigFile(".env")
-	err := viper.ReadInConfig()
-	if err != nil {
-		return nil, err
-
-	}
-
-	var config Environment
-	err = viper.Unmarshal(&config)
+	redisDbFromEnv := os.Getenv("REDIS_DATABASE")
+	redisDatabase, err := strconv.Atoi(redisDbFromEnv)
 	if err != nil {
 		return nil, err
 	}
 
-	return &config, err
+	env := &Environment{
+		ServerPort:    os.Getenv("PORT"),
+		RedisPort:     os.Getenv("REDIS_PORT"),
+		RedisAddress:  os.Getenv("REDIS_ADDRESS"),
+		RedisPassword: os.Getenv("REDIS_PASSWORD"),
+		RedisDatabase: redisDatabase,
+	}
+
+	if env.ServerPort == "" || env.RedisPort == "" || env.RedisAddress == "" || env.RedisPassword == "" {
+		return nil, errors.New("missing required environment variables")
+	}
+
+	return env, nil
 }

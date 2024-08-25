@@ -9,10 +9,6 @@ import (
 )
 
 func main() {
-	// err := client.MakeChatRequests(context.Background(), "project-kota-433508", "asia-east1", "gemini-1.5-flash")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 	ctx := context.Background()
 
 	genAiClient, err := client.NewGeminiClient(ctx, "project-kota-433508", "asia-east1")
@@ -21,7 +17,13 @@ func main() {
 	}
 	defer genAiClient.Close()
 
-	server := server.InitServer(genAiClient)
+	redisClient, err := client.NewRedisClient(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer redisClient.Close()
+
+	server := server.InitServer(genAiClient, redisClient)
 
 	err = server.ListenAndServe()
 	if err != nil {

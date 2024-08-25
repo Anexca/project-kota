@@ -33,7 +33,7 @@ func (s *Server) SupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	jsonResp, _ := json.Marshal(s.db.Health())
+	jsonResp, _ := json.Marshal(s.redisService.Health())
 	response := Response{
 		Data: string(jsonResp),
 	}
