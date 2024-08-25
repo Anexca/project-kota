@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -20,6 +21,28 @@ func NewRedisService(redisClient *redis.Client) *RedisService {
 	return &RedisService{
 		client: redisClient,
 	}
+}
+
+func (r *RedisService) Store(ctx context.Context, key string, value any) error {
+	status := r.client.Set(ctx, key, value, 0)
+	return status.Err()
+}
+
+func (r *RedisService) Get(ctx context.Context, key string) (any, error) {
+	val, err := r.client.Get(ctx, key).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, errors.New("key does not exist")
+		} else {
+			return nil, err
+		}
+	}
+
+	return val, nil
+}
+
+func (r *RedisService) Delete(ctx context.Context, key string) error {
+	return r.client.Del(ctx, "mykey").Err()
 }
 
 func (s *RedisService) Health() map[string]string {
