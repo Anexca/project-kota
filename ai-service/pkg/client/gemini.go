@@ -1,6 +1,7 @@
 package client
 
 import (
+	"ai-service/pkg/config"
 	"context"
 	"fmt"
 	"log"
@@ -8,8 +9,13 @@ import (
 	"cloud.google.com/go/vertexai/genai"
 )
 
-func NewGeminiClient(ctx context.Context, projectID, region string) (*genai.Client, error) {
-	client, err := genai.NewClient(ctx, projectID, region)
+func NewGeminiClient(ctx context.Context) (*genai.Client, error) {
+	env, err := config.LoadEnvironment()
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := genai.NewClient(ctx, env.GoogleCloudProjectId, env.GoogleCloudProjectRegion)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create client: %w", err)
 	}

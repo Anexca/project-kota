@@ -11,7 +11,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	genAiClient, err := client.NewGeminiClient(ctx, "project-kota-433508", "asia-east1")
+	genAiClient, err := client.NewGeminiClient(ctx)
 	if err != nil {
 		log.Fatalln(err)
 	}
