@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -32,7 +31,7 @@ func (r *RedisService) Get(ctx context.Context, key string) (any, error) {
 	val, err := r.client.Get(ctx, key).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return nil, errors.New("key does not exist")
+			return nil, fmt.Errorf("key %v does not exist", key)
 		} else {
 			return nil, err
 		}
@@ -42,7 +41,7 @@ func (r *RedisService) Get(ctx context.Context, key string) (any, error) {
 }
 
 func (r *RedisService) Delete(ctx context.Context, key string) error {
-	return r.client.Del(ctx, "mykey").Err()
+	return r.client.Del(ctx, key).Err()
 }
 
 func (s *RedisService) Health() map[string]string {
