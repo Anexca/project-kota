@@ -17,7 +17,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Route("/questions", func(r chi.Router) {
 		r.Route("/jee", func(r chi.Router) {
-			r.Get("/physics", s.GetJEEPhysicsQuestions)
+			r.Get("/mcq/physics", s.GetJEEPhysicsMCQs)
+			r.Get("/nvq/physics", s.GetJEEPhysicsNVQs)
 		})
 	})
 
