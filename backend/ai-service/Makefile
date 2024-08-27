@@ -7,13 +7,6 @@ build:
 	@echo "Building..."
 	@go build -o main cmd/api/main.go
 
-up: 
-	@echo "Stopping docker images (if running...)"
-	docker-compose down
-	@echo "Building (when required) and starting docker images..."
-	docker-compose up --build -d
-	@echo "Docker images built and started!"
-
 # Run the application
 run:
 	@go run cmd/api/main.go
