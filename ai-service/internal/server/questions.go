@@ -3,7 +3,7 @@ package server
 import "net/http"
 
 func (s *Server) GetJEEPhysicsMCQs(w http.ResponseWriter, r *http.Request) {
-	questions, err := s.questionService.GenerateQuestions(r.Context(), "Multiple Choice Question", "JEE_Mains", "physics", 5)
+	questions, err := s.questionService.GenerateQuestions(r.Context(), "Multiple Choice Question", "JEE_Mains", "physics", 20)
 	if err != nil {
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
@@ -17,7 +17,7 @@ func (s *Server) GetJEEPhysicsMCQs(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) GetJEEPhysicsNVQs(w http.ResponseWriter, r *http.Request) {
-	questions, err := s.questionService.GenerateQuestions(r.Context(), "Numerical Value Question", "JEE_Mains", "physics", 5)
+	questions, err := s.questionService.GenerateQuestions(r.Context(), "Numerical Value Question", "JEE_Mains", "physics", 20)
 	if err != nil {
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return

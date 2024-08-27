@@ -35,7 +35,7 @@ func NewQuestionService(genAIClient *genai.Client, redisClient *redis.Client) *Q
 const GEN_AI_MODEL = "gemini-1.5-flash"
 const REDIS_CACHE_PREFIX = "QUESTIONS"
 
-func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, examName, subject string, numberOfQuestions int) (*[]Question, error) {
+func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, examName, subject string, numberOfQuestions int) ([]Question, error) {
 	cachedQuestionKey := generateCacheKey(questionType, examName, subject, numberOfQuestions)
 	var formattedQuestions []Question
 
@@ -52,7 +52,7 @@ func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, e
 			return nil, err
 		}
 
-		return &formattedQuestions, nil
+		return formattedQuestions, nil
 	}
 
 	// Generate questions using GenAI if not found in cache
@@ -74,7 +74,7 @@ func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, e
 
 	q.redisService.Store(ctx, cachedQuestionKey, questions)
 
-	return &formattedQuestions, nil
+	return formattedQuestions, nil
 }
 
 func generateCacheKey(questionType, examName, subject string, numberOfQuestions int) string {
