@@ -8,6 +8,11 @@ import (
 
 type Environment struct {
 	ServerPort               string
+	DatabaseHost             string
+	DatabasePort             string
+	DatabaseName             string
+	DatabaseUser             string
+	DatabasePassword         string
 	RedisPort                string
 	RedisAddress             string
 	RedisPassword            string
@@ -26,6 +31,11 @@ func LoadEnvironment() (*Environment, error) {
 	env := &Environment{
 		ServerPort:               os.Getenv("PORT"),
 		RedisPort:                os.Getenv("REDIS_PORT"),
+		DatabaseHost:             os.Getenv("DB_HOST"),
+		DatabasePort:             os.Getenv("DB_PORT"),
+		DatabaseName:             os.Getenv("DB_NAME"),
+		DatabaseUser:             os.Getenv("DB_USER"),
+		DatabasePassword:         os.Getenv("DB_PASSWORD"),
 		RedisAddress:             os.Getenv("REDIS_ADDRESS"),
 		RedisPassword:            os.Getenv("REDIS_PASSWORD"),
 		RedisDatabase:            redisDatabase,
@@ -33,8 +43,20 @@ func LoadEnvironment() (*Environment, error) {
 		GoogleCloudProjectRegion: os.Getenv("GCLOUD_PROJECT_REGION"),
 	}
 
-	if env.ServerPort == "" || env.RedisPort == "" || env.RedisAddress == "" || env.RedisPassword == "" || env.GoogleCloudProjectId == "" || env.GoogleCloudProjectRegion == "" {
-		return nil, errors.New("missing required environment variables")
+	if env.ServerPort == "" {
+		return nil, errors.New("missing SERVER_PORT environment variable")
+	}
+
+	if env.RedisPort == "" || env.RedisAddress == "" || env.RedisPassword == "" {
+		return nil, errors.New("missing Redis environment variables")
+	}
+
+	if env.DatabaseHost == "" || env.DatabasePort == "" || env.DatabaseName == "" || env.DatabaseUser == "" || env.DatabasePassword == "" {
+		return nil, errors.New("missing Database environment variables")
+	}
+
+	if env.GoogleCloudProjectId == "" || env.GoogleCloudProjectRegion == "" {
+		return nil, errors.New("missing Google Cloud environment variables")
 	}
 
 	return env, nil
