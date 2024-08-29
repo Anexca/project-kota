@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/redis/go-redis/v9"
@@ -98,7 +97,6 @@ func (q *QuestionService) GenerateDescriptiveQuestions(ctx context.Context, exam
 	if err != nil {
 		return nil, err
 	}
-	log.Println(questions)
 	// Unmarshall and store questions in cache
 	err = json.Unmarshal([]byte(questions), &formattedQuestions)
 	if err != nil {
