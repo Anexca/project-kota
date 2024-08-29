@@ -1,8 +1,6 @@
 package server
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -19,13 +17,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 }
 
 func (s *Server) Sup(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
-	resp["message"] = "Sup"
-
-	jsonResp, err := json.Marshal(resp)
-	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
+	response := Response{
+		Message: "Sup",
 	}
 
-	_, _ = w.Write(jsonResp)
+	s.WriteJson(w, http.StatusOK, &response)
 }
