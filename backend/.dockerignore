@@ -1,0 +1,6 @@
+tmp/
+
+.air*
+main
+Makefile
+*.md
