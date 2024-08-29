@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/redis/go-redis/v9"
@@ -14,12 +15,18 @@ type QuestionService struct {
 	redisService *RedisService
 }
 
-type Question struct {
+type QuestionWithExplanation struct {
 	Type        string   `json:"type"` // Added field to differentiate MCQ and NVQ
 	Question    string   `json:"question"`
 	Options     []string `json:"options,omitempty"` // Optional for NVQs
 	Answer      string   `json:"answer"`
 	Explanation string   `json:"explanation"`
+}
+
+type DescriptiveQuestion struct {
+	Type  string   `json:"type"`
+	Topic string   `json:"topic"`
+	Hint  []string `json:"hint,omitempty"`
 }
 
 func NewQuestionService(genAIClient *genai.Client, redisClient *redis.Client) *QuestionService {
@@ -35,9 +42,9 @@ func NewQuestionService(genAIClient *genai.Client, redisClient *redis.Client) *Q
 const GEN_AI_MODEL = "gemini-1.5-flash"
 const REDIS_CACHE_PREFIX = "QUESTIONS"
 
-func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, examName, subject string, numberOfQuestions int) ([]Question, error) {
+func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, examName, subject string, numberOfQuestions int) ([]QuestionWithExplanation, error) {
 	cachedQuestionKey := generateCacheKey(questionType, examName, subject, numberOfQuestions)
-	var formattedQuestions []Question
+	var formattedQuestions []QuestionWithExplanation
 
 	// Check cache for existing questions
 	cachedQuestions, err := q.redisService.Get(ctx, cachedQuestionKey)
@@ -73,6 +80,32 @@ func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, e
 	}
 
 	q.redisService.Store(ctx, cachedQuestionKey, questions)
+
+	return formattedQuestions, nil
+}
+
+func (q *QuestionService) GenerateDescriptiveQuestions(ctx context.Context, examName string, numberOfQuestions int) ([]DescriptiveQuestion, error) {
+	var formattedQuestions []DescriptiveQuestion
+
+	prompt := fmt.Sprintf(`Generate a JSON array containing %d Descriptive questions for the %s exam. 
+							Essay should be a one sentence topic, letter writing should be formal.
+                            Each question should have a "type" should be either formal letter or essay, "topic" should be the question itself, "hint" should be an array of hints for topic.
+                            The JSON output should be a single-line string without any extra formatting.`,
+		numberOfQuestions, examName)
+
+	questions, err := q.genAIService.GetContentStream(ctx, prompt, GEN_AI_MODEL)
+
+	if err != nil {
+		return nil, err
+	}
+	log.Println(questions)
+	// Unmarshall and store questions in cache
+	err = json.Unmarshal([]byte(questions), &formattedQuestions)
+	if err != nil {
+		return nil, err
+	}
+
+	q.redisService.Store(ctx, "KEY", questions)
 
 	return formattedQuestions, nil
 }
