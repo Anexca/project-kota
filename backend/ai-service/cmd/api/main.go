@@ -2,6 +2,7 @@ package main
 
 import (
 	"ai-service/internal/server"
+	"ai-service/internal/workers"
 	"ai-service/pkg/client"
 	"context"
 	"fmt"
@@ -22,6 +23,11 @@ func main() {
 		log.Fatalln(err)
 	}
 	defer redisClient.Close()
+
+	c := workers.InitWorkers()
+	c.Start()
+
+	defer c.Stop()
 
 	server := server.InitServer(genAiClient, redisClient)
 
