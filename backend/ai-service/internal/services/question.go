@@ -1,6 +1,7 @@
 package services
 
 import (
+	util "common/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -103,7 +104,8 @@ func (q *QuestionService) GenerateDescriptiveQuestions(ctx context.Context, exam
 		return nil, err
 	}
 
-	q.redisService.Store(ctx, "KEY", questions)
+	uid := util.GenerateUUID()
+	q.redisService.Store(ctx, uid, questions)
 
 	return formattedQuestions, nil
 }
