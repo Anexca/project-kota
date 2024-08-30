@@ -12,6 +12,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"ai-service/internal/services"
+	"ai-service/pkg/config"
 )
 
 type Server struct {
@@ -22,6 +23,8 @@ type Server struct {
 
 func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+
+	logger := config.SetupLogger()
 
 	questionService := services.NewQuestionService(genAiClient, redisClient)
 	redisService := services.NewRedisService(redisClient)
@@ -39,6 +42,7 @@ func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Serv
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
+		ErrorLog:     logger,
 	}
 
 	return server

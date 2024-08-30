@@ -1,7 +1,7 @@
 package workers
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/robfig/cron/v3"
 )
@@ -9,6 +9,9 @@ import (
 func InitWorkers() *cron.Cron {
 	c := cron.New()
 
-	c.AddFunc("*/1 * * * *", func() { fmt.Println("Every hour on the half hour") })
+	c.AddFunc("*/1 * * * *", func() {
+		log.Println("Every Minute")
+	})
+
 	return c
 }
