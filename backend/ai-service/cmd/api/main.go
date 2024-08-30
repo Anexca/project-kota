@@ -24,7 +24,7 @@ func main() {
 	}
 	defer redisClient.Close()
 
-	c := workers.InitWorkers()
+	c := workers.InitWorkers(genAiClient, redisClient)
 	c.Start()
 
 	defer c.Stop()

@@ -39,7 +39,7 @@ func NewQuestionService(genAIClient *genai.Client, redisClient *redis.Client) *Q
 	}
 }
 
-const GEN_AI_MODEL = "gemini-1.5-flash"
+const GEN_AI_MODEL = "gemini-1.5-pro"
 const REDIS_CACHE_PREFIX = "QUESTIONS"
 
 func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, examName, subject string, numberOfQuestions int) ([]QuestionWithExplanation, error) {
