@@ -6,15 +6,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/redis/go-redis/v9"
 )
 
 type QuestionService struct {
-	genAIService   *GenAIService
-	redisService   *RedisService
-	examRepository *repositories.ExamRepository
+	genAIService           *GenAIService
+	redisService           *RedisService
+	examRepository         *repositories.ExamRepository
+	examCategoryRepository *repositories.ExamCategoryRepository
 }
 
 type QuestionWithExplanation struct {
@@ -35,11 +37,13 @@ func NewQuestionService(genAIClient *genai.Client, redisClient *redis.Client, db
 	genAIService := NewGenAIService(genAIClient)
 	redisService := NewRedisService(redisClient)
 	examRepository := repositories.NewExamRespository(dbClient)
+	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
 
 	return &QuestionService{
-		genAIService:   genAIService,
-		redisService:   redisService,
-		examRepository: examRepository,
+		genAIService:           genAIService,
+		redisService:           redisService,
+		examRepository:         examRepository,
+		examCategoryRepository: examCategoryRepository,
 	}
 }
 
@@ -88,8 +92,21 @@ func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, e
 	return formattedQuestions, nil
 }
 
-func (q *QuestionService) GenerateDescriptiveQuestions(ctx context.Context, examName string, numberOfQuestions int) ([]DescriptiveQuestion, error) {
+func (q *QuestionService) GenerateDescriptiveQuestions(ctx context.Context, examName string, numberOfQuestions int) (any, error) {
 	var formattedQuestions []DescriptiveQuestion
+
+	examCategories, err := q.examCategoryRepository.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, cat := range examCategories {
+		exam, err := q.examRepository.GetByExamCategory(ctx, cat)
+		if err != nil {
+			return nil, err
+		}
+
+		log.Println(exam)
+	}
 
 	// prompt := fmt.Sprintf(`Generate a JSON array containing %d Descriptive questions for the %s exam.
 	// 						Essay should be a one sentence topic, letter writing should be formal.

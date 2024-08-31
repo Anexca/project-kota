@@ -17,11 +17,11 @@ func NewExamRespository(dbClient *ent.Client) *ExamRepository {
 	}
 }
 
-func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategor *ent.ExamCategory) ([]*ent.Exam, error) {
+func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategory *ent.ExamCategory) ([]*ent.Exam, error) {
 	return e.dbClient.Exam.
 		Query().
 		Where(exam.HasCategoryWith(
-			examcategory.ID(examCategor.ID),
+			examcategory.ID(examCategory.ID),
 		)).
 		All(ctx)
 }

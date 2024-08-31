@@ -3,6 +3,7 @@ package workers
 import (
 	"ai-service/internal/services"
 	"common/ent"
+	"context"
 	"log"
 
 	"cloud.google.com/go/vertexai/genai"
@@ -32,11 +33,11 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient 
 
 func (w *Worker) RegisterWorkers() {
 	w.cronHandler.AddFunc("*/1 * * * *", func() {
-		// ctx := context.Background()
+		ctx := context.Background()
 		log.Println("Every Minute")
-		// _, err := w.questionService.GenerateDescriptiveQuestions(ctx, "IBPS PO Mains", 10)
-		// if err != nil {
-		// 	log.Printf("Failed to generate questions: %v", err)
-		// }
+		_, err := w.questionService.GenerateDescriptiveQuestions(ctx, "IBPS PO Mains", 10)
+		if err != nil {
+			log.Printf("Failed to generate questions: %v", err)
+		}
 	})
 }
