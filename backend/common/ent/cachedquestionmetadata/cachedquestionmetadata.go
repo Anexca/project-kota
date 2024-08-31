@@ -10,35 +10,29 @@ import (
 
 const (
 	// Label holds the string label denoting the cachedquestionmetadata type in the database.
-	Label = "cached_question_metadata"
+	Label = "cached_question_meta_data"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldKey holds the string denoting the key field in the database.
-	FieldKey = "key"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
-	// FieldSubject holds the string denoting the subject field in the database.
-	FieldSubject = "subject"
-	// FieldExam holds the string denoting the exam field in the database.
-	FieldExam = "exam"
-	// FieldIsProcessed holds the string denoting the is_processed field in the database.
-	FieldIsProcessed = "is_processed"
+	// FieldCacheUID holds the string denoting the cache_uid field in the database.
+	FieldCacheUID = "cache_uid"
+	// FieldIsUsed holds the string denoting the is_used field in the database.
+	FieldIsUsed = "is_used"
+	// FieldExpiresAt holds the string denoting the expires_at field in the database.
+	FieldExpiresAt = "expires_at"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the cachedquestionmetadata in the database.
-	Table = "cached_question_metadata"
+	Table = "cached_question_meta_data"
 )
 
 // Columns holds all SQL columns for cachedquestionmetadata fields.
 var Columns = []string{
 	FieldID,
-	FieldKey,
-	FieldType,
-	FieldSubject,
-	FieldExam,
-	FieldIsProcessed,
+	FieldCacheUID,
+	FieldIsUsed,
+	FieldExpiresAt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -54,8 +48,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultIsProcessed holds the default value on creation for the "is_processed" field.
-	DefaultIsProcessed bool
+	// DefaultIsUsed holds the default value on creation for the "is_used" field.
+	DefaultIsUsed bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -64,7 +58,7 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
-// OrderOption defines the ordering options for the CachedQuestionMetadata queries.
+// OrderOption defines the ordering options for the CachedQuestionMetaData queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
@@ -72,29 +66,19 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByKey orders the results by the key field.
-func ByKey(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldKey, opts...).ToFunc()
+// ByCacheUID orders the results by the cache_uid field.
+func ByCacheUID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCacheUID, opts...).ToFunc()
 }
 
-// ByType orders the results by the type field.
-func ByType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldType, opts...).ToFunc()
+// ByIsUsed orders the results by the is_used field.
+func ByIsUsed(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsUsed, opts...).ToFunc()
 }
 
-// BySubject orders the results by the subject field.
-func BySubject(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSubject, opts...).ToFunc()
-}
-
-// ByExam orders the results by the exam field.
-func ByExam(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldExam, opts...).ToFunc()
-}
-
-// ByIsProcessed orders the results by the is_processed field.
-func ByIsProcessed(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsProcessed, opts...).ToFunc()
+// ByExpiresAt orders the results by the expires_at field.
+func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

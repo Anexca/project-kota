@@ -10,446 +10,281 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldID, id))
+func ID(id int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldID, id))
+func IDEQ(id int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldID, id))
+func IDNEQ(id int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldIn(FieldID, ids...))
+func IDIn(ids ...int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNotIn(FieldID, ids...))
+func IDNotIn(ids ...int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGT(FieldID, id))
+func IDGT(id int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGTE(FieldID, id))
+func IDGTE(id int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLT(FieldID, id))
+func IDLT(id int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLTE(FieldID, id))
+func IDLTE(id int) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLTE(FieldID, id))
 }
 
-// Key applies equality check predicate on the "key" field. It's identical to KeyEQ.
-func Key(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldKey, v))
+// CacheUID applies equality check predicate on the "cache_uid" field. It's identical to CacheUIDEQ.
+func CacheUID(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldCacheUID, v))
 }
 
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldType, v))
+// IsUsed applies equality check predicate on the "is_used" field. It's identical to IsUsedEQ.
+func IsUsed(v bool) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldIsUsed, v))
 }
 
-// Subject applies equality check predicate on the "subject" field. It's identical to SubjectEQ.
-func Subject(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldSubject, v))
-}
-
-// Exam applies equality check predicate on the "exam" field. It's identical to ExamEQ.
-func Exam(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldExam, v))
-}
-
-// IsProcessed applies equality check predicate on the "is_processed" field. It's identical to IsProcessedEQ.
-func IsProcessed(v bool) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldIsProcessed, v))
+// ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
+func ExpiresAt(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldExpiresAt, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldCreatedAt, v))
+func CreatedAt(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldUpdatedAt, v))
+func UpdatedAt(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// KeyEQ applies the EQ predicate on the "key" field.
-func KeyEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldKey, v))
+// CacheUIDEQ applies the EQ predicate on the "cache_uid" field.
+func CacheUIDEQ(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldCacheUID, v))
 }
 
-// KeyNEQ applies the NEQ predicate on the "key" field.
-func KeyNEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldKey, v))
+// CacheUIDNEQ applies the NEQ predicate on the "cache_uid" field.
+func CacheUIDNEQ(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNEQ(FieldCacheUID, v))
 }
 
-// KeyIn applies the In predicate on the "key" field.
-func KeyIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldIn(FieldKey, vs...))
+// CacheUIDIn applies the In predicate on the "cache_uid" field.
+func CacheUIDIn(vs ...string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldIn(FieldCacheUID, vs...))
 }
 
-// KeyNotIn applies the NotIn predicate on the "key" field.
-func KeyNotIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNotIn(FieldKey, vs...))
+// CacheUIDNotIn applies the NotIn predicate on the "cache_uid" field.
+func CacheUIDNotIn(vs ...string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNotIn(FieldCacheUID, vs...))
 }
 
-// KeyGT applies the GT predicate on the "key" field.
-func KeyGT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGT(FieldKey, v))
+// CacheUIDGT applies the GT predicate on the "cache_uid" field.
+func CacheUIDGT(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGT(FieldCacheUID, v))
 }
 
-// KeyGTE applies the GTE predicate on the "key" field.
-func KeyGTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGTE(FieldKey, v))
+// CacheUIDGTE applies the GTE predicate on the "cache_uid" field.
+func CacheUIDGTE(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGTE(FieldCacheUID, v))
 }
 
-// KeyLT applies the LT predicate on the "key" field.
-func KeyLT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLT(FieldKey, v))
+// CacheUIDLT applies the LT predicate on the "cache_uid" field.
+func CacheUIDLT(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLT(FieldCacheUID, v))
 }
 
-// KeyLTE applies the LTE predicate on the "key" field.
-func KeyLTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLTE(FieldKey, v))
+// CacheUIDLTE applies the LTE predicate on the "cache_uid" field.
+func CacheUIDLTE(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLTE(FieldCacheUID, v))
 }
 
-// KeyContains applies the Contains predicate on the "key" field.
-func KeyContains(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContains(FieldKey, v))
+// CacheUIDContains applies the Contains predicate on the "cache_uid" field.
+func CacheUIDContains(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldContains(FieldCacheUID, v))
 }
 
-// KeyHasPrefix applies the HasPrefix predicate on the "key" field.
-func KeyHasPrefix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasPrefix(FieldKey, v))
+// CacheUIDHasPrefix applies the HasPrefix predicate on the "cache_uid" field.
+func CacheUIDHasPrefix(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldHasPrefix(FieldCacheUID, v))
 }
 
-// KeyHasSuffix applies the HasSuffix predicate on the "key" field.
-func KeyHasSuffix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasSuffix(FieldKey, v))
+// CacheUIDHasSuffix applies the HasSuffix predicate on the "cache_uid" field.
+func CacheUIDHasSuffix(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldHasSuffix(FieldCacheUID, v))
 }
 
-// KeyEqualFold applies the EqualFold predicate on the "key" field.
-func KeyEqualFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEqualFold(FieldKey, v))
+// CacheUIDEqualFold applies the EqualFold predicate on the "cache_uid" field.
+func CacheUIDEqualFold(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEqualFold(FieldCacheUID, v))
 }
 
-// KeyContainsFold applies the ContainsFold predicate on the "key" field.
-func KeyContainsFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContainsFold(FieldKey, v))
+// CacheUIDContainsFold applies the ContainsFold predicate on the "cache_uid" field.
+func CacheUIDContainsFold(v string) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldContainsFold(FieldCacheUID, v))
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldType, v))
+// IsUsedEQ applies the EQ predicate on the "is_used" field.
+func IsUsedEQ(v bool) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldIsUsed, v))
 }
 
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldType, v))
+// IsUsedNEQ applies the NEQ predicate on the "is_used" field.
+func IsUsedNEQ(v bool) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNEQ(FieldIsUsed, v))
 }
 
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldIn(FieldType, vs...))
+// ExpiresAtEQ applies the EQ predicate on the "expires_at" field.
+func ExpiresAtEQ(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldExpiresAt, v))
 }
 
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNotIn(FieldType, vs...))
+// ExpiresAtNEQ applies the NEQ predicate on the "expires_at" field.
+func ExpiresAtNEQ(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNEQ(FieldExpiresAt, v))
 }
 
-// TypeGT applies the GT predicate on the "type" field.
-func TypeGT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGT(FieldType, v))
+// ExpiresAtIn applies the In predicate on the "expires_at" field.
+func ExpiresAtIn(vs ...time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldIn(FieldExpiresAt, vs...))
 }
 
-// TypeGTE applies the GTE predicate on the "type" field.
-func TypeGTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGTE(FieldType, v))
+// ExpiresAtNotIn applies the NotIn predicate on the "expires_at" field.
+func ExpiresAtNotIn(vs ...time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNotIn(FieldExpiresAt, vs...))
 }
 
-// TypeLT applies the LT predicate on the "type" field.
-func TypeLT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLT(FieldType, v))
+// ExpiresAtGT applies the GT predicate on the "expires_at" field.
+func ExpiresAtGT(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGT(FieldExpiresAt, v))
 }
 
-// TypeLTE applies the LTE predicate on the "type" field.
-func TypeLTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLTE(FieldType, v))
+// ExpiresAtGTE applies the GTE predicate on the "expires_at" field.
+func ExpiresAtGTE(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGTE(FieldExpiresAt, v))
 }
 
-// TypeContains applies the Contains predicate on the "type" field.
-func TypeContains(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContains(FieldType, v))
+// ExpiresAtLT applies the LT predicate on the "expires_at" field.
+func ExpiresAtLT(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLT(FieldExpiresAt, v))
 }
 
-// TypeHasPrefix applies the HasPrefix predicate on the "type" field.
-func TypeHasPrefix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasPrefix(FieldType, v))
-}
-
-// TypeHasSuffix applies the HasSuffix predicate on the "type" field.
-func TypeHasSuffix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasSuffix(FieldType, v))
-}
-
-// TypeEqualFold applies the EqualFold predicate on the "type" field.
-func TypeEqualFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEqualFold(FieldType, v))
-}
-
-// TypeContainsFold applies the ContainsFold predicate on the "type" field.
-func TypeContainsFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContainsFold(FieldType, v))
-}
-
-// SubjectEQ applies the EQ predicate on the "subject" field.
-func SubjectEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldSubject, v))
-}
-
-// SubjectNEQ applies the NEQ predicate on the "subject" field.
-func SubjectNEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldSubject, v))
-}
-
-// SubjectIn applies the In predicate on the "subject" field.
-func SubjectIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldIn(FieldSubject, vs...))
-}
-
-// SubjectNotIn applies the NotIn predicate on the "subject" field.
-func SubjectNotIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNotIn(FieldSubject, vs...))
-}
-
-// SubjectGT applies the GT predicate on the "subject" field.
-func SubjectGT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGT(FieldSubject, v))
-}
-
-// SubjectGTE applies the GTE predicate on the "subject" field.
-func SubjectGTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGTE(FieldSubject, v))
-}
-
-// SubjectLT applies the LT predicate on the "subject" field.
-func SubjectLT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLT(FieldSubject, v))
-}
-
-// SubjectLTE applies the LTE predicate on the "subject" field.
-func SubjectLTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLTE(FieldSubject, v))
-}
-
-// SubjectContains applies the Contains predicate on the "subject" field.
-func SubjectContains(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContains(FieldSubject, v))
-}
-
-// SubjectHasPrefix applies the HasPrefix predicate on the "subject" field.
-func SubjectHasPrefix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasPrefix(FieldSubject, v))
-}
-
-// SubjectHasSuffix applies the HasSuffix predicate on the "subject" field.
-func SubjectHasSuffix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasSuffix(FieldSubject, v))
-}
-
-// SubjectEqualFold applies the EqualFold predicate on the "subject" field.
-func SubjectEqualFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEqualFold(FieldSubject, v))
-}
-
-// SubjectContainsFold applies the ContainsFold predicate on the "subject" field.
-func SubjectContainsFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContainsFold(FieldSubject, v))
-}
-
-// ExamEQ applies the EQ predicate on the "exam" field.
-func ExamEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldExam, v))
-}
-
-// ExamNEQ applies the NEQ predicate on the "exam" field.
-func ExamNEQ(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldExam, v))
-}
-
-// ExamIn applies the In predicate on the "exam" field.
-func ExamIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldIn(FieldExam, vs...))
-}
-
-// ExamNotIn applies the NotIn predicate on the "exam" field.
-func ExamNotIn(vs ...string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNotIn(FieldExam, vs...))
-}
-
-// ExamGT applies the GT predicate on the "exam" field.
-func ExamGT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGT(FieldExam, v))
-}
-
-// ExamGTE applies the GTE predicate on the "exam" field.
-func ExamGTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGTE(FieldExam, v))
-}
-
-// ExamLT applies the LT predicate on the "exam" field.
-func ExamLT(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLT(FieldExam, v))
-}
-
-// ExamLTE applies the LTE predicate on the "exam" field.
-func ExamLTE(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLTE(FieldExam, v))
-}
-
-// ExamContains applies the Contains predicate on the "exam" field.
-func ExamContains(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContains(FieldExam, v))
-}
-
-// ExamHasPrefix applies the HasPrefix predicate on the "exam" field.
-func ExamHasPrefix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasPrefix(FieldExam, v))
-}
-
-// ExamHasSuffix applies the HasSuffix predicate on the "exam" field.
-func ExamHasSuffix(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldHasSuffix(FieldExam, v))
-}
-
-// ExamEqualFold applies the EqualFold predicate on the "exam" field.
-func ExamEqualFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEqualFold(FieldExam, v))
-}
-
-// ExamContainsFold applies the ContainsFold predicate on the "exam" field.
-func ExamContainsFold(v string) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldContainsFold(FieldExam, v))
-}
-
-// IsProcessedEQ applies the EQ predicate on the "is_processed" field.
-func IsProcessedEQ(v bool) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldIsProcessed, v))
-}
-
-// IsProcessedNEQ applies the NEQ predicate on the "is_processed" field.
-func IsProcessedNEQ(v bool) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldIsProcessed, v))
+// ExpiresAtLTE applies the LTE predicate on the "expires_at" field.
+func ExpiresAtLTE(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLTE(FieldExpiresAt, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldCreatedAt, v))
+func CreatedAtEQ(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldCreatedAt, v))
+func CreatedAtNEQ(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldIn(FieldCreatedAt, vs...))
+func CreatedAtIn(vs ...time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNotIn(FieldCreatedAt, vs...))
+func CreatedAtNotIn(vs ...time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGT(FieldCreatedAt, v))
+func CreatedAtGT(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGTE(FieldCreatedAt, v))
+func CreatedAtGTE(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLT(FieldCreatedAt, v))
+func CreatedAtLT(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLTE(FieldCreatedAt, v))
+func CreatedAtLTE(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldEQ(FieldUpdatedAt, v))
+func UpdatedAtEQ(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNEQ(FieldUpdatedAt, v))
+func UpdatedAtNEQ(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldIn(FieldUpdatedAt, vs...))
+func UpdatedAtIn(vs ...time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldNotIn(FieldUpdatedAt, vs...))
+func UpdatedAtNotIn(vs ...time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGT(FieldUpdatedAt, v))
+func UpdatedAtGT(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldGTE(FieldUpdatedAt, v))
+func UpdatedAtGTE(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldGTE(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLT(FieldUpdatedAt, v))
+func UpdatedAtLT(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.FieldLTE(FieldUpdatedAt, v))
+func UpdatedAtLTE(v time.Time) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // And groups predicates with the AND operator between them.
-func And(predicates ...predicate.CachedQuestionMetadata) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.AndPredicates(predicates...))
+func And(predicates ...predicate.CachedQuestionMetaData) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
-func Or(predicates ...predicate.CachedQuestionMetadata) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.OrPredicates(predicates...))
+func Or(predicates ...predicate.CachedQuestionMetaData) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
-func Not(p predicate.CachedQuestionMetadata) predicate.CachedQuestionMetadata {
-	return predicate.CachedQuestionMetadata(sql.NotPredicates(p))
+func Not(p predicate.CachedQuestionMetaData) predicate.CachedQuestionMetaData {
+	return predicate.CachedQuestionMetaData(sql.NotPredicates(p))
 }

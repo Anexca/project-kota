@@ -8,22 +8,20 @@ import (
 )
 
 var (
-	// CachedQuestionMetadataColumns holds the columns for the "cached_question_metadata" table.
-	CachedQuestionMetadataColumns = []*schema.Column{
+	// CachedQuestionMetaDataColumns holds the columns for the "cached_question_meta_data" table.
+	CachedQuestionMetaDataColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "key", Type: field.TypeString, Unique: true},
-		{Name: "type", Type: field.TypeString},
-		{Name: "subject", Type: field.TypeString},
-		{Name: "exam", Type: field.TypeString},
-		{Name: "is_processed", Type: field.TypeBool, Default: false},
+		{Name: "cache_uid", Type: field.TypeString, Unique: true},
+		{Name: "is_used", Type: field.TypeBool, Default: false},
+		{Name: "expires_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
-	// CachedQuestionMetadataTable holds the schema information for the "cached_question_metadata" table.
-	CachedQuestionMetadataTable = &schema.Table{
-		Name:       "cached_question_metadata",
-		Columns:    CachedQuestionMetadataColumns,
-		PrimaryKey: []*schema.Column{CachedQuestionMetadataColumns[0]},
+	// CachedQuestionMetaDataTable holds the schema information for the "cached_question_meta_data" table.
+	CachedQuestionMetaDataTable = &schema.Table{
+		Name:       "cached_question_meta_data",
+		Columns:    CachedQuestionMetaDataColumns,
+		PrimaryKey: []*schema.Column{CachedQuestionMetaDataColumns[0]},
 	}
 	// ExamsColumns holds the columns for the "exams" table.
 	ExamsColumns = []*schema.Column{
@@ -89,7 +87,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		CachedQuestionMetadataTable,
+		CachedQuestionMetaDataTable,
 		ExamsTable,
 		ExamCategoriesTable,
 		ExamSettingsTable,

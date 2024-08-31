@@ -14,18 +14,18 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	cachedquestionmetadataFields := schema.CachedQuestionMetadata{}.Fields()
+	cachedquestionmetadataFields := schema.CachedQuestionMetaData{}.Fields()
 	_ = cachedquestionmetadataFields
-	// cachedquestionmetadataDescIsProcessed is the schema descriptor for is_processed field.
-	cachedquestionmetadataDescIsProcessed := cachedquestionmetadataFields[4].Descriptor()
-	// cachedquestionmetadata.DefaultIsProcessed holds the default value on creation for the is_processed field.
-	cachedquestionmetadata.DefaultIsProcessed = cachedquestionmetadataDescIsProcessed.Default.(bool)
+	// cachedquestionmetadataDescIsUsed is the schema descriptor for is_used field.
+	cachedquestionmetadataDescIsUsed := cachedquestionmetadataFields[1].Descriptor()
+	// cachedquestionmetadata.DefaultIsUsed holds the default value on creation for the is_used field.
+	cachedquestionmetadata.DefaultIsUsed = cachedquestionmetadataDescIsUsed.Default.(bool)
 	// cachedquestionmetadataDescCreatedAt is the schema descriptor for created_at field.
-	cachedquestionmetadataDescCreatedAt := cachedquestionmetadataFields[5].Descriptor()
+	cachedquestionmetadataDescCreatedAt := cachedquestionmetadataFields[3].Descriptor()
 	// cachedquestionmetadata.DefaultCreatedAt holds the default value on creation for the created_at field.
 	cachedquestionmetadata.DefaultCreatedAt = cachedquestionmetadataDescCreatedAt.Default.(func() time.Time)
 	// cachedquestionmetadataDescUpdatedAt is the schema descriptor for updated_at field.
-	cachedquestionmetadataDescUpdatedAt := cachedquestionmetadataFields[6].Descriptor()
+	cachedquestionmetadataDescUpdatedAt := cachedquestionmetadataFields[4].Descriptor()
 	// cachedquestionmetadata.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	cachedquestionmetadata.DefaultUpdatedAt = cachedquestionmetadataDescUpdatedAt.Default.(func() time.Time)
 	// cachedquestionmetadata.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

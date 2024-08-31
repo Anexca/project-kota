@@ -13,93 +13,81 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CachedQuestionMetadataCreate is the builder for creating a CachedQuestionMetadata entity.
-type CachedQuestionMetadataCreate struct {
+// CachedQuestionMetaDataCreate is the builder for creating a CachedQuestionMetaData entity.
+type CachedQuestionMetaDataCreate struct {
 	config
-	mutation *CachedQuestionMetadataMutation
+	mutation *CachedQuestionMetaDataMutation
 	hooks    []Hook
 }
 
-// SetKey sets the "key" field.
-func (cqmc *CachedQuestionMetadataCreate) SetKey(s string) *CachedQuestionMetadataCreate {
-	cqmc.mutation.SetKey(s)
-	return cqmc
+// SetCacheUID sets the "cache_uid" field.
+func (cqmdc *CachedQuestionMetaDataCreate) SetCacheUID(s string) *CachedQuestionMetaDataCreate {
+	cqmdc.mutation.SetCacheUID(s)
+	return cqmdc
 }
 
-// SetType sets the "type" field.
-func (cqmc *CachedQuestionMetadataCreate) SetType(s string) *CachedQuestionMetadataCreate {
-	cqmc.mutation.SetType(s)
-	return cqmc
+// SetIsUsed sets the "is_used" field.
+func (cqmdc *CachedQuestionMetaDataCreate) SetIsUsed(b bool) *CachedQuestionMetaDataCreate {
+	cqmdc.mutation.SetIsUsed(b)
+	return cqmdc
 }
 
-// SetSubject sets the "subject" field.
-func (cqmc *CachedQuestionMetadataCreate) SetSubject(s string) *CachedQuestionMetadataCreate {
-	cqmc.mutation.SetSubject(s)
-	return cqmc
-}
-
-// SetExam sets the "exam" field.
-func (cqmc *CachedQuestionMetadataCreate) SetExam(s string) *CachedQuestionMetadataCreate {
-	cqmc.mutation.SetExam(s)
-	return cqmc
-}
-
-// SetIsProcessed sets the "is_processed" field.
-func (cqmc *CachedQuestionMetadataCreate) SetIsProcessed(b bool) *CachedQuestionMetadataCreate {
-	cqmc.mutation.SetIsProcessed(b)
-	return cqmc
-}
-
-// SetNillableIsProcessed sets the "is_processed" field if the given value is not nil.
-func (cqmc *CachedQuestionMetadataCreate) SetNillableIsProcessed(b *bool) *CachedQuestionMetadataCreate {
+// SetNillableIsUsed sets the "is_used" field if the given value is not nil.
+func (cqmdc *CachedQuestionMetaDataCreate) SetNillableIsUsed(b *bool) *CachedQuestionMetaDataCreate {
 	if b != nil {
-		cqmc.SetIsProcessed(*b)
+		cqmdc.SetIsUsed(*b)
 	}
-	return cqmc
+	return cqmdc
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (cqmdc *CachedQuestionMetaDataCreate) SetExpiresAt(t time.Time) *CachedQuestionMetaDataCreate {
+	cqmdc.mutation.SetExpiresAt(t)
+	return cqmdc
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (cqmc *CachedQuestionMetadataCreate) SetCreatedAt(t time.Time) *CachedQuestionMetadataCreate {
-	cqmc.mutation.SetCreatedAt(t)
-	return cqmc
+func (cqmdc *CachedQuestionMetaDataCreate) SetCreatedAt(t time.Time) *CachedQuestionMetaDataCreate {
+	cqmdc.mutation.SetCreatedAt(t)
+	return cqmdc
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cqmc *CachedQuestionMetadataCreate) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetadataCreate {
+func (cqmdc *CachedQuestionMetaDataCreate) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetaDataCreate {
 	if t != nil {
-		cqmc.SetCreatedAt(*t)
+		cqmdc.SetCreatedAt(*t)
 	}
-	return cqmc
+	return cqmdc
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cqmc *CachedQuestionMetadataCreate) SetUpdatedAt(t time.Time) *CachedQuestionMetadataCreate {
-	cqmc.mutation.SetUpdatedAt(t)
-	return cqmc
+func (cqmdc *CachedQuestionMetaDataCreate) SetUpdatedAt(t time.Time) *CachedQuestionMetaDataCreate {
+	cqmdc.mutation.SetUpdatedAt(t)
+	return cqmdc
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (cqmc *CachedQuestionMetadataCreate) SetNillableUpdatedAt(t *time.Time) *CachedQuestionMetadataCreate {
+func (cqmdc *CachedQuestionMetaDataCreate) SetNillableUpdatedAt(t *time.Time) *CachedQuestionMetaDataCreate {
 	if t != nil {
-		cqmc.SetUpdatedAt(*t)
+		cqmdc.SetUpdatedAt(*t)
 	}
-	return cqmc
+	return cqmdc
 }
 
-// Mutation returns the CachedQuestionMetadataMutation object of the builder.
-func (cqmc *CachedQuestionMetadataCreate) Mutation() *CachedQuestionMetadataMutation {
-	return cqmc.mutation
+// Mutation returns the CachedQuestionMetaDataMutation object of the builder.
+func (cqmdc *CachedQuestionMetaDataCreate) Mutation() *CachedQuestionMetaDataMutation {
+	return cqmdc.mutation
 }
 
-// Save creates the CachedQuestionMetadata in the database.
-func (cqmc *CachedQuestionMetadataCreate) Save(ctx context.Context) (*CachedQuestionMetadata, error) {
-	cqmc.defaults()
-	return withHooks(ctx, cqmc.sqlSave, cqmc.mutation, cqmc.hooks)
+// Save creates the CachedQuestionMetaData in the database.
+func (cqmdc *CachedQuestionMetaDataCreate) Save(ctx context.Context) (*CachedQuestionMetaData, error) {
+	cqmdc.defaults()
+	return withHooks(ctx, cqmdc.sqlSave, cqmdc.mutation, cqmdc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (cqmc *CachedQuestionMetadataCreate) SaveX(ctx context.Context) *CachedQuestionMetadata {
-	v, err := cqmc.Save(ctx)
+func (cqmdc *CachedQuestionMetaDataCreate) SaveX(ctx context.Context) *CachedQuestionMetaData {
+	v, err := cqmdc.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -107,66 +95,60 @@ func (cqmc *CachedQuestionMetadataCreate) SaveX(ctx context.Context) *CachedQues
 }
 
 // Exec executes the query.
-func (cqmc *CachedQuestionMetadataCreate) Exec(ctx context.Context) error {
-	_, err := cqmc.Save(ctx)
+func (cqmdc *CachedQuestionMetaDataCreate) Exec(ctx context.Context) error {
+	_, err := cqmdc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cqmc *CachedQuestionMetadataCreate) ExecX(ctx context.Context) {
-	if err := cqmc.Exec(ctx); err != nil {
+func (cqmdc *CachedQuestionMetaDataCreate) ExecX(ctx context.Context) {
+	if err := cqmdc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cqmc *CachedQuestionMetadataCreate) defaults() {
-	if _, ok := cqmc.mutation.IsProcessed(); !ok {
-		v := cachedquestionmetadata.DefaultIsProcessed
-		cqmc.mutation.SetIsProcessed(v)
+func (cqmdc *CachedQuestionMetaDataCreate) defaults() {
+	if _, ok := cqmdc.mutation.IsUsed(); !ok {
+		v := cachedquestionmetadata.DefaultIsUsed
+		cqmdc.mutation.SetIsUsed(v)
 	}
-	if _, ok := cqmc.mutation.CreatedAt(); !ok {
+	if _, ok := cqmdc.mutation.CreatedAt(); !ok {
 		v := cachedquestionmetadata.DefaultCreatedAt()
-		cqmc.mutation.SetCreatedAt(v)
+		cqmdc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := cqmc.mutation.UpdatedAt(); !ok {
+	if _, ok := cqmdc.mutation.UpdatedAt(); !ok {
 		v := cachedquestionmetadata.DefaultUpdatedAt()
-		cqmc.mutation.SetUpdatedAt(v)
+		cqmdc.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cqmc *CachedQuestionMetadataCreate) check() error {
-	if _, ok := cqmc.mutation.Key(); !ok {
-		return &ValidationError{Name: "key", err: errors.New(`ent: missing required field "CachedQuestionMetadata.key"`)}
+func (cqmdc *CachedQuestionMetaDataCreate) check() error {
+	if _, ok := cqmdc.mutation.CacheUID(); !ok {
+		return &ValidationError{Name: "cache_uid", err: errors.New(`ent: missing required field "CachedQuestionMetaData.cache_uid"`)}
 	}
-	if _, ok := cqmc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "CachedQuestionMetadata.type"`)}
+	if _, ok := cqmdc.mutation.IsUsed(); !ok {
+		return &ValidationError{Name: "is_used", err: errors.New(`ent: missing required field "CachedQuestionMetaData.is_used"`)}
 	}
-	if _, ok := cqmc.mutation.Subject(); !ok {
-		return &ValidationError{Name: "subject", err: errors.New(`ent: missing required field "CachedQuestionMetadata.subject"`)}
+	if _, ok := cqmdc.mutation.ExpiresAt(); !ok {
+		return &ValidationError{Name: "expires_at", err: errors.New(`ent: missing required field "CachedQuestionMetaData.expires_at"`)}
 	}
-	if _, ok := cqmc.mutation.Exam(); !ok {
-		return &ValidationError{Name: "exam", err: errors.New(`ent: missing required field "CachedQuestionMetadata.exam"`)}
+	if _, ok := cqmdc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "CachedQuestionMetaData.created_at"`)}
 	}
-	if _, ok := cqmc.mutation.IsProcessed(); !ok {
-		return &ValidationError{Name: "is_processed", err: errors.New(`ent: missing required field "CachedQuestionMetadata.is_processed"`)}
-	}
-	if _, ok := cqmc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "CachedQuestionMetadata.created_at"`)}
-	}
-	if _, ok := cqmc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "CachedQuestionMetadata.updated_at"`)}
+	if _, ok := cqmdc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "CachedQuestionMetaData.updated_at"`)}
 	}
 	return nil
 }
 
-func (cqmc *CachedQuestionMetadataCreate) sqlSave(ctx context.Context) (*CachedQuestionMetadata, error) {
-	if err := cqmc.check(); err != nil {
+func (cqmdc *CachedQuestionMetaDataCreate) sqlSave(ctx context.Context) (*CachedQuestionMetaData, error) {
+	if err := cqmdc.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := cqmc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, cqmc.driver, _spec); err != nil {
+	_node, _spec := cqmdc.createSpec()
+	if err := sqlgraph.CreateNode(ctx, cqmdc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -174,68 +156,60 @@ func (cqmc *CachedQuestionMetadataCreate) sqlSave(ctx context.Context) (*CachedQ
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	cqmc.mutation.id = &_node.ID
-	cqmc.mutation.done = true
+	cqmdc.mutation.id = &_node.ID
+	cqmdc.mutation.done = true
 	return _node, nil
 }
 
-func (cqmc *CachedQuestionMetadataCreate) createSpec() (*CachedQuestionMetadata, *sqlgraph.CreateSpec) {
+func (cqmdc *CachedQuestionMetaDataCreate) createSpec() (*CachedQuestionMetaData, *sqlgraph.CreateSpec) {
 	var (
-		_node = &CachedQuestionMetadata{config: cqmc.config}
+		_node = &CachedQuestionMetaData{config: cqmdc.config}
 		_spec = sqlgraph.NewCreateSpec(cachedquestionmetadata.Table, sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt))
 	)
-	if value, ok := cqmc.mutation.Key(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldKey, field.TypeString, value)
-		_node.Key = value
+	if value, ok := cqmdc.mutation.CacheUID(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldCacheUID, field.TypeString, value)
+		_node.CacheUID = value
 	}
-	if value, ok := cqmc.mutation.GetType(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldType, field.TypeString, value)
-		_node.Type = value
+	if value, ok := cqmdc.mutation.IsUsed(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldIsUsed, field.TypeBool, value)
+		_node.IsUsed = value
 	}
-	if value, ok := cqmc.mutation.Subject(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldSubject, field.TypeString, value)
-		_node.Subject = value
+	if value, ok := cqmdc.mutation.ExpiresAt(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldExpiresAt, field.TypeTime, value)
+		_node.ExpiresAt = value
 	}
-	if value, ok := cqmc.mutation.Exam(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldExam, field.TypeString, value)
-		_node.Exam = value
-	}
-	if value, ok := cqmc.mutation.IsProcessed(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldIsProcessed, field.TypeBool, value)
-		_node.IsProcessed = value
-	}
-	if value, ok := cqmc.mutation.CreatedAt(); ok {
+	if value, ok := cqmdc.mutation.CreatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := cqmc.mutation.UpdatedAt(); ok {
+	if value, ok := cqmdc.mutation.UpdatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }
 
-// CachedQuestionMetadataCreateBulk is the builder for creating many CachedQuestionMetadata entities in bulk.
-type CachedQuestionMetadataCreateBulk struct {
+// CachedQuestionMetaDataCreateBulk is the builder for creating many CachedQuestionMetaData entities in bulk.
+type CachedQuestionMetaDataCreateBulk struct {
 	config
 	err      error
-	builders []*CachedQuestionMetadataCreate
+	builders []*CachedQuestionMetaDataCreate
 }
 
-// Save creates the CachedQuestionMetadata entities in the database.
-func (cqmcb *CachedQuestionMetadataCreateBulk) Save(ctx context.Context) ([]*CachedQuestionMetadata, error) {
-	if cqmcb.err != nil {
-		return nil, cqmcb.err
+// Save creates the CachedQuestionMetaData entities in the database.
+func (cqmdcb *CachedQuestionMetaDataCreateBulk) Save(ctx context.Context) ([]*CachedQuestionMetaData, error) {
+	if cqmdcb.err != nil {
+		return nil, cqmdcb.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(cqmcb.builders))
-	nodes := make([]*CachedQuestionMetadata, len(cqmcb.builders))
-	mutators := make([]Mutator, len(cqmcb.builders))
-	for i := range cqmcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(cqmdcb.builders))
+	nodes := make([]*CachedQuestionMetaData, len(cqmdcb.builders))
+	mutators := make([]Mutator, len(cqmdcb.builders))
+	for i := range cqmdcb.builders {
 		func(i int, root context.Context) {
-			builder := cqmcb.builders[i]
+			builder := cqmdcb.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*CachedQuestionMetadataMutation)
+				mutation, ok := m.(*CachedQuestionMetaDataMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -246,11 +220,11 @@ func (cqmcb *CachedQuestionMetadataCreateBulk) Save(ctx context.Context) ([]*Cac
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, cqmcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, cqmdcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, cqmcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, cqmdcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -274,7 +248,7 @@ func (cqmcb *CachedQuestionMetadataCreateBulk) Save(ctx context.Context) ([]*Cac
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, cqmcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, cqmdcb.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -282,8 +256,8 @@ func (cqmcb *CachedQuestionMetadataCreateBulk) Save(ctx context.Context) ([]*Cac
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cqmcb *CachedQuestionMetadataCreateBulk) SaveX(ctx context.Context) []*CachedQuestionMetadata {
-	v, err := cqmcb.Save(ctx)
+func (cqmdcb *CachedQuestionMetaDataCreateBulk) SaveX(ctx context.Context) []*CachedQuestionMetaData {
+	v, err := cqmdcb.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -291,14 +265,14 @@ func (cqmcb *CachedQuestionMetadataCreateBulk) SaveX(ctx context.Context) []*Cac
 }
 
 // Exec executes the query.
-func (cqmcb *CachedQuestionMetadataCreateBulk) Exec(ctx context.Context) error {
-	_, err := cqmcb.Save(ctx)
+func (cqmdcb *CachedQuestionMetaDataCreateBulk) Exec(ctx context.Context) error {
+	_, err := cqmdcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cqmcb *CachedQuestionMetadataCreateBulk) ExecX(ctx context.Context) {
-	if err := cqmcb.Exec(ctx); err != nil {
+func (cqmdcb *CachedQuestionMetaDataCreateBulk) ExecX(ctx context.Context) {
+	if err := cqmdcb.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

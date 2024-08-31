@@ -27,42 +27,40 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCachedQuestionMetadata = "CachedQuestionMetadata"
+	TypeCachedQuestionMetaData = "CachedQuestionMetaData"
 	TypeExam                   = "Exam"
 	TypeExamCategory           = "ExamCategory"
 	TypeExamSetting            = "ExamSetting"
 )
 
-// CachedQuestionMetadataMutation represents an operation that mutates the CachedQuestionMetadata nodes in the graph.
-type CachedQuestionMetadataMutation struct {
+// CachedQuestionMetaDataMutation represents an operation that mutates the CachedQuestionMetaData nodes in the graph.
+type CachedQuestionMetaDataMutation struct {
 	config
 	op            Op
 	typ           string
 	id            *int
-	key           *string
-	_type         *string
-	subject       *string
-	exam          *string
-	is_processed  *bool
+	cache_uid     *string
+	is_used       *bool
+	expires_at    *time.Time
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
 	done          bool
-	oldValue      func(context.Context) (*CachedQuestionMetadata, error)
-	predicates    []predicate.CachedQuestionMetadata
+	oldValue      func(context.Context) (*CachedQuestionMetaData, error)
+	predicates    []predicate.CachedQuestionMetaData
 }
 
-var _ ent.Mutation = (*CachedQuestionMetadataMutation)(nil)
+var _ ent.Mutation = (*CachedQuestionMetaDataMutation)(nil)
 
 // cachedquestionmetadataOption allows management of the mutation configuration using functional options.
-type cachedquestionmetadataOption func(*CachedQuestionMetadataMutation)
+type cachedquestionmetadataOption func(*CachedQuestionMetaDataMutation)
 
-// newCachedQuestionMetadataMutation creates new mutation for the CachedQuestionMetadata entity.
-func newCachedQuestionMetadataMutation(c config, op Op, opts ...cachedquestionmetadataOption) *CachedQuestionMetadataMutation {
-	m := &CachedQuestionMetadataMutation{
+// newCachedQuestionMetaDataMutation creates new mutation for the CachedQuestionMetaData entity.
+func newCachedQuestionMetaDataMutation(c config, op Op, opts ...cachedquestionmetadataOption) *CachedQuestionMetaDataMutation {
+	m := &CachedQuestionMetaDataMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeCachedQuestionMetadata,
+		typ:           TypeCachedQuestionMetaData,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -71,20 +69,20 @@ func newCachedQuestionMetadataMutation(c config, op Op, opts ...cachedquestionme
 	return m
 }
 
-// withCachedQuestionMetadataID sets the ID field of the mutation.
-func withCachedQuestionMetadataID(id int) cachedquestionmetadataOption {
-	return func(m *CachedQuestionMetadataMutation) {
+// withCachedQuestionMetaDataID sets the ID field of the mutation.
+func withCachedQuestionMetaDataID(id int) cachedquestionmetadataOption {
+	return func(m *CachedQuestionMetaDataMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *CachedQuestionMetadata
+			value *CachedQuestionMetaData
 		)
-		m.oldValue = func(ctx context.Context) (*CachedQuestionMetadata, error) {
+		m.oldValue = func(ctx context.Context) (*CachedQuestionMetaData, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().CachedQuestionMetadata.Get(ctx, id)
+					value, err = m.Client().CachedQuestionMetaData.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -93,10 +91,10 @@ func withCachedQuestionMetadataID(id int) cachedquestionmetadataOption {
 	}
 }
 
-// withCachedQuestionMetadata sets the old CachedQuestionMetadata of the mutation.
-func withCachedQuestionMetadata(node *CachedQuestionMetadata) cachedquestionmetadataOption {
-	return func(m *CachedQuestionMetadataMutation) {
-		m.oldValue = func(context.Context) (*CachedQuestionMetadata, error) {
+// withCachedQuestionMetaData sets the old CachedQuestionMetaData of the mutation.
+func withCachedQuestionMetaData(node *CachedQuestionMetaData) cachedquestionmetadataOption {
+	return func(m *CachedQuestionMetaDataMutation) {
+		m.oldValue = func(context.Context) (*CachedQuestionMetaData, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -105,7 +103,7 @@ func withCachedQuestionMetadata(node *CachedQuestionMetadata) cachedquestionmeta
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m CachedQuestionMetadataMutation) Client() *Client {
+func (m CachedQuestionMetaDataMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -113,7 +111,7 @@ func (m CachedQuestionMetadataMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m CachedQuestionMetadataMutation) Tx() (*Tx, error) {
+func (m CachedQuestionMetaDataMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -124,7 +122,7 @@ func (m CachedQuestionMetadataMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CachedQuestionMetadataMutation) ID() (id int, exists bool) {
+func (m *CachedQuestionMetaDataMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -135,7 +133,7 @@ func (m *CachedQuestionMetadataMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CachedQuestionMetadataMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *CachedQuestionMetaDataMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -144,199 +142,127 @@ func (m *CachedQuestionMetadataMutation) IDs(ctx context.Context) ([]int, error)
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().CachedQuestionMetadata.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().CachedQuestionMetaData.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// SetKey sets the "key" field.
-func (m *CachedQuestionMetadataMutation) SetKey(s string) {
-	m.key = &s
+// SetCacheUID sets the "cache_uid" field.
+func (m *CachedQuestionMetaDataMutation) SetCacheUID(s string) {
+	m.cache_uid = &s
 }
 
-// Key returns the value of the "key" field in the mutation.
-func (m *CachedQuestionMetadataMutation) Key() (r string, exists bool) {
-	v := m.key
+// CacheUID returns the value of the "cache_uid" field in the mutation.
+func (m *CachedQuestionMetaDataMutation) CacheUID() (r string, exists bool) {
+	v := m.cache_uid
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldKey returns the old "key" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldCacheUID returns the old "cache_uid" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldKey(ctx context.Context) (v string, err error) {
+func (m *CachedQuestionMetaDataMutation) OldCacheUID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldKey is only allowed on UpdateOne operations")
+		return v, errors.New("OldCacheUID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldKey requires an ID field in the mutation")
+		return v, errors.New("OldCacheUID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKey: %w", err)
+		return v, fmt.Errorf("querying old value for OldCacheUID: %w", err)
 	}
-	return oldValue.Key, nil
+	return oldValue.CacheUID, nil
 }
 
-// ResetKey resets all changes to the "key" field.
-func (m *CachedQuestionMetadataMutation) ResetKey() {
-	m.key = nil
+// ResetCacheUID resets all changes to the "cache_uid" field.
+func (m *CachedQuestionMetaDataMutation) ResetCacheUID() {
+	m.cache_uid = nil
 }
 
-// SetType sets the "type" field.
-func (m *CachedQuestionMetadataMutation) SetType(s string) {
-	m._type = &s
+// SetIsUsed sets the "is_used" field.
+func (m *CachedQuestionMetaDataMutation) SetIsUsed(b bool) {
+	m.is_used = &b
 }
 
-// GetType returns the value of the "type" field in the mutation.
-func (m *CachedQuestionMetadataMutation) GetType() (r string, exists bool) {
-	v := m._type
+// IsUsed returns the value of the "is_used" field in the mutation.
+func (m *CachedQuestionMetaDataMutation) IsUsed() (r bool, exists bool) {
+	v := m.is_used
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldType returns the old "type" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldIsUsed returns the old "is_used" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldType(ctx context.Context) (v string, err error) {
+func (m *CachedQuestionMetaDataMutation) OldIsUsed(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldType is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsUsed is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldType requires an ID field in the mutation")
+		return v, errors.New("OldIsUsed requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsUsed: %w", err)
 	}
-	return oldValue.Type, nil
+	return oldValue.IsUsed, nil
 }
 
-// ResetType resets all changes to the "type" field.
-func (m *CachedQuestionMetadataMutation) ResetType() {
-	m._type = nil
+// ResetIsUsed resets all changes to the "is_used" field.
+func (m *CachedQuestionMetaDataMutation) ResetIsUsed() {
+	m.is_used = nil
 }
 
-// SetSubject sets the "subject" field.
-func (m *CachedQuestionMetadataMutation) SetSubject(s string) {
-	m.subject = &s
+// SetExpiresAt sets the "expires_at" field.
+func (m *CachedQuestionMetaDataMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
 }
 
-// Subject returns the value of the "subject" field in the mutation.
-func (m *CachedQuestionMetadataMutation) Subject() (r string, exists bool) {
-	v := m.subject
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *CachedQuestionMetaDataMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSubject returns the old "subject" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldExpiresAt returns the old "expires_at" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldSubject(ctx context.Context) (v string, err error) {
+func (m *CachedQuestionMetaDataMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSubject is only allowed on UpdateOne operations")
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSubject requires an ID field in the mutation")
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSubject: %w", err)
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
 	}
-	return oldValue.Subject, nil
+	return oldValue.ExpiresAt, nil
 }
 
-// ResetSubject resets all changes to the "subject" field.
-func (m *CachedQuestionMetadataMutation) ResetSubject() {
-	m.subject = nil
-}
-
-// SetExam sets the "exam" field.
-func (m *CachedQuestionMetadataMutation) SetExam(s string) {
-	m.exam = &s
-}
-
-// Exam returns the value of the "exam" field in the mutation.
-func (m *CachedQuestionMetadataMutation) Exam() (r string, exists bool) {
-	v := m.exam
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldExam returns the old "exam" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldExam(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldExam is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldExam requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldExam: %w", err)
-	}
-	return oldValue.Exam, nil
-}
-
-// ResetExam resets all changes to the "exam" field.
-func (m *CachedQuestionMetadataMutation) ResetExam() {
-	m.exam = nil
-}
-
-// SetIsProcessed sets the "is_processed" field.
-func (m *CachedQuestionMetadataMutation) SetIsProcessed(b bool) {
-	m.is_processed = &b
-}
-
-// IsProcessed returns the value of the "is_processed" field in the mutation.
-func (m *CachedQuestionMetadataMutation) IsProcessed() (r bool, exists bool) {
-	v := m.is_processed
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsProcessed returns the old "is_processed" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldIsProcessed(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsProcessed is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsProcessed requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsProcessed: %w", err)
-	}
-	return oldValue.IsProcessed, nil
-}
-
-// ResetIsProcessed resets all changes to the "is_processed" field.
-func (m *CachedQuestionMetadataMutation) ResetIsProcessed() {
-	m.is_processed = nil
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *CachedQuestionMetaDataMutation) ResetExpiresAt() {
+	m.expires_at = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (m *CachedQuestionMetadataMutation) SetCreatedAt(t time.Time) {
+func (m *CachedQuestionMetaDataMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
 }
 
 // CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *CachedQuestionMetadataMutation) CreatedAt() (r time.Time, exists bool) {
+func (m *CachedQuestionMetaDataMutation) CreatedAt() (r time.Time, exists bool) {
 	v := m.created_at
 	if v == nil {
 		return
@@ -344,10 +270,10 @@ func (m *CachedQuestionMetadataMutation) CreatedAt() (r time.Time, exists bool) 
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldCreatedAt returns the old "created_at" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *CachedQuestionMetaDataMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -362,17 +288,17 @@ func (m *CachedQuestionMetadataMutation) OldCreatedAt(ctx context.Context) (v ti
 }
 
 // ResetCreatedAt resets all changes to the "created_at" field.
-func (m *CachedQuestionMetadataMutation) ResetCreatedAt() {
+func (m *CachedQuestionMetaDataMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (m *CachedQuestionMetadataMutation) SetUpdatedAt(t time.Time) {
+func (m *CachedQuestionMetaDataMutation) SetUpdatedAt(t time.Time) {
 	m.updated_at = &t
 }
 
 // UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *CachedQuestionMetadataMutation) UpdatedAt() (r time.Time, exists bool) {
+func (m *CachedQuestionMetaDataMutation) UpdatedAt() (r time.Time, exists bool) {
 	v := m.updated_at
 	if v == nil {
 		return
@@ -380,10 +306,10 @@ func (m *CachedQuestionMetadataMutation) UpdatedAt() (r time.Time, exists bool) 
 	return *v, true
 }
 
-// OldUpdatedAt returns the old "updated_at" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldUpdatedAt returns the old "updated_at" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *CachedQuestionMetaDataMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -398,19 +324,19 @@ func (m *CachedQuestionMetadataMutation) OldUpdatedAt(ctx context.Context) (v ti
 }
 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *CachedQuestionMetadataMutation) ResetUpdatedAt() {
+func (m *CachedQuestionMetaDataMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// Where appends a list predicates to the CachedQuestionMetadataMutation builder.
-func (m *CachedQuestionMetadataMutation) Where(ps ...predicate.CachedQuestionMetadata) {
+// Where appends a list predicates to the CachedQuestionMetaDataMutation builder.
+func (m *CachedQuestionMetaDataMutation) Where(ps ...predicate.CachedQuestionMetaData) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the CachedQuestionMetadataMutation builder. Using this method,
+// WhereP appends storage-level predicates to the CachedQuestionMetaDataMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *CachedQuestionMetadataMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.CachedQuestionMetadata, len(ps))
+func (m *CachedQuestionMetaDataMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.CachedQuestionMetaData, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -418,39 +344,33 @@ func (m *CachedQuestionMetadataMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *CachedQuestionMetadataMutation) Op() Op {
+func (m *CachedQuestionMetaDataMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *CachedQuestionMetadataMutation) SetOp(op Op) {
+func (m *CachedQuestionMetaDataMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (CachedQuestionMetadata).
-func (m *CachedQuestionMetadataMutation) Type() string {
+// Type returns the node type of this mutation (CachedQuestionMetaData).
+func (m *CachedQuestionMetaDataMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *CachedQuestionMetadataMutation) Fields() []string {
-	fields := make([]string, 0, 7)
-	if m.key != nil {
-		fields = append(fields, cachedquestionmetadata.FieldKey)
+func (m *CachedQuestionMetaDataMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.cache_uid != nil {
+		fields = append(fields, cachedquestionmetadata.FieldCacheUID)
 	}
-	if m._type != nil {
-		fields = append(fields, cachedquestionmetadata.FieldType)
+	if m.is_used != nil {
+		fields = append(fields, cachedquestionmetadata.FieldIsUsed)
 	}
-	if m.subject != nil {
-		fields = append(fields, cachedquestionmetadata.FieldSubject)
-	}
-	if m.exam != nil {
-		fields = append(fields, cachedquestionmetadata.FieldExam)
-	}
-	if m.is_processed != nil {
-		fields = append(fields, cachedquestionmetadata.FieldIsProcessed)
+	if m.expires_at != nil {
+		fields = append(fields, cachedquestionmetadata.FieldExpiresAt)
 	}
 	if m.created_at != nil {
 		fields = append(fields, cachedquestionmetadata.FieldCreatedAt)
@@ -464,18 +384,14 @@ func (m *CachedQuestionMetadataMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *CachedQuestionMetadataMutation) Field(name string) (ent.Value, bool) {
+func (m *CachedQuestionMetaDataMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
-		return m.Key()
-	case cachedquestionmetadata.FieldType:
-		return m.GetType()
-	case cachedquestionmetadata.FieldSubject:
-		return m.Subject()
-	case cachedquestionmetadata.FieldExam:
-		return m.Exam()
-	case cachedquestionmetadata.FieldIsProcessed:
-		return m.IsProcessed()
+	case cachedquestionmetadata.FieldCacheUID:
+		return m.CacheUID()
+	case cachedquestionmetadata.FieldIsUsed:
+		return m.IsUsed()
+	case cachedquestionmetadata.FieldExpiresAt:
+		return m.ExpiresAt()
 	case cachedquestionmetadata.FieldCreatedAt:
 		return m.CreatedAt()
 	case cachedquestionmetadata.FieldUpdatedAt:
@@ -487,65 +403,47 @@ func (m *CachedQuestionMetadataMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *CachedQuestionMetadataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *CachedQuestionMetaDataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
-		return m.OldKey(ctx)
-	case cachedquestionmetadata.FieldType:
-		return m.OldType(ctx)
-	case cachedquestionmetadata.FieldSubject:
-		return m.OldSubject(ctx)
-	case cachedquestionmetadata.FieldExam:
-		return m.OldExam(ctx)
-	case cachedquestionmetadata.FieldIsProcessed:
-		return m.OldIsProcessed(ctx)
+	case cachedquestionmetadata.FieldCacheUID:
+		return m.OldCacheUID(ctx)
+	case cachedquestionmetadata.FieldIsUsed:
+		return m.OldIsUsed(ctx)
+	case cachedquestionmetadata.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
 	case cachedquestionmetadata.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case cachedquestionmetadata.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
 	}
-	return nil, fmt.Errorf("unknown CachedQuestionMetadata field %s", name)
+	return nil, fmt.Errorf("unknown CachedQuestionMetaData field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *CachedQuestionMetadataMutation) SetField(name string, value ent.Value) error {
+func (m *CachedQuestionMetaDataMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
+	case cachedquestionmetadata.FieldCacheUID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetKey(v)
+		m.SetCacheUID(v)
 		return nil
-	case cachedquestionmetadata.FieldType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetType(v)
-		return nil
-	case cachedquestionmetadata.FieldSubject:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSubject(v)
-		return nil
-	case cachedquestionmetadata.FieldExam:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetExam(v)
-		return nil
-	case cachedquestionmetadata.FieldIsProcessed:
+	case cachedquestionmetadata.FieldIsUsed:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsProcessed(v)
+		m.SetIsUsed(v)
+		return nil
+	case cachedquestionmetadata.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
 		return nil
 	case cachedquestionmetadata.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -562,68 +460,62 @@ func (m *CachedQuestionMetadataMutation) SetField(name string, value ent.Value) 
 		m.SetUpdatedAt(v)
 		return nil
 	}
-	return fmt.Errorf("unknown CachedQuestionMetadata field %s", name)
+	return fmt.Errorf("unknown CachedQuestionMetaData field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *CachedQuestionMetadataMutation) AddedFields() []string {
+func (m *CachedQuestionMetaDataMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *CachedQuestionMetadataMutation) AddedField(name string) (ent.Value, bool) {
+func (m *CachedQuestionMetaDataMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *CachedQuestionMetadataMutation) AddField(name string, value ent.Value) error {
+func (m *CachedQuestionMetaDataMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown CachedQuestionMetadata numeric field %s", name)
+	return fmt.Errorf("unknown CachedQuestionMetaData numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *CachedQuestionMetadataMutation) ClearedFields() []string {
+func (m *CachedQuestionMetaDataMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *CachedQuestionMetadataMutation) FieldCleared(name string) bool {
+func (m *CachedQuestionMetaDataMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown CachedQuestionMetadata nullable field %s", name)
+func (m *CachedQuestionMetaDataMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CachedQuestionMetaData nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ResetField(name string) error {
+func (m *CachedQuestionMetaDataMutation) ResetField(name string) error {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
-		m.ResetKey()
+	case cachedquestionmetadata.FieldCacheUID:
+		m.ResetCacheUID()
 		return nil
-	case cachedquestionmetadata.FieldType:
-		m.ResetType()
+	case cachedquestionmetadata.FieldIsUsed:
+		m.ResetIsUsed()
 		return nil
-	case cachedquestionmetadata.FieldSubject:
-		m.ResetSubject()
-		return nil
-	case cachedquestionmetadata.FieldExam:
-		m.ResetExam()
-		return nil
-	case cachedquestionmetadata.FieldIsProcessed:
-		m.ResetIsProcessed()
+	case cachedquestionmetadata.FieldExpiresAt:
+		m.ResetExpiresAt()
 		return nil
 	case cachedquestionmetadata.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -632,55 +524,55 @@ func (m *CachedQuestionMetadataMutation) ResetField(name string) error {
 		m.ResetUpdatedAt()
 		return nil
 	}
-	return fmt.Errorf("unknown CachedQuestionMetadata field %s", name)
+	return fmt.Errorf("unknown CachedQuestionMetaData field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *CachedQuestionMetadataMutation) AddedEdges() []string {
+func (m *CachedQuestionMetaDataMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *CachedQuestionMetadataMutation) AddedIDs(name string) []ent.Value {
+func (m *CachedQuestionMetaDataMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *CachedQuestionMetadataMutation) RemovedEdges() []string {
+func (m *CachedQuestionMetaDataMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *CachedQuestionMetadataMutation) RemovedIDs(name string) []ent.Value {
+func (m *CachedQuestionMetaDataMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *CachedQuestionMetadataMutation) ClearedEdges() []string {
+func (m *CachedQuestionMetaDataMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *CachedQuestionMetadataMutation) EdgeCleared(name string) bool {
+func (m *CachedQuestionMetaDataMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown CachedQuestionMetadata unique edge %s", name)
+func (m *CachedQuestionMetaDataMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown CachedQuestionMetaData unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown CachedQuestionMetadata edge %s", name)
+func (m *CachedQuestionMetaDataMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown CachedQuestionMetaData edge %s", name)
 }
 
 // ExamMutation represents an operation that mutates the Exam nodes in the graph.

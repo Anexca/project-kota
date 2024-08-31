@@ -12,64 +12,64 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CachedQuestionMetadataDelete is the builder for deleting a CachedQuestionMetadata entity.
-type CachedQuestionMetadataDelete struct {
+// CachedQuestionMetaDataDelete is the builder for deleting a CachedQuestionMetaData entity.
+type CachedQuestionMetaDataDelete struct {
 	config
 	hooks    []Hook
-	mutation *CachedQuestionMetadataMutation
+	mutation *CachedQuestionMetaDataMutation
 }
 
-// Where appends a list predicates to the CachedQuestionMetadataDelete builder.
-func (cqmd *CachedQuestionMetadataDelete) Where(ps ...predicate.CachedQuestionMetadata) *CachedQuestionMetadataDelete {
-	cqmd.mutation.Where(ps...)
-	return cqmd
+// Where appends a list predicates to the CachedQuestionMetaDataDelete builder.
+func (cqmdd *CachedQuestionMetaDataDelete) Where(ps ...predicate.CachedQuestionMetaData) *CachedQuestionMetaDataDelete {
+	cqmdd.mutation.Where(ps...)
+	return cqmdd
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (cqmd *CachedQuestionMetadataDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, cqmd.sqlExec, cqmd.mutation, cqmd.hooks)
+func (cqmdd *CachedQuestionMetaDataDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, cqmdd.sqlExec, cqmdd.mutation, cqmdd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cqmd *CachedQuestionMetadataDelete) ExecX(ctx context.Context) int {
-	n, err := cqmd.Exec(ctx)
+func (cqmdd *CachedQuestionMetaDataDelete) ExecX(ctx context.Context) int {
+	n, err := cqmdd.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (cqmd *CachedQuestionMetadataDelete) sqlExec(ctx context.Context) (int, error) {
+func (cqmdd *CachedQuestionMetaDataDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(cachedquestionmetadata.Table, sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt))
-	if ps := cqmd.mutation.predicates; len(ps) > 0 {
+	if ps := cqmdd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, cqmd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, cqmdd.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	cqmd.mutation.done = true
+	cqmdd.mutation.done = true
 	return affected, err
 }
 
-// CachedQuestionMetadataDeleteOne is the builder for deleting a single CachedQuestionMetadata entity.
-type CachedQuestionMetadataDeleteOne struct {
-	cqmd *CachedQuestionMetadataDelete
+// CachedQuestionMetaDataDeleteOne is the builder for deleting a single CachedQuestionMetaData entity.
+type CachedQuestionMetaDataDeleteOne struct {
+	cqmdd *CachedQuestionMetaDataDelete
 }
 
-// Where appends a list predicates to the CachedQuestionMetadataDelete builder.
-func (cqmdo *CachedQuestionMetadataDeleteOne) Where(ps ...predicate.CachedQuestionMetadata) *CachedQuestionMetadataDeleteOne {
-	cqmdo.cqmd.mutation.Where(ps...)
-	return cqmdo
+// Where appends a list predicates to the CachedQuestionMetaDataDelete builder.
+func (cqmddo *CachedQuestionMetaDataDeleteOne) Where(ps ...predicate.CachedQuestionMetaData) *CachedQuestionMetaDataDeleteOne {
+	cqmddo.cqmdd.mutation.Where(ps...)
+	return cqmddo
 }
 
 // Exec executes the deletion query.
-func (cqmdo *CachedQuestionMetadataDeleteOne) Exec(ctx context.Context) error {
-	n, err := cqmdo.cqmd.Exec(ctx)
+func (cqmddo *CachedQuestionMetaDataDeleteOne) Exec(ctx context.Context) error {
+	n, err := cqmddo.cqmdd.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (cqmdo *CachedQuestionMetadataDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cqmdo *CachedQuestionMetadataDeleteOne) ExecX(ctx context.Context) {
-	if err := cqmdo.Exec(ctx); err != nil {
+func (cqmddo *CachedQuestionMetaDataDeleteOne) ExecX(ctx context.Context) {
+	if err := cqmddo.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

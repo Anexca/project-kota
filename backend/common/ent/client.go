@@ -27,8 +27,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// CachedQuestionMetadata is the client for interacting with the CachedQuestionMetadata builders.
-	CachedQuestionMetadata *CachedQuestionMetadataClient
+	// CachedQuestionMetaData is the client for interacting with the CachedQuestionMetaData builders.
+	CachedQuestionMetaData *CachedQuestionMetaDataClient
 	// Exam is the client for interacting with the Exam builders.
 	Exam *ExamClient
 	// ExamCategory is the client for interacting with the ExamCategory builders.
@@ -46,7 +46,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.CachedQuestionMetadata = NewCachedQuestionMetadataClient(c.config)
+	c.CachedQuestionMetaData = NewCachedQuestionMetaDataClient(c.config)
 	c.Exam = NewExamClient(c.config)
 	c.ExamCategory = NewExamCategoryClient(c.config)
 	c.ExamSetting = NewExamSettingClient(c.config)
@@ -142,7 +142,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:                    ctx,
 		config:                 cfg,
-		CachedQuestionMetadata: NewCachedQuestionMetadataClient(cfg),
+		CachedQuestionMetaData: NewCachedQuestionMetaDataClient(cfg),
 		Exam:                   NewExamClient(cfg),
 		ExamCategory:           NewExamCategoryClient(cfg),
 		ExamSetting:            NewExamSettingClient(cfg),
@@ -165,7 +165,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:                    ctx,
 		config:                 cfg,
-		CachedQuestionMetadata: NewCachedQuestionMetadataClient(cfg),
+		CachedQuestionMetaData: NewCachedQuestionMetaDataClient(cfg),
 		Exam:                   NewExamClient(cfg),
 		ExamCategory:           NewExamCategoryClient(cfg),
 		ExamSetting:            NewExamSettingClient(cfg),
@@ -175,7 +175,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		CachedQuestionMetadata.
+//		CachedQuestionMetaData.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -197,7 +197,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.CachedQuestionMetadata.Use(hooks...)
+	c.CachedQuestionMetaData.Use(hooks...)
 	c.Exam.Use(hooks...)
 	c.ExamCategory.Use(hooks...)
 	c.ExamSetting.Use(hooks...)
@@ -206,7 +206,7 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.CachedQuestionMetadata.Intercept(interceptors...)
+	c.CachedQuestionMetaData.Intercept(interceptors...)
 	c.Exam.Intercept(interceptors...)
 	c.ExamCategory.Intercept(interceptors...)
 	c.ExamSetting.Intercept(interceptors...)
@@ -215,8 +215,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *CachedQuestionMetadataMutation:
-		return c.CachedQuestionMetadata.mutate(ctx, m)
+	case *CachedQuestionMetaDataMutation:
+		return c.CachedQuestionMetaData.mutate(ctx, m)
 	case *ExamMutation:
 		return c.Exam.mutate(ctx, m)
 	case *ExamCategoryMutation:
@@ -228,107 +228,107 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	}
 }
 
-// CachedQuestionMetadataClient is a client for the CachedQuestionMetadata schema.
-type CachedQuestionMetadataClient struct {
+// CachedQuestionMetaDataClient is a client for the CachedQuestionMetaData schema.
+type CachedQuestionMetaDataClient struct {
 	config
 }
 
-// NewCachedQuestionMetadataClient returns a client for the CachedQuestionMetadata from the given config.
-func NewCachedQuestionMetadataClient(c config) *CachedQuestionMetadataClient {
-	return &CachedQuestionMetadataClient{config: c}
+// NewCachedQuestionMetaDataClient returns a client for the CachedQuestionMetaData from the given config.
+func NewCachedQuestionMetaDataClient(c config) *CachedQuestionMetaDataClient {
+	return &CachedQuestionMetaDataClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
 // A call to `Use(f, g, h)` equals to `cachedquestionmetadata.Hooks(f(g(h())))`.
-func (c *CachedQuestionMetadataClient) Use(hooks ...Hook) {
-	c.hooks.CachedQuestionMetadata = append(c.hooks.CachedQuestionMetadata, hooks...)
+func (c *CachedQuestionMetaDataClient) Use(hooks ...Hook) {
+	c.hooks.CachedQuestionMetaData = append(c.hooks.CachedQuestionMetaData, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `cachedquestionmetadata.Intercept(f(g(h())))`.
-func (c *CachedQuestionMetadataClient) Intercept(interceptors ...Interceptor) {
-	c.inters.CachedQuestionMetadata = append(c.inters.CachedQuestionMetadata, interceptors...)
+func (c *CachedQuestionMetaDataClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CachedQuestionMetaData = append(c.inters.CachedQuestionMetaData, interceptors...)
 }
 
-// Create returns a builder for creating a CachedQuestionMetadata entity.
-func (c *CachedQuestionMetadataClient) Create() *CachedQuestionMetadataCreate {
-	mutation := newCachedQuestionMetadataMutation(c.config, OpCreate)
-	return &CachedQuestionMetadataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a CachedQuestionMetaData entity.
+func (c *CachedQuestionMetaDataClient) Create() *CachedQuestionMetaDataCreate {
+	mutation := newCachedQuestionMetaDataMutation(c.config, OpCreate)
+	return &CachedQuestionMetaDataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of CachedQuestionMetadata entities.
-func (c *CachedQuestionMetadataClient) CreateBulk(builders ...*CachedQuestionMetadataCreate) *CachedQuestionMetadataCreateBulk {
-	return &CachedQuestionMetadataCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of CachedQuestionMetaData entities.
+func (c *CachedQuestionMetaDataClient) CreateBulk(builders ...*CachedQuestionMetaDataCreate) *CachedQuestionMetaDataCreateBulk {
+	return &CachedQuestionMetaDataCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *CachedQuestionMetadataClient) MapCreateBulk(slice any, setFunc func(*CachedQuestionMetadataCreate, int)) *CachedQuestionMetadataCreateBulk {
+func (c *CachedQuestionMetaDataClient) MapCreateBulk(slice any, setFunc func(*CachedQuestionMetaDataCreate, int)) *CachedQuestionMetaDataCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &CachedQuestionMetadataCreateBulk{err: fmt.Errorf("calling to CachedQuestionMetadataClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &CachedQuestionMetaDataCreateBulk{err: fmt.Errorf("calling to CachedQuestionMetaDataClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*CachedQuestionMetadataCreate, rv.Len())
+	builders := make([]*CachedQuestionMetaDataCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &CachedQuestionMetadataCreateBulk{config: c.config, builders: builders}
+	return &CachedQuestionMetaDataCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for CachedQuestionMetadata.
-func (c *CachedQuestionMetadataClient) Update() *CachedQuestionMetadataUpdate {
-	mutation := newCachedQuestionMetadataMutation(c.config, OpUpdate)
-	return &CachedQuestionMetadataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for CachedQuestionMetaData.
+func (c *CachedQuestionMetaDataClient) Update() *CachedQuestionMetaDataUpdate {
+	mutation := newCachedQuestionMetaDataMutation(c.config, OpUpdate)
+	return &CachedQuestionMetaDataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CachedQuestionMetadataClient) UpdateOne(cqm *CachedQuestionMetadata) *CachedQuestionMetadataUpdateOne {
-	mutation := newCachedQuestionMetadataMutation(c.config, OpUpdateOne, withCachedQuestionMetadata(cqm))
-	return &CachedQuestionMetadataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CachedQuestionMetaDataClient) UpdateOne(cqmd *CachedQuestionMetaData) *CachedQuestionMetaDataUpdateOne {
+	mutation := newCachedQuestionMetaDataMutation(c.config, OpUpdateOne, withCachedQuestionMetaData(cqmd))
+	return &CachedQuestionMetaDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CachedQuestionMetadataClient) UpdateOneID(id int) *CachedQuestionMetadataUpdateOne {
-	mutation := newCachedQuestionMetadataMutation(c.config, OpUpdateOne, withCachedQuestionMetadataID(id))
-	return &CachedQuestionMetadataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CachedQuestionMetaDataClient) UpdateOneID(id int) *CachedQuestionMetaDataUpdateOne {
+	mutation := newCachedQuestionMetaDataMutation(c.config, OpUpdateOne, withCachedQuestionMetaDataID(id))
+	return &CachedQuestionMetaDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for CachedQuestionMetadata.
-func (c *CachedQuestionMetadataClient) Delete() *CachedQuestionMetadataDelete {
-	mutation := newCachedQuestionMetadataMutation(c.config, OpDelete)
-	return &CachedQuestionMetadataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for CachedQuestionMetaData.
+func (c *CachedQuestionMetaDataClient) Delete() *CachedQuestionMetaDataDelete {
+	mutation := newCachedQuestionMetaDataMutation(c.config, OpDelete)
+	return &CachedQuestionMetaDataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CachedQuestionMetadataClient) DeleteOne(cqm *CachedQuestionMetadata) *CachedQuestionMetadataDeleteOne {
-	return c.DeleteOneID(cqm.ID)
+func (c *CachedQuestionMetaDataClient) DeleteOne(cqmd *CachedQuestionMetaData) *CachedQuestionMetaDataDeleteOne {
+	return c.DeleteOneID(cqmd.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CachedQuestionMetadataClient) DeleteOneID(id int) *CachedQuestionMetadataDeleteOne {
+func (c *CachedQuestionMetaDataClient) DeleteOneID(id int) *CachedQuestionMetaDataDeleteOne {
 	builder := c.Delete().Where(cachedquestionmetadata.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CachedQuestionMetadataDeleteOne{builder}
+	return &CachedQuestionMetaDataDeleteOne{builder}
 }
 
-// Query returns a query builder for CachedQuestionMetadata.
-func (c *CachedQuestionMetadataClient) Query() *CachedQuestionMetadataQuery {
-	return &CachedQuestionMetadataQuery{
+// Query returns a query builder for CachedQuestionMetaData.
+func (c *CachedQuestionMetaDataClient) Query() *CachedQuestionMetaDataQuery {
+	return &CachedQuestionMetaDataQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeCachedQuestionMetadata},
+		ctx:    &QueryContext{Type: TypeCachedQuestionMetaData},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a CachedQuestionMetadata entity by its id.
-func (c *CachedQuestionMetadataClient) Get(ctx context.Context, id int) (*CachedQuestionMetadata, error) {
+// Get returns a CachedQuestionMetaData entity by its id.
+func (c *CachedQuestionMetaDataClient) Get(ctx context.Context, id int) (*CachedQuestionMetaData, error) {
 	return c.Query().Where(cachedquestionmetadata.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CachedQuestionMetadataClient) GetX(ctx context.Context, id int) *CachedQuestionMetadata {
+func (c *CachedQuestionMetaDataClient) GetX(ctx context.Context, id int) *CachedQuestionMetaData {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -337,27 +337,27 @@ func (c *CachedQuestionMetadataClient) GetX(ctx context.Context, id int) *Cached
 }
 
 // Hooks returns the client hooks.
-func (c *CachedQuestionMetadataClient) Hooks() []Hook {
-	return c.hooks.CachedQuestionMetadata
+func (c *CachedQuestionMetaDataClient) Hooks() []Hook {
+	return c.hooks.CachedQuestionMetaData
 }
 
 // Interceptors returns the client interceptors.
-func (c *CachedQuestionMetadataClient) Interceptors() []Interceptor {
-	return c.inters.CachedQuestionMetadata
+func (c *CachedQuestionMetaDataClient) Interceptors() []Interceptor {
+	return c.inters.CachedQuestionMetaData
 }
 
-func (c *CachedQuestionMetadataClient) mutate(ctx context.Context, m *CachedQuestionMetadataMutation) (Value, error) {
+func (c *CachedQuestionMetaDataClient) mutate(ctx context.Context, m *CachedQuestionMetaDataMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&CachedQuestionMetadataCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CachedQuestionMetaDataCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&CachedQuestionMetadataUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CachedQuestionMetaDataUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&CachedQuestionMetadataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CachedQuestionMetaDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&CachedQuestionMetadataDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&CachedQuestionMetaDataDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown CachedQuestionMetadata mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown CachedQuestionMetaData mutation op: %q", m.Op())
 	}
 }
 
@@ -827,9 +827,9 @@ func (c *ExamSettingClient) mutate(ctx context.Context, m *ExamSettingMutation) 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		CachedQuestionMetadata, Exam, ExamCategory, ExamSetting []ent.Hook
+		CachedQuestionMetaData, Exam, ExamCategory, ExamSetting []ent.Hook
 	}
 	inters struct {
-		CachedQuestionMetadata, Exam, ExamCategory, ExamSetting []ent.Interceptor
+		CachedQuestionMetaData, Exam, ExamCategory, ExamSetting []ent.Interceptor
 	}
 )
