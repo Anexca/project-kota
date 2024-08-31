@@ -52,7 +52,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 		return err
 	}
 
-	for _, cat := range examCategories {
+	for _, examCategory := range examCategories {
 		wg.Add(1)
 		go func(cat *ent.ExamCategory) {
 			defer wg.Done()
@@ -82,7 +82,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 
 					uid := commonUtil.GenerateUUID()
 					q.redisService.Store(ctx, uid, response, DEFAULT_CACHE_EXPIRY)
-					cacheMetaData, err := q.cachedQuestionMetaDataRepository.Create(ctx, uid, DEFAULT_CACHE_EXPIRY)
+					cacheMetaData, err := q.cachedQuestionMetaDataRepository.Create(ctx, uid, DEFAULT_CACHE_EXPIRY, exam)
 					if err != nil {
 						log.Printf("Error saving cached meta data for exam %s: %v", exam.Name, err)
 						return
@@ -90,7 +90,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 					log.Printf("Cached response for exam %s with uid %s, saved its meta data in db with id %d", exam.Name, uid, cacheMetaData.ID)
 				}(exam)
 			}
-		}(cat)
+		}(examCategory)
 	}
 
 	wg.Wait()
