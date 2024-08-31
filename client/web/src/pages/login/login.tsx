@@ -62,9 +62,14 @@ export function Login() {
   return (
     <div className="w-full h-screen max-h-screen lg:grid lg:grid-cols-2 ">
       <div className="flex items-center justify-center py-12">
-        <Card className="max-w-sm">
+        <Card className="max-w-[20rem]">
           <CardHeader>
-            <CardTitle className="text-xl">Login</CardTitle>
+            <CardTitle className="text-xl flex">
+              Login
+              <Link className="ml-auto" to={`/${paths.HOMEPAGE}`}>
+                <i className="fa-solid fa-xmark"></i>
+              </Link>
+            </CardTitle>
             <CardDescription>
               Enter your email below to login to your account
             </CardDescription>

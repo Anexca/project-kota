@@ -48,9 +48,14 @@ export function RegisterPage() {
   return (
     <div className="w-full h-screen max-h-screen lg:grid lg:grid-cols-2 ">
       <div className="flex items-center justify-center py-12">
-        <Card className="max-w-sm">
+        <Card className="max-w-[20rem]">
           <CardHeader>
-            <CardTitle className="text-xl">Register</CardTitle>
+            <CardTitle className="text-xl flex">
+              Register
+              <Link className="ml-auto" to={`/${paths.HOMEPAGE}`}>
+                <i className="fa-solid fa-xmark"></i>
+              </Link>
+            </CardTitle>
             <CardDescription>
               Enter your information to create an account
             </CardDescription>
