@@ -1,3 +1,7 @@
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../../componnets/base/button/button";
 import {
   Card,
   CardContent,
@@ -5,54 +9,55 @@ import {
   CardHeader,
   CardTitle,
 } from "../../componnets/base/card/card";
-import { Label } from "../../componnets/base/label/label";
-
-import { Button } from "../../componnets/base/button/button";
-import { BackgroundGradientAnimation } from "../../componnets/shared/background-blob/background-blob";
-import { paths } from "../../routes/route.constant";
-import { Link } from "react-router-dom";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
 import ControlledInput from "../../componnets/base/controlled-input";
+import { Label } from "../../componnets/base/label/label";
+import { BackgroundGradientAnimation } from "../../componnets/shared/background-blob/background-blob";
 import { useToast } from "../../hooks/use-toast";
+import { paths } from "../../routes/route.constant";
 import useSessionStore from "../../store/auth-store";
-import { LoginSchema, LoginType } from "../../validation-schema/auth";
 import { supabase } from "../../supabase/client";
-import GoogleIcon from "../../assets/svg/google-icon";
+import {
+  ForgotPasswordSchema,
+  ForgotPasswordType,
+} from "../../validation-schema/auth";
+import {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+} from "../../componnets/base/alert/alert";
 
-export function RegisterPage() {
-  const { setSession } = useSessionStore();
+export function ForgotPassword() {
+  const navigate = useNavigate();
+  const { loadSession } = useSessionStore();
   const { toast } = useToast();
   const { handleSubmit, control } = useForm({
     defaultValues: {
       email: "",
-      password: "",
     },
-    resolver: yupResolver(LoginSchema),
+    resolver: yupResolver(ForgotPasswordSchema),
   });
-  const onSumbit = async (formData: LoginType) => {
-    const { email, password } = formData;
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const onSumbit = async (formData: ForgotPasswordType) => {
+    const { email } = formData;
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) {
       toast({ title: error.message || "Something went wrong." });
       return;
     }
     if (data) {
-      toast({ title: "Successfully logged in." });
-      setSession(data.session);
+      const session = await loadSession();
+      session && navigate(`/${paths.HOMEPAGE}`);
     }
   };
+
   return (
     <div className="w-full h-screen max-h-screen lg:grid lg:grid-cols-2 ">
       <div className="flex items-center justify-center py-12">
         <Card className="max-w-sm">
           <CardHeader>
-            <CardTitle className="text-xl">Register</CardTitle>
+            <CardTitle className="text-xl">Forgot Password</CardTitle>
             <CardDescription>
-              Enter your information to create an account
+              Enter your email below to get password recovery mail.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -73,23 +78,18 @@ export function RegisterPage() {
                   }}
                 />
               </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <ControlledInput
-                  control={control}
-                  inputProps={{ type: "password" }}
-                  name="password"
-                />
-              </div>
+
               <Button type="submit" className="w-full">
-                Register
-              </Button>
-              <Button variant="outline" className="w-full">
-                <GoogleIcon className="mr-2" /> Login with Google
+                Send Recovery Mail
               </Button>
             </form>
+            <Alert variant={"success"} className="mt-4">
+              <AlertTitle>Success ✌</AlertTitle>
+              <AlertDescription>
+                Please check you mail box for password reset mail.
+              </AlertDescription>
+            </Alert>
+
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
               <Link to={`/${paths.LOGIN}`} className="underline">
