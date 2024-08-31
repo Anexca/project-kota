@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -25,6 +26,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.Heartbeat("/ping"))
 
 	r.Get("/sup", s.Sup)
+	r.Get("/health", s.HealthCheck)
 
 	r.Route("/exams", func(r chi.Router) {
 		r.Route("/banking", func(r chi.Router) {
@@ -41,4 +43,13 @@ func (s *Server) Sup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.WriteJson(w, http.StatusOK, &response)
+}
+
+func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	jsonResp, _ := json.Marshal(s.redisService.Health())
+	response := Response{
+		Data: string(jsonResp),
+	}
+	s.WriteJson(w, http.StatusOK, &response)
+
 }

@@ -13,7 +13,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.Logger)
 
 	r.Get("/sup", s.SupHandler)
-	r.Get("/health", s.HealthCheckHandler)
+	r.Get("/health", s.HealthCheck)
 
 	return r
 }
@@ -26,7 +26,7 @@ func (s *Server) SupHandler(w http.ResponseWriter, r *http.Request) {
 	s.WriteJson(w, http.StatusOK, &response)
 }
 
-func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	jsonResp, _ := json.Marshal(s.redisService.Health())
 	response := Response{
 		Data: string(jsonResp),
