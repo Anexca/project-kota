@@ -1,10 +1,10 @@
 package services
 
 import (
-	"ai-service/internal/repositories"
 	"common/ent"
+	commonRepositories "common/repositories"
 	commonService "common/services"
-	util "common/util"
+	commonUtil "common/util"
 	"context"
 	"log"
 	"sync"
@@ -17,19 +17,19 @@ import (
 type ExamService struct {
 	genAIService                     *GenAIService
 	redisService                     *commonService.RedisService
-	examRepository                   *repositories.ExamRepository
-	examCategoryRepository           *repositories.ExamCategoryRepository
-	examSettingRepository            *repositories.ExamSettingRepository
-	cachedQuestionMetaDataRepository *repositories.CachedQuestionMetaDataRepository
+	examRepository                   *commonRepositories.ExamRepository
+	examCategoryRepository           *commonRepositories.ExamCategoryRepository
+	examSettingRepository            *commonRepositories.ExamSettingRepository
+	cachedQuestionMetaDataRepository *commonRepositories.CachedQuestionMetaDataRepository
 }
 
 func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *ExamService {
 	genAIService := NewGenAIService(genAIClient)
 	redisService := commonService.NewRedisService(redisClient)
-	examRepository := repositories.NewExamRespository(dbClient)
-	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
-	examSettingRepository := repositories.NewExamSettingRepository(dbClient)
-	cachedQuestionMetaDataRepository := repositories.NewCachedQuestionMetaDataRepository(dbClient)
+	examRepository := commonRepositories.NewExamRespository(dbClient)
+	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
+	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
+	cachedQuestionMetaDataRepository := commonRepositories.NewCachedQuestionMetaDataRepository(dbClient)
 
 	return &ExamService{
 		genAIService:                     genAIService,
@@ -80,7 +80,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 						return
 					}
 
-					uid := util.GenerateUUID()
+					uid := commonUtil.GenerateUUID()
 					q.redisService.Store(ctx, uid, response, DEFAULT_CACHE_EXPIRY)
 					cacheMetaData, err := q.cachedQuestionMetaDataRepository.Create(ctx, uid, DEFAULT_CACHE_EXPIRY)
 					if err != nil {
