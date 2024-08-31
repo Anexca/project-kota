@@ -177,7 +177,7 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if esu.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   examsetting.ExamTable,
 			Columns: []string{examsetting.ExamColumn},
@@ -190,7 +190,7 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := esu.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   examsetting.ExamTable,
 			Columns: []string{examsetting.ExamColumn},
@@ -402,7 +402,7 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	}
 	if esuo.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   examsetting.ExamTable,
 			Columns: []string{examsetting.ExamColumn},
@@ -415,7 +415,7 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	}
 	if nodes := esuo.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   examsetting.ExamTable,
 			Columns: []string{examsetting.ExamColumn},

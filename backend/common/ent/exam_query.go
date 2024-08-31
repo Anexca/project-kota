@@ -26,7 +26,7 @@ type ExamQuery struct {
 	inters       []Interceptor
 	predicates   []predicate.Exam
 	withCategory *ExamCategoryQuery
-	withSettings *ExamSettingQuery
+	withSetting  *ExamSettingQuery
 	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -86,8 +86,8 @@ func (eq *ExamQuery) QueryCategory() *ExamCategoryQuery {
 	return query
 }
 
-// QuerySettings chains the current query on the "settings" edge.
-func (eq *ExamQuery) QuerySettings() *ExamSettingQuery {
+// QuerySetting chains the current query on the "setting" edge.
+func (eq *ExamQuery) QuerySetting() *ExamSettingQuery {
 	query := (&ExamSettingClient{config: eq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
@@ -100,7 +100,7 @@ func (eq *ExamQuery) QuerySettings() *ExamSettingQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(exam.Table, exam.FieldID, selector),
 			sqlgraph.To(examsetting.Table, examsetting.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, exam.SettingsTable, exam.SettingsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, exam.SettingTable, exam.SettingColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -301,7 +301,7 @@ func (eq *ExamQuery) Clone() *ExamQuery {
 		inters:       append([]Interceptor{}, eq.inters...),
 		predicates:   append([]predicate.Exam{}, eq.predicates...),
 		withCategory: eq.withCategory.Clone(),
-		withSettings: eq.withSettings.Clone(),
+		withSetting:  eq.withSetting.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -319,14 +319,14 @@ func (eq *ExamQuery) WithCategory(opts ...func(*ExamCategoryQuery)) *ExamQuery {
 	return eq
 }
 
-// WithSettings tells the query-builder to eager-load the nodes that are connected to
-// the "settings" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *ExamQuery) WithSettings(opts ...func(*ExamSettingQuery)) *ExamQuery {
+// WithSetting tells the query-builder to eager-load the nodes that are connected to
+// the "setting" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *ExamQuery) WithSetting(opts ...func(*ExamSettingQuery)) *ExamQuery {
 	query := (&ExamSettingClient{config: eq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withSettings = query
+	eq.withSetting = query
 	return eq
 }
 
@@ -411,7 +411,7 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 		_spec       = eq.querySpec()
 		loadedTypes = [2]bool{
 			eq.withCategory != nil,
-			eq.withSettings != nil,
+			eq.withSetting != nil,
 		}
 	)
 	if eq.withCategory != nil {
@@ -444,10 +444,9 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 			return nil, err
 		}
 	}
-	if query := eq.withSettings; query != nil {
-		if err := eq.loadSettings(ctx, query, nodes,
-			func(n *Exam) { n.Edges.Settings = []*ExamSetting{} },
-			func(n *Exam, e *ExamSetting) { n.Edges.Settings = append(n.Edges.Settings, e) }); err != nil {
+	if query := eq.withSetting; query != nil {
+		if err := eq.loadSetting(ctx, query, nodes, nil,
+			func(n *Exam, e *ExamSetting) { n.Edges.Setting = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -486,32 +485,29 @@ func (eq *ExamQuery) loadCategory(ctx context.Context, query *ExamCategoryQuery,
 	}
 	return nil
 }
-func (eq *ExamQuery) loadSettings(ctx context.Context, query *ExamSettingQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *ExamSetting)) error {
+func (eq *ExamQuery) loadSetting(ctx context.Context, query *ExamSettingQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *ExamSetting)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Exam)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.ExamSetting(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(exam.SettingsColumn), fks...))
+		s.Where(sql.InValues(s.C(exam.SettingColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.exam_settings
+		fk := n.exam_setting
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "exam_settings" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "exam_setting" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "exam_settings" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "exam_setting" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

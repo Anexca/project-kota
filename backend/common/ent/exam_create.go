@@ -95,19 +95,23 @@ func (ec *ExamCreate) SetCategory(e *ExamCategory) *ExamCreate {
 	return ec.SetCategoryID(e.ID)
 }
 
-// AddSettingIDs adds the "settings" edge to the ExamSetting entity by IDs.
-func (ec *ExamCreate) AddSettingIDs(ids ...int) *ExamCreate {
-	ec.mutation.AddSettingIDs(ids...)
+// SetSettingID sets the "setting" edge to the ExamSetting entity by ID.
+func (ec *ExamCreate) SetSettingID(id int) *ExamCreate {
+	ec.mutation.SetSettingID(id)
 	return ec
 }
 
-// AddSettings adds the "settings" edges to the ExamSetting entity.
-func (ec *ExamCreate) AddSettings(e ...*ExamSetting) *ExamCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableSettingID sets the "setting" edge to the ExamSetting entity by ID if the given value is not nil.
+func (ec *ExamCreate) SetNillableSettingID(id *int) *ExamCreate {
+	if id != nil {
+		ec = ec.SetSettingID(*id)
 	}
-	return ec.AddSettingIDs(ids...)
+	return ec
+}
+
+// SetSetting sets the "setting" edge to the ExamSetting entity.
+func (ec *ExamCreate) SetSetting(e *ExamSetting) *ExamCreate {
+	return ec.SetSettingID(e.ID)
 }
 
 // Mutation returns the ExamMutation object of the builder.
@@ -239,12 +243,12 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 		_node.exam_category_exams = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.SettingsIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.SettingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   exam.SettingsTable,
-			Columns: []string{exam.SettingsColumn},
+			Table:   exam.SettingTable,
+			Columns: []string{exam.SettingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),

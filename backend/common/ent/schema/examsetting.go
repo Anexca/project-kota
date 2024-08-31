@@ -29,7 +29,7 @@ func (ExamSetting) Fields() []ent.Field {
 func (ExamSetting) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("exam", Exam.Type).
-			Ref("settings").
-			Unique(),
+			Ref("setting").
+			Unique(), // Each ExamSetting belongs to one Exam
 	}
 }

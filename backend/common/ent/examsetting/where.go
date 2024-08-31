@@ -195,7 +195,7 @@ func HasExam() predicate.ExamSetting {
 	return predicate.ExamSetting(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ExamTable, ExamColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, ExamTable, ExamColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

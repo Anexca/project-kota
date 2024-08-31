@@ -30,7 +30,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "exam" package.
 	ExamInverseTable = "exams"
 	// ExamColumn is the table column denoting the exam relation/edge.
-	ExamColumn = "exam_settings"
+	ExamColumn = "exam_setting"
 )
 
 // Columns holds all SQL columns for examsetting fields.
@@ -45,7 +45,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "exam_settings"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"exam_settings",
+	"exam_setting",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -96,6 +96,6 @@ func newExamStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ExamInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ExamTable, ExamColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, ExamTable, ExamColumn),
 	)
 }

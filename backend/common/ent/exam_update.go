@@ -111,19 +111,23 @@ func (eu *ExamUpdate) SetCategory(e *ExamCategory) *ExamUpdate {
 	return eu.SetCategoryID(e.ID)
 }
 
-// AddSettingIDs adds the "settings" edge to the ExamSetting entity by IDs.
-func (eu *ExamUpdate) AddSettingIDs(ids ...int) *ExamUpdate {
-	eu.mutation.AddSettingIDs(ids...)
+// SetSettingID sets the "setting" edge to the ExamSetting entity by ID.
+func (eu *ExamUpdate) SetSettingID(id int) *ExamUpdate {
+	eu.mutation.SetSettingID(id)
 	return eu
 }
 
-// AddSettings adds the "settings" edges to the ExamSetting entity.
-func (eu *ExamUpdate) AddSettings(e ...*ExamSetting) *ExamUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableSettingID sets the "setting" edge to the ExamSetting entity by ID if the given value is not nil.
+func (eu *ExamUpdate) SetNillableSettingID(id *int) *ExamUpdate {
+	if id != nil {
+		eu = eu.SetSettingID(*id)
 	}
-	return eu.AddSettingIDs(ids...)
+	return eu
+}
+
+// SetSetting sets the "setting" edge to the ExamSetting entity.
+func (eu *ExamUpdate) SetSetting(e *ExamSetting) *ExamUpdate {
+	return eu.SetSettingID(e.ID)
 }
 
 // Mutation returns the ExamMutation object of the builder.
@@ -137,25 +141,10 @@ func (eu *ExamUpdate) ClearCategory() *ExamUpdate {
 	return eu
 }
 
-// ClearSettings clears all "settings" edges to the ExamSetting entity.
-func (eu *ExamUpdate) ClearSettings() *ExamUpdate {
-	eu.mutation.ClearSettings()
+// ClearSetting clears the "setting" edge to the ExamSetting entity.
+func (eu *ExamUpdate) ClearSetting() *ExamUpdate {
+	eu.mutation.ClearSetting()
 	return eu
-}
-
-// RemoveSettingIDs removes the "settings" edge to ExamSetting entities by IDs.
-func (eu *ExamUpdate) RemoveSettingIDs(ids ...int) *ExamUpdate {
-	eu.mutation.RemoveSettingIDs(ids...)
-	return eu
-}
-
-// RemoveSettings removes "settings" edges to ExamSetting entities.
-func (eu *ExamUpdate) RemoveSettings(e ...*ExamSetting) *ExamUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.RemoveSettingIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -247,12 +236,12 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.SettingsCleared() {
+	if eu.mutation.SettingCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   exam.SettingsTable,
-			Columns: []string{exam.SettingsColumn},
+			Table:   exam.SettingTable,
+			Columns: []string{exam.SettingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
@@ -260,28 +249,12 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedSettingsIDs(); len(nodes) > 0 && !eu.mutation.SettingsCleared() {
+	if nodes := eu.mutation.SettingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   exam.SettingsTable,
-			Columns: []string{exam.SettingsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.SettingsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.SettingsTable,
-			Columns: []string{exam.SettingsColumn},
+			Table:   exam.SettingTable,
+			Columns: []string{exam.SettingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
@@ -393,19 +366,23 @@ func (euo *ExamUpdateOne) SetCategory(e *ExamCategory) *ExamUpdateOne {
 	return euo.SetCategoryID(e.ID)
 }
 
-// AddSettingIDs adds the "settings" edge to the ExamSetting entity by IDs.
-func (euo *ExamUpdateOne) AddSettingIDs(ids ...int) *ExamUpdateOne {
-	euo.mutation.AddSettingIDs(ids...)
+// SetSettingID sets the "setting" edge to the ExamSetting entity by ID.
+func (euo *ExamUpdateOne) SetSettingID(id int) *ExamUpdateOne {
+	euo.mutation.SetSettingID(id)
 	return euo
 }
 
-// AddSettings adds the "settings" edges to the ExamSetting entity.
-func (euo *ExamUpdateOne) AddSettings(e ...*ExamSetting) *ExamUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableSettingID sets the "setting" edge to the ExamSetting entity by ID if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableSettingID(id *int) *ExamUpdateOne {
+	if id != nil {
+		euo = euo.SetSettingID(*id)
 	}
-	return euo.AddSettingIDs(ids...)
+	return euo
+}
+
+// SetSetting sets the "setting" edge to the ExamSetting entity.
+func (euo *ExamUpdateOne) SetSetting(e *ExamSetting) *ExamUpdateOne {
+	return euo.SetSettingID(e.ID)
 }
 
 // Mutation returns the ExamMutation object of the builder.
@@ -419,25 +396,10 @@ func (euo *ExamUpdateOne) ClearCategory() *ExamUpdateOne {
 	return euo
 }
 
-// ClearSettings clears all "settings" edges to the ExamSetting entity.
-func (euo *ExamUpdateOne) ClearSettings() *ExamUpdateOne {
-	euo.mutation.ClearSettings()
+// ClearSetting clears the "setting" edge to the ExamSetting entity.
+func (euo *ExamUpdateOne) ClearSetting() *ExamUpdateOne {
+	euo.mutation.ClearSetting()
 	return euo
-}
-
-// RemoveSettingIDs removes the "settings" edge to ExamSetting entities by IDs.
-func (euo *ExamUpdateOne) RemoveSettingIDs(ids ...int) *ExamUpdateOne {
-	euo.mutation.RemoveSettingIDs(ids...)
-	return euo
-}
-
-// RemoveSettings removes "settings" edges to ExamSetting entities.
-func (euo *ExamUpdateOne) RemoveSettings(e ...*ExamSetting) *ExamUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.RemoveSettingIDs(ids...)
 }
 
 // Where appends a list predicates to the ExamUpdate builder.
@@ -559,12 +521,12 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.SettingsCleared() {
+	if euo.mutation.SettingCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   exam.SettingsTable,
-			Columns: []string{exam.SettingsColumn},
+			Table:   exam.SettingTable,
+			Columns: []string{exam.SettingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
@@ -572,28 +534,12 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedSettingsIDs(); len(nodes) > 0 && !euo.mutation.SettingsCleared() {
+	if nodes := euo.mutation.SettingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   exam.SettingsTable,
-			Columns: []string{exam.SettingsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.SettingsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.SettingsTable,
-			Columns: []string{exam.SettingsColumn},
+			Table:   exam.SettingTable,
+			Columns: []string{exam.SettingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),

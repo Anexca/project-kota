@@ -71,7 +71,7 @@ var (
 		{Name: "duration_minutes", Type: field.TypeTime},
 		{Name: "negative_marking", Type: field.TypeFloat64},
 		{Name: "other_details", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "json"}},
-		{Name: "exam_settings", Type: field.TypeInt, Nullable: true},
+		{Name: "exam_setting", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// ExamSettingsTable holds the schema information for the "exam_settings" table.
 	ExamSettingsTable = &schema.Table{
@@ -80,7 +80,7 @@ var (
 		PrimaryKey: []*schema.Column{ExamSettingsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "exam_settings_exams_settings",
+				Symbol:     "exam_settings_exams_setting",
 				Columns:    []*schema.Column{ExamSettingsColumns[5]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.SetNull,

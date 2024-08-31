@@ -27,6 +27,6 @@ func (ExamCategory) Fields() []ent.Field {
 // Edges of the ExamCategory.
 func (ExamCategory) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("exams", Exam.Type),
+		edge.To("exams", Exam.Type), // One ExamCategory can have many Exams
 	}
 }

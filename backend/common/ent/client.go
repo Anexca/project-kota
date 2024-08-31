@@ -485,15 +485,15 @@ func (c *ExamClient) QueryCategory(e *Exam) *ExamCategoryQuery {
 	return query
 }
 
-// QuerySettings queries the settings edge of a Exam.
-func (c *ExamClient) QuerySettings(e *Exam) *ExamSettingQuery {
+// QuerySetting queries the setting edge of a Exam.
+func (c *ExamClient) QuerySetting(e *Exam) *ExamSettingQuery {
 	query := (&ExamSettingClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(exam.Table, exam.FieldID, id),
 			sqlgraph.To(examsetting.Table, examsetting.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, exam.SettingsTable, exam.SettingsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, exam.SettingTable, exam.SettingColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -791,7 +791,7 @@ func (c *ExamSettingClient) QueryExam(es *ExamSetting) *ExamQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(examsetting.Table, examsetting.FieldID, id),
 			sqlgraph.To(exam.Table, exam.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, examsetting.ExamTable, examsetting.ExamColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, examsetting.ExamTable, examsetting.ExamColumn),
 		)
 		fromV = sqlgraph.Neighbors(es.driver.Dialect(), step)
 		return fromV, nil

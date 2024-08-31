@@ -323,21 +323,21 @@ func HasCategoryWith(preds ...predicate.ExamCategory) predicate.Exam {
 	})
 }
 
-// HasSettings applies the HasEdge predicate on the "settings" edge.
-func HasSettings() predicate.Exam {
+// HasSetting applies the HasEdge predicate on the "setting" edge.
+func HasSetting() predicate.Exam {
 	return predicate.Exam(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SettingsTable, SettingsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, SettingTable, SettingColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSettingsWith applies the HasEdge predicate on the "settings" edge with a given conditions (other predicates).
-func HasSettingsWith(preds ...predicate.ExamSetting) predicate.Exam {
+// HasSettingWith applies the HasEdge predicate on the "setting" edge with a given conditions (other predicates).
+func HasSettingWith(preds ...predicate.ExamSetting) predicate.Exam {
 	return predicate.Exam(func(s *sql.Selector) {
-		step := newSettingsStep()
+		step := newSettingStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

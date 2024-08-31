@@ -26,8 +26,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
-	// EdgeSettings holds the string denoting the settings edge name in mutations.
-	EdgeSettings = "settings"
+	// EdgeSetting holds the string denoting the setting edge name in mutations.
+	EdgeSetting = "setting"
 	// Table holds the table name of the exam in the database.
 	Table = "exams"
 	// CategoryTable is the table that holds the category relation/edge.
@@ -37,13 +37,13 @@ const (
 	CategoryInverseTable = "exam_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "exam_category_exams"
-	// SettingsTable is the table that holds the settings relation/edge.
-	SettingsTable = "exam_settings"
-	// SettingsInverseTable is the table name for the ExamSetting entity.
+	// SettingTable is the table that holds the setting relation/edge.
+	SettingTable = "exam_settings"
+	// SettingInverseTable is the table name for the ExamSetting entity.
 	// It exists in this package in order to avoid circular dependency with the "examsetting" package.
-	SettingsInverseTable = "exam_settings"
-	// SettingsColumn is the table column denoting the settings relation/edge.
-	SettingsColumn = "exam_settings"
+	SettingInverseTable = "exam_settings"
+	// SettingColumn is the table column denoting the setting relation/edge.
+	SettingColumn = "exam_setting"
 )
 
 // Columns holds all SQL columns for exam fields.
@@ -128,17 +128,10 @@ func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// BySettingsCount orders the results by settings count.
-func BySettingsCount(opts ...sql.OrderTermOption) OrderOption {
+// BySettingField orders the results by setting field.
+func BySettingField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSettingsStep(), opts...)
-	}
-}
-
-// BySettings orders the results by settings terms.
-func BySettings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSettingsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newSettingStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newCategoryStep() *sqlgraph.Step {
@@ -148,10 +141,10 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
 	)
 }
-func newSettingsStep() *sqlgraph.Step {
+func newSettingStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SettingsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SettingsTable, SettingsColumn),
+		sqlgraph.To(SettingInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, SettingTable, SettingColumn),
 	)
 }

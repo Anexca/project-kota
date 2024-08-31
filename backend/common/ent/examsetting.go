@@ -29,9 +29,9 @@ type ExamSetting struct {
 	OtherDetails map[string]interface{} `json:"other_details,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ExamSettingQuery when eager-loading is set.
-	Edges         ExamSettingEdges `json:"edges"`
-	exam_settings *int
-	selectValues  sql.SelectValues
+	Edges        ExamSettingEdges `json:"edges"`
+	exam_setting *int
+	selectValues sql.SelectValues
 }
 
 // ExamSettingEdges holds the relations/edges for other nodes in the graph.
@@ -67,7 +67,7 @@ func (*ExamSetting) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case examsetting.FieldDurationMinutes:
 			values[i] = new(sql.NullTime)
-		case examsetting.ForeignKeys[0]: // exam_settings
+		case examsetting.ForeignKeys[0]: // exam_setting
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -118,10 +118,10 @@ func (es *ExamSetting) assignValues(columns []string, values []any) error {
 			}
 		case examsetting.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field exam_settings", value)
+				return fmt.Errorf("unexpected type %T for edge-field exam_setting", value)
 			} else if value.Valid {
-				es.exam_settings = new(int)
-				*es.exam_settings = int(value.Int64)
+				es.exam_setting = new(int)
+				*es.exam_setting = int(value.Int64)
 			}
 		default:
 			es.selectValues.Set(columns[i], values[i])

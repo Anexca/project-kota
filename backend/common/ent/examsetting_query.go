@@ -75,7 +75,7 @@ func (esq *ExamSettingQuery) QueryExam() *ExamQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(examsetting.Table, examsetting.FieldID, selector),
 			sqlgraph.To(exam.Table, exam.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, examsetting.ExamTable, examsetting.ExamColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, examsetting.ExamTable, examsetting.ExamColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(esq.driver.Dialect(), step)
 		return fromU, nil
@@ -413,10 +413,10 @@ func (esq *ExamSettingQuery) loadExam(ctx context.Context, query *ExamQuery, nod
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ExamSetting)
 	for i := range nodes {
-		if nodes[i].exam_settings == nil {
+		if nodes[i].exam_setting == nil {
 			continue
 		}
-		fk := *nodes[i].exam_settings
+		fk := *nodes[i].exam_setting
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -433,7 +433,7 @@ func (esq *ExamSettingQuery) loadExam(ctx context.Context, query *ExamQuery, nod
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "exam_settings" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "exam_setting" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

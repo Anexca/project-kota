@@ -5,6 +5,7 @@ package ent
 import (
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examsetting"
 	"fmt"
 	"strings"
 	"time"
@@ -39,8 +40,8 @@ type Exam struct {
 type ExamEdges struct {
 	// Category holds the value of the category edge.
 	Category *ExamCategory `json:"category,omitempty"`
-	// Settings holds the value of the settings edge.
-	Settings []*ExamSetting `json:"settings,omitempty"`
+	// Setting holds the value of the setting edge.
+	Setting *ExamSetting `json:"setting,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -57,13 +58,15 @@ func (e ExamEdges) CategoryOrErr() (*ExamCategory, error) {
 	return nil, &NotLoadedError{edge: "category"}
 }
 
-// SettingsOrErr returns the Settings value or an error if the edge
-// was not loaded in eager-loading.
-func (e ExamEdges) SettingsOrErr() ([]*ExamSetting, error) {
-	if e.loadedTypes[1] {
-		return e.Settings, nil
+// SettingOrErr returns the Setting value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ExamEdges) SettingOrErr() (*ExamSetting, error) {
+	if e.Setting != nil {
+		return e.Setting, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: examsetting.Label}
 	}
-	return nil, &NotLoadedError{edge: "settings"}
+	return nil, &NotLoadedError{edge: "setting"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -157,9 +160,9 @@ func (e *Exam) QueryCategory() *ExamCategoryQuery {
 	return NewExamClient(e.config).QueryCategory(e)
 }
 
-// QuerySettings queries the "settings" edge of the Exam entity.
-func (e *Exam) QuerySettings() *ExamSettingQuery {
-	return NewExamClient(e.config).QuerySettings(e)
+// QuerySetting queries the "setting" edge of the Exam entity.
+func (e *Exam) QuerySetting() *ExamSettingQuery {
+	return NewExamClient(e.config).QuerySetting(e)
 }
 
 // Update returns a builder for updating this Exam.

@@ -697,9 +697,8 @@ type ExamMutation struct {
 	clearedFields   map[string]struct{}
 	category        *int
 	clearedcategory bool
-	settings        map[int]struct{}
-	removedsettings map[int]struct{}
-	clearedsettings bool
+	setting         *int
+	clearedsetting  bool
 	done            bool
 	oldValue        func(context.Context) (*Exam, error)
 	predicates      []predicate.Exam
@@ -1022,58 +1021,43 @@ func (m *ExamMutation) ResetCategory() {
 	m.clearedcategory = false
 }
 
-// AddSettingIDs adds the "settings" edge to the ExamSetting entity by ids.
-func (m *ExamMutation) AddSettingIDs(ids ...int) {
-	if m.settings == nil {
-		m.settings = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.settings[ids[i]] = struct{}{}
-	}
+// SetSettingID sets the "setting" edge to the ExamSetting entity by id.
+func (m *ExamMutation) SetSettingID(id int) {
+	m.setting = &id
 }
 
-// ClearSettings clears the "settings" edge to the ExamSetting entity.
-func (m *ExamMutation) ClearSettings() {
-	m.clearedsettings = true
+// ClearSetting clears the "setting" edge to the ExamSetting entity.
+func (m *ExamMutation) ClearSetting() {
+	m.clearedsetting = true
 }
 
-// SettingsCleared reports if the "settings" edge to the ExamSetting entity was cleared.
-func (m *ExamMutation) SettingsCleared() bool {
-	return m.clearedsettings
+// SettingCleared reports if the "setting" edge to the ExamSetting entity was cleared.
+func (m *ExamMutation) SettingCleared() bool {
+	return m.clearedsetting
 }
 
-// RemoveSettingIDs removes the "settings" edge to the ExamSetting entity by IDs.
-func (m *ExamMutation) RemoveSettingIDs(ids ...int) {
-	if m.removedsettings == nil {
-		m.removedsettings = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.settings, ids[i])
-		m.removedsettings[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSettings returns the removed IDs of the "settings" edge to the ExamSetting entity.
-func (m *ExamMutation) RemovedSettingsIDs() (ids []int) {
-	for id := range m.removedsettings {
-		ids = append(ids, id)
+// SettingID returns the "setting" edge ID in the mutation.
+func (m *ExamMutation) SettingID() (id int, exists bool) {
+	if m.setting != nil {
+		return *m.setting, true
 	}
 	return
 }
 
-// SettingsIDs returns the "settings" edge IDs in the mutation.
-func (m *ExamMutation) SettingsIDs() (ids []int) {
-	for id := range m.settings {
-		ids = append(ids, id)
+// SettingIDs returns the "setting" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SettingID instead. It exists only for internal usage by the builders.
+func (m *ExamMutation) SettingIDs() (ids []int) {
+	if id := m.setting; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetSettings resets all changes to the "settings" edge.
-func (m *ExamMutation) ResetSettings() {
-	m.settings = nil
-	m.clearedsettings = false
-	m.removedsettings = nil
+// ResetSetting resets all changes to the "setting" edge.
+func (m *ExamMutation) ResetSetting() {
+	m.setting = nil
+	m.clearedsetting = false
 }
 
 // Where appends a list predicates to the ExamMutation builder.
@@ -1281,8 +1265,8 @@ func (m *ExamMutation) AddedEdges() []string {
 	if m.category != nil {
 		edges = append(edges, exam.EdgeCategory)
 	}
-	if m.settings != nil {
-		edges = append(edges, exam.EdgeSettings)
+	if m.setting != nil {
+		edges = append(edges, exam.EdgeSetting)
 	}
 	return edges
 }
@@ -1295,12 +1279,10 @@ func (m *ExamMutation) AddedIDs(name string) []ent.Value {
 		if id := m.category; id != nil {
 			return []ent.Value{*id}
 		}
-	case exam.EdgeSettings:
-		ids := make([]ent.Value, 0, len(m.settings))
-		for id := range m.settings {
-			ids = append(ids, id)
+	case exam.EdgeSetting:
+		if id := m.setting; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -1308,23 +1290,12 @@ func (m *ExamMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ExamMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedsettings != nil {
-		edges = append(edges, exam.EdgeSettings)
-	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ExamMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case exam.EdgeSettings:
-		ids := make([]ent.Value, 0, len(m.removedsettings))
-		for id := range m.removedsettings {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
@@ -1334,8 +1305,8 @@ func (m *ExamMutation) ClearedEdges() []string {
 	if m.clearedcategory {
 		edges = append(edges, exam.EdgeCategory)
 	}
-	if m.clearedsettings {
-		edges = append(edges, exam.EdgeSettings)
+	if m.clearedsetting {
+		edges = append(edges, exam.EdgeSetting)
 	}
 	return edges
 }
@@ -1346,8 +1317,8 @@ func (m *ExamMutation) EdgeCleared(name string) bool {
 	switch name {
 	case exam.EdgeCategory:
 		return m.clearedcategory
-	case exam.EdgeSettings:
-		return m.clearedsettings
+	case exam.EdgeSetting:
+		return m.clearedsetting
 	}
 	return false
 }
@@ -1358,6 +1329,9 @@ func (m *ExamMutation) ClearEdge(name string) error {
 	switch name {
 	case exam.EdgeCategory:
 		m.ClearCategory()
+		return nil
+	case exam.EdgeSetting:
+		m.ClearSetting()
 		return nil
 	}
 	return fmt.Errorf("unknown Exam unique edge %s", name)
@@ -1370,8 +1344,8 @@ func (m *ExamMutation) ResetEdge(name string) error {
 	case exam.EdgeCategory:
 		m.ResetCategory()
 		return nil
-	case exam.EdgeSettings:
-		m.ResetSettings()
+	case exam.EdgeSetting:
+		m.ResetSetting()
 		return nil
 	}
 	return fmt.Errorf("unknown Exam edge %s", name)

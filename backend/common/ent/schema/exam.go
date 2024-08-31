@@ -29,7 +29,8 @@ func (Exam) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("category", ExamCategory.Type).
 			Ref("exams").
-			Unique(),
-		edge.To("settings", ExamSetting.Type),
+			Unique(), // Many Exams belong to one ExamCategory
+		edge.To("setting", ExamSetting.Type).
+			Unique(), // Each Exam has one ExamSetting
 	}
 }

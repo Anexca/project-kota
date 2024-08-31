@@ -154,7 +154,7 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 	}
 	if nodes := esc.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   examsetting.ExamTable,
 			Columns: []string{examsetting.ExamColumn},
@@ -166,7 +166,7 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.exam_settings = &nodes[0]
+		_node.exam_setting = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
