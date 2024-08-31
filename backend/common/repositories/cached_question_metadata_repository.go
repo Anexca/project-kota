@@ -16,11 +16,12 @@ func NewCachedQuestionMetaDataRepository(dbClient *ent.Client) *CachedQuestionMe
 	}
 }
 
-func (c *CachedQuestionMetaDataRepository) Create(ctx context.Context, cacheUID string, expiry time.Duration) (*ent.CachedQuestionMetaData, error) {
+func (c *CachedQuestionMetaDataRepository) Create(ctx context.Context, cacheUID string, expiry time.Duration, exam *ent.Exam) (*ent.CachedQuestionMetaData, error) {
 	expiresAt := time.Now().Add(expiry)
 
 	return c.dbClient.CachedQuestionMetaData.Create().
 		SetCacheUID(cacheUID).
 		SetExpiresAt(expiresAt).
+		SetExam(exam).
 		Save(ctx)
 }

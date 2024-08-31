@@ -277,10 +277,10 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ec.mutation.CachedQuestionMetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   exam.CachedQuestionMetadataTable,
-			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Columns: []string{exam.CachedQuestionMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),

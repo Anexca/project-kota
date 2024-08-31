@@ -46,11 +46,13 @@ const (
 	SettingInverseTable = "exam_settings"
 	// SettingColumn is the table column denoting the setting relation/edge.
 	SettingColumn = "exam_setting"
-	// CachedQuestionMetadataTable is the table that holds the cached_question_metadata relation/edge. The primary key declared below.
-	CachedQuestionMetadataTable = "exam_cached_question_metadata"
+	// CachedQuestionMetadataTable is the table that holds the cached_question_metadata relation/edge.
+	CachedQuestionMetadataTable = "cached_question_meta_data"
 	// CachedQuestionMetadataInverseTable is the table name for the CachedQuestionMetaData entity.
 	// It exists in this package in order to avoid circular dependency with the "cachedquestionmetadata" package.
 	CachedQuestionMetadataInverseTable = "cached_question_meta_data"
+	// CachedQuestionMetadataColumn is the table column denoting the cached_question_metadata relation/edge.
+	CachedQuestionMetadataColumn = "exam_cached_question_metadata"
 )
 
 // Columns holds all SQL columns for exam fields.
@@ -68,12 +70,6 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"exam_category_exams",
 }
-
-var (
-	// CachedQuestionMetadataPrimaryKey and CachedQuestionMetadataColumn2 are the table columns denoting the
-	// primary key for the cached_question_metadata relation (M2M).
-	CachedQuestionMetadataPrimaryKey = []string{"exam_id", "cached_question_meta_data_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -179,6 +175,6 @@ func newCachedQuestionMetadataStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CachedQuestionMetadataInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, CachedQuestionMetadataTable, CachedQuestionMetadataPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, CachedQuestionMetadataTable, CachedQuestionMetadataColumn),
 	)
 }

@@ -280,7 +280,7 @@ func HasExam() predicate.CachedQuestionMetaData {
 	return predicate.CachedQuestionMetaData(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ExamTable, ExamPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, ExamTable, ExamColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

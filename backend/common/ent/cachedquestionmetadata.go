@@ -4,6 +4,7 @@ package ent
 
 import (
 	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
 	"fmt"
 	"strings"
 	"time"
@@ -29,24 +30,27 @@ type CachedQuestionMetaData struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CachedQuestionMetaDataQuery when eager-loading is set.
-	Edges        CachedQuestionMetaDataEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges                         CachedQuestionMetaDataEdges `json:"edges"`
+	exam_cached_question_metadata *int
+	selectValues                  sql.SelectValues
 }
 
 // CachedQuestionMetaDataEdges holds the relations/edges for other nodes in the graph.
 type CachedQuestionMetaDataEdges struct {
 	// Exam holds the value of the exam edge.
-	Exam []*Exam `json:"exam,omitempty"`
+	Exam *Exam `json:"exam,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // ExamOrErr returns the Exam value or an error if the edge
-// was not loaded in eager-loading.
-func (e CachedQuestionMetaDataEdges) ExamOrErr() ([]*Exam, error) {
-	if e.loadedTypes[0] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CachedQuestionMetaDataEdges) ExamOrErr() (*Exam, error) {
+	if e.Exam != nil {
 		return e.Exam, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: exam.Label}
 	}
 	return nil, &NotLoadedError{edge: "exam"}
 }
@@ -64,6 +68,8 @@ func (*CachedQuestionMetaData) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case cachedquestionmetadata.FieldExpiresAt, cachedquestionmetadata.FieldCreatedAt, cachedquestionmetadata.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case cachedquestionmetadata.ForeignKeys[0]: // exam_cached_question_metadata
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -114,6 +120,13 @@ func (cqmd *CachedQuestionMetaData) assignValues(columns []string, values []any)
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				cqmd.UpdatedAt = value.Time
+			}
+		case cachedquestionmetadata.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field exam_cached_question_metadata", value)
+			} else if value.Valid {
+				cqmd.exam_cached_question_metadata = new(int)
+				*cqmd.exam_cached_question_metadata = int(value.Int64)
 			}
 		default:
 			cqmd.selectValues.Set(columns[i], values[i])

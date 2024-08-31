@@ -28,6 +28,8 @@ func (CachedQuestionMetaData) Fields() []ent.Field {
 func (CachedQuestionMetaData) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("exam", Exam.Type).
-			Ref("cached_question_metadata"), // Each Exam can have multiple CachedQuestionMetaData
+			Ref("cached_question_metadata").
+			Unique().
+			Required(),
 	}
 }

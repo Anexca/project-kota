@@ -351,7 +351,7 @@ func HasCachedQuestionMetadata() predicate.Exam {
 	return predicate.Exam(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, CachedQuestionMetadataTable, CachedQuestionMetadataPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, CachedQuestionMetadataTable, CachedQuestionMetadataColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

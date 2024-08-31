@@ -304,10 +304,10 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.CachedQuestionMetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   exam.CachedQuestionMetadataTable,
-			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Columns: []string{exam.CachedQuestionMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
@@ -317,10 +317,10 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := eu.mutation.RemovedCachedQuestionMetadataIDs(); len(nodes) > 0 && !eu.mutation.CachedQuestionMetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   exam.CachedQuestionMetadataTable,
-			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Columns: []string{exam.CachedQuestionMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
@@ -333,10 +333,10 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := eu.mutation.CachedQuestionMetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   exam.CachedQuestionMetadataTable,
-			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Columns: []string{exam.CachedQuestionMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
@@ -670,10 +670,10 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if euo.mutation.CachedQuestionMetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   exam.CachedQuestionMetadataTable,
-			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Columns: []string{exam.CachedQuestionMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
@@ -683,10 +683,10 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if nodes := euo.mutation.RemovedCachedQuestionMetadataIDs(); len(nodes) > 0 && !euo.mutation.CachedQuestionMetadataCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   exam.CachedQuestionMetadataTable,
-			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Columns: []string{exam.CachedQuestionMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
@@ -699,10 +699,10 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if nodes := euo.mutation.CachedQuestionMetadataIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   exam.CachedQuestionMetadataTable,
-			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Columns: []string{exam.CachedQuestionMetadataColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),

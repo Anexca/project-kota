@@ -28,11 +28,13 @@ const (
 	EdgeExam = "exam"
 	// Table holds the table name of the cachedquestionmetadata in the database.
 	Table = "cached_question_meta_data"
-	// ExamTable is the table that holds the exam relation/edge. The primary key declared below.
-	ExamTable = "exam_cached_question_metadata"
+	// ExamTable is the table that holds the exam relation/edge.
+	ExamTable = "cached_question_meta_data"
 	// ExamInverseTable is the table name for the Exam entity.
 	// It exists in this package in order to avoid circular dependency with the "exam" package.
 	ExamInverseTable = "exams"
+	// ExamColumn is the table column denoting the exam relation/edge.
+	ExamColumn = "exam_cached_question_metadata"
 )
 
 // Columns holds all SQL columns for cachedquestionmetadata fields.
@@ -45,16 +47,21 @@ var Columns = []string{
 	FieldUpdatedAt,
 }
 
-var (
-	// ExamPrimaryKey and ExamColumn2 are the table columns denoting the
-	// primary key for the exam relation (M2M).
-	ExamPrimaryKey = []string{"exam_id", "cached_question_meta_data_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the "cached_question_meta_data"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"exam_cached_question_metadata",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -105,23 +112,16 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByExamCount orders the results by exam count.
-func ByExamCount(opts ...sql.OrderTermOption) OrderOption {
+// ByExamField orders the results by exam field.
+func ByExamField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newExamStep(), opts...)
-	}
-}
-
-// ByExam orders the results by exam terms.
-func ByExam(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newExamStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newExamStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newExamStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ExamInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ExamTable, ExamPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, true, ExamTable, ExamColumn),
 	)
 }

@@ -91,19 +91,15 @@ func (cqmdu *CachedQuestionMetaDataUpdate) SetUpdatedAt(t time.Time) *CachedQues
 	return cqmdu
 }
 
-// AddExamIDs adds the "exam" edge to the Exam entity by IDs.
-func (cqmdu *CachedQuestionMetaDataUpdate) AddExamIDs(ids ...int) *CachedQuestionMetaDataUpdate {
-	cqmdu.mutation.AddExamIDs(ids...)
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetExamID(id int) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.SetExamID(id)
 	return cqmdu
 }
 
-// AddExam adds the "exam" edges to the Exam entity.
-func (cqmdu *CachedQuestionMetaDataUpdate) AddExam(e ...*Exam) *CachedQuestionMetaDataUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cqmdu.AddExamIDs(ids...)
+// SetExam sets the "exam" edge to the Exam entity.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetExam(e *Exam) *CachedQuestionMetaDataUpdate {
+	return cqmdu.SetExamID(e.ID)
 }
 
 // Mutation returns the CachedQuestionMetaDataMutation object of the builder.
@@ -111,25 +107,10 @@ func (cqmdu *CachedQuestionMetaDataUpdate) Mutation() *CachedQuestionMetaDataMut
 	return cqmdu.mutation
 }
 
-// ClearExam clears all "exam" edges to the Exam entity.
+// ClearExam clears the "exam" edge to the Exam entity.
 func (cqmdu *CachedQuestionMetaDataUpdate) ClearExam() *CachedQuestionMetaDataUpdate {
 	cqmdu.mutation.ClearExam()
 	return cqmdu
-}
-
-// RemoveExamIDs removes the "exam" edge to Exam entities by IDs.
-func (cqmdu *CachedQuestionMetaDataUpdate) RemoveExamIDs(ids ...int) *CachedQuestionMetaDataUpdate {
-	cqmdu.mutation.RemoveExamIDs(ids...)
-	return cqmdu
-}
-
-// RemoveExam removes "exam" edges to Exam entities.
-func (cqmdu *CachedQuestionMetaDataUpdate) RemoveExam(e ...*Exam) *CachedQuestionMetaDataUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cqmdu.RemoveExamIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -168,7 +149,18 @@ func (cqmdu *CachedQuestionMetaDataUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cqmdu *CachedQuestionMetaDataUpdate) check() error {
+	if cqmdu.mutation.ExamCleared() && len(cqmdu.mutation.ExamIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "CachedQuestionMetaData.exam"`)
+	}
+	return nil
+}
+
 func (cqmdu *CachedQuestionMetaDataUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cqmdu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(cachedquestionmetadata.Table, cachedquestionmetadata.Columns, sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt))
 	if ps := cqmdu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -194,39 +186,23 @@ func (cqmdu *CachedQuestionMetaDataUpdate) sqlSave(ctx context.Context) (n int, 
 	}
 	if cqmdu.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   cachedquestionmetadata.ExamTable,
-			Columns: cachedquestionmetadata.ExamPrimaryKey,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cqmdu.mutation.RemovedExamIDs(); len(nodes) > 0 && !cqmdu.mutation.ExamCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   cachedquestionmetadata.ExamTable,
-			Columns: cachedquestionmetadata.ExamPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := cqmdu.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   cachedquestionmetadata.ExamTable,
-			Columns: cachedquestionmetadata.ExamPrimaryKey,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
@@ -319,19 +295,15 @@ func (cqmduo *CachedQuestionMetaDataUpdateOne) SetUpdatedAt(t time.Time) *Cached
 	return cqmduo
 }
 
-// AddExamIDs adds the "exam" edge to the Exam entity by IDs.
-func (cqmduo *CachedQuestionMetaDataUpdateOne) AddExamIDs(ids ...int) *CachedQuestionMetaDataUpdateOne {
-	cqmduo.mutation.AddExamIDs(ids...)
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetExamID(id int) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.SetExamID(id)
 	return cqmduo
 }
 
-// AddExam adds the "exam" edges to the Exam entity.
-func (cqmduo *CachedQuestionMetaDataUpdateOne) AddExam(e ...*Exam) *CachedQuestionMetaDataUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cqmduo.AddExamIDs(ids...)
+// SetExam sets the "exam" edge to the Exam entity.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetExam(e *Exam) *CachedQuestionMetaDataUpdateOne {
+	return cqmduo.SetExamID(e.ID)
 }
 
 // Mutation returns the CachedQuestionMetaDataMutation object of the builder.
@@ -339,25 +311,10 @@ func (cqmduo *CachedQuestionMetaDataUpdateOne) Mutation() *CachedQuestionMetaDat
 	return cqmduo.mutation
 }
 
-// ClearExam clears all "exam" edges to the Exam entity.
+// ClearExam clears the "exam" edge to the Exam entity.
 func (cqmduo *CachedQuestionMetaDataUpdateOne) ClearExam() *CachedQuestionMetaDataUpdateOne {
 	cqmduo.mutation.ClearExam()
 	return cqmduo
-}
-
-// RemoveExamIDs removes the "exam" edge to Exam entities by IDs.
-func (cqmduo *CachedQuestionMetaDataUpdateOne) RemoveExamIDs(ids ...int) *CachedQuestionMetaDataUpdateOne {
-	cqmduo.mutation.RemoveExamIDs(ids...)
-	return cqmduo
-}
-
-// RemoveExam removes "exam" edges to Exam entities.
-func (cqmduo *CachedQuestionMetaDataUpdateOne) RemoveExam(e ...*Exam) *CachedQuestionMetaDataUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cqmduo.RemoveExamIDs(ids...)
 }
 
 // Where appends a list predicates to the CachedQuestionMetaDataUpdate builder.
@@ -409,7 +366,18 @@ func (cqmduo *CachedQuestionMetaDataUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) check() error {
+	if cqmduo.mutation.ExamCleared() && len(cqmduo.mutation.ExamIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "CachedQuestionMetaData.exam"`)
+	}
+	return nil
+}
+
 func (cqmduo *CachedQuestionMetaDataUpdateOne) sqlSave(ctx context.Context) (_node *CachedQuestionMetaData, err error) {
+	if err := cqmduo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(cachedquestionmetadata.Table, cachedquestionmetadata.Columns, sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt))
 	id, ok := cqmduo.mutation.ID()
 	if !ok {
@@ -452,39 +420,23 @@ func (cqmduo *CachedQuestionMetaDataUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if cqmduo.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   cachedquestionmetadata.ExamTable,
-			Columns: cachedquestionmetadata.ExamPrimaryKey,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cqmduo.mutation.RemovedExamIDs(); len(nodes) > 0 && !cqmduo.mutation.ExamCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   cachedquestionmetadata.ExamTable,
-			Columns: cachedquestionmetadata.ExamPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := cqmduo.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   cachedquestionmetadata.ExamTable,
-			Columns: cachedquestionmetadata.ExamPrimaryKey,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),

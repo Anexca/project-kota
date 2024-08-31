@@ -16,12 +16,21 @@ var (
 		{Name: "expires_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_cached_question_metadata", Type: field.TypeInt},
 	}
 	// CachedQuestionMetaDataTable holds the schema information for the "cached_question_meta_data" table.
 	CachedQuestionMetaDataTable = &schema.Table{
 		Name:       "cached_question_meta_data",
 		Columns:    CachedQuestionMetaDataColumns,
 		PrimaryKey: []*schema.Column{CachedQuestionMetaDataColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "cached_question_meta_data_exams_cached_question_metadata",
+				Columns:    []*schema.Column{CachedQuestionMetaDataColumns[6]},
+				RefColumns: []*schema.Column{ExamsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// ExamsColumns holds the columns for the "exams" table.
 	ExamsColumns = []*schema.Column{
@@ -88,44 +97,17 @@ var (
 			},
 		},
 	}
-	// ExamCachedQuestionMetadataColumns holds the columns for the "exam_cached_question_metadata" table.
-	ExamCachedQuestionMetadataColumns = []*schema.Column{
-		{Name: "exam_id", Type: field.TypeInt},
-		{Name: "cached_question_meta_data_id", Type: field.TypeInt},
-	}
-	// ExamCachedQuestionMetadataTable holds the schema information for the "exam_cached_question_metadata" table.
-	ExamCachedQuestionMetadataTable = &schema.Table{
-		Name:       "exam_cached_question_metadata",
-		Columns:    ExamCachedQuestionMetadataColumns,
-		PrimaryKey: []*schema.Column{ExamCachedQuestionMetadataColumns[0], ExamCachedQuestionMetadataColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "exam_cached_question_metadata_exam_id",
-				Columns:    []*schema.Column{ExamCachedQuestionMetadataColumns[0]},
-				RefColumns: []*schema.Column{ExamsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "exam_cached_question_metadata_cached_question_meta_data_id",
-				Columns:    []*schema.Column{ExamCachedQuestionMetadataColumns[1]},
-				RefColumns: []*schema.Column{CachedQuestionMetaDataColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CachedQuestionMetaDataTable,
 		ExamsTable,
 		ExamCategoriesTable,
 		ExamSettingsTable,
-		ExamCachedQuestionMetadataTable,
 	}
 )
 
 func init() {
+	CachedQuestionMetaDataTable.ForeignKeys[0].RefTable = ExamsTable
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable
-	ExamCachedQuestionMetadataTable.ForeignKeys[0].RefTable = ExamsTable
-	ExamCachedQuestionMetadataTable.ForeignKeys[1].RefTable = CachedQuestionMetaDataTable
 }

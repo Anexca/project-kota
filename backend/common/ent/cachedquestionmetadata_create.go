@@ -75,19 +75,15 @@ func (cqmdc *CachedQuestionMetaDataCreate) SetNillableUpdatedAt(t *time.Time) *C
 	return cqmdc
 }
 
-// AddExamIDs adds the "exam" edge to the Exam entity by IDs.
-func (cqmdc *CachedQuestionMetaDataCreate) AddExamIDs(ids ...int) *CachedQuestionMetaDataCreate {
-	cqmdc.mutation.AddExamIDs(ids...)
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (cqmdc *CachedQuestionMetaDataCreate) SetExamID(id int) *CachedQuestionMetaDataCreate {
+	cqmdc.mutation.SetExamID(id)
 	return cqmdc
 }
 
-// AddExam adds the "exam" edges to the Exam entity.
-func (cqmdc *CachedQuestionMetaDataCreate) AddExam(e ...*Exam) *CachedQuestionMetaDataCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cqmdc.AddExamIDs(ids...)
+// SetExam sets the "exam" edge to the Exam entity.
+func (cqmdc *CachedQuestionMetaDataCreate) SetExam(e *Exam) *CachedQuestionMetaDataCreate {
+	return cqmdc.SetExamID(e.ID)
 }
 
 // Mutation returns the CachedQuestionMetaDataMutation object of the builder.
@@ -156,6 +152,9 @@ func (cqmdc *CachedQuestionMetaDataCreate) check() error {
 	if _, ok := cqmdc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "CachedQuestionMetaData.updated_at"`)}
 	}
+	if len(cqmdc.mutation.ExamIDs()) == 0 {
+		return &ValidationError{Name: "exam", err: errors.New(`ent: missing required edge "CachedQuestionMetaData.exam"`)}
+	}
 	return nil
 }
 
@@ -204,10 +203,10 @@ func (cqmdc *CachedQuestionMetaDataCreate) createSpec() (*CachedQuestionMetaData
 	}
 	if nodes := cqmdc.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   cachedquestionmetadata.ExamTable,
-			Columns: cachedquestionmetadata.ExamPrimaryKey,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
@@ -216,6 +215,7 @@ func (cqmdc *CachedQuestionMetaDataCreate) createSpec() (*CachedQuestionMetaData
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.exam_cached_question_metadata = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

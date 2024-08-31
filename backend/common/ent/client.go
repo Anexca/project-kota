@@ -344,7 +344,7 @@ func (c *CachedQuestionMetaDataClient) QueryExam(cqmd *CachedQuestionMetaData) *
 		step := sqlgraph.NewStep(
 			sqlgraph.From(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID, id),
 			sqlgraph.To(exam.Table, exam.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, cachedquestionmetadata.ExamTable, cachedquestionmetadata.ExamPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, cachedquestionmetadata.ExamTable, cachedquestionmetadata.ExamColumn),
 		)
 		fromV = sqlgraph.Neighbors(cqmd.driver.Dialect(), step)
 		return fromV, nil
@@ -525,7 +525,7 @@ func (c *ExamClient) QueryCachedQuestionMetadata(e *Exam) *CachedQuestionMetaDat
 		step := sqlgraph.NewStep(
 			sqlgraph.From(exam.Table, exam.FieldID, id),
 			sqlgraph.To(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, exam.CachedQuestionMetadataTable, exam.CachedQuestionMetadataPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, exam.CachedQuestionMetadataTable, exam.CachedQuestionMetadataColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
