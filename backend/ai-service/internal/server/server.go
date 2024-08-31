@@ -17,7 +17,7 @@ import (
 
 type Server struct {
 	port            int
-	questionService *services.QuestionService
+	questionService *services.ExamService
 	redisService    *services.RedisService
 }
 

@@ -13,13 +13,13 @@ import (
 
 type Worker struct {
 	cronHandler     *cron.Cron
-	questionService *services.QuestionService
+	questionService *services.ExamService
 }
 
 func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 	c := cron.New()
 
-	questionService := services.NewQuestionService(genAiClient, redisClient, dbClient)
+	questionService := services.NewExamService(genAiClient, redisClient, dbClient)
 
 	worker := &Worker{
 		cronHandler:     c,
