@@ -2068,6 +2068,7 @@ type ExamSettingMutation struct {
 	addduration_minutes    *int
 	negative_marking       *float64
 	addnegative_marking    *float64
+	ai_prompt              *string
 	other_details          *map[string]interface{}
 	created_at             *time.Time
 	updated_at             *time.Time
@@ -2359,6 +2360,55 @@ func (m *ExamSettingMutation) ResetNegativeMarking() {
 	delete(m.clearedFields, examsetting.FieldNegativeMarking)
 }
 
+// SetAiPrompt sets the "ai_prompt" field.
+func (m *ExamSettingMutation) SetAiPrompt(s string) {
+	m.ai_prompt = &s
+}
+
+// AiPrompt returns the value of the "ai_prompt" field in the mutation.
+func (m *ExamSettingMutation) AiPrompt() (r string, exists bool) {
+	v := m.ai_prompt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAiPrompt returns the old "ai_prompt" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldAiPrompt(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAiPrompt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAiPrompt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAiPrompt: %w", err)
+	}
+	return oldValue.AiPrompt, nil
+}
+
+// ClearAiPrompt clears the value of the "ai_prompt" field.
+func (m *ExamSettingMutation) ClearAiPrompt() {
+	m.ai_prompt = nil
+	m.clearedFields[examsetting.FieldAiPrompt] = struct{}{}
+}
+
+// AiPromptCleared returns if the "ai_prompt" field was cleared in this mutation.
+func (m *ExamSettingMutation) AiPromptCleared() bool {
+	_, ok := m.clearedFields[examsetting.FieldAiPrompt]
+	return ok
+}
+
+// ResetAiPrompt resets all changes to the "ai_prompt" field.
+func (m *ExamSettingMutation) ResetAiPrompt() {
+	m.ai_prompt = nil
+	delete(m.clearedFields, examsetting.FieldAiPrompt)
+}
+
 // SetOtherDetails sets the "other_details" field.
 func (m *ExamSettingMutation) SetOtherDetails(value map[string]interface{}) {
 	m.other_details = &value
@@ -2553,7 +2603,7 @@ func (m *ExamSettingMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamSettingMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.number_of_questions != nil {
 		fields = append(fields, examsetting.FieldNumberOfQuestions)
 	}
@@ -2562,6 +2612,9 @@ func (m *ExamSettingMutation) Fields() []string {
 	}
 	if m.negative_marking != nil {
 		fields = append(fields, examsetting.FieldNegativeMarking)
+	}
+	if m.ai_prompt != nil {
+		fields = append(fields, examsetting.FieldAiPrompt)
 	}
 	if m.other_details != nil {
 		fields = append(fields, examsetting.FieldOtherDetails)
@@ -2586,6 +2639,8 @@ func (m *ExamSettingMutation) Field(name string) (ent.Value, bool) {
 		return m.DurationMinutes()
 	case examsetting.FieldNegativeMarking:
 		return m.NegativeMarking()
+	case examsetting.FieldAiPrompt:
+		return m.AiPrompt()
 	case examsetting.FieldOtherDetails:
 		return m.OtherDetails()
 	case examsetting.FieldCreatedAt:
@@ -2607,6 +2662,8 @@ func (m *ExamSettingMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldDurationMinutes(ctx)
 	case examsetting.FieldNegativeMarking:
 		return m.OldNegativeMarking(ctx)
+	case examsetting.FieldAiPrompt:
+		return m.OldAiPrompt(ctx)
 	case examsetting.FieldOtherDetails:
 		return m.OldOtherDetails(ctx)
 	case examsetting.FieldCreatedAt:
@@ -2642,6 +2699,13 @@ func (m *ExamSettingMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNegativeMarking(v)
+		return nil
+	case examsetting.FieldAiPrompt:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAiPrompt(v)
 		return nil
 	case examsetting.FieldOtherDetails:
 		v, ok := value.(map[string]interface{})
@@ -2736,6 +2800,9 @@ func (m *ExamSettingMutation) ClearedFields() []string {
 	if m.FieldCleared(examsetting.FieldNegativeMarking) {
 		fields = append(fields, examsetting.FieldNegativeMarking)
 	}
+	if m.FieldCleared(examsetting.FieldAiPrompt) {
+		fields = append(fields, examsetting.FieldAiPrompt)
+	}
 	if m.FieldCleared(examsetting.FieldOtherDetails) {
 		fields = append(fields, examsetting.FieldOtherDetails)
 	}
@@ -2756,6 +2823,9 @@ func (m *ExamSettingMutation) ClearField(name string) error {
 	case examsetting.FieldNegativeMarking:
 		m.ClearNegativeMarking()
 		return nil
+	case examsetting.FieldAiPrompt:
+		m.ClearAiPrompt()
+		return nil
 	case examsetting.FieldOtherDetails:
 		m.ClearOtherDetails()
 		return nil
@@ -2775,6 +2845,9 @@ func (m *ExamSettingMutation) ResetField(name string) error {
 		return nil
 	case examsetting.FieldNegativeMarking:
 		m.ResetNegativeMarking()
+		return nil
+	case examsetting.FieldAiPrompt:
+		m.ResetAiPrompt()
 		return nil
 	case examsetting.FieldOtherDetails:
 		m.ResetOtherDetails()

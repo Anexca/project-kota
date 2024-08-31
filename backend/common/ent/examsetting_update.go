@@ -98,6 +98,26 @@ func (esu *ExamSettingUpdate) ClearNegativeMarking() *ExamSettingUpdate {
 	return esu
 }
 
+// SetAiPrompt sets the "ai_prompt" field.
+func (esu *ExamSettingUpdate) SetAiPrompt(s string) *ExamSettingUpdate {
+	esu.mutation.SetAiPrompt(s)
+	return esu
+}
+
+// SetNillableAiPrompt sets the "ai_prompt" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableAiPrompt(s *string) *ExamSettingUpdate {
+	if s != nil {
+		esu.SetAiPrompt(*s)
+	}
+	return esu
+}
+
+// ClearAiPrompt clears the value of the "ai_prompt" field.
+func (esu *ExamSettingUpdate) ClearAiPrompt() *ExamSettingUpdate {
+	esu.mutation.ClearAiPrompt()
+	return esu
+}
+
 // SetOtherDetails sets the "other_details" field.
 func (esu *ExamSettingUpdate) SetOtherDetails(m map[string]interface{}) *ExamSettingUpdate {
 	esu.mutation.SetOtherDetails(m)
@@ -226,6 +246,12 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if esu.mutation.NegativeMarkingCleared() {
 		_spec.ClearField(examsetting.FieldNegativeMarking, field.TypeFloat64)
 	}
+	if value, ok := esu.mutation.AiPrompt(); ok {
+		_spec.SetField(examsetting.FieldAiPrompt, field.TypeString, value)
+	}
+	if esu.mutation.AiPromptCleared() {
+		_spec.ClearField(examsetting.FieldAiPrompt, field.TypeString)
+	}
 	if value, ok := esu.mutation.OtherDetails(); ok {
 		_spec.SetField(examsetting.FieldOtherDetails, field.TypeJSON, value)
 	}
@@ -353,6 +379,26 @@ func (esuo *ExamSettingUpdateOne) AddNegativeMarking(f float64) *ExamSettingUpda
 // ClearNegativeMarking clears the value of the "negative_marking" field.
 func (esuo *ExamSettingUpdateOne) ClearNegativeMarking() *ExamSettingUpdateOne {
 	esuo.mutation.ClearNegativeMarking()
+	return esuo
+}
+
+// SetAiPrompt sets the "ai_prompt" field.
+func (esuo *ExamSettingUpdateOne) SetAiPrompt(s string) *ExamSettingUpdateOne {
+	esuo.mutation.SetAiPrompt(s)
+	return esuo
+}
+
+// SetNillableAiPrompt sets the "ai_prompt" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableAiPrompt(s *string) *ExamSettingUpdateOne {
+	if s != nil {
+		esuo.SetAiPrompt(*s)
+	}
+	return esuo
+}
+
+// ClearAiPrompt clears the value of the "ai_prompt" field.
+func (esuo *ExamSettingUpdateOne) ClearAiPrompt() *ExamSettingUpdateOne {
+	esuo.mutation.ClearAiPrompt()
 	return esuo
 }
 
@@ -513,6 +559,12 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	}
 	if esuo.mutation.NegativeMarkingCleared() {
 		_spec.ClearField(examsetting.FieldNegativeMarking, field.TypeFloat64)
+	}
+	if value, ok := esuo.mutation.AiPrompt(); ok {
+		_spec.SetField(examsetting.FieldAiPrompt, field.TypeString, value)
+	}
+	if esuo.mutation.AiPromptCleared() {
+		_spec.ClearField(examsetting.FieldAiPrompt, field.TypeString)
 	}
 	if value, ok := esuo.mutation.OtherDetails(); ok {
 		_spec.SetField(examsetting.FieldOtherDetails, field.TypeJSON, value)

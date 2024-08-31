@@ -66,11 +66,11 @@ func init() {
 	examsettingFields := schema.ExamSetting{}.Fields()
 	_ = examsettingFields
 	// examsettingDescCreatedAt is the schema descriptor for created_at field.
-	examsettingDescCreatedAt := examsettingFields[4].Descriptor()
+	examsettingDescCreatedAt := examsettingFields[5].Descriptor()
 	// examsetting.DefaultCreatedAt holds the default value on creation for the created_at field.
 	examsetting.DefaultCreatedAt = examsettingDescCreatedAt.Default.(func() time.Time)
 	// examsettingDescUpdatedAt is the schema descriptor for updated_at field.
-	examsettingDescUpdatedAt := examsettingFields[5].Descriptor()
+	examsettingDescUpdatedAt := examsettingFields[6].Descriptor()
 	// examsetting.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	examsetting.DefaultUpdatedAt = examsettingDescUpdatedAt.Default.(func() time.Time)
 	// examsetting.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

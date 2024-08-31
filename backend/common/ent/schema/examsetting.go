@@ -20,6 +20,7 @@ func (ExamSetting) Fields() []ent.Field {
 		field.Int("number_of_questions"),
 		field.Int("duration_minutes"),
 		field.Float("negative_marking").Optional(),
+		field.String("ai_prompt").Optional(),
 		field.JSON("other_details", map[string]interface{}{}).
 			Optional().
 			SchemaType(map[string]string{

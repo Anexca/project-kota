@@ -70,6 +70,11 @@ func NegativeMarking(v float64) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldNegativeMarking, v))
 }
 
+// AiPrompt applies equality check predicate on the "ai_prompt" field. It's identical to AiPromptEQ.
+func AiPrompt(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldAiPrompt, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldCreatedAt, v))
@@ -208,6 +213,81 @@ func NegativeMarkingIsNil() predicate.ExamSetting {
 // NegativeMarkingNotNil applies the NotNil predicate on the "negative_marking" field.
 func NegativeMarkingNotNil() predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldNotNull(FieldNegativeMarking))
+}
+
+// AiPromptEQ applies the EQ predicate on the "ai_prompt" field.
+func AiPromptEQ(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldAiPrompt, v))
+}
+
+// AiPromptNEQ applies the NEQ predicate on the "ai_prompt" field.
+func AiPromptNEQ(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldAiPrompt, v))
+}
+
+// AiPromptIn applies the In predicate on the "ai_prompt" field.
+func AiPromptIn(vs ...string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldAiPrompt, vs...))
+}
+
+// AiPromptNotIn applies the NotIn predicate on the "ai_prompt" field.
+func AiPromptNotIn(vs ...string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldAiPrompt, vs...))
+}
+
+// AiPromptGT applies the GT predicate on the "ai_prompt" field.
+func AiPromptGT(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldAiPrompt, v))
+}
+
+// AiPromptGTE applies the GTE predicate on the "ai_prompt" field.
+func AiPromptGTE(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldAiPrompt, v))
+}
+
+// AiPromptLT applies the LT predicate on the "ai_prompt" field.
+func AiPromptLT(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldAiPrompt, v))
+}
+
+// AiPromptLTE applies the LTE predicate on the "ai_prompt" field.
+func AiPromptLTE(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldAiPrompt, v))
+}
+
+// AiPromptContains applies the Contains predicate on the "ai_prompt" field.
+func AiPromptContains(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldContains(FieldAiPrompt, v))
+}
+
+// AiPromptHasPrefix applies the HasPrefix predicate on the "ai_prompt" field.
+func AiPromptHasPrefix(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldHasPrefix(FieldAiPrompt, v))
+}
+
+// AiPromptHasSuffix applies the HasSuffix predicate on the "ai_prompt" field.
+func AiPromptHasSuffix(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldHasSuffix(FieldAiPrompt, v))
+}
+
+// AiPromptIsNil applies the IsNil predicate on the "ai_prompt" field.
+func AiPromptIsNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIsNull(FieldAiPrompt))
+}
+
+// AiPromptNotNil applies the NotNil predicate on the "ai_prompt" field.
+func AiPromptNotNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotNull(FieldAiPrompt))
+}
+
+// AiPromptEqualFold applies the EqualFold predicate on the "ai_prompt" field.
+func AiPromptEqualFold(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEqualFold(FieldAiPrompt, v))
+}
+
+// AiPromptContainsFold applies the ContainsFold predicate on the "ai_prompt" field.
+func AiPromptContainsFold(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldContainsFold(FieldAiPrompt, v))
 }
 
 // OtherDetailsIsNil applies the IsNil predicate on the "other_details" field.

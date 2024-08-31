@@ -25,6 +25,8 @@ type ExamSetting struct {
 	DurationMinutes int `json:"duration_minutes,omitempty"`
 	// NegativeMarking holds the value of the "negative_marking" field.
 	NegativeMarking float64 `json:"negative_marking,omitempty"`
+	// AiPrompt holds the value of the "ai_prompt" field.
+	AiPrompt string `json:"ai_prompt,omitempty"`
 	// OtherDetails holds the value of the "other_details" field.
 	OtherDetails map[string]interface{} `json:"other_details,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -69,6 +71,8 @@ func (*ExamSetting) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationMinutes:
 			values[i] = new(sql.NullInt64)
+		case examsetting.FieldAiPrompt:
+			values[i] = new(sql.NullString)
 		case examsetting.FieldCreatedAt, examsetting.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case examsetting.ForeignKeys[0]: // exam_setting
@@ -111,6 +115,12 @@ func (es *ExamSetting) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field negative_marking", values[i])
 			} else if value.Valid {
 				es.NegativeMarking = value.Float64
+			}
+		case examsetting.FieldAiPrompt:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field ai_prompt", values[i])
+			} else if value.Valid {
+				es.AiPrompt = value.String
 			}
 		case examsetting.FieldOtherDetails:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -188,6 +198,9 @@ func (es *ExamSetting) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("negative_marking=")
 	builder.WriteString(fmt.Sprintf("%v", es.NegativeMarking))
+	builder.WriteString(", ")
+	builder.WriteString("ai_prompt=")
+	builder.WriteString(es.AiPrompt)
 	builder.WriteString(", ")
 	builder.WriteString("other_details=")
 	builder.WriteString(fmt.Sprintf("%v", es.OtherDetails))

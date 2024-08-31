@@ -20,6 +20,8 @@ const (
 	FieldDurationMinutes = "duration_minutes"
 	// FieldNegativeMarking holds the string denoting the negative_marking field in the database.
 	FieldNegativeMarking = "negative_marking"
+	// FieldAiPrompt holds the string denoting the ai_prompt field in the database.
+	FieldAiPrompt = "ai_prompt"
 	// FieldOtherDetails holds the string denoting the other_details field in the database.
 	FieldOtherDetails = "other_details"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -45,6 +47,7 @@ var Columns = []string{
 	FieldNumberOfQuestions,
 	FieldDurationMinutes,
 	FieldNegativeMarking,
+	FieldAiPrompt,
 	FieldOtherDetails,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -101,6 +104,11 @@ func ByDurationMinutes(opts ...sql.OrderTermOption) OrderOption {
 // ByNegativeMarking orders the results by the negative_marking field.
 func ByNegativeMarking(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNegativeMarking, opts...).ToFunc()
+}
+
+// ByAiPrompt orders the results by the ai_prompt field.
+func ByAiPrompt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAiPrompt, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

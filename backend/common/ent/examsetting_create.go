@@ -47,6 +47,20 @@ func (esc *ExamSettingCreate) SetNillableNegativeMarking(f *float64) *ExamSettin
 	return esc
 }
 
+// SetAiPrompt sets the "ai_prompt" field.
+func (esc *ExamSettingCreate) SetAiPrompt(s string) *ExamSettingCreate {
+	esc.mutation.SetAiPrompt(s)
+	return esc
+}
+
+// SetNillableAiPrompt sets the "ai_prompt" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableAiPrompt(s *string) *ExamSettingCreate {
+	if s != nil {
+		esc.SetAiPrompt(*s)
+	}
+	return esc
+}
+
 // SetOtherDetails sets the "other_details" field.
 func (esc *ExamSettingCreate) SetOtherDetails(m map[string]interface{}) *ExamSettingCreate {
 	esc.mutation.SetOtherDetails(m)
@@ -196,6 +210,10 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 	if value, ok := esc.mutation.NegativeMarking(); ok {
 		_spec.SetField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)
 		_node.NegativeMarking = value
+	}
+	if value, ok := esc.mutation.AiPrompt(); ok {
+		_spec.SetField(examsetting.FieldAiPrompt, field.TypeString, value)
+		_node.AiPrompt = value
 	}
 	if value, ok := esc.mutation.OtherDetails(); ok {
 		_spec.SetField(examsetting.FieldOtherDetails, field.TypeJSON, value)
