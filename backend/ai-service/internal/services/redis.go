@@ -22,8 +22,8 @@ func NewRedisService(redisClient *redis.Client) *RedisService {
 	}
 }
 
-func (r *RedisService) Store(ctx context.Context, key string, value any) error {
-	status := r.client.Set(ctx, key, value, 0)
+func (r *RedisService) Store(ctx context.Context, key string, value any, expiry time.Duration) error {
+	status := r.client.Set(ctx, key, value, expiry)
 	return status.Err()
 }
 
