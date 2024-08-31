@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -25,5 +26,8 @@ func (CachedQuestionMetaData) Fields() []ent.Field {
 
 // Edges of the CachedQuestionMetaData.
 func (CachedQuestionMetaData) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("exam", Exam.Type).
+			Ref("cached_question_metadata"), // Each Exam can have multiple CachedQuestionMetaData
+	}
 }

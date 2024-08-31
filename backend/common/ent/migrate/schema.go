@@ -85,16 +85,44 @@ var (
 			},
 		},
 	}
+	// ExamCachedQuestionMetadataColumns holds the columns for the "exam_cached_question_metadata" table.
+	ExamCachedQuestionMetadataColumns = []*schema.Column{
+		{Name: "exam_id", Type: field.TypeInt},
+		{Name: "cached_question_meta_data_id", Type: field.TypeInt},
+	}
+	// ExamCachedQuestionMetadataTable holds the schema information for the "exam_cached_question_metadata" table.
+	ExamCachedQuestionMetadataTable = &schema.Table{
+		Name:       "exam_cached_question_metadata",
+		Columns:    ExamCachedQuestionMetadataColumns,
+		PrimaryKey: []*schema.Column{ExamCachedQuestionMetadataColumns[0], ExamCachedQuestionMetadataColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exam_cached_question_metadata_exam_id",
+				Columns:    []*schema.Column{ExamCachedQuestionMetadataColumns[0]},
+				RefColumns: []*schema.Column{ExamsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "exam_cached_question_metadata_cached_question_meta_data_id",
+				Columns:    []*schema.Column{ExamCachedQuestionMetadataColumns[1]},
+				RefColumns: []*schema.Column{CachedQuestionMetaDataColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CachedQuestionMetaDataTable,
 		ExamsTable,
 		ExamCategoriesTable,
 		ExamSettingsTable,
+		ExamCachedQuestionMetadataTable,
 	}
 )
 
 func init() {
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable
+	ExamCachedQuestionMetadataTable.ForeignKeys[0].RefTable = ExamsTable
+	ExamCachedQuestionMetadataTable.ForeignKeys[1].RefTable = CachedQuestionMetaDataTable
 }

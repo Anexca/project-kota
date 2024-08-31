@@ -28,6 +28,8 @@ const (
 	EdgeCategory = "category"
 	// EdgeSetting holds the string denoting the setting edge name in mutations.
 	EdgeSetting = "setting"
+	// EdgeCachedQuestionMetadata holds the string denoting the cached_question_metadata edge name in mutations.
+	EdgeCachedQuestionMetadata = "cached_question_metadata"
 	// Table holds the table name of the exam in the database.
 	Table = "exams"
 	// CategoryTable is the table that holds the category relation/edge.
@@ -44,6 +46,11 @@ const (
 	SettingInverseTable = "exam_settings"
 	// SettingColumn is the table column denoting the setting relation/edge.
 	SettingColumn = "exam_setting"
+	// CachedQuestionMetadataTable is the table that holds the cached_question_metadata relation/edge. The primary key declared below.
+	CachedQuestionMetadataTable = "exam_cached_question_metadata"
+	// CachedQuestionMetadataInverseTable is the table name for the CachedQuestionMetaData entity.
+	// It exists in this package in order to avoid circular dependency with the "cachedquestionmetadata" package.
+	CachedQuestionMetadataInverseTable = "cached_question_meta_data"
 )
 
 // Columns holds all SQL columns for exam fields.
@@ -61,6 +68,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"exam_category_exams",
 }
+
+var (
+	// CachedQuestionMetadataPrimaryKey and CachedQuestionMetadataColumn2 are the table columns denoting the
+	// primary key for the cached_question_metadata relation (M2M).
+	CachedQuestionMetadataPrimaryKey = []string{"exam_id", "cached_question_meta_data_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -134,6 +147,20 @@ func BySettingField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSettingStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCachedQuestionMetadataCount orders the results by cached_question_metadata count.
+func ByCachedQuestionMetadataCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCachedQuestionMetadataStep(), opts...)
+	}
+}
+
+// ByCachedQuestionMetadata orders the results by cached_question_metadata terms.
+func ByCachedQuestionMetadata(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCachedQuestionMetadataStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -146,5 +173,12 @@ func newSettingStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SettingInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, SettingTable, SettingColumn),
+	)
+}
+func newCachedQuestionMetadataStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CachedQuestionMetadataInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, CachedQuestionMetadataTable, CachedQuestionMetadataPrimaryKey...),
 	)
 }

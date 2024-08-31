@@ -336,6 +336,22 @@ func (c *CachedQuestionMetaDataClient) GetX(ctx context.Context, id int) *Cached
 	return obj
 }
 
+// QueryExam queries the exam edge of a CachedQuestionMetaData.
+func (c *CachedQuestionMetaDataClient) QueryExam(cqmd *CachedQuestionMetaData) *ExamQuery {
+	query := (&ExamClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cqmd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID, id),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, cachedquestionmetadata.ExamTable, cachedquestionmetadata.ExamPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cqmd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CachedQuestionMetaDataClient) Hooks() []Hook {
 	return c.hooks.CachedQuestionMetaData
@@ -494,6 +510,22 @@ func (c *ExamClient) QuerySetting(e *Exam) *ExamSettingQuery {
 			sqlgraph.From(exam.Table, exam.FieldID, id),
 			sqlgraph.To(examsetting.Table, examsetting.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, exam.SettingTable, exam.SettingColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCachedQuestionMetadata queries the cached_question_metadata edge of a Exam.
+func (c *ExamClient) QueryCachedQuestionMetadata(e *Exam) *CachedQuestionMetaDataQuery {
+	query := (&CachedQuestionMetaDataClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, id),
+			sqlgraph.To(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, exam.CachedQuestionMetadataTable, exam.CachedQuestionMetadataPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil

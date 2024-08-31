@@ -26,8 +26,29 @@ type CachedQuestionMetaData struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CachedQuestionMetaDataQuery when eager-loading is set.
+	Edges        CachedQuestionMetaDataEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// CachedQuestionMetaDataEdges holds the relations/edges for other nodes in the graph.
+type CachedQuestionMetaDataEdges struct {
+	// Exam holds the value of the exam edge.
+	Exam []*Exam `json:"exam,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// ExamOrErr returns the Exam value or an error if the edge
+// was not loaded in eager-loading.
+func (e CachedQuestionMetaDataEdges) ExamOrErr() ([]*Exam, error) {
+	if e.loadedTypes[0] {
+		return e.Exam, nil
+	}
+	return nil, &NotLoadedError{edge: "exam"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -105,6 +126,11 @@ func (cqmd *CachedQuestionMetaData) assignValues(columns []string, values []any)
 // This includes values selected through modifiers, order, etc.
 func (cqmd *CachedQuestionMetaData) Value(name string) (ent.Value, error) {
 	return cqmd.selectValues.Get(name)
+}
+
+// QueryExam queries the "exam" edge of the CachedQuestionMetaData entity.
+func (cqmd *CachedQuestionMetaData) QueryExam() *ExamQuery {
+	return NewCachedQuestionMetaDataClient(cqmd.config).QueryExam(cqmd)
 }
 
 // Update returns a builder for updating this CachedQuestionMetaData.

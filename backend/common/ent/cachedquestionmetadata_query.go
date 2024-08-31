@@ -4,8 +4,10 @@ package ent
 
 import (
 	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
 	"common/ent/predicate"
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -22,6 +24,7 @@ type CachedQuestionMetaDataQuery struct {
 	order      []cachedquestionmetadata.OrderOption
 	inters     []Interceptor
 	predicates []predicate.CachedQuestionMetaData
+	withExam   *ExamQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +59,28 @@ func (cqmdq *CachedQuestionMetaDataQuery) Unique(unique bool) *CachedQuestionMet
 func (cqmdq *CachedQuestionMetaDataQuery) Order(o ...cachedquestionmetadata.OrderOption) *CachedQuestionMetaDataQuery {
 	cqmdq.order = append(cqmdq.order, o...)
 	return cqmdq
+}
+
+// QueryExam chains the current query on the "exam" edge.
+func (cqmdq *CachedQuestionMetaDataQuery) QueryExam() *ExamQuery {
+	query := (&ExamClient{config: cqmdq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cqmdq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cqmdq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID, selector),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, cachedquestionmetadata.ExamTable, cachedquestionmetadata.ExamPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cqmdq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first CachedQuestionMetaData entity from the query.
@@ -250,10 +275,22 @@ func (cqmdq *CachedQuestionMetaDataQuery) Clone() *CachedQuestionMetaDataQuery {
 		order:      append([]cachedquestionmetadata.OrderOption{}, cqmdq.order...),
 		inters:     append([]Interceptor{}, cqmdq.inters...),
 		predicates: append([]predicate.CachedQuestionMetaData{}, cqmdq.predicates...),
+		withExam:   cqmdq.withExam.Clone(),
 		// clone intermediate query.
 		sql:  cqmdq.sql.Clone(),
 		path: cqmdq.path,
 	}
+}
+
+// WithExam tells the query-builder to eager-load the nodes that are connected to
+// the "exam" edge. The optional arguments are used to configure the query builder of the edge.
+func (cqmdq *CachedQuestionMetaDataQuery) WithExam(opts ...func(*ExamQuery)) *CachedQuestionMetaDataQuery {
+	query := (&ExamClient{config: cqmdq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cqmdq.withExam = query
+	return cqmdq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,8 +369,11 @@ func (cqmdq *CachedQuestionMetaDataQuery) prepareQuery(ctx context.Context) erro
 
 func (cqmdq *CachedQuestionMetaDataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CachedQuestionMetaData, error) {
 	var (
-		nodes = []*CachedQuestionMetaData{}
-		_spec = cqmdq.querySpec()
+		nodes       = []*CachedQuestionMetaData{}
+		_spec       = cqmdq.querySpec()
+		loadedTypes = [1]bool{
+			cqmdq.withExam != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*CachedQuestionMetaData).scanValues(nil, columns)
@@ -341,6 +381,7 @@ func (cqmdq *CachedQuestionMetaDataQuery) sqlAll(ctx context.Context, hooks ...q
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &CachedQuestionMetaData{config: cqmdq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +393,76 @@ func (cqmdq *CachedQuestionMetaDataQuery) sqlAll(ctx context.Context, hooks ...q
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cqmdq.withExam; query != nil {
+		if err := cqmdq.loadExam(ctx, query, nodes,
+			func(n *CachedQuestionMetaData) { n.Edges.Exam = []*Exam{} },
+			func(n *CachedQuestionMetaData, e *Exam) { n.Edges.Exam = append(n.Edges.Exam, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (cqmdq *CachedQuestionMetaDataQuery) loadExam(ctx context.Context, query *ExamQuery, nodes []*CachedQuestionMetaData, init func(*CachedQuestionMetaData), assign func(*CachedQuestionMetaData, *Exam)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*CachedQuestionMetaData)
+	nids := make(map[int]map[*CachedQuestionMetaData]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(cachedquestionmetadata.ExamTable)
+		s.Join(joinT).On(s.C(exam.FieldID), joinT.C(cachedquestionmetadata.ExamPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(cachedquestionmetadata.ExamPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(cachedquestionmetadata.ExamPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*CachedQuestionMetaData]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Exam](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "exam" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
 }
 
 func (cqmdq *CachedQuestionMetaDataQuery) sqlCount(ctx context.Context) (int, error) {

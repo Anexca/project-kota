@@ -30,7 +30,10 @@ func (Exam) Edges() []ent.Edge {
 		edge.From("category", ExamCategory.Type).
 			Ref("exams").
 			Unique(), // Many Exams belong to one ExamCategory
+
 		edge.To("setting", ExamSetting.Type).
 			Unique(), // Each Exam has one ExamSetting
+
+		edge.To("cached_question_metadata", CachedQuestionMetaData.Type),
 	}
 }

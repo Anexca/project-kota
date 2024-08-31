@@ -4,6 +4,7 @@ package ent
 
 import (
 	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
 	"context"
 	"errors"
 	"fmt"
@@ -72,6 +73,21 @@ func (cqmdc *CachedQuestionMetaDataCreate) SetNillableUpdatedAt(t *time.Time) *C
 		cqmdc.SetUpdatedAt(*t)
 	}
 	return cqmdc
+}
+
+// AddExamIDs adds the "exam" edge to the Exam entity by IDs.
+func (cqmdc *CachedQuestionMetaDataCreate) AddExamIDs(ids ...int) *CachedQuestionMetaDataCreate {
+	cqmdc.mutation.AddExamIDs(ids...)
+	return cqmdc
+}
+
+// AddExam adds the "exam" edges to the Exam entity.
+func (cqmdc *CachedQuestionMetaDataCreate) AddExam(e ...*Exam) *CachedQuestionMetaDataCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return cqmdc.AddExamIDs(ids...)
 }
 
 // Mutation returns the CachedQuestionMetaDataMutation object of the builder.
@@ -185,6 +201,22 @@ func (cqmdc *CachedQuestionMetaDataCreate) createSpec() (*CachedQuestionMetaData
 	if value, ok := cqmdc.mutation.UpdatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if nodes := cqmdc.mutation.ExamIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   cachedquestionmetadata.ExamTable,
+			Columns: cachedquestionmetadata.ExamPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

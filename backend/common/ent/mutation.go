@@ -45,6 +45,9 @@ type CachedQuestionMetaDataMutation struct {
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
+	exam          map[int]struct{}
+	removedexam   map[int]struct{}
+	clearedexam   bool
 	done          bool
 	oldValue      func(context.Context) (*CachedQuestionMetaData, error)
 	predicates    []predicate.CachedQuestionMetaData
@@ -328,6 +331,60 @@ func (m *CachedQuestionMetaDataMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// AddExamIDs adds the "exam" edge to the Exam entity by ids.
+func (m *CachedQuestionMetaDataMutation) AddExamIDs(ids ...int) {
+	if m.exam == nil {
+		m.exam = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.exam[ids[i]] = struct{}{}
+	}
+}
+
+// ClearExam clears the "exam" edge to the Exam entity.
+func (m *CachedQuestionMetaDataMutation) ClearExam() {
+	m.clearedexam = true
+}
+
+// ExamCleared reports if the "exam" edge to the Exam entity was cleared.
+func (m *CachedQuestionMetaDataMutation) ExamCleared() bool {
+	return m.clearedexam
+}
+
+// RemoveExamIDs removes the "exam" edge to the Exam entity by IDs.
+func (m *CachedQuestionMetaDataMutation) RemoveExamIDs(ids ...int) {
+	if m.removedexam == nil {
+		m.removedexam = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.exam, ids[i])
+		m.removedexam[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedExam returns the removed IDs of the "exam" edge to the Exam entity.
+func (m *CachedQuestionMetaDataMutation) RemovedExamIDs() (ids []int) {
+	for id := range m.removedexam {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ExamIDs returns the "exam" edge IDs in the mutation.
+func (m *CachedQuestionMetaDataMutation) ExamIDs() (ids []int) {
+	for id := range m.exam {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetExam resets all changes to the "exam" edge.
+func (m *CachedQuestionMetaDataMutation) ResetExam() {
+	m.exam = nil
+	m.clearedexam = false
+	m.removedexam = nil
+}
+
 // Where appends a list predicates to the CachedQuestionMetaDataMutation builder.
 func (m *CachedQuestionMetaDataMutation) Where(ps ...predicate.CachedQuestionMetaData) {
 	m.predicates = append(m.predicates, ps...)
@@ -529,71 +586,110 @@ func (m *CachedQuestionMetaDataMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CachedQuestionMetaDataMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.exam != nil {
+		edges = append(edges, cachedquestionmetadata.EdgeExam)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *CachedQuestionMetaDataMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		ids := make([]ent.Value, 0, len(m.exam))
+		for id := range m.exam {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CachedQuestionMetaDataMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedexam != nil {
+		edges = append(edges, cachedquestionmetadata.EdgeExam)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *CachedQuestionMetaDataMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		ids := make([]ent.Value, 0, len(m.removedexam))
+		for id := range m.removedexam {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CachedQuestionMetaDataMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedexam {
+		edges = append(edges, cachedquestionmetadata.EdgeExam)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *CachedQuestionMetaDataMutation) EdgeCleared(name string) bool {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		return m.clearedexam
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *CachedQuestionMetaDataMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown CachedQuestionMetaData unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *CachedQuestionMetaDataMutation) ResetEdge(name string) error {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		m.ResetExam()
+		return nil
+	}
 	return fmt.Errorf("unknown CachedQuestionMetaData edge %s", name)
 }
 
 // ExamMutation represents an operation that mutates the Exam nodes in the graph.
 type ExamMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	name            *string
-	description     *string
-	is_active       *bool
-	created_at      *time.Time
-	updated_at      *time.Time
-	clearedFields   map[string]struct{}
-	category        *int
-	clearedcategory bool
-	setting         *int
-	clearedsetting  bool
-	done            bool
-	oldValue        func(context.Context) (*Exam, error)
-	predicates      []predicate.Exam
+	op                              Op
+	typ                             string
+	id                              *int
+	name                            *string
+	description                     *string
+	is_active                       *bool
+	created_at                      *time.Time
+	updated_at                      *time.Time
+	clearedFields                   map[string]struct{}
+	category                        *int
+	clearedcategory                 bool
+	setting                         *int
+	clearedsetting                  bool
+	cached_question_metadata        map[int]struct{}
+	removedcached_question_metadata map[int]struct{}
+	clearedcached_question_metadata bool
+	done                            bool
+	oldValue                        func(context.Context) (*Exam, error)
+	predicates                      []predicate.Exam
 }
 
 var _ ent.Mutation = (*ExamMutation)(nil)
@@ -952,6 +1048,60 @@ func (m *ExamMutation) ResetSetting() {
 	m.clearedsetting = false
 }
 
+// AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by ids.
+func (m *ExamMutation) AddCachedQuestionMetadatumIDs(ids ...int) {
+	if m.cached_question_metadata == nil {
+		m.cached_question_metadata = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.cached_question_metadata[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCachedQuestionMetadata clears the "cached_question_metadata" edge to the CachedQuestionMetaData entity.
+func (m *ExamMutation) ClearCachedQuestionMetadata() {
+	m.clearedcached_question_metadata = true
+}
+
+// CachedQuestionMetadataCleared reports if the "cached_question_metadata" edge to the CachedQuestionMetaData entity was cleared.
+func (m *ExamMutation) CachedQuestionMetadataCleared() bool {
+	return m.clearedcached_question_metadata
+}
+
+// RemoveCachedQuestionMetadatumIDs removes the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
+func (m *ExamMutation) RemoveCachedQuestionMetadatumIDs(ids ...int) {
+	if m.removedcached_question_metadata == nil {
+		m.removedcached_question_metadata = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.cached_question_metadata, ids[i])
+		m.removedcached_question_metadata[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCachedQuestionMetadata returns the removed IDs of the "cached_question_metadata" edge to the CachedQuestionMetaData entity.
+func (m *ExamMutation) RemovedCachedQuestionMetadataIDs() (ids []int) {
+	for id := range m.removedcached_question_metadata {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CachedQuestionMetadataIDs returns the "cached_question_metadata" edge IDs in the mutation.
+func (m *ExamMutation) CachedQuestionMetadataIDs() (ids []int) {
+	for id := range m.cached_question_metadata {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCachedQuestionMetadata resets all changes to the "cached_question_metadata" edge.
+func (m *ExamMutation) ResetCachedQuestionMetadata() {
+	m.cached_question_metadata = nil
+	m.clearedcached_question_metadata = false
+	m.removedcached_question_metadata = nil
+}
+
 // Where appends a list predicates to the ExamMutation builder.
 func (m *ExamMutation) Where(ps ...predicate.Exam) {
 	m.predicates = append(m.predicates, ps...)
@@ -1153,12 +1303,15 @@ func (m *ExamMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ExamMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.category != nil {
 		edges = append(edges, exam.EdgeCategory)
 	}
 	if m.setting != nil {
 		edges = append(edges, exam.EdgeSetting)
+	}
+	if m.cached_question_metadata != nil {
+		edges = append(edges, exam.EdgeCachedQuestionMetadata)
 	}
 	return edges
 }
@@ -1175,30 +1328,50 @@ func (m *ExamMutation) AddedIDs(name string) []ent.Value {
 		if id := m.setting; id != nil {
 			return []ent.Value{*id}
 		}
+	case exam.EdgeCachedQuestionMetadata:
+		ids := make([]ent.Value, 0, len(m.cached_question_metadata))
+		for id := range m.cached_question_metadata {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ExamMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedcached_question_metadata != nil {
+		edges = append(edges, exam.EdgeCachedQuestionMetadata)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ExamMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case exam.EdgeCachedQuestionMetadata:
+		ids := make([]ent.Value, 0, len(m.removedcached_question_metadata))
+		for id := range m.removedcached_question_metadata {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ExamMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedcategory {
 		edges = append(edges, exam.EdgeCategory)
 	}
 	if m.clearedsetting {
 		edges = append(edges, exam.EdgeSetting)
+	}
+	if m.clearedcached_question_metadata {
+		edges = append(edges, exam.EdgeCachedQuestionMetadata)
 	}
 	return edges
 }
@@ -1211,6 +1384,8 @@ func (m *ExamMutation) EdgeCleared(name string) bool {
 		return m.clearedcategory
 	case exam.EdgeSetting:
 		return m.clearedsetting
+	case exam.EdgeCachedQuestionMetadata:
+		return m.clearedcached_question_metadata
 	}
 	return false
 }
@@ -1238,6 +1413,9 @@ func (m *ExamMutation) ResetEdge(name string) error {
 		return nil
 	case exam.EdgeSetting:
 		m.ResetSetting()
+		return nil
+	case exam.EdgeCachedQuestionMetadata:
+		m.ResetCachedQuestionMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Exam edge %s", name)

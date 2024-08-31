@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -23,8 +24,15 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// EdgeExam holds the string denoting the exam edge name in mutations.
+	EdgeExam = "exam"
 	// Table holds the table name of the cachedquestionmetadata in the database.
 	Table = "cached_question_meta_data"
+	// ExamTable is the table that holds the exam relation/edge. The primary key declared below.
+	ExamTable = "exam_cached_question_metadata"
+	// ExamInverseTable is the table name for the Exam entity.
+	// It exists in this package in order to avoid circular dependency with the "exam" package.
+	ExamInverseTable = "exams"
 )
 
 // Columns holds all SQL columns for cachedquestionmetadata fields.
@@ -36,6 +44,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
+
+var (
+	// ExamPrimaryKey and ExamColumn2 are the table columns denoting the
+	// primary key for the exam relation (M2M).
+	ExamPrimaryKey = []string{"exam_id", "cached_question_meta_data_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -89,4 +103,25 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByExamCount orders the results by exam count.
+func ByExamCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newExamStep(), opts...)
+	}
+}
+
+// ByExam orders the results by exam terms.
+func ByExam(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newExamStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newExamStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ExamInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ExamTable, ExamPrimaryKey...),
+	)
 }

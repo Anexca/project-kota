@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/cachedquestionmetadata"
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
@@ -130,6 +131,21 @@ func (eu *ExamUpdate) SetSetting(e *ExamSetting) *ExamUpdate {
 	return eu.SetSettingID(e.ID)
 }
 
+// AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
+func (eu *ExamUpdate) AddCachedQuestionMetadatumIDs(ids ...int) *ExamUpdate {
+	eu.mutation.AddCachedQuestionMetadatumIDs(ids...)
+	return eu
+}
+
+// AddCachedQuestionMetadata adds the "cached_question_metadata" edges to the CachedQuestionMetaData entity.
+func (eu *ExamUpdate) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData) *ExamUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eu.AddCachedQuestionMetadatumIDs(ids...)
+}
+
 // Mutation returns the ExamMutation object of the builder.
 func (eu *ExamUpdate) Mutation() *ExamMutation {
 	return eu.mutation
@@ -145,6 +161,27 @@ func (eu *ExamUpdate) ClearCategory() *ExamUpdate {
 func (eu *ExamUpdate) ClearSetting() *ExamUpdate {
 	eu.mutation.ClearSetting()
 	return eu
+}
+
+// ClearCachedQuestionMetadata clears all "cached_question_metadata" edges to the CachedQuestionMetaData entity.
+func (eu *ExamUpdate) ClearCachedQuestionMetadata() *ExamUpdate {
+	eu.mutation.ClearCachedQuestionMetadata()
+	return eu
+}
+
+// RemoveCachedQuestionMetadatumIDs removes the "cached_question_metadata" edge to CachedQuestionMetaData entities by IDs.
+func (eu *ExamUpdate) RemoveCachedQuestionMetadatumIDs(ids ...int) *ExamUpdate {
+	eu.mutation.RemoveCachedQuestionMetadatumIDs(ids...)
+	return eu
+}
+
+// RemoveCachedQuestionMetadata removes "cached_question_metadata" edges to CachedQuestionMetaData entities.
+func (eu *ExamUpdate) RemoveCachedQuestionMetadata(c ...*CachedQuestionMetaData) *ExamUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eu.RemoveCachedQuestionMetadatumIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -258,6 +295,51 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.CachedQuestionMetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   exam.CachedQuestionMetadataTable,
+			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedCachedQuestionMetadataIDs(); len(nodes) > 0 && !eu.mutation.CachedQuestionMetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   exam.CachedQuestionMetadataTable,
+			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.CachedQuestionMetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   exam.CachedQuestionMetadataTable,
+			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -385,6 +467,21 @@ func (euo *ExamUpdateOne) SetSetting(e *ExamSetting) *ExamUpdateOne {
 	return euo.SetSettingID(e.ID)
 }
 
+// AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
+func (euo *ExamUpdateOne) AddCachedQuestionMetadatumIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.AddCachedQuestionMetadatumIDs(ids...)
+	return euo
+}
+
+// AddCachedQuestionMetadata adds the "cached_question_metadata" edges to the CachedQuestionMetaData entity.
+func (euo *ExamUpdateOne) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData) *ExamUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return euo.AddCachedQuestionMetadatumIDs(ids...)
+}
+
 // Mutation returns the ExamMutation object of the builder.
 func (euo *ExamUpdateOne) Mutation() *ExamMutation {
 	return euo.mutation
@@ -400,6 +497,27 @@ func (euo *ExamUpdateOne) ClearCategory() *ExamUpdateOne {
 func (euo *ExamUpdateOne) ClearSetting() *ExamUpdateOne {
 	euo.mutation.ClearSetting()
 	return euo
+}
+
+// ClearCachedQuestionMetadata clears all "cached_question_metadata" edges to the CachedQuestionMetaData entity.
+func (euo *ExamUpdateOne) ClearCachedQuestionMetadata() *ExamUpdateOne {
+	euo.mutation.ClearCachedQuestionMetadata()
+	return euo
+}
+
+// RemoveCachedQuestionMetadatumIDs removes the "cached_question_metadata" edge to CachedQuestionMetaData entities by IDs.
+func (euo *ExamUpdateOne) RemoveCachedQuestionMetadatumIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.RemoveCachedQuestionMetadatumIDs(ids...)
+	return euo
+}
+
+// RemoveCachedQuestionMetadata removes "cached_question_metadata" edges to CachedQuestionMetaData entities.
+func (euo *ExamUpdateOne) RemoveCachedQuestionMetadata(c ...*CachedQuestionMetaData) *ExamUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return euo.RemoveCachedQuestionMetadatumIDs(ids...)
 }
 
 // Where appends a list predicates to the ExamUpdate builder.
@@ -543,6 +661,51 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.CachedQuestionMetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   exam.CachedQuestionMetadataTable,
+			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedCachedQuestionMetadataIDs(); len(nodes) > 0 && !euo.mutation.CachedQuestionMetadataCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   exam.CachedQuestionMetadataTable,
+			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.CachedQuestionMetadataIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   exam.CachedQuestionMetadataTable,
+			Columns: exam.CachedQuestionMetadataPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
