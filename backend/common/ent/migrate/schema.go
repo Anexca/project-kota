@@ -25,11 +25,78 @@ var (
 		Columns:    CachedQuestionMetadataColumns,
 		PrimaryKey: []*schema.Column{CachedQuestionMetadataColumns[0]},
 	}
+	// ExamsColumns holds the columns for the "exams" table.
+	ExamsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_category_exams", Type: field.TypeInt, Nullable: true},
+	}
+	// ExamsTable holds the schema information for the "exams" table.
+	ExamsTable = &schema.Table{
+		Name:       "exams",
+		Columns:    ExamsColumns,
+		PrimaryKey: []*schema.Column{ExamsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exams_exam_categories_exams",
+				Columns:    []*schema.Column{ExamsColumns[6]},
+				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ExamCategoriesColumns holds the columns for the "exam_categories" table.
+	ExamCategoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// ExamCategoriesTable holds the schema information for the "exam_categories" table.
+	ExamCategoriesTable = &schema.Table{
+		Name:       "exam_categories",
+		Columns:    ExamCategoriesColumns,
+		PrimaryKey: []*schema.Column{ExamCategoriesColumns[0]},
+	}
+	// ExamSettingsColumns holds the columns for the "exam_settings" table.
+	ExamSettingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "number_of_questions", Type: field.TypeInt},
+		{Name: "duration_minutes", Type: field.TypeTime},
+		{Name: "negative_marking", Type: field.TypeFloat64},
+		{Name: "other_details", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "json"}},
+		{Name: "exam_settings", Type: field.TypeInt, Nullable: true},
+	}
+	// ExamSettingsTable holds the schema information for the "exam_settings" table.
+	ExamSettingsTable = &schema.Table{
+		Name:       "exam_settings",
+		Columns:    ExamSettingsColumns,
+		PrimaryKey: []*schema.Column{ExamSettingsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exam_settings_exams_settings",
+				Columns:    []*schema.Column{ExamSettingsColumns[5]},
+				RefColumns: []*schema.Column{ExamsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CachedQuestionMetadataTable,
+		ExamsTable,
+		ExamCategoriesTable,
+		ExamSettingsTable,
 	}
 )
 
 func init() {
+	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
+	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable
 }

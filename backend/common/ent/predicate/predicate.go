@@ -8,3 +8,12 @@ import (
 
 // CachedQuestionMetadata is the predicate function for cachedquestionmetadata builders.
 type CachedQuestionMetadata func(*sql.Selector)
+
+// Exam is the predicate function for exam builders.
+type Exam func(*sql.Selector)
+
+// ExamCategory is the predicate function for examcategory builders.
+type ExamCategory func(*sql.Selector)
+
+// ExamSetting is the predicate function for examsetting builders.
+type ExamSetting func(*sql.Selector)

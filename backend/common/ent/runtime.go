@@ -4,6 +4,8 @@ package ent
 
 import (
 	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
+	"common/ent/examcategory"
 	"common/ent/schema"
 	"time"
 )
@@ -28,4 +30,36 @@ func init() {
 	cachedquestionmetadata.DefaultUpdatedAt = cachedquestionmetadataDescUpdatedAt.Default.(func() time.Time)
 	// cachedquestionmetadata.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	cachedquestionmetadata.UpdateDefaultUpdatedAt = cachedquestionmetadataDescUpdatedAt.UpdateDefault.(func() time.Time)
+	examFields := schema.Exam{}.Fields()
+	_ = examFields
+	// examDescIsActive is the schema descriptor for is_active field.
+	examDescIsActive := examFields[2].Descriptor()
+	// exam.DefaultIsActive holds the default value on creation for the is_active field.
+	exam.DefaultIsActive = examDescIsActive.Default.(bool)
+	// examDescCreatedAt is the schema descriptor for created_at field.
+	examDescCreatedAt := examFields[3].Descriptor()
+	// exam.DefaultCreatedAt holds the default value on creation for the created_at field.
+	exam.DefaultCreatedAt = examDescCreatedAt.Default.(func() time.Time)
+	// examDescUpdatedAt is the schema descriptor for updated_at field.
+	examDescUpdatedAt := examFields[4].Descriptor()
+	// exam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	exam.DefaultUpdatedAt = examDescUpdatedAt.Default.(func() time.Time)
+	// exam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	exam.UpdateDefaultUpdatedAt = examDescUpdatedAt.UpdateDefault.(func() time.Time)
+	examcategoryFields := schema.ExamCategory{}.Fields()
+	_ = examcategoryFields
+	// examcategoryDescIsActive is the schema descriptor for is_active field.
+	examcategoryDescIsActive := examcategoryFields[2].Descriptor()
+	// examcategory.DefaultIsActive holds the default value on creation for the is_active field.
+	examcategory.DefaultIsActive = examcategoryDescIsActive.Default.(bool)
+	// examcategoryDescCreatedAt is the schema descriptor for created_at field.
+	examcategoryDescCreatedAt := examcategoryFields[3].Descriptor()
+	// examcategory.DefaultCreatedAt holds the default value on creation for the created_at field.
+	examcategory.DefaultCreatedAt = examcategoryDescCreatedAt.Default.(func() time.Time)
+	// examcategoryDescUpdatedAt is the schema descriptor for updated_at field.
+	examcategoryDescUpdatedAt := examcategoryFields[4].Descriptor()
+	// examcategory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	examcategory.DefaultUpdatedAt = examcategoryDescUpdatedAt.Default.(func() time.Time)
+	// examcategory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	examcategory.UpdateDefaultUpdatedAt = examcategoryDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

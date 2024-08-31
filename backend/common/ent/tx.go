@@ -14,6 +14,12 @@ type Tx struct {
 	config
 	// CachedQuestionMetadata is the client for interacting with the CachedQuestionMetadata builders.
 	CachedQuestionMetadata *CachedQuestionMetadataClient
+	// Exam is the client for interacting with the Exam builders.
+	Exam *ExamClient
+	// ExamCategory is the client for interacting with the ExamCategory builders.
+	ExamCategory *ExamCategoryClient
+	// ExamSetting is the client for interacting with the ExamSetting builders.
+	ExamSetting *ExamSettingClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +152,9 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.CachedQuestionMetadata = NewCachedQuestionMetadataClient(tx.config)
+	tx.Exam = NewExamClient(tx.config)
+	tx.ExamCategory = NewExamCategoryClient(tx.config)
+	tx.ExamSetting = NewExamSettingClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

@@ -24,6 +24,11 @@ func main() {
 	}
 	defer redisClient.Close()
 
+	_, err = client.NewDbClient(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	c := workers.InitWorkers(genAiClient, redisClient)
 	c.Start()
 
