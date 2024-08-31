@@ -26,6 +26,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/sup", s.Sup)
 
+	r.Route("/exams", func(r chi.Router) {
+		r.Route("/banking", func(r chi.Router) {
+			r.Get("/descriptive", s.GetBankingDescriptiveQuestions)
+		})
+	})
+
 	return r
 }
 

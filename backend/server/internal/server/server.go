@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"server/internal/services"
 	"strconv"
 	"time"
 
@@ -13,11 +14,15 @@ import (
 
 type Server struct {
 	port int
+
+	examService *services.ExamService
 }
 
 func InitServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	logger := commonConfig.SetupLogger()
+
+	// examService := services.NewExamService()
 
 	NewServer := &Server{
 		port: port,
