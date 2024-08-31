@@ -1,6 +1,7 @@
 package server
 
 import (
+	commonService "common/services"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,13 +12,12 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/redis/go-redis/v9"
 
-	"ai-service/internal/services"
 	"ai-service/pkg/config"
 )
 
 type Server struct {
 	port         int
-	redisService *services.RedisService
+	redisService *commonService.RedisService
 }
 
 func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Server {
@@ -25,7 +25,7 @@ func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Serv
 
 	logger := config.SetupLogger()
 
-	redisService := services.NewRedisService(redisClient)
+	redisService := commonService.NewRedisService(redisClient)
 
 	NewServer := &Server{
 		port:         port,

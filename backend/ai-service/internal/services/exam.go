@@ -3,7 +3,8 @@ package services
 import (
 	"ai-service/internal/repositories"
 	"common/ent"
-	util "common/utils"
+	commonService "common/services"
+	util "common/util"
 	"context"
 	"log"
 	"sync"
@@ -15,7 +16,7 @@ import (
 
 type ExamService struct {
 	genAIService                     *GenAIService
-	redisService                     *RedisService
+	redisService                     *commonService.RedisService
 	examRepository                   *repositories.ExamRepository
 	examCategoryRepository           *repositories.ExamCategoryRepository
 	examSettingRepository            *repositories.ExamSettingRepository
@@ -24,7 +25,7 @@ type ExamService struct {
 
 func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *ExamService {
 	genAIService := NewGenAIService(genAIClient)
-	redisService := NewRedisService(redisClient)
+	redisService := commonService.NewRedisService(redisClient)
 	examRepository := repositories.NewExamRespository(dbClient)
 	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
 	examSettingRepository := repositories.NewExamSettingRepository(dbClient)
