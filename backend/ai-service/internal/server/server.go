@@ -16,9 +16,8 @@ import (
 )
 
 type Server struct {
-	port            int
-	questionService *services.ExamService
-	redisService    *services.RedisService
+	port         int
+	redisService *services.RedisService
 }
 
 func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Server {
@@ -26,12 +25,10 @@ func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Serv
 
 	logger := config.SetupLogger()
 
-	// questionService := services.NewQuestionService(genAiClient, redisClient)
 	redisService := services.NewRedisService(redisClient)
 
 	NewServer := &Server{
-		port: port,
-		// questionService: questionService,
+		port:         port,
 		redisService: redisService,
 	}
 

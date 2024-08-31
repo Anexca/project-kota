@@ -12,18 +12,18 @@ import (
 )
 
 type Worker struct {
-	cronHandler     *cron.Cron
-	questionService *services.ExamService
+	cronHandler *cron.Cron
+	examService *services.ExamService
 }
 
 func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 	c := cron.New()
 
-	questionService := services.NewExamService(genAiClient, redisClient, dbClient)
+	examService := services.NewExamService(genAiClient, redisClient, dbClient)
 
 	worker := &Worker{
-		cronHandler:     c,
-		questionService: questionService,
+		cronHandler: c,
+		examService: examService,
 	}
 
 	worker.RegisterWorkers()
@@ -34,8 +34,7 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient 
 func (w *Worker) RegisterWorkers() {
 	w.cronHandler.AddFunc("*/1 * * * *", func() {
 		ctx := context.Background()
-		log.Println("Every Minute")
-		_, err := w.questionService.GenerateDescriptiveQuestions(ctx, "IBPS PO Mains", 10)
+		err := w.examService.PopulateExamQuestionCache(ctx)
 		if err != nil {
 			log.Printf("Failed to generate questions: %v", err)
 		}

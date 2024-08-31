@@ -15,17 +15,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/sup", s.SupHandler)
 	r.Get("/health", s.HealthCheckHandler)
 
-	r.Route("/questions", func(r chi.Router) {
-		r.Route("/jee", func(r chi.Router) {
-			r.Get("/mcq/physics", s.GetJEEPhysicsMCQs)
-			r.Get("/nvq/physics", s.GetJEEPhysicsNVQs)
-		})
-
-		r.Route("/banking", func(r chi.Router) {
-			r.Get("/descriptive", s.GetDescriptiveQuestions)
-		})
-	})
-
 	return r
 }
 
