@@ -61,13 +61,23 @@ func NumberOfQuestions(v int) predicate.ExamSetting {
 }
 
 // DurationMinutes applies equality check predicate on the "duration_minutes" field. It's identical to DurationMinutesEQ.
-func DurationMinutes(v time.Time) predicate.ExamSetting {
+func DurationMinutes(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldDurationMinutes, v))
 }
 
 // NegativeMarking applies equality check predicate on the "negative_marking" field. It's identical to NegativeMarkingEQ.
 func NegativeMarking(v float64) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldNegativeMarking, v))
+}
+
+// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+func CreatedAt(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
+func UpdatedAt(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // NumberOfQuestionsEQ applies the EQ predicate on the "number_of_questions" field.
@@ -111,42 +121,42 @@ func NumberOfQuestionsLTE(v int) predicate.ExamSetting {
 }
 
 // DurationMinutesEQ applies the EQ predicate on the "duration_minutes" field.
-func DurationMinutesEQ(v time.Time) predicate.ExamSetting {
+func DurationMinutesEQ(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldDurationMinutes, v))
 }
 
 // DurationMinutesNEQ applies the NEQ predicate on the "duration_minutes" field.
-func DurationMinutesNEQ(v time.Time) predicate.ExamSetting {
+func DurationMinutesNEQ(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldNEQ(FieldDurationMinutes, v))
 }
 
 // DurationMinutesIn applies the In predicate on the "duration_minutes" field.
-func DurationMinutesIn(vs ...time.Time) predicate.ExamSetting {
+func DurationMinutesIn(vs ...int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldIn(FieldDurationMinutes, vs...))
 }
 
 // DurationMinutesNotIn applies the NotIn predicate on the "duration_minutes" field.
-func DurationMinutesNotIn(vs ...time.Time) predicate.ExamSetting {
+func DurationMinutesNotIn(vs ...int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldNotIn(FieldDurationMinutes, vs...))
 }
 
 // DurationMinutesGT applies the GT predicate on the "duration_minutes" field.
-func DurationMinutesGT(v time.Time) predicate.ExamSetting {
+func DurationMinutesGT(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldGT(FieldDurationMinutes, v))
 }
 
 // DurationMinutesGTE applies the GTE predicate on the "duration_minutes" field.
-func DurationMinutesGTE(v time.Time) predicate.ExamSetting {
+func DurationMinutesGTE(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldGTE(FieldDurationMinutes, v))
 }
 
 // DurationMinutesLT applies the LT predicate on the "duration_minutes" field.
-func DurationMinutesLT(v time.Time) predicate.ExamSetting {
+func DurationMinutesLT(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldLT(FieldDurationMinutes, v))
 }
 
 // DurationMinutesLTE applies the LTE predicate on the "duration_minutes" field.
-func DurationMinutesLTE(v time.Time) predicate.ExamSetting {
+func DurationMinutesLTE(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldLTE(FieldDurationMinutes, v))
 }
 
@@ -188,6 +198,106 @@ func NegativeMarkingLT(v float64) predicate.ExamSetting {
 // NegativeMarkingLTE applies the LTE predicate on the "negative_marking" field.
 func NegativeMarkingLTE(v float64) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldLTE(FieldNegativeMarking, v))
+}
+
+// NegativeMarkingIsNil applies the IsNil predicate on the "negative_marking" field.
+func NegativeMarkingIsNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIsNull(FieldNegativeMarking))
+}
+
+// NegativeMarkingNotNil applies the NotNil predicate on the "negative_marking" field.
+func NegativeMarkingNotNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotNull(FieldNegativeMarking))
+}
+
+// OtherDetailsIsNil applies the IsNil predicate on the "other_details" field.
+func OtherDetailsIsNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIsNull(FieldOtherDetails))
+}
+
+// OtherDetailsNotNil applies the NotNil predicate on the "other_details" field.
+func OtherDetailsNotNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotNull(FieldOtherDetails))
+}
+
+// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+func CreatedAtEQ(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+func CreatedAtNEQ(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldCreatedAt, v))
+}
+
+// CreatedAtIn applies the In predicate on the "created_at" field.
+func CreatedAtIn(vs ...time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+func CreatedAtNotIn(vs ...time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldCreatedAt, vs...))
+}
+
+// CreatedAtGT applies the GT predicate on the "created_at" field.
+func CreatedAtGT(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldCreatedAt, v))
+}
+
+// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+func CreatedAtGTE(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldCreatedAt, v))
+}
+
+// CreatedAtLT applies the LT predicate on the "created_at" field.
+func CreatedAtLT(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldCreatedAt, v))
+}
+
+// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+func CreatedAtLTE(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
+func UpdatedAtEQ(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
+func UpdatedAtNEQ(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIn applies the In predicate on the "updated_at" field.
+func UpdatedAtIn(vs ...time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
+func UpdatedAtNotIn(vs ...time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldUpdatedAt, vs...))
+}
+
+// UpdatedAtGT applies the GT predicate on the "updated_at" field.
+func UpdatedAtGT(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
+func UpdatedAtGTE(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLT applies the LT predicate on the "updated_at" field.
+func UpdatedAtLT(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldUpdatedAt, v))
+}
+
+// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
+func UpdatedAtLTE(v time.Time) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // HasExam applies the HasEdge predicate on the "exam" edge.

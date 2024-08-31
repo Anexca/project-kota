@@ -22,11 +22,15 @@ type ExamSetting struct {
 	// NumberOfQuestions holds the value of the "number_of_questions" field.
 	NumberOfQuestions int `json:"number_of_questions,omitempty"`
 	// DurationMinutes holds the value of the "duration_minutes" field.
-	DurationMinutes time.Time `json:"duration_minutes,omitempty"`
+	DurationMinutes int `json:"duration_minutes,omitempty"`
 	// NegativeMarking holds the value of the "negative_marking" field.
 	NegativeMarking float64 `json:"negative_marking,omitempty"`
 	// OtherDetails holds the value of the "other_details" field.
 	OtherDetails map[string]interface{} `json:"other_details,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ExamSettingQuery when eager-loading is set.
 	Edges        ExamSettingEdges `json:"edges"`
@@ -63,9 +67,9 @@ func (*ExamSetting) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case examsetting.FieldNegativeMarking:
 			values[i] = new(sql.NullFloat64)
-		case examsetting.FieldID, examsetting.FieldNumberOfQuestions:
+		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationMinutes:
 			values[i] = new(sql.NullInt64)
-		case examsetting.FieldDurationMinutes:
+		case examsetting.FieldCreatedAt, examsetting.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case examsetting.ForeignKeys[0]: // exam_setting
 			values[i] = new(sql.NullInt64)
@@ -97,10 +101,10 @@ func (es *ExamSetting) assignValues(columns []string, values []any) error {
 				es.NumberOfQuestions = int(value.Int64)
 			}
 		case examsetting.FieldDurationMinutes:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field duration_minutes", values[i])
 			} else if value.Valid {
-				es.DurationMinutes = value.Time
+				es.DurationMinutes = int(value.Int64)
 			}
 		case examsetting.FieldNegativeMarking:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -115,6 +119,18 @@ func (es *ExamSetting) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &es.OtherDetails); err != nil {
 					return fmt.Errorf("unmarshal field other_details: %w", err)
 				}
+			}
+		case examsetting.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				es.CreatedAt = value.Time
+			}
+		case examsetting.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				es.UpdatedAt = value.Time
 			}
 		case examsetting.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -168,13 +184,19 @@ func (es *ExamSetting) String() string {
 	builder.WriteString(fmt.Sprintf("%v", es.NumberOfQuestions))
 	builder.WriteString(", ")
 	builder.WriteString("duration_minutes=")
-	builder.WriteString(es.DurationMinutes.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", es.DurationMinutes))
 	builder.WriteString(", ")
 	builder.WriteString("negative_marking=")
 	builder.WriteString(fmt.Sprintf("%v", es.NegativeMarking))
 	builder.WriteString(", ")
 	builder.WriteString("other_details=")
 	builder.WriteString(fmt.Sprintf("%v", es.OtherDetails))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(es.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(es.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

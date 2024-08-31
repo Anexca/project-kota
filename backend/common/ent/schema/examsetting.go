@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
@@ -16,12 +18,15 @@ type ExamSetting struct {
 func (ExamSetting) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("number_of_questions"),
-		field.Time("duration_minutes"),
-		field.Float("negative_marking"),
+		field.Int("duration_minutes"),
+		field.Float("negative_marking").Optional(),
 		field.JSON("other_details", map[string]interface{}{}).
+			Optional().
 			SchemaType(map[string]string{
 				dialect.Postgres: "json",
 			}),
+		field.Time("created_at").Default(time.Now),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 

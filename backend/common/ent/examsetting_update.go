@@ -51,16 +51,23 @@ func (esu *ExamSettingUpdate) AddNumberOfQuestions(i int) *ExamSettingUpdate {
 }
 
 // SetDurationMinutes sets the "duration_minutes" field.
-func (esu *ExamSettingUpdate) SetDurationMinutes(t time.Time) *ExamSettingUpdate {
-	esu.mutation.SetDurationMinutes(t)
+func (esu *ExamSettingUpdate) SetDurationMinutes(i int) *ExamSettingUpdate {
+	esu.mutation.ResetDurationMinutes()
+	esu.mutation.SetDurationMinutes(i)
 	return esu
 }
 
 // SetNillableDurationMinutes sets the "duration_minutes" field if the given value is not nil.
-func (esu *ExamSettingUpdate) SetNillableDurationMinutes(t *time.Time) *ExamSettingUpdate {
-	if t != nil {
-		esu.SetDurationMinutes(*t)
+func (esu *ExamSettingUpdate) SetNillableDurationMinutes(i *int) *ExamSettingUpdate {
+	if i != nil {
+		esu.SetDurationMinutes(*i)
 	}
+	return esu
+}
+
+// AddDurationMinutes adds i to the "duration_minutes" field.
+func (esu *ExamSettingUpdate) AddDurationMinutes(i int) *ExamSettingUpdate {
+	esu.mutation.AddDurationMinutes(i)
 	return esu
 }
 
@@ -85,9 +92,41 @@ func (esu *ExamSettingUpdate) AddNegativeMarking(f float64) *ExamSettingUpdate {
 	return esu
 }
 
+// ClearNegativeMarking clears the value of the "negative_marking" field.
+func (esu *ExamSettingUpdate) ClearNegativeMarking() *ExamSettingUpdate {
+	esu.mutation.ClearNegativeMarking()
+	return esu
+}
+
 // SetOtherDetails sets the "other_details" field.
 func (esu *ExamSettingUpdate) SetOtherDetails(m map[string]interface{}) *ExamSettingUpdate {
 	esu.mutation.SetOtherDetails(m)
+	return esu
+}
+
+// ClearOtherDetails clears the value of the "other_details" field.
+func (esu *ExamSettingUpdate) ClearOtherDetails() *ExamSettingUpdate {
+	esu.mutation.ClearOtherDetails()
+	return esu
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (esu *ExamSettingUpdate) SetCreatedAt(t time.Time) *ExamSettingUpdate {
+	esu.mutation.SetCreatedAt(t)
+	return esu
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableCreatedAt(t *time.Time) *ExamSettingUpdate {
+	if t != nil {
+		esu.SetCreatedAt(*t)
+	}
+	return esu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (esu *ExamSettingUpdate) SetUpdatedAt(t time.Time) *ExamSettingUpdate {
+	esu.mutation.SetUpdatedAt(t)
 	return esu
 }
 
@@ -123,6 +162,7 @@ func (esu *ExamSettingUpdate) ClearExam() *ExamSettingUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (esu *ExamSettingUpdate) Save(ctx context.Context) (int, error) {
+	esu.defaults()
 	return withHooks(ctx, esu.sqlSave, esu.mutation, esu.hooks)
 }
 
@@ -148,6 +188,14 @@ func (esu *ExamSettingUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (esu *ExamSettingUpdate) defaults() {
+	if _, ok := esu.mutation.UpdatedAt(); !ok {
+		v := examsetting.UpdateDefaultUpdatedAt()
+		esu.mutation.SetUpdatedAt(v)
+	}
+}
+
 func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(examsetting.Table, examsetting.Columns, sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt))
 	if ps := esu.mutation.predicates; len(ps) > 0 {
@@ -164,7 +212,10 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(examsetting.FieldNumberOfQuestions, field.TypeInt, value)
 	}
 	if value, ok := esu.mutation.DurationMinutes(); ok {
-		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeTime, value)
+		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeInt, value)
+	}
+	if value, ok := esu.mutation.AddedDurationMinutes(); ok {
+		_spec.AddField(examsetting.FieldDurationMinutes, field.TypeInt, value)
 	}
 	if value, ok := esu.mutation.NegativeMarking(); ok {
 		_spec.SetField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)
@@ -172,8 +223,20 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := esu.mutation.AddedNegativeMarking(); ok {
 		_spec.AddField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)
 	}
+	if esu.mutation.NegativeMarkingCleared() {
+		_spec.ClearField(examsetting.FieldNegativeMarking, field.TypeFloat64)
+	}
 	if value, ok := esu.mutation.OtherDetails(); ok {
 		_spec.SetField(examsetting.FieldOtherDetails, field.TypeJSON, value)
+	}
+	if esu.mutation.OtherDetailsCleared() {
+		_spec.ClearField(examsetting.FieldOtherDetails, field.TypeJSON)
+	}
+	if value, ok := esu.mutation.CreatedAt(); ok {
+		_spec.SetField(examsetting.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := esu.mutation.UpdatedAt(); ok {
+		_spec.SetField(examsetting.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if esu.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -246,16 +309,23 @@ func (esuo *ExamSettingUpdateOne) AddNumberOfQuestions(i int) *ExamSettingUpdate
 }
 
 // SetDurationMinutes sets the "duration_minutes" field.
-func (esuo *ExamSettingUpdateOne) SetDurationMinutes(t time.Time) *ExamSettingUpdateOne {
-	esuo.mutation.SetDurationMinutes(t)
+func (esuo *ExamSettingUpdateOne) SetDurationMinutes(i int) *ExamSettingUpdateOne {
+	esuo.mutation.ResetDurationMinutes()
+	esuo.mutation.SetDurationMinutes(i)
 	return esuo
 }
 
 // SetNillableDurationMinutes sets the "duration_minutes" field if the given value is not nil.
-func (esuo *ExamSettingUpdateOne) SetNillableDurationMinutes(t *time.Time) *ExamSettingUpdateOne {
-	if t != nil {
-		esuo.SetDurationMinutes(*t)
+func (esuo *ExamSettingUpdateOne) SetNillableDurationMinutes(i *int) *ExamSettingUpdateOne {
+	if i != nil {
+		esuo.SetDurationMinutes(*i)
 	}
+	return esuo
+}
+
+// AddDurationMinutes adds i to the "duration_minutes" field.
+func (esuo *ExamSettingUpdateOne) AddDurationMinutes(i int) *ExamSettingUpdateOne {
+	esuo.mutation.AddDurationMinutes(i)
 	return esuo
 }
 
@@ -280,9 +350,41 @@ func (esuo *ExamSettingUpdateOne) AddNegativeMarking(f float64) *ExamSettingUpda
 	return esuo
 }
 
+// ClearNegativeMarking clears the value of the "negative_marking" field.
+func (esuo *ExamSettingUpdateOne) ClearNegativeMarking() *ExamSettingUpdateOne {
+	esuo.mutation.ClearNegativeMarking()
+	return esuo
+}
+
 // SetOtherDetails sets the "other_details" field.
 func (esuo *ExamSettingUpdateOne) SetOtherDetails(m map[string]interface{}) *ExamSettingUpdateOne {
 	esuo.mutation.SetOtherDetails(m)
+	return esuo
+}
+
+// ClearOtherDetails clears the value of the "other_details" field.
+func (esuo *ExamSettingUpdateOne) ClearOtherDetails() *ExamSettingUpdateOne {
+	esuo.mutation.ClearOtherDetails()
+	return esuo
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (esuo *ExamSettingUpdateOne) SetCreatedAt(t time.Time) *ExamSettingUpdateOne {
+	esuo.mutation.SetCreatedAt(t)
+	return esuo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableCreatedAt(t *time.Time) *ExamSettingUpdateOne {
+	if t != nil {
+		esuo.SetCreatedAt(*t)
+	}
+	return esuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (esuo *ExamSettingUpdateOne) SetUpdatedAt(t time.Time) *ExamSettingUpdateOne {
+	esuo.mutation.SetUpdatedAt(t)
 	return esuo
 }
 
@@ -331,6 +433,7 @@ func (esuo *ExamSettingUpdateOne) Select(field string, fields ...string) *ExamSe
 
 // Save executes the query and returns the updated ExamSetting entity.
 func (esuo *ExamSettingUpdateOne) Save(ctx context.Context) (*ExamSetting, error) {
+	esuo.defaults()
 	return withHooks(ctx, esuo.sqlSave, esuo.mutation, esuo.hooks)
 }
 
@@ -353,6 +456,14 @@ func (esuo *ExamSettingUpdateOne) Exec(ctx context.Context) error {
 func (esuo *ExamSettingUpdateOne) ExecX(ctx context.Context) {
 	if err := esuo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (esuo *ExamSettingUpdateOne) defaults() {
+	if _, ok := esuo.mutation.UpdatedAt(); !ok {
+		v := examsetting.UpdateDefaultUpdatedAt()
+		esuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -389,7 +500,10 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 		_spec.AddField(examsetting.FieldNumberOfQuestions, field.TypeInt, value)
 	}
 	if value, ok := esuo.mutation.DurationMinutes(); ok {
-		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeTime, value)
+		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeInt, value)
+	}
+	if value, ok := esuo.mutation.AddedDurationMinutes(); ok {
+		_spec.AddField(examsetting.FieldDurationMinutes, field.TypeInt, value)
 	}
 	if value, ok := esuo.mutation.NegativeMarking(); ok {
 		_spec.SetField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)
@@ -397,8 +511,20 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	if value, ok := esuo.mutation.AddedNegativeMarking(); ok {
 		_spec.AddField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)
 	}
+	if esuo.mutation.NegativeMarkingCleared() {
+		_spec.ClearField(examsetting.FieldNegativeMarking, field.TypeFloat64)
+	}
 	if value, ok := esuo.mutation.OtherDetails(); ok {
 		_spec.SetField(examsetting.FieldOtherDetails, field.TypeJSON, value)
+	}
+	if esuo.mutation.OtherDetailsCleared() {
+		_spec.ClearField(examsetting.FieldOtherDetails, field.TypeJSON)
+	}
+	if value, ok := esuo.mutation.CreatedAt(); ok {
+		_spec.SetField(examsetting.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := esuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(examsetting.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if esuo.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -28,8 +28,8 @@ func (esc *ExamSettingCreate) SetNumberOfQuestions(i int) *ExamSettingCreate {
 }
 
 // SetDurationMinutes sets the "duration_minutes" field.
-func (esc *ExamSettingCreate) SetDurationMinutes(t time.Time) *ExamSettingCreate {
-	esc.mutation.SetDurationMinutes(t)
+func (esc *ExamSettingCreate) SetDurationMinutes(i int) *ExamSettingCreate {
+	esc.mutation.SetDurationMinutes(i)
 	return esc
 }
 
@@ -39,9 +39,45 @@ func (esc *ExamSettingCreate) SetNegativeMarking(f float64) *ExamSettingCreate {
 	return esc
 }
 
+// SetNillableNegativeMarking sets the "negative_marking" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableNegativeMarking(f *float64) *ExamSettingCreate {
+	if f != nil {
+		esc.SetNegativeMarking(*f)
+	}
+	return esc
+}
+
 // SetOtherDetails sets the "other_details" field.
 func (esc *ExamSettingCreate) SetOtherDetails(m map[string]interface{}) *ExamSettingCreate {
 	esc.mutation.SetOtherDetails(m)
+	return esc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (esc *ExamSettingCreate) SetCreatedAt(t time.Time) *ExamSettingCreate {
+	esc.mutation.SetCreatedAt(t)
+	return esc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableCreatedAt(t *time.Time) *ExamSettingCreate {
+	if t != nil {
+		esc.SetCreatedAt(*t)
+	}
+	return esc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (esc *ExamSettingCreate) SetUpdatedAt(t time.Time) *ExamSettingCreate {
+	esc.mutation.SetUpdatedAt(t)
+	return esc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableUpdatedAt(t *time.Time) *ExamSettingCreate {
+	if t != nil {
+		esc.SetUpdatedAt(*t)
+	}
 	return esc
 }
 
@@ -71,6 +107,7 @@ func (esc *ExamSettingCreate) Mutation() *ExamSettingMutation {
 
 // Save creates the ExamSetting in the database.
 func (esc *ExamSettingCreate) Save(ctx context.Context) (*ExamSetting, error) {
+	esc.defaults()
 	return withHooks(ctx, esc.sqlSave, esc.mutation, esc.hooks)
 }
 
@@ -96,6 +133,18 @@ func (esc *ExamSettingCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (esc *ExamSettingCreate) defaults() {
+	if _, ok := esc.mutation.CreatedAt(); !ok {
+		v := examsetting.DefaultCreatedAt()
+		esc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := esc.mutation.UpdatedAt(); !ok {
+		v := examsetting.DefaultUpdatedAt()
+		esc.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (esc *ExamSettingCreate) check() error {
 	if _, ok := esc.mutation.NumberOfQuestions(); !ok {
@@ -104,11 +153,11 @@ func (esc *ExamSettingCreate) check() error {
 	if _, ok := esc.mutation.DurationMinutes(); !ok {
 		return &ValidationError{Name: "duration_minutes", err: errors.New(`ent: missing required field "ExamSetting.duration_minutes"`)}
 	}
-	if _, ok := esc.mutation.NegativeMarking(); !ok {
-		return &ValidationError{Name: "negative_marking", err: errors.New(`ent: missing required field "ExamSetting.negative_marking"`)}
+	if _, ok := esc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ExamSetting.created_at"`)}
 	}
-	if _, ok := esc.mutation.OtherDetails(); !ok {
-		return &ValidationError{Name: "other_details", err: errors.New(`ent: missing required field "ExamSetting.other_details"`)}
+	if _, ok := esc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ExamSetting.updated_at"`)}
 	}
 	return nil
 }
@@ -141,7 +190,7 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 		_node.NumberOfQuestions = value
 	}
 	if value, ok := esc.mutation.DurationMinutes(); ok {
-		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeTime, value)
+		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeInt, value)
 		_node.DurationMinutes = value
 	}
 	if value, ok := esc.mutation.NegativeMarking(); ok {
@@ -151,6 +200,14 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 	if value, ok := esc.mutation.OtherDetails(); ok {
 		_spec.SetField(examsetting.FieldOtherDetails, field.TypeJSON, value)
 		_node.OtherDetails = value
+	}
+	if value, ok := esc.mutation.CreatedAt(); ok {
+		_spec.SetField(examsetting.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := esc.mutation.UpdatedAt(); ok {
+		_spec.SetField(examsetting.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if nodes := esc.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -190,6 +247,7 @@ func (escb *ExamSettingCreateBulk) Save(ctx context.Context) ([]*ExamSetting, er
 	for i := range escb.builders {
 		func(i int, root context.Context) {
 			builder := escb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ExamSettingMutation)
 				if !ok {
