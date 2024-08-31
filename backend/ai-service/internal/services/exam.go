@@ -52,9 +52,9 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 	}
 
 	for _, cat := range examCategories {
-		wg.Add(1) // Increment wait group for each category
+		wg.Add(1)
 		go func(cat *ent.ExamCategory) {
-			defer wg.Done() // Decrement wait group after processing category
+			defer wg.Done()
 
 			exams, err := q.examRepository.GetByExamCategory(ctx, cat)
 			if err != nil {
@@ -63,9 +63,9 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 			}
 
 			for _, exam := range exams {
-				wg.Add(1) // Increment wait group for each exam
+				wg.Add(1)
 				go func(exam *ent.Exam) {
-					defer wg.Done() // Decrement wait group after processing exam
+					defer wg.Done()
 
 					examSetting, err := q.examSettingRepository.GetByExam(ctx, exam)
 					if err != nil {
@@ -87,12 +87,11 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 						return
 					}
 					log.Printf("Cached response for exam %s with uid %s, saved its meta data in db with id %d", exam.Name, uid, cacheMetaData.ID)
-				}(exam) // Pass the loop variable to the goroutine
+				}(exam)
 			}
-		}(cat) // Pass the loop variable to the goroutine
+		}(cat)
 	}
 
-	// Wait for all goroutines to finish
 	wg.Wait()
 
 	return nil
