@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"common/ent"
+	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
 	"context"
 	"time"
 )
@@ -24,4 +26,8 @@ func (c *CachedQuestionMetaDataRepository) Create(ctx context.Context, cacheUID 
 		SetExpiresAt(expiresAt).
 		SetExam(exam).
 		Save(ctx)
+}
+
+func (c *CachedQuestionMetaDataRepository) GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.CachedQuestionMetaData, error) {
+	return c.dbClient.CachedQuestionMetaData.Query().Where(cachedquestionmetadata.HasExamWith(exam.ID(ex.ID))).All(ctx)
 }
