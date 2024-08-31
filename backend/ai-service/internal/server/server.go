@@ -26,13 +26,13 @@ func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Serv
 
 	logger := config.SetupLogger()
 
-	questionService := services.NewQuestionService(genAiClient, redisClient)
+	// questionService := services.NewQuestionService(genAiClient, redisClient)
 	redisService := services.NewRedisService(redisClient)
 
 	NewServer := &Server{
-		port:            port,
-		questionService: questionService,
-		redisService:    redisService,
+		port: port,
+		// questionService: questionService,
+		redisService: redisService,
 	}
 
 	// Declare Server config

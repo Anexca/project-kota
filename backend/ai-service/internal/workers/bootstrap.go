@@ -2,6 +2,7 @@ package workers
 
 import (
 	"ai-service/internal/services"
+	"common/ent"
 	"log"
 
 	"cloud.google.com/go/vertexai/genai"
@@ -14,10 +15,10 @@ type Worker struct {
 	questionService *services.QuestionService
 }
 
-func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client) *cron.Cron {
+func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 	c := cron.New()
 
-	questionService := services.NewQuestionService(genAiClient, redisClient)
+	questionService := services.NewQuestionService(genAiClient, redisClient, dbClient)
 
 	worker := &Worker{
 		cronHandler:     c,

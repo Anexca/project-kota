@@ -1,7 +1,8 @@
 package services
 
 import (
-	util "common/utils"
+	"ai-service/internal/repositories"
+	"common/ent"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,8 +12,9 @@ import (
 )
 
 type QuestionService struct {
-	genAIService *GenAIService
-	redisService *RedisService
+	genAIService   *GenAIService
+	redisService   *RedisService
+	examRepository *repositories.ExamRepository
 }
 
 type QuestionWithExplanation struct {
@@ -29,13 +31,15 @@ type DescriptiveQuestion struct {
 	Hint  []string `json:"hint,omitempty"`
 }
 
-func NewQuestionService(genAIClient *genai.Client, redisClient *redis.Client) *QuestionService {
+func NewQuestionService(genAIClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *QuestionService {
 	genAIService := NewGenAIService(genAIClient)
 	redisService := NewRedisService(redisClient)
+	examRepository := repositories.NewExamRespository(dbClient)
 
 	return &QuestionService{
-		genAIService: genAIService,
-		redisService: redisService,
+		genAIService:   genAIService,
+		redisService:   redisService,
+		examRepository: examRepository,
 	}
 }
 
@@ -87,25 +91,26 @@ func (q *QuestionService) GenerateQuestions(ctx context.Context, questionType, e
 func (q *QuestionService) GenerateDescriptiveQuestions(ctx context.Context, examName string, numberOfQuestions int) ([]DescriptiveQuestion, error) {
 	var formattedQuestions []DescriptiveQuestion
 
-	prompt := fmt.Sprintf(`Generate a JSON array containing %d Descriptive questions for the %s exam. 
-							Essay should be a one sentence topic, letter writing should be formal.
-                            Each question should have a "type" should be either formal letter or essay, "topic" should be the question itself, "hint" should be an array of hints for topic.
-                            The JSON output should be a single-line string without any extra formatting.`,
-		numberOfQuestions, examName)
+	// prompt := fmt.Sprintf(`Generate a JSON array containing %d Descriptive questions for the %s exam.
+	// 						Essay should be a one sentence topic, letter writing should be formal.
+	//                         Each question should have a "type" should be either formal letter or essay, "topic" should be the question itself, "hint" should be an array of hints for topic.
+	//                         The JSON output should be a single-line string without any extra formatting.`,
+	// 	numberOfQuestions, examName)
 
-	questions, err := q.genAIService.GetContentStream(ctx, prompt, GEN_AI_MODEL)
+	// questions, err := q.genAIService.GetContentStream(ctx, prompt, GEN_AI_MODEL)
 
-	if err != nil {
-		return nil, err
-	}
-	// Unmarshall and store questions in cache
-	err = json.Unmarshal([]byte(questions), &formattedQuestions)
-	if err != nil {
-		return nil, err
-	}
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// // Unmarshall and store questions in cache
+	// err = json.Unmarshal([]byte(questions), &formattedQuestions)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	uid := util.GenerateUUID()
-	q.redisService.Store(ctx, uid, questions)
+	// uid := util.GenerateUUID()
+	// q.redisService.Store(ctx, uid, questions)
+	// exams, _ := q.examRepository.GetByExamCategory(ctx, )
 
 	return formattedQuestions, nil
 }
