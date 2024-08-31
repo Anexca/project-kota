@@ -1,6 +1,7 @@
 package server
 
 import (
+	commonConfig "common/config"
 	commonService "common/services"
 	"fmt"
 	"net/http"
@@ -11,8 +12,6 @@ import (
 	"cloud.google.com/go/vertexai/genai"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/redis/go-redis/v9"
-
-	"ai-service/pkg/config"
 )
 
 type Server struct {
@@ -23,7 +22,7 @@ type Server struct {
 func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 
-	logger := config.SetupLogger()
+	logger := commonConfig.SetupLogger()
 
 	redisService := commonService.NewRedisService(redisClient)
 

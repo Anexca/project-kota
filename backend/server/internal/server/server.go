@@ -1,6 +1,7 @@
 package server
 
 import (
+	commonConfig "common/config"
 	"fmt"
 	"net/http"
 	"os"
@@ -16,6 +17,8 @@ type Server struct {
 
 func InitServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	logger := commonConfig.SetupLogger()
+
 	NewServer := &Server{
 		port: port,
 	}
@@ -27,6 +30,7 @@ func InitServer() *http.Server {
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
+		ErrorLog:     logger,
 	}
 
 	return server

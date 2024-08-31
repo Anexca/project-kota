@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"server/internal/server"
 )
 
@@ -9,8 +9,9 @@ func main() {
 
 	server := server.InitServer()
 
+	log.Println("Starting server on address", server.Addr)
 	err := server.ListenAndServe()
 	if err != nil {
-		panic(fmt.Sprintf("cannot start server: %s", err))
+		log.Fatalln("cannot start server: %s", err)
 	}
 }
