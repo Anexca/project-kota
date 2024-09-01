@@ -28,7 +28,7 @@ func NewRedisClient(ctx context.Context) (*redis.Client, error) {
 		return nil, fmt.Errorf("redis did not respond to Ping request %v", err)
 	}
 
-	log.Println("redis connected, PING ->", pong)
+	log.Println("redis connected to client", env.RedisAddress, ",PING ->", pong)
 
 	return redisClient, nil
 }
