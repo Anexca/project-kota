@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"net/http"
-	"server/middlewares"
+	"server/internal/middlewares"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
