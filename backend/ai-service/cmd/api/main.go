@@ -2,6 +2,7 @@ package main
 
 import (
 	"ai-service/internal/server"
+	"ai-service/internal/workers"
 	"ai-service/pkg/client"
 	"context"
 	"fmt"
@@ -23,11 +24,22 @@ func main() {
 	}
 	defer redisClient.Close()
 
+	dbclient, err := client.NewDbClient(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer dbclient.Close()
+
+	c := workers.InitWorkers(genAiClient, redisClient, dbclient)
+	c.Start()
+
+	defer c.Stop()
+
 	server := server.InitServer(genAiClient, redisClient)
 
 	err = server.ListenAndServe()
 	if err != nil {
-		panic(fmt.Sprintf("cannot start server: %s", err))
+		log.Fatal(fmt.Sprintf("cannot start server: %s", err))
 	}
 
 }

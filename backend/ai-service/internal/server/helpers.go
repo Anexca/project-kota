@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -76,7 +77,7 @@ func (app *Server) ErrorJson(w http.ResponseWriter, err error, status ...int) er
 	payload.Error = true
 	payload.Message = err.Error()
 
-	fmt.Println("Error: ", payload.Message)
+	log.Println("Error: ", payload.Message)
 
 	return app.WriteJson(w, statusCode, &payload)
 }

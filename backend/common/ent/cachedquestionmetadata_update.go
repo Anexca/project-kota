@@ -4,6 +4,7 @@ package ent
 
 import (
 	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
 	"common/ent/predicate"
 	"context"
 	"errors"
@@ -15,123 +16,112 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CachedQuestionMetadataUpdate is the builder for updating CachedQuestionMetadata entities.
-type CachedQuestionMetadataUpdate struct {
+// CachedQuestionMetaDataUpdate is the builder for updating CachedQuestionMetaData entities.
+type CachedQuestionMetaDataUpdate struct {
 	config
 	hooks    []Hook
-	mutation *CachedQuestionMetadataMutation
+	mutation *CachedQuestionMetaDataMutation
 }
 
-// Where appends a list predicates to the CachedQuestionMetadataUpdate builder.
-func (cqmu *CachedQuestionMetadataUpdate) Where(ps ...predicate.CachedQuestionMetadata) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.Where(ps...)
-	return cqmu
+// Where appends a list predicates to the CachedQuestionMetaDataUpdate builder.
+func (cqmdu *CachedQuestionMetaDataUpdate) Where(ps ...predicate.CachedQuestionMetaData) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.Where(ps...)
+	return cqmdu
 }
 
-// SetKey sets the "key" field.
-func (cqmu *CachedQuestionMetadataUpdate) SetKey(s string) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.SetKey(s)
-	return cqmu
+// SetCacheUID sets the "cache_uid" field.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetCacheUID(s string) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.SetCacheUID(s)
+	return cqmdu
 }
 
-// SetNillableKey sets the "key" field if the given value is not nil.
-func (cqmu *CachedQuestionMetadataUpdate) SetNillableKey(s *string) *CachedQuestionMetadataUpdate {
+// SetNillableCacheUID sets the "cache_uid" field if the given value is not nil.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetNillableCacheUID(s *string) *CachedQuestionMetaDataUpdate {
 	if s != nil {
-		cqmu.SetKey(*s)
+		cqmdu.SetCacheUID(*s)
 	}
-	return cqmu
+	return cqmdu
 }
 
-// SetType sets the "type" field.
-func (cqmu *CachedQuestionMetadataUpdate) SetType(s string) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.SetType(s)
-	return cqmu
+// SetIsUsed sets the "is_used" field.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetIsUsed(b bool) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.SetIsUsed(b)
+	return cqmdu
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (cqmu *CachedQuestionMetadataUpdate) SetNillableType(s *string) *CachedQuestionMetadataUpdate {
-	if s != nil {
-		cqmu.SetType(*s)
-	}
-	return cqmu
-}
-
-// SetSubject sets the "subject" field.
-func (cqmu *CachedQuestionMetadataUpdate) SetSubject(s string) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.SetSubject(s)
-	return cqmu
-}
-
-// SetNillableSubject sets the "subject" field if the given value is not nil.
-func (cqmu *CachedQuestionMetadataUpdate) SetNillableSubject(s *string) *CachedQuestionMetadataUpdate {
-	if s != nil {
-		cqmu.SetSubject(*s)
-	}
-	return cqmu
-}
-
-// SetExam sets the "exam" field.
-func (cqmu *CachedQuestionMetadataUpdate) SetExam(s string) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.SetExam(s)
-	return cqmu
-}
-
-// SetNillableExam sets the "exam" field if the given value is not nil.
-func (cqmu *CachedQuestionMetadataUpdate) SetNillableExam(s *string) *CachedQuestionMetadataUpdate {
-	if s != nil {
-		cqmu.SetExam(*s)
-	}
-	return cqmu
-}
-
-// SetIsProcessed sets the "is_processed" field.
-func (cqmu *CachedQuestionMetadataUpdate) SetIsProcessed(b bool) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.SetIsProcessed(b)
-	return cqmu
-}
-
-// SetNillableIsProcessed sets the "is_processed" field if the given value is not nil.
-func (cqmu *CachedQuestionMetadataUpdate) SetNillableIsProcessed(b *bool) *CachedQuestionMetadataUpdate {
+// SetNillableIsUsed sets the "is_used" field if the given value is not nil.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetNillableIsUsed(b *bool) *CachedQuestionMetaDataUpdate {
 	if b != nil {
-		cqmu.SetIsProcessed(*b)
+		cqmdu.SetIsUsed(*b)
 	}
-	return cqmu
+	return cqmdu
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetExpiresAt(t time.Time) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.SetExpiresAt(t)
+	return cqmdu
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetNillableExpiresAt(t *time.Time) *CachedQuestionMetaDataUpdate {
+	if t != nil {
+		cqmdu.SetExpiresAt(*t)
+	}
+	return cqmdu
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (cqmu *CachedQuestionMetadataUpdate) SetCreatedAt(t time.Time) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.SetCreatedAt(t)
-	return cqmu
+func (cqmdu *CachedQuestionMetaDataUpdate) SetCreatedAt(t time.Time) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.SetCreatedAt(t)
+	return cqmdu
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cqmu *CachedQuestionMetadataUpdate) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetadataUpdate {
+func (cqmdu *CachedQuestionMetaDataUpdate) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetaDataUpdate {
 	if t != nil {
-		cqmu.SetCreatedAt(*t)
+		cqmdu.SetCreatedAt(*t)
 	}
-	return cqmu
+	return cqmdu
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cqmu *CachedQuestionMetadataUpdate) SetUpdatedAt(t time.Time) *CachedQuestionMetadataUpdate {
-	cqmu.mutation.SetUpdatedAt(t)
-	return cqmu
+func (cqmdu *CachedQuestionMetaDataUpdate) SetUpdatedAt(t time.Time) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.SetUpdatedAt(t)
+	return cqmdu
 }
 
-// Mutation returns the CachedQuestionMetadataMutation object of the builder.
-func (cqmu *CachedQuestionMetadataUpdate) Mutation() *CachedQuestionMetadataMutation {
-	return cqmu.mutation
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetExamID(id int) *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.SetExamID(id)
+	return cqmdu
+}
+
+// SetExam sets the "exam" edge to the Exam entity.
+func (cqmdu *CachedQuestionMetaDataUpdate) SetExam(e *Exam) *CachedQuestionMetaDataUpdate {
+	return cqmdu.SetExamID(e.ID)
+}
+
+// Mutation returns the CachedQuestionMetaDataMutation object of the builder.
+func (cqmdu *CachedQuestionMetaDataUpdate) Mutation() *CachedQuestionMetaDataMutation {
+	return cqmdu.mutation
+}
+
+// ClearExam clears the "exam" edge to the Exam entity.
+func (cqmdu *CachedQuestionMetaDataUpdate) ClearExam() *CachedQuestionMetaDataUpdate {
+	cqmdu.mutation.ClearExam()
+	return cqmdu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cqmu *CachedQuestionMetadataUpdate) Save(ctx context.Context) (int, error) {
-	cqmu.defaults()
-	return withHooks(ctx, cqmu.sqlSave, cqmu.mutation, cqmu.hooks)
+func (cqmdu *CachedQuestionMetaDataUpdate) Save(ctx context.Context) (int, error) {
+	cqmdu.defaults()
+	return withHooks(ctx, cqmdu.sqlSave, cqmdu.mutation, cqmdu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cqmu *CachedQuestionMetadataUpdate) SaveX(ctx context.Context) int {
-	affected, err := cqmu.Save(ctx)
+func (cqmdu *CachedQuestionMetaDataUpdate) SaveX(ctx context.Context) int {
+	affected, err := cqmdu.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -139,57 +129,91 @@ func (cqmu *CachedQuestionMetadataUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cqmu *CachedQuestionMetadataUpdate) Exec(ctx context.Context) error {
-	_, err := cqmu.Save(ctx)
+func (cqmdu *CachedQuestionMetaDataUpdate) Exec(ctx context.Context) error {
+	_, err := cqmdu.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cqmu *CachedQuestionMetadataUpdate) ExecX(ctx context.Context) {
-	if err := cqmu.Exec(ctx); err != nil {
+func (cqmdu *CachedQuestionMetaDataUpdate) ExecX(ctx context.Context) {
+	if err := cqmdu.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cqmu *CachedQuestionMetadataUpdate) defaults() {
-	if _, ok := cqmu.mutation.UpdatedAt(); !ok {
+func (cqmdu *CachedQuestionMetaDataUpdate) defaults() {
+	if _, ok := cqmdu.mutation.UpdatedAt(); !ok {
 		v := cachedquestionmetadata.UpdateDefaultUpdatedAt()
-		cqmu.mutation.SetUpdatedAt(v)
+		cqmdu.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (cqmu *CachedQuestionMetadataUpdate) sqlSave(ctx context.Context) (n int, err error) {
+// check runs all checks and user-defined validators on the builder.
+func (cqmdu *CachedQuestionMetaDataUpdate) check() error {
+	if cqmdu.mutation.ExamCleared() && len(cqmdu.mutation.ExamIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "CachedQuestionMetaData.exam"`)
+	}
+	return nil
+}
+
+func (cqmdu *CachedQuestionMetaDataUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cqmdu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(cachedquestionmetadata.Table, cachedquestionmetadata.Columns, sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt))
-	if ps := cqmu.mutation.predicates; len(ps) > 0 {
+	if ps := cqmdu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cqmu.mutation.Key(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldKey, field.TypeString, value)
+	if value, ok := cqmdu.mutation.CacheUID(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldCacheUID, field.TypeString, value)
 	}
-	if value, ok := cqmu.mutation.GetType(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldType, field.TypeString, value)
+	if value, ok := cqmdu.mutation.IsUsed(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldIsUsed, field.TypeBool, value)
 	}
-	if value, ok := cqmu.mutation.Subject(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldSubject, field.TypeString, value)
+	if value, ok := cqmdu.mutation.ExpiresAt(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldExpiresAt, field.TypeTime, value)
 	}
-	if value, ok := cqmu.mutation.Exam(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldExam, field.TypeString, value)
-	}
-	if value, ok := cqmu.mutation.IsProcessed(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldIsProcessed, field.TypeBool, value)
-	}
-	if value, ok := cqmu.mutation.CreatedAt(); ok {
+	if value, ok := cqmdu.mutation.CreatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldCreatedAt, field.TypeTime, value)
 	}
-	if value, ok := cqmu.mutation.UpdatedAt(); ok {
+	if value, ok := cqmdu.mutation.UpdatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, cqmu.driver, _spec); err != nil {
+	if cqmdu.mutation.ExamCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   cachedquestionmetadata.ExamTable,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cqmdu.mutation.ExamIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   cachedquestionmetadata.ExamTable,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if n, err = sqlgraph.UpdateNodes(ctx, cqmdu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{cachedquestionmetadata.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -197,135 +221,124 @@ func (cqmu *CachedQuestionMetadataUpdate) sqlSave(ctx context.Context) (n int, e
 		}
 		return 0, err
 	}
-	cqmu.mutation.done = true
+	cqmdu.mutation.done = true
 	return n, nil
 }
 
-// CachedQuestionMetadataUpdateOne is the builder for updating a single CachedQuestionMetadata entity.
-type CachedQuestionMetadataUpdateOne struct {
+// CachedQuestionMetaDataUpdateOne is the builder for updating a single CachedQuestionMetaData entity.
+type CachedQuestionMetaDataUpdateOne struct {
 	config
 	fields   []string
 	hooks    []Hook
-	mutation *CachedQuestionMetadataMutation
+	mutation *CachedQuestionMetaDataMutation
 }
 
-// SetKey sets the "key" field.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetKey(s string) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.SetKey(s)
-	return cqmuo
+// SetCacheUID sets the "cache_uid" field.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetCacheUID(s string) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.SetCacheUID(s)
+	return cqmduo
 }
 
-// SetNillableKey sets the "key" field if the given value is not nil.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetNillableKey(s *string) *CachedQuestionMetadataUpdateOne {
+// SetNillableCacheUID sets the "cache_uid" field if the given value is not nil.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetNillableCacheUID(s *string) *CachedQuestionMetaDataUpdateOne {
 	if s != nil {
-		cqmuo.SetKey(*s)
+		cqmduo.SetCacheUID(*s)
 	}
-	return cqmuo
+	return cqmduo
 }
 
-// SetType sets the "type" field.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetType(s string) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.SetType(s)
-	return cqmuo
+// SetIsUsed sets the "is_used" field.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetIsUsed(b bool) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.SetIsUsed(b)
+	return cqmduo
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetNillableType(s *string) *CachedQuestionMetadataUpdateOne {
-	if s != nil {
-		cqmuo.SetType(*s)
-	}
-	return cqmuo
-}
-
-// SetSubject sets the "subject" field.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetSubject(s string) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.SetSubject(s)
-	return cqmuo
-}
-
-// SetNillableSubject sets the "subject" field if the given value is not nil.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetNillableSubject(s *string) *CachedQuestionMetadataUpdateOne {
-	if s != nil {
-		cqmuo.SetSubject(*s)
-	}
-	return cqmuo
-}
-
-// SetExam sets the "exam" field.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetExam(s string) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.SetExam(s)
-	return cqmuo
-}
-
-// SetNillableExam sets the "exam" field if the given value is not nil.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetNillableExam(s *string) *CachedQuestionMetadataUpdateOne {
-	if s != nil {
-		cqmuo.SetExam(*s)
-	}
-	return cqmuo
-}
-
-// SetIsProcessed sets the "is_processed" field.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetIsProcessed(b bool) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.SetIsProcessed(b)
-	return cqmuo
-}
-
-// SetNillableIsProcessed sets the "is_processed" field if the given value is not nil.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetNillableIsProcessed(b *bool) *CachedQuestionMetadataUpdateOne {
+// SetNillableIsUsed sets the "is_used" field if the given value is not nil.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetNillableIsUsed(b *bool) *CachedQuestionMetaDataUpdateOne {
 	if b != nil {
-		cqmuo.SetIsProcessed(*b)
+		cqmduo.SetIsUsed(*b)
 	}
-	return cqmuo
+	return cqmduo
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetExpiresAt(t time.Time) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.SetExpiresAt(t)
+	return cqmduo
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetNillableExpiresAt(t *time.Time) *CachedQuestionMetaDataUpdateOne {
+	if t != nil {
+		cqmduo.SetExpiresAt(*t)
+	}
+	return cqmduo
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetCreatedAt(t time.Time) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.SetCreatedAt(t)
-	return cqmuo
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetCreatedAt(t time.Time) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.SetCreatedAt(t)
+	return cqmduo
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetadataUpdateOne {
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetaDataUpdateOne {
 	if t != nil {
-		cqmuo.SetCreatedAt(*t)
+		cqmduo.SetCreatedAt(*t)
 	}
-	return cqmuo
+	return cqmduo
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SetUpdatedAt(t time.Time) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.SetUpdatedAt(t)
-	return cqmuo
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetUpdatedAt(t time.Time) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.SetUpdatedAt(t)
+	return cqmduo
 }
 
-// Mutation returns the CachedQuestionMetadataMutation object of the builder.
-func (cqmuo *CachedQuestionMetadataUpdateOne) Mutation() *CachedQuestionMetadataMutation {
-	return cqmuo.mutation
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetExamID(id int) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.SetExamID(id)
+	return cqmduo
 }
 
-// Where appends a list predicates to the CachedQuestionMetadataUpdate builder.
-func (cqmuo *CachedQuestionMetadataUpdateOne) Where(ps ...predicate.CachedQuestionMetadata) *CachedQuestionMetadataUpdateOne {
-	cqmuo.mutation.Where(ps...)
-	return cqmuo
+// SetExam sets the "exam" edge to the Exam entity.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SetExam(e *Exam) *CachedQuestionMetaDataUpdateOne {
+	return cqmduo.SetExamID(e.ID)
+}
+
+// Mutation returns the CachedQuestionMetaDataMutation object of the builder.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) Mutation() *CachedQuestionMetaDataMutation {
+	return cqmduo.mutation
+}
+
+// ClearExam clears the "exam" edge to the Exam entity.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) ClearExam() *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.ClearExam()
+	return cqmduo
+}
+
+// Where appends a list predicates to the CachedQuestionMetaDataUpdate builder.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) Where(ps ...predicate.CachedQuestionMetaData) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.mutation.Where(ps...)
+	return cqmduo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cqmuo *CachedQuestionMetadataUpdateOne) Select(field string, fields ...string) *CachedQuestionMetadataUpdateOne {
-	cqmuo.fields = append([]string{field}, fields...)
-	return cqmuo
+func (cqmduo *CachedQuestionMetaDataUpdateOne) Select(field string, fields ...string) *CachedQuestionMetaDataUpdateOne {
+	cqmduo.fields = append([]string{field}, fields...)
+	return cqmduo
 }
 
-// Save executes the query and returns the updated CachedQuestionMetadata entity.
-func (cqmuo *CachedQuestionMetadataUpdateOne) Save(ctx context.Context) (*CachedQuestionMetadata, error) {
-	cqmuo.defaults()
-	return withHooks(ctx, cqmuo.sqlSave, cqmuo.mutation, cqmuo.hooks)
+// Save executes the query and returns the updated CachedQuestionMetaData entity.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) Save(ctx context.Context) (*CachedQuestionMetaData, error) {
+	cqmduo.defaults()
+	return withHooks(ctx, cqmduo.sqlSave, cqmduo.mutation, cqmduo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cqmuo *CachedQuestionMetadataUpdateOne) SaveX(ctx context.Context) *CachedQuestionMetadata {
-	node, err := cqmuo.Save(ctx)
+func (cqmduo *CachedQuestionMetaDataUpdateOne) SaveX(ctx context.Context) *CachedQuestionMetaData {
+	node, err := cqmduo.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -333,34 +346,45 @@ func (cqmuo *CachedQuestionMetadataUpdateOne) SaveX(ctx context.Context) *Cached
 }
 
 // Exec executes the query on the entity.
-func (cqmuo *CachedQuestionMetadataUpdateOne) Exec(ctx context.Context) error {
-	_, err := cqmuo.Save(ctx)
+func (cqmduo *CachedQuestionMetaDataUpdateOne) Exec(ctx context.Context) error {
+	_, err := cqmduo.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cqmuo *CachedQuestionMetadataUpdateOne) ExecX(ctx context.Context) {
-	if err := cqmuo.Exec(ctx); err != nil {
+func (cqmduo *CachedQuestionMetaDataUpdateOne) ExecX(ctx context.Context) {
+	if err := cqmduo.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cqmuo *CachedQuestionMetadataUpdateOne) defaults() {
-	if _, ok := cqmuo.mutation.UpdatedAt(); !ok {
+func (cqmduo *CachedQuestionMetaDataUpdateOne) defaults() {
+	if _, ok := cqmduo.mutation.UpdatedAt(); !ok {
 		v := cachedquestionmetadata.UpdateDefaultUpdatedAt()
-		cqmuo.mutation.SetUpdatedAt(v)
+		cqmduo.mutation.SetUpdatedAt(v)
 	}
 }
 
-func (cqmuo *CachedQuestionMetadataUpdateOne) sqlSave(ctx context.Context) (_node *CachedQuestionMetadata, err error) {
+// check runs all checks and user-defined validators on the builder.
+func (cqmduo *CachedQuestionMetaDataUpdateOne) check() error {
+	if cqmduo.mutation.ExamCleared() && len(cqmduo.mutation.ExamIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "CachedQuestionMetaData.exam"`)
+	}
+	return nil
+}
+
+func (cqmduo *CachedQuestionMetaDataUpdateOne) sqlSave(ctx context.Context) (_node *CachedQuestionMetaData, err error) {
+	if err := cqmduo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(cachedquestionmetadata.Table, cachedquestionmetadata.Columns, sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt))
-	id, ok := cqmuo.mutation.ID()
+	id, ok := cqmduo.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "CachedQuestionMetadata.id" for update`)}
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "CachedQuestionMetaData.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := cqmuo.fields; len(fields) > 0 {
+	if fields := cqmduo.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, cachedquestionmetadata.FieldID)
 		for _, f := range fields {
@@ -372,38 +396,61 @@ func (cqmuo *CachedQuestionMetadataUpdateOne) sqlSave(ctx context.Context) (_nod
 			}
 		}
 	}
-	if ps := cqmuo.mutation.predicates; len(ps) > 0 {
+	if ps := cqmduo.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cqmuo.mutation.Key(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldKey, field.TypeString, value)
+	if value, ok := cqmduo.mutation.CacheUID(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldCacheUID, field.TypeString, value)
 	}
-	if value, ok := cqmuo.mutation.GetType(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldType, field.TypeString, value)
+	if value, ok := cqmduo.mutation.IsUsed(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldIsUsed, field.TypeBool, value)
 	}
-	if value, ok := cqmuo.mutation.Subject(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldSubject, field.TypeString, value)
+	if value, ok := cqmduo.mutation.ExpiresAt(); ok {
+		_spec.SetField(cachedquestionmetadata.FieldExpiresAt, field.TypeTime, value)
 	}
-	if value, ok := cqmuo.mutation.Exam(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldExam, field.TypeString, value)
-	}
-	if value, ok := cqmuo.mutation.IsProcessed(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldIsProcessed, field.TypeBool, value)
-	}
-	if value, ok := cqmuo.mutation.CreatedAt(); ok {
+	if value, ok := cqmduo.mutation.CreatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldCreatedAt, field.TypeTime, value)
 	}
-	if value, ok := cqmuo.mutation.UpdatedAt(); ok {
+	if value, ok := cqmduo.mutation.UpdatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldUpdatedAt, field.TypeTime, value)
 	}
-	_node = &CachedQuestionMetadata{config: cqmuo.config}
+	if cqmduo.mutation.ExamCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   cachedquestionmetadata.ExamTable,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cqmduo.mutation.ExamIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   cachedquestionmetadata.ExamTable,
+			Columns: []string{cachedquestionmetadata.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	_node = &CachedQuestionMetaData{config: cqmduo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cqmuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, cqmduo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{cachedquestionmetadata.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -411,6 +458,6 @@ func (cqmuo *CachedQuestionMetadataUpdateOne) sqlSave(ctx context.Context) (_nod
 		}
 		return nil, err
 	}
-	cqmuo.mutation.done = true
+	cqmduo.mutation.done = true
 	return _node, nil
 }

@@ -12,32 +12,45 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// RedisService wraps Redis client operations.
 type RedisService struct {
 	client *redis.Client
 }
 
+// NewRedisService initializes a new RedisService instance.
 func NewRedisService(redisClient *redis.Client) *RedisService {
 	return &RedisService{
 		client: redisClient,
 	}
 }
 
-func (r *RedisService) Store(ctx context.Context, key string, value any) error {
-	status := r.client.Set(ctx, key, value, 0)
-	return status.Err()
+// Store stores a key-value pair in Redis with a specified expiration time.
+func (r *RedisService) Store(ctx context.Context, key string, value any, expiry time.Duration) error {
+	status := r.client.Set(ctx, key, value, expiry)
+	if err := status.Err(); err != nil {
+		return fmt.Errorf("failed to store key %s in Redis: %w", key, err)
+	}
+	return nil
 }
 
+// Get retrieves a value from Redis by key.
 func (r *RedisService) Get(ctx context.Context, key string) (string, error) {
 	val, err := r.client.Get(ctx, key).Result()
 	if err != nil {
-		return "", err
+		if err == redis.Nil {
+			return "", fmt.Errorf("key %s does not exist in Redis", key)
+		}
+		return "", fmt.Errorf("failed to get key %s from Redis: %w", key, err)
 	}
-
 	return val, nil
 }
 
+// Delete removes a key from Redis.
 func (r *RedisService) Delete(ctx context.Context, key string) error {
-	return r.client.Del(ctx, key).Err()
+	if err := r.client.Del(ctx, key).Err(); err != nil {
+		return fmt.Errorf("failed to delete key %s from Redis: %w", key, err)
+	}
+	return nil
 }
 
 func (s *RedisService) Health() map[string]string {

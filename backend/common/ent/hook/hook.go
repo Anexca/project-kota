@@ -8,16 +8,52 @@ import (
 	"fmt"
 )
 
-// The CachedQuestionMetadataFunc type is an adapter to allow the use of ordinary
-// function as CachedQuestionMetadata mutator.
-type CachedQuestionMetadataFunc func(context.Context, *ent.CachedQuestionMetadataMutation) (ent.Value, error)
+// The CachedQuestionMetaDataFunc type is an adapter to allow the use of ordinary
+// function as CachedQuestionMetaData mutator.
+type CachedQuestionMetaDataFunc func(context.Context, *ent.CachedQuestionMetaDataMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CachedQuestionMetadataFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CachedQuestionMetadataMutation); ok {
+func (f CachedQuestionMetaDataFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CachedQuestionMetaDataMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CachedQuestionMetadataMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CachedQuestionMetaDataMutation", m)
+}
+
+// The ExamFunc type is an adapter to allow the use of ordinary
+// function as Exam mutator.
+type ExamFunc func(context.Context, *ent.ExamMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ExamFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ExamMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamMutation", m)
+}
+
+// The ExamCategoryFunc type is an adapter to allow the use of ordinary
+// function as ExamCategory mutator.
+type ExamCategoryFunc func(context.Context, *ent.ExamCategoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ExamCategoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ExamCategoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamCategoryMutation", m)
+}
+
+// The ExamSettingFunc type is an adapter to allow the use of ordinary
+// function as ExamSetting mutator.
+type ExamSettingFunc func(context.Context, *ent.ExamSettingMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ExamSettingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ExamSettingMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamSettingMutation", m)
 }
 
 // Condition is a hook condition function.
