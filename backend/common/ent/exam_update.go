@@ -8,6 +8,7 @@ import (
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/predicate"
+	"common/ent/question"
 	"context"
 	"errors"
 	"fmt"
@@ -146,6 +147,21 @@ func (eu *ExamUpdate) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData) *E
 	return eu.AddCachedQuestionMetadatumIDs(ids...)
 }
 
+// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
+func (eu *ExamUpdate) AddQuestionIDs(ids ...int) *ExamUpdate {
+	eu.mutation.AddQuestionIDs(ids...)
+	return eu
+}
+
+// AddQuestions adds the "questions" edges to the Question entity.
+func (eu *ExamUpdate) AddQuestions(q ...*Question) *ExamUpdate {
+	ids := make([]int, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return eu.AddQuestionIDs(ids...)
+}
+
 // Mutation returns the ExamMutation object of the builder.
 func (eu *ExamUpdate) Mutation() *ExamMutation {
 	return eu.mutation
@@ -182,6 +198,27 @@ func (eu *ExamUpdate) RemoveCachedQuestionMetadata(c ...*CachedQuestionMetaData)
 		ids[i] = c[i].ID
 	}
 	return eu.RemoveCachedQuestionMetadatumIDs(ids...)
+}
+
+// ClearQuestions clears all "questions" edges to the Question entity.
+func (eu *ExamUpdate) ClearQuestions() *ExamUpdate {
+	eu.mutation.ClearQuestions()
+	return eu
+}
+
+// RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
+func (eu *ExamUpdate) RemoveQuestionIDs(ids ...int) *ExamUpdate {
+	eu.mutation.RemoveQuestionIDs(ids...)
+	return eu
+}
+
+// RemoveQuestions removes "questions" edges to Question entities.
+func (eu *ExamUpdate) RemoveQuestions(q ...*Question) *ExamUpdate {
+	ids := make([]int, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return eu.RemoveQuestionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -347,6 +384,51 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.QuestionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.QuestionsTable,
+			Columns: []string{exam.QuestionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !eu.mutation.QuestionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.QuestionsTable,
+			Columns: []string{exam.QuestionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.QuestionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.QuestionsTable,
+			Columns: []string{exam.QuestionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{exam.Label}
@@ -482,6 +564,21 @@ func (euo *ExamUpdateOne) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData
 	return euo.AddCachedQuestionMetadatumIDs(ids...)
 }
 
+// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
+func (euo *ExamUpdateOne) AddQuestionIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.AddQuestionIDs(ids...)
+	return euo
+}
+
+// AddQuestions adds the "questions" edges to the Question entity.
+func (euo *ExamUpdateOne) AddQuestions(q ...*Question) *ExamUpdateOne {
+	ids := make([]int, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return euo.AddQuestionIDs(ids...)
+}
+
 // Mutation returns the ExamMutation object of the builder.
 func (euo *ExamUpdateOne) Mutation() *ExamMutation {
 	return euo.mutation
@@ -518,6 +615,27 @@ func (euo *ExamUpdateOne) RemoveCachedQuestionMetadata(c ...*CachedQuestionMetaD
 		ids[i] = c[i].ID
 	}
 	return euo.RemoveCachedQuestionMetadatumIDs(ids...)
+}
+
+// ClearQuestions clears all "questions" edges to the Question entity.
+func (euo *ExamUpdateOne) ClearQuestions() *ExamUpdateOne {
+	euo.mutation.ClearQuestions()
+	return euo
+}
+
+// RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
+func (euo *ExamUpdateOne) RemoveQuestionIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.RemoveQuestionIDs(ids...)
+	return euo
+}
+
+// RemoveQuestions removes "questions" edges to Question entities.
+func (euo *ExamUpdateOne) RemoveQuestions(q ...*Question) *ExamUpdateOne {
+	ids := make([]int, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return euo.RemoveQuestionIDs(ids...)
 }
 
 // Where appends a list predicates to the ExamUpdate builder.
@@ -706,6 +824,51 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.QuestionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.QuestionsTable,
+			Columns: []string{exam.QuestionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !euo.mutation.QuestionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.QuestionsTable,
+			Columns: []string{exam.QuestionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.QuestionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.QuestionsTable,
+			Columns: []string{exam.QuestionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

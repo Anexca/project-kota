@@ -20,6 +20,8 @@ type Tx struct {
 	ExamCategory *ExamCategoryClient
 	// ExamSetting is the client for interacting with the ExamSetting builders.
 	ExamSetting *ExamSettingClient
+	// Question is the client for interacting with the Question builders.
+	Question *QuestionClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -157,6 +159,7 @@ func (tx *Tx) init() {
 	tx.Exam = NewExamClient(tx.config)
 	tx.ExamCategory = NewExamCategoryClient(tx.config)
 	tx.ExamSetting = NewExamSettingClient(tx.config)
+	tx.Question = NewQuestionClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

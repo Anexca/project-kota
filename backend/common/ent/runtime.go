@@ -7,6 +7,7 @@ import (
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
+	"common/ent/question"
 	"common/ent/schema"
 	"common/ent/user"
 	"time"
@@ -76,6 +77,12 @@ func init() {
 	examsetting.DefaultUpdatedAt = examsettingDescUpdatedAt.Default.(func() time.Time)
 	// examsetting.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	examsetting.UpdateDefaultUpdatedAt = examsettingDescUpdatedAt.UpdateDefault.(func() time.Time)
+	questionFields := schema.Question{}.Fields()
+	_ = questionFields
+	// questionDescIsActive is the schema descriptor for is_active field.
+	questionDescIsActive := questionFields[0].Descriptor()
+	// question.DefaultIsActive holds the default value on creation for the is_active field.
+	question.DefaultIsActive = questionDescIsActive.Default.(bool)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescEmail is the schema descriptor for email field.

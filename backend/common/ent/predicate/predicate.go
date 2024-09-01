@@ -18,5 +18,8 @@ type ExamCategory func(*sql.Selector)
 // ExamSetting is the predicate function for examsetting builders.
 type ExamSetting func(*sql.Selector)
 
+// Question is the predicate function for question builders.
+type Question func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
