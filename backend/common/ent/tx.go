@@ -20,6 +20,8 @@ type Tx struct {
 	ExamCategory *ExamCategoryClient
 	// ExamSetting is the client for interacting with the ExamSetting builders.
 	ExamSetting *ExamSettingClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 
 	// lazily loaded.
 	client     *Client
@@ -155,6 +157,7 @@ func (tx *Tx) init() {
 	tx.Exam = NewExamClient(tx.config)
 	tx.ExamCategory = NewExamCategoryClient(tx.config)
 	tx.ExamSetting = NewExamSettingClient(tx.config)
+	tx.User = NewUserClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
