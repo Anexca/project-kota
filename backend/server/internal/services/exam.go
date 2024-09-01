@@ -15,6 +15,7 @@ import (
 type ExamService struct {
 	redisService                     *commonServices.RedisService
 	examRepository                   *commonRepositories.ExamRepository
+	questionRepository               *commonRepositories.QuestionRepository
 	examCategoryRepository           *commonRepositories.ExamCategoryRepository
 	cachedQuestionMetaDataRepository *commonRepositories.CachedQuestionMetaDataRepository
 }
@@ -24,12 +25,14 @@ func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamServic
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	cachedQuestionMetaDataRepository := commonRepositories.NewCachedQuestionMetaDataRepository(dbClient)
+	questionRepository := commonRepositories.NewQuestionRepository(dbClient)
 
 	return &ExamService{
 		redisService:                     redisService,
 		examRepository:                   examRepository,
 		examCategoryRepository:           examCategoryRepository,
 		cachedQuestionMetaDataRepository: cachedQuestionMetaDataRepository,
+		questionRepository:               questionRepository,
 	}
 }
 
@@ -55,10 +58,14 @@ func (e *ExamService) GetCachedQuestions(ctx context.Context, examType commonCon
 		return nil, err
 	}
 
-	err = json.Unmarshal([]byte(cachedData), returnType)
+	var questions []any
+
+	err = json.Unmarshal([]byte(cachedData), questions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal cached data: %w", err)
 	}
+
+	e.questionRepository.AddMany(ctx, questions, exam)
 
 	return returnType, nil
 }

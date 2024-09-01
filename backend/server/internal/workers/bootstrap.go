@@ -31,10 +31,13 @@ func InitWorkers(redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 
 func (w *Worker) RegisterWorkers() {
 	w.cronHandler.AddFunc("*/1 * * * *", func() {
-		log.Println("Starting Worker Job for Populating Exam Question Cache")
+		log.Println("Starting Worker Job for Adding Descriptive Question in Database")
+
 		err := w.AddDescriptiveQuestionsInDatabase()
 		if err != nil {
 			log.Printf("Failed to generate questions: %v", err)
 		}
+
+		log.Println("Finished Worker Job for Adding Descriptive Question in Database")
 	})
 }

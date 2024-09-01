@@ -2,6 +2,7 @@ package server
 
 import (
 	commonConstants "common/constants"
+	"server/pkg/models"
 
 	"net/http"
 )
@@ -11,13 +12,7 @@ const EXAM_CATEGORY_TYPE = commonConstants.Banking
 func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
 	const EXAM_TYPE = commonConstants.Descriptive
 
-	type DescriptiveQuestion struct {
-		Type  string   `json:"type"`
-		Topic string   `json:"topic"`
-		Hints []string `json:"hints"`
-	}
-
-	var descriptiveQuestions []DescriptiveQuestion
+	var descriptiveQuestions []models.DescriptiveQuestion
 
 	cachedQuestions, err := s.examService.GetCachedQuestions(r.Context(), EXAM_TYPE, &descriptiveQuestions)
 	if err != nil {
