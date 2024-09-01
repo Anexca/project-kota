@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"server/internal/server"
+	"server/internal/workers"
 	"server/pkg/client"
 )
 
@@ -26,6 +27,9 @@ func main() {
 	if err != nil {
 		log.Fatalln("cannot connect to supabase", err)
 	}
+
+	workers := workers.InitWorkers(redisClient, dbClient)
+	defer workers.Stop()
 
 	server := server.InitServer(redisClient, dbClient, supabaseClient)
 
