@@ -12,8 +12,14 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// CachedQuestionMetadata is the client for interacting with the CachedQuestionMetadata builders.
-	CachedQuestionMetadata *CachedQuestionMetadataClient
+	// CachedQuestionMetaData is the client for interacting with the CachedQuestionMetaData builders.
+	CachedQuestionMetaData *CachedQuestionMetaDataClient
+	// Exam is the client for interacting with the Exam builders.
+	Exam *ExamClient
+	// ExamCategory is the client for interacting with the ExamCategory builders.
+	ExamCategory *ExamCategoryClient
+	// ExamSetting is the client for interacting with the ExamSetting builders.
+	ExamSetting *ExamSettingClient
 
 	// lazily loaded.
 	client     *Client
@@ -145,7 +151,10 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.CachedQuestionMetadata = NewCachedQuestionMetadataClient(tx.config)
+	tx.CachedQuestionMetaData = NewCachedQuestionMetaDataClient(tx.config)
+	tx.Exam = NewExamClient(tx.config)
+	tx.ExamCategory = NewExamCategoryClient(tx.config)
+	tx.ExamSetting = NewExamSettingClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -155,7 +164,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: CachedQuestionMetadata.QueryXXX(), the query will be executed
+// applies a query, for example: CachedQuestionMetaData.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

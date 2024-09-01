@@ -4,6 +4,7 @@ package ent
 
 import (
 	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
 	"common/ent/predicate"
 	"context"
 	"fmt"
@@ -15,53 +16,77 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CachedQuestionMetadataQuery is the builder for querying CachedQuestionMetadata entities.
-type CachedQuestionMetadataQuery struct {
+// CachedQuestionMetaDataQuery is the builder for querying CachedQuestionMetaData entities.
+type CachedQuestionMetaDataQuery struct {
 	config
 	ctx        *QueryContext
 	order      []cachedquestionmetadata.OrderOption
 	inters     []Interceptor
-	predicates []predicate.CachedQuestionMetadata
+	predicates []predicate.CachedQuestionMetaData
+	withExam   *ExamQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the CachedQuestionMetadataQuery builder.
-func (cqmq *CachedQuestionMetadataQuery) Where(ps ...predicate.CachedQuestionMetadata) *CachedQuestionMetadataQuery {
-	cqmq.predicates = append(cqmq.predicates, ps...)
-	return cqmq
+// Where adds a new predicate for the CachedQuestionMetaDataQuery builder.
+func (cqmdq *CachedQuestionMetaDataQuery) Where(ps ...predicate.CachedQuestionMetaData) *CachedQuestionMetaDataQuery {
+	cqmdq.predicates = append(cqmdq.predicates, ps...)
+	return cqmdq
 }
 
 // Limit the number of records to be returned by this query.
-func (cqmq *CachedQuestionMetadataQuery) Limit(limit int) *CachedQuestionMetadataQuery {
-	cqmq.ctx.Limit = &limit
-	return cqmq
+func (cqmdq *CachedQuestionMetaDataQuery) Limit(limit int) *CachedQuestionMetaDataQuery {
+	cqmdq.ctx.Limit = &limit
+	return cqmdq
 }
 
 // Offset to start from.
-func (cqmq *CachedQuestionMetadataQuery) Offset(offset int) *CachedQuestionMetadataQuery {
-	cqmq.ctx.Offset = &offset
-	return cqmq
+func (cqmdq *CachedQuestionMetaDataQuery) Offset(offset int) *CachedQuestionMetaDataQuery {
+	cqmdq.ctx.Offset = &offset
+	return cqmdq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (cqmq *CachedQuestionMetadataQuery) Unique(unique bool) *CachedQuestionMetadataQuery {
-	cqmq.ctx.Unique = &unique
-	return cqmq
+func (cqmdq *CachedQuestionMetaDataQuery) Unique(unique bool) *CachedQuestionMetaDataQuery {
+	cqmdq.ctx.Unique = &unique
+	return cqmdq
 }
 
 // Order specifies how the records should be ordered.
-func (cqmq *CachedQuestionMetadataQuery) Order(o ...cachedquestionmetadata.OrderOption) *CachedQuestionMetadataQuery {
-	cqmq.order = append(cqmq.order, o...)
-	return cqmq
+func (cqmdq *CachedQuestionMetaDataQuery) Order(o ...cachedquestionmetadata.OrderOption) *CachedQuestionMetaDataQuery {
+	cqmdq.order = append(cqmdq.order, o...)
+	return cqmdq
 }
 
-// First returns the first CachedQuestionMetadata entity from the query.
-// Returns a *NotFoundError when no CachedQuestionMetadata was found.
-func (cqmq *CachedQuestionMetadataQuery) First(ctx context.Context) (*CachedQuestionMetadata, error) {
-	nodes, err := cqmq.Limit(1).All(setContextOp(ctx, cqmq.ctx, ent.OpQueryFirst))
+// QueryExam chains the current query on the "exam" edge.
+func (cqmdq *CachedQuestionMetaDataQuery) QueryExam() *ExamQuery {
+	query := (&ExamClient{config: cqmdq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cqmdq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cqmdq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID, selector),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, cachedquestionmetadata.ExamTable, cachedquestionmetadata.ExamColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cqmdq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// First returns the first CachedQuestionMetaData entity from the query.
+// Returns a *NotFoundError when no CachedQuestionMetaData was found.
+func (cqmdq *CachedQuestionMetaDataQuery) First(ctx context.Context) (*CachedQuestionMetaData, error) {
+	nodes, err := cqmdq.Limit(1).All(setContextOp(ctx, cqmdq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -72,19 +97,19 @@ func (cqmq *CachedQuestionMetadataQuery) First(ctx context.Context) (*CachedQues
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) FirstX(ctx context.Context) *CachedQuestionMetadata {
-	node, err := cqmq.First(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) FirstX(ctx context.Context) *CachedQuestionMetaData {
+	node, err := cqmdq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
 	return node
 }
 
-// FirstID returns the first CachedQuestionMetadata ID from the query.
-// Returns a *NotFoundError when no CachedQuestionMetadata ID was found.
-func (cqmq *CachedQuestionMetadataQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first CachedQuestionMetaData ID from the query.
+// Returns a *NotFoundError when no CachedQuestionMetaData ID was found.
+func (cqmdq *CachedQuestionMetaDataQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = cqmq.Limit(1).IDs(setContextOp(ctx, cqmq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = cqmdq.Limit(1).IDs(setContextOp(ctx, cqmdq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -95,19 +120,19 @@ func (cqmq *CachedQuestionMetadataQuery) FirstID(ctx context.Context) (id int, e
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) FirstIDX(ctx context.Context) int {
-	id, err := cqmq.FirstID(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) FirstIDX(ctx context.Context) int {
+	id, err := cqmdq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
 	return id
 }
 
-// Only returns a single CachedQuestionMetadata entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one CachedQuestionMetadata entity is found.
-// Returns a *NotFoundError when no CachedQuestionMetadata entities are found.
-func (cqmq *CachedQuestionMetadataQuery) Only(ctx context.Context) (*CachedQuestionMetadata, error) {
-	nodes, err := cqmq.Limit(2).All(setContextOp(ctx, cqmq.ctx, ent.OpQueryOnly))
+// Only returns a single CachedQuestionMetaData entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one CachedQuestionMetaData entity is found.
+// Returns a *NotFoundError when no CachedQuestionMetaData entities are found.
+func (cqmdq *CachedQuestionMetaDataQuery) Only(ctx context.Context) (*CachedQuestionMetaData, error) {
+	nodes, err := cqmdq.Limit(2).All(setContextOp(ctx, cqmdq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -122,20 +147,20 @@ func (cqmq *CachedQuestionMetadataQuery) Only(ctx context.Context) (*CachedQuest
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) OnlyX(ctx context.Context) *CachedQuestionMetadata {
-	node, err := cqmq.Only(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) OnlyX(ctx context.Context) *CachedQuestionMetaData {
+	node, err := cqmdq.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return node
 }
 
-// OnlyID is like Only, but returns the only CachedQuestionMetadata ID in the query.
-// Returns a *NotSingularError when more than one CachedQuestionMetadata ID is found.
+// OnlyID is like Only, but returns the only CachedQuestionMetaData ID in the query.
+// Returns a *NotSingularError when more than one CachedQuestionMetaData ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cqmq *CachedQuestionMetadataQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (cqmdq *CachedQuestionMetaDataQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = cqmq.Limit(2).IDs(setContextOp(ctx, cqmq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = cqmdq.Limit(2).IDs(setContextOp(ctx, cqmdq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -150,48 +175,48 @@ func (cqmq *CachedQuestionMetadataQuery) OnlyID(ctx context.Context) (id int, er
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) OnlyIDX(ctx context.Context) int {
-	id, err := cqmq.OnlyID(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) OnlyIDX(ctx context.Context) int {
+	id, err := cqmdq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return id
 }
 
-// All executes the query and returns a list of CachedQuestionMetadataSlice.
-func (cqmq *CachedQuestionMetadataQuery) All(ctx context.Context) ([]*CachedQuestionMetadata, error) {
-	ctx = setContextOp(ctx, cqmq.ctx, ent.OpQueryAll)
-	if err := cqmq.prepareQuery(ctx); err != nil {
+// All executes the query and returns a list of CachedQuestionMetaDataSlice.
+func (cqmdq *CachedQuestionMetaDataQuery) All(ctx context.Context) ([]*CachedQuestionMetaData, error) {
+	ctx = setContextOp(ctx, cqmdq.ctx, ent.OpQueryAll)
+	if err := cqmdq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*CachedQuestionMetadata, *CachedQuestionMetadataQuery]()
-	return withInterceptors[[]*CachedQuestionMetadata](ctx, cqmq, qr, cqmq.inters)
+	qr := querierAll[[]*CachedQuestionMetaData, *CachedQuestionMetaDataQuery]()
+	return withInterceptors[[]*CachedQuestionMetaData](ctx, cqmdq, qr, cqmdq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) AllX(ctx context.Context) []*CachedQuestionMetadata {
-	nodes, err := cqmq.All(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) AllX(ctx context.Context) []*CachedQuestionMetaData {
+	nodes, err := cqmdq.All(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return nodes
 }
 
-// IDs executes the query and returns a list of CachedQuestionMetadata IDs.
-func (cqmq *CachedQuestionMetadataQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if cqmq.ctx.Unique == nil && cqmq.path != nil {
-		cqmq.Unique(true)
+// IDs executes the query and returns a list of CachedQuestionMetaData IDs.
+func (cqmdq *CachedQuestionMetaDataQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if cqmdq.ctx.Unique == nil && cqmdq.path != nil {
+		cqmdq.Unique(true)
 	}
-	ctx = setContextOp(ctx, cqmq.ctx, ent.OpQueryIDs)
-	if err = cqmq.Select(cachedquestionmetadata.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, cqmdq.ctx, ent.OpQueryIDs)
+	if err = cqmdq.Select(cachedquestionmetadata.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) IDsX(ctx context.Context) []int {
-	ids, err := cqmq.IDs(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) IDsX(ctx context.Context) []int {
+	ids, err := cqmdq.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -199,17 +224,17 @@ func (cqmq *CachedQuestionMetadataQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (cqmq *CachedQuestionMetadataQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cqmq.ctx, ent.OpQueryCount)
-	if err := cqmq.prepareQuery(ctx); err != nil {
+func (cqmdq *CachedQuestionMetaDataQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, cqmdq.ctx, ent.OpQueryCount)
+	if err := cqmdq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, cqmq, querierCount[*CachedQuestionMetadataQuery](), cqmq.inters)
+	return withInterceptors[int](ctx, cqmdq, querierCount[*CachedQuestionMetaDataQuery](), cqmdq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) CountX(ctx context.Context) int {
-	count, err := cqmq.Count(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) CountX(ctx context.Context) int {
+	count, err := cqmdq.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -217,9 +242,9 @@ func (cqmq *CachedQuestionMetadataQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (cqmq *CachedQuestionMetadataQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cqmq.ctx, ent.OpQueryExist)
-	switch _, err := cqmq.FirstID(ctx); {
+func (cqmdq *CachedQuestionMetaDataQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, cqmdq.ctx, ent.OpQueryExist)
+	switch _, err := cqmdq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -230,30 +255,42 @@ func (cqmq *CachedQuestionMetadataQuery) Exist(ctx context.Context) (bool, error
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (cqmq *CachedQuestionMetadataQuery) ExistX(ctx context.Context) bool {
-	exist, err := cqmq.Exist(ctx)
+func (cqmdq *CachedQuestionMetaDataQuery) ExistX(ctx context.Context) bool {
+	exist, err := cqmdq.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return exist
 }
 
-// Clone returns a duplicate of the CachedQuestionMetadataQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the CachedQuestionMetaDataQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (cqmq *CachedQuestionMetadataQuery) Clone() *CachedQuestionMetadataQuery {
-	if cqmq == nil {
+func (cqmdq *CachedQuestionMetaDataQuery) Clone() *CachedQuestionMetaDataQuery {
+	if cqmdq == nil {
 		return nil
 	}
-	return &CachedQuestionMetadataQuery{
-		config:     cqmq.config,
-		ctx:        cqmq.ctx.Clone(),
-		order:      append([]cachedquestionmetadata.OrderOption{}, cqmq.order...),
-		inters:     append([]Interceptor{}, cqmq.inters...),
-		predicates: append([]predicate.CachedQuestionMetadata{}, cqmq.predicates...),
+	return &CachedQuestionMetaDataQuery{
+		config:     cqmdq.config,
+		ctx:        cqmdq.ctx.Clone(),
+		order:      append([]cachedquestionmetadata.OrderOption{}, cqmdq.order...),
+		inters:     append([]Interceptor{}, cqmdq.inters...),
+		predicates: append([]predicate.CachedQuestionMetaData{}, cqmdq.predicates...),
+		withExam:   cqmdq.withExam.Clone(),
 		// clone intermediate query.
-		sql:  cqmq.sql.Clone(),
-		path: cqmq.path,
+		sql:  cqmdq.sql.Clone(),
+		path: cqmdq.path,
 	}
+}
+
+// WithExam tells the query-builder to eager-load the nodes that are connected to
+// the "exam" edge. The optional arguments are used to configure the query builder of the edge.
+func (cqmdq *CachedQuestionMetaDataQuery) WithExam(opts ...func(*ExamQuery)) *CachedQuestionMetaDataQuery {
+	query := (&ExamClient{config: cqmdq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cqmdq.withExam = query
+	return cqmdq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -262,18 +299,18 @@ func (cqmq *CachedQuestionMetadataQuery) Clone() *CachedQuestionMetadataQuery {
 // Example:
 //
 //	var v []struct {
-//		Key string `json:"key,omitempty"`
+//		CacheUID string `json:"cache_uid,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.CachedQuestionMetadata.Query().
-//		GroupBy(cachedquestionmetadata.FieldKey).
+//	client.CachedQuestionMetaData.Query().
+//		GroupBy(cachedquestionmetadata.FieldCacheUID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (cqmq *CachedQuestionMetadataQuery) GroupBy(field string, fields ...string) *CachedQuestionMetadataGroupBy {
-	cqmq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &CachedQuestionMetadataGroupBy{build: cqmq}
-	grbuild.flds = &cqmq.ctx.Fields
+func (cqmdq *CachedQuestionMetaDataQuery) GroupBy(field string, fields ...string) *CachedQuestionMetaDataGroupBy {
+	cqmdq.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &CachedQuestionMetaDataGroupBy{build: cqmdq}
+	grbuild.flds = &cqmdq.ctx.Fields
 	grbuild.label = cachedquestionmetadata.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -285,94 +322,144 @@ func (cqmq *CachedQuestionMetadataQuery) GroupBy(field string, fields ...string)
 // Example:
 //
 //	var v []struct {
-//		Key string `json:"key,omitempty"`
+//		CacheUID string `json:"cache_uid,omitempty"`
 //	}
 //
-//	client.CachedQuestionMetadata.Query().
-//		Select(cachedquestionmetadata.FieldKey).
+//	client.CachedQuestionMetaData.Query().
+//		Select(cachedquestionmetadata.FieldCacheUID).
 //		Scan(ctx, &v)
-func (cqmq *CachedQuestionMetadataQuery) Select(fields ...string) *CachedQuestionMetadataSelect {
-	cqmq.ctx.Fields = append(cqmq.ctx.Fields, fields...)
-	sbuild := &CachedQuestionMetadataSelect{CachedQuestionMetadataQuery: cqmq}
+func (cqmdq *CachedQuestionMetaDataQuery) Select(fields ...string) *CachedQuestionMetaDataSelect {
+	cqmdq.ctx.Fields = append(cqmdq.ctx.Fields, fields...)
+	sbuild := &CachedQuestionMetaDataSelect{CachedQuestionMetaDataQuery: cqmdq}
 	sbuild.label = cachedquestionmetadata.Label
-	sbuild.flds, sbuild.scan = &cqmq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &cqmdq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a CachedQuestionMetadataSelect configured with the given aggregations.
-func (cqmq *CachedQuestionMetadataQuery) Aggregate(fns ...AggregateFunc) *CachedQuestionMetadataSelect {
-	return cqmq.Select().Aggregate(fns...)
+// Aggregate returns a CachedQuestionMetaDataSelect configured with the given aggregations.
+func (cqmdq *CachedQuestionMetaDataQuery) Aggregate(fns ...AggregateFunc) *CachedQuestionMetaDataSelect {
+	return cqmdq.Select().Aggregate(fns...)
 }
 
-func (cqmq *CachedQuestionMetadataQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range cqmq.inters {
+func (cqmdq *CachedQuestionMetaDataQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range cqmdq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, cqmq); err != nil {
+			if err := trv.Traverse(ctx, cqmdq); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range cqmq.ctx.Fields {
+	for _, f := range cqmdq.ctx.Fields {
 		if !cachedquestionmetadata.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if cqmq.path != nil {
-		prev, err := cqmq.path(ctx)
+	if cqmdq.path != nil {
+		prev, err := cqmdq.path(ctx)
 		if err != nil {
 			return err
 		}
-		cqmq.sql = prev
+		cqmdq.sql = prev
 	}
 	return nil
 }
 
-func (cqmq *CachedQuestionMetadataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CachedQuestionMetadata, error) {
+func (cqmdq *CachedQuestionMetaDataQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CachedQuestionMetaData, error) {
 	var (
-		nodes = []*CachedQuestionMetadata{}
-		_spec = cqmq.querySpec()
+		nodes       = []*CachedQuestionMetaData{}
+		withFKs     = cqmdq.withFKs
+		_spec       = cqmdq.querySpec()
+		loadedTypes = [1]bool{
+			cqmdq.withExam != nil,
+		}
 	)
+	if cqmdq.withExam != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, cachedquestionmetadata.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*CachedQuestionMetadata).scanValues(nil, columns)
+		return (*CachedQuestionMetaData).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &CachedQuestionMetadata{config: cqmq.config}
+		node := &CachedQuestionMetaData{config: cqmdq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, cqmq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, cqmdq.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cqmdq.withExam; query != nil {
+		if err := cqmdq.loadExam(ctx, query, nodes, nil,
+			func(n *CachedQuestionMetaData, e *Exam) { n.Edges.Exam = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
-func (cqmq *CachedQuestionMetadataQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := cqmq.querySpec()
-	_spec.Node.Columns = cqmq.ctx.Fields
-	if len(cqmq.ctx.Fields) > 0 {
-		_spec.Unique = cqmq.ctx.Unique != nil && *cqmq.ctx.Unique
+func (cqmdq *CachedQuestionMetaDataQuery) loadExam(ctx context.Context, query *ExamQuery, nodes []*CachedQuestionMetaData, init func(*CachedQuestionMetaData), assign func(*CachedQuestionMetaData, *Exam)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*CachedQuestionMetaData)
+	for i := range nodes {
+		if nodes[i].exam_cached_question_metadata == nil {
+			continue
+		}
+		fk := *nodes[i].exam_cached_question_metadata
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	return sqlgraph.CountNodes(ctx, cqmq.driver, _spec)
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(exam.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "exam_cached_question_metadata" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
-func (cqmq *CachedQuestionMetadataQuery) querySpec() *sqlgraph.QuerySpec {
+func (cqmdq *CachedQuestionMetaDataQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := cqmdq.querySpec()
+	_spec.Node.Columns = cqmdq.ctx.Fields
+	if len(cqmdq.ctx.Fields) > 0 {
+		_spec.Unique = cqmdq.ctx.Unique != nil && *cqmdq.ctx.Unique
+	}
+	return sqlgraph.CountNodes(ctx, cqmdq.driver, _spec)
+}
+
+func (cqmdq *CachedQuestionMetaDataQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(cachedquestionmetadata.Table, cachedquestionmetadata.Columns, sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt))
-	_spec.From = cqmq.sql
-	if unique := cqmq.ctx.Unique; unique != nil {
+	_spec.From = cqmdq.sql
+	if unique := cqmdq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if cqmq.path != nil {
+	} else if cqmdq.path != nil {
 		_spec.Unique = true
 	}
-	if fields := cqmq.ctx.Fields; len(fields) > 0 {
+	if fields := cqmdq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, cachedquestionmetadata.FieldID)
 		for i := range fields {
@@ -381,20 +468,20 @@ func (cqmq *CachedQuestionMetadataQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := cqmq.predicates; len(ps) > 0 {
+	if ps := cqmdq.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := cqmq.ctx.Limit; limit != nil {
+	if limit := cqmdq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := cqmq.ctx.Offset; offset != nil {
+	if offset := cqmdq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := cqmq.order; len(ps) > 0 {
+	if ps := cqmdq.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -404,114 +491,114 @@ func (cqmq *CachedQuestionMetadataQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (cqmq *CachedQuestionMetadataQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(cqmq.driver.Dialect())
+func (cqmdq *CachedQuestionMetaDataQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(cqmdq.driver.Dialect())
 	t1 := builder.Table(cachedquestionmetadata.Table)
-	columns := cqmq.ctx.Fields
+	columns := cqmdq.ctx.Fields
 	if len(columns) == 0 {
 		columns = cachedquestionmetadata.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if cqmq.sql != nil {
-		selector = cqmq.sql
+	if cqmdq.sql != nil {
+		selector = cqmdq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if cqmq.ctx.Unique != nil && *cqmq.ctx.Unique {
+	if cqmdq.ctx.Unique != nil && *cqmdq.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range cqmq.predicates {
+	for _, p := range cqmdq.predicates {
 		p(selector)
 	}
-	for _, p := range cqmq.order {
+	for _, p := range cqmdq.order {
 		p(selector)
 	}
-	if offset := cqmq.ctx.Offset; offset != nil {
+	if offset := cqmdq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := cqmq.ctx.Limit; limit != nil {
+	if limit := cqmdq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
-// CachedQuestionMetadataGroupBy is the group-by builder for CachedQuestionMetadata entities.
-type CachedQuestionMetadataGroupBy struct {
+// CachedQuestionMetaDataGroupBy is the group-by builder for CachedQuestionMetaData entities.
+type CachedQuestionMetaDataGroupBy struct {
 	selector
-	build *CachedQuestionMetadataQuery
+	build *CachedQuestionMetaDataQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (cqmgb *CachedQuestionMetadataGroupBy) Aggregate(fns ...AggregateFunc) *CachedQuestionMetadataGroupBy {
-	cqmgb.fns = append(cqmgb.fns, fns...)
-	return cqmgb
+func (cqmdgb *CachedQuestionMetaDataGroupBy) Aggregate(fns ...AggregateFunc) *CachedQuestionMetaDataGroupBy {
+	cqmdgb.fns = append(cqmdgb.fns, fns...)
+	return cqmdgb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cqmgb *CachedQuestionMetadataGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cqmgb.build.ctx, ent.OpQueryGroupBy)
-	if err := cqmgb.build.prepareQuery(ctx); err != nil {
+func (cqmdgb *CachedQuestionMetaDataGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, cqmdgb.build.ctx, ent.OpQueryGroupBy)
+	if err := cqmdgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CachedQuestionMetadataQuery, *CachedQuestionMetadataGroupBy](ctx, cqmgb.build, cqmgb, cqmgb.build.inters, v)
+	return scanWithInterceptors[*CachedQuestionMetaDataQuery, *CachedQuestionMetaDataGroupBy](ctx, cqmdgb.build, cqmdgb, cqmdgb.build.inters, v)
 }
 
-func (cqmgb *CachedQuestionMetadataGroupBy) sqlScan(ctx context.Context, root *CachedQuestionMetadataQuery, v any) error {
+func (cqmdgb *CachedQuestionMetaDataGroupBy) sqlScan(ctx context.Context, root *CachedQuestionMetaDataQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(cqmgb.fns))
-	for _, fn := range cqmgb.fns {
+	aggregation := make([]string, 0, len(cqmdgb.fns))
+	for _, fn := range cqmdgb.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*cqmgb.flds)+len(cqmgb.fns))
-		for _, f := range *cqmgb.flds {
+		columns := make([]string, 0, len(*cqmdgb.flds)+len(cqmdgb.fns))
+		for _, f := range *cqmdgb.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*cqmgb.flds...)...)
+	selector.GroupBy(selector.Columns(*cqmdgb.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cqmgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := cqmdgb.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
 	return sql.ScanSlice(rows, v)
 }
 
-// CachedQuestionMetadataSelect is the builder for selecting fields of CachedQuestionMetadata entities.
-type CachedQuestionMetadataSelect struct {
-	*CachedQuestionMetadataQuery
+// CachedQuestionMetaDataSelect is the builder for selecting fields of CachedQuestionMetaData entities.
+type CachedQuestionMetaDataSelect struct {
+	*CachedQuestionMetaDataQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (cqms *CachedQuestionMetadataSelect) Aggregate(fns ...AggregateFunc) *CachedQuestionMetadataSelect {
-	cqms.fns = append(cqms.fns, fns...)
-	return cqms
+func (cqmds *CachedQuestionMetaDataSelect) Aggregate(fns ...AggregateFunc) *CachedQuestionMetaDataSelect {
+	cqmds.fns = append(cqmds.fns, fns...)
+	return cqmds
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cqms *CachedQuestionMetadataSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cqms.ctx, ent.OpQuerySelect)
-	if err := cqms.prepareQuery(ctx); err != nil {
+func (cqmds *CachedQuestionMetaDataSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, cqmds.ctx, ent.OpQuerySelect)
+	if err := cqmds.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CachedQuestionMetadataQuery, *CachedQuestionMetadataSelect](ctx, cqms.CachedQuestionMetadataQuery, cqms, cqms.inters, v)
+	return scanWithInterceptors[*CachedQuestionMetaDataQuery, *CachedQuestionMetaDataSelect](ctx, cqmds.CachedQuestionMetaDataQuery, cqmds, cqmds.inters, v)
 }
 
-func (cqms *CachedQuestionMetadataSelect) sqlScan(ctx context.Context, root *CachedQuestionMetadataQuery, v any) error {
+func (cqmds *CachedQuestionMetaDataSelect) sqlScan(ctx context.Context, root *CachedQuestionMetaDataQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(cqms.fns))
-	for _, fn := range cqms.fns {
+	aggregation := make([]string, 0, len(cqmds.fns))
+	for _, fn := range cqmds.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*cqms.selector.flds); {
+	switch n := len(*cqmds.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -519,7 +606,7 @@ func (cqms *CachedQuestionMetadataSelect) sqlScan(ctx context.Context, root *Cac
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cqms.driver.Query(ctx, query, args, rows); err != nil {
+	if err := cqmds.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

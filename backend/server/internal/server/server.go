@@ -1,23 +1,39 @@
 package server
 
 import (
+	commonConfig "common/config"
+	commonService "common/services"
+
+	"common/ent"
 	"fmt"
 	"net/http"
 	"os"
+	"server/internal/services"
 	"strconv"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/redis/go-redis/v9"
 )
 
 type Server struct {
 	port int
+
+	examService  *services.ExamService
+	redisService *commonService.RedisService
 }
 
-func InitServer() *http.Server {
+func InitServer(redisClient *redis.Client, dbClient *ent.Client) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	logger := commonConfig.SetupLogger()
+
+	redisService := commonService.NewRedisService(redisClient)
+	examService := services.NewExamService(redisClient, dbClient)
+
 	NewServer := &Server{
-		port: port,
+		port:         port,
+		examService:  examService,
+		redisService: redisService,
 	}
 
 	// Declare Server config
@@ -27,6 +43,7 @@ func InitServer() *http.Server {
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
+		ErrorLog:     logger,
 	}
 
 	return server

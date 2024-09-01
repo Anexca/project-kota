@@ -4,30 +4,32 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
-// CachedQuestionMetadata holds the schema definition for the CachedQuestionMetadata entity.
-type CachedQuestionMetadata struct {
+// CachedQuestionMetaData holds the schema definition for the CachedQuestionMetaData entity.
+type CachedQuestionMetaData struct {
 	ent.Schema
 }
 
-// Fields of the CachedQuestionMetadata.
-func (CachedQuestionMetadata) Fields() []ent.Field {
+// Fields of the CachedQuestionMetaData.
+func (CachedQuestionMetaData) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("key").Unique(),
-		field.String("type"),
-		field.String("subject"),
-		field.String("exam"),
-		field.Bool("is_processed").Default(false),
+		field.String("cache_uid").Unique(),
+		field.Bool("is_used").Default(false),
+		field.Time("expires_at"),
 		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").
-			Default(time.Now).
-			UpdateDefault(time.Now),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 
-// Edges of the CachedQuestionMetadata.
-func (CachedQuestionMetadata) Edges() []ent.Edge {
-	return nil
+// Edges of the CachedQuestionMetaData.
+func (CachedQuestionMetaData) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("exam", Exam.Type).
+			Ref("cached_question_metadata").
+			Unique().
+			Required(),
+	}
 }

@@ -4,6 +4,9 @@ package ent
 
 import (
 	"common/ent/cachedquestionmetadata"
+	"common/ent/exam"
+	"common/ent/examcategory"
+	"common/ent/examsetting"
 	"common/ent/predicate"
 	"context"
 	"errors"
@@ -24,39 +27,42 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCachedQuestionMetadata = "CachedQuestionMetadata"
+	TypeCachedQuestionMetaData = "CachedQuestionMetaData"
+	TypeExam                   = "Exam"
+	TypeExamCategory           = "ExamCategory"
+	TypeExamSetting            = "ExamSetting"
 )
 
-// CachedQuestionMetadataMutation represents an operation that mutates the CachedQuestionMetadata nodes in the graph.
-type CachedQuestionMetadataMutation struct {
+// CachedQuestionMetaDataMutation represents an operation that mutates the CachedQuestionMetaData nodes in the graph.
+type CachedQuestionMetaDataMutation struct {
 	config
 	op            Op
 	typ           string
 	id            *int
-	key           *string
-	_type         *string
-	subject       *string
-	exam          *string
-	is_processed  *bool
+	cache_uid     *string
+	is_used       *bool
+	expires_at    *time.Time
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
+	exam          *int
+	clearedexam   bool
 	done          bool
-	oldValue      func(context.Context) (*CachedQuestionMetadata, error)
-	predicates    []predicate.CachedQuestionMetadata
+	oldValue      func(context.Context) (*CachedQuestionMetaData, error)
+	predicates    []predicate.CachedQuestionMetaData
 }
 
-var _ ent.Mutation = (*CachedQuestionMetadataMutation)(nil)
+var _ ent.Mutation = (*CachedQuestionMetaDataMutation)(nil)
 
 // cachedquestionmetadataOption allows management of the mutation configuration using functional options.
-type cachedquestionmetadataOption func(*CachedQuestionMetadataMutation)
+type cachedquestionmetadataOption func(*CachedQuestionMetaDataMutation)
 
-// newCachedQuestionMetadataMutation creates new mutation for the CachedQuestionMetadata entity.
-func newCachedQuestionMetadataMutation(c config, op Op, opts ...cachedquestionmetadataOption) *CachedQuestionMetadataMutation {
-	m := &CachedQuestionMetadataMutation{
+// newCachedQuestionMetaDataMutation creates new mutation for the CachedQuestionMetaData entity.
+func newCachedQuestionMetaDataMutation(c config, op Op, opts ...cachedquestionmetadataOption) *CachedQuestionMetaDataMutation {
+	m := &CachedQuestionMetaDataMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeCachedQuestionMetadata,
+		typ:           TypeCachedQuestionMetaData,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -65,20 +71,20 @@ func newCachedQuestionMetadataMutation(c config, op Op, opts ...cachedquestionme
 	return m
 }
 
-// withCachedQuestionMetadataID sets the ID field of the mutation.
-func withCachedQuestionMetadataID(id int) cachedquestionmetadataOption {
-	return func(m *CachedQuestionMetadataMutation) {
+// withCachedQuestionMetaDataID sets the ID field of the mutation.
+func withCachedQuestionMetaDataID(id int) cachedquestionmetadataOption {
+	return func(m *CachedQuestionMetaDataMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *CachedQuestionMetadata
+			value *CachedQuestionMetaData
 		)
-		m.oldValue = func(ctx context.Context) (*CachedQuestionMetadata, error) {
+		m.oldValue = func(ctx context.Context) (*CachedQuestionMetaData, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().CachedQuestionMetadata.Get(ctx, id)
+					value, err = m.Client().CachedQuestionMetaData.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -87,10 +93,10 @@ func withCachedQuestionMetadataID(id int) cachedquestionmetadataOption {
 	}
 }
 
-// withCachedQuestionMetadata sets the old CachedQuestionMetadata of the mutation.
-func withCachedQuestionMetadata(node *CachedQuestionMetadata) cachedquestionmetadataOption {
-	return func(m *CachedQuestionMetadataMutation) {
-		m.oldValue = func(context.Context) (*CachedQuestionMetadata, error) {
+// withCachedQuestionMetaData sets the old CachedQuestionMetaData of the mutation.
+func withCachedQuestionMetaData(node *CachedQuestionMetaData) cachedquestionmetadataOption {
+	return func(m *CachedQuestionMetaDataMutation) {
+		m.oldValue = func(context.Context) (*CachedQuestionMetaData, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -99,7 +105,7 @@ func withCachedQuestionMetadata(node *CachedQuestionMetadata) cachedquestionmeta
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m CachedQuestionMetadataMutation) Client() *Client {
+func (m CachedQuestionMetaDataMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -107,7 +113,7 @@ func (m CachedQuestionMetadataMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m CachedQuestionMetadataMutation) Tx() (*Tx, error) {
+func (m CachedQuestionMetaDataMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -118,7 +124,7 @@ func (m CachedQuestionMetadataMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CachedQuestionMetadataMutation) ID() (id int, exists bool) {
+func (m *CachedQuestionMetaDataMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -129,7 +135,7 @@ func (m *CachedQuestionMetadataMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CachedQuestionMetadataMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *CachedQuestionMetaDataMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -138,199 +144,127 @@ func (m *CachedQuestionMetadataMutation) IDs(ctx context.Context) ([]int, error)
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().CachedQuestionMetadata.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().CachedQuestionMetaData.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// SetKey sets the "key" field.
-func (m *CachedQuestionMetadataMutation) SetKey(s string) {
-	m.key = &s
+// SetCacheUID sets the "cache_uid" field.
+func (m *CachedQuestionMetaDataMutation) SetCacheUID(s string) {
+	m.cache_uid = &s
 }
 
-// Key returns the value of the "key" field in the mutation.
-func (m *CachedQuestionMetadataMutation) Key() (r string, exists bool) {
-	v := m.key
+// CacheUID returns the value of the "cache_uid" field in the mutation.
+func (m *CachedQuestionMetaDataMutation) CacheUID() (r string, exists bool) {
+	v := m.cache_uid
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldKey returns the old "key" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldCacheUID returns the old "cache_uid" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldKey(ctx context.Context) (v string, err error) {
+func (m *CachedQuestionMetaDataMutation) OldCacheUID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldKey is only allowed on UpdateOne operations")
+		return v, errors.New("OldCacheUID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldKey requires an ID field in the mutation")
+		return v, errors.New("OldCacheUID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKey: %w", err)
+		return v, fmt.Errorf("querying old value for OldCacheUID: %w", err)
 	}
-	return oldValue.Key, nil
+	return oldValue.CacheUID, nil
 }
 
-// ResetKey resets all changes to the "key" field.
-func (m *CachedQuestionMetadataMutation) ResetKey() {
-	m.key = nil
+// ResetCacheUID resets all changes to the "cache_uid" field.
+func (m *CachedQuestionMetaDataMutation) ResetCacheUID() {
+	m.cache_uid = nil
 }
 
-// SetType sets the "type" field.
-func (m *CachedQuestionMetadataMutation) SetType(s string) {
-	m._type = &s
+// SetIsUsed sets the "is_used" field.
+func (m *CachedQuestionMetaDataMutation) SetIsUsed(b bool) {
+	m.is_used = &b
 }
 
-// GetType returns the value of the "type" field in the mutation.
-func (m *CachedQuestionMetadataMutation) GetType() (r string, exists bool) {
-	v := m._type
+// IsUsed returns the value of the "is_used" field in the mutation.
+func (m *CachedQuestionMetaDataMutation) IsUsed() (r bool, exists bool) {
+	v := m.is_used
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldType returns the old "type" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldIsUsed returns the old "is_used" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldType(ctx context.Context) (v string, err error) {
+func (m *CachedQuestionMetaDataMutation) OldIsUsed(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldType is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsUsed is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldType requires an ID field in the mutation")
+		return v, errors.New("OldIsUsed requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsUsed: %w", err)
 	}
-	return oldValue.Type, nil
+	return oldValue.IsUsed, nil
 }
 
-// ResetType resets all changes to the "type" field.
-func (m *CachedQuestionMetadataMutation) ResetType() {
-	m._type = nil
+// ResetIsUsed resets all changes to the "is_used" field.
+func (m *CachedQuestionMetaDataMutation) ResetIsUsed() {
+	m.is_used = nil
 }
 
-// SetSubject sets the "subject" field.
-func (m *CachedQuestionMetadataMutation) SetSubject(s string) {
-	m.subject = &s
+// SetExpiresAt sets the "expires_at" field.
+func (m *CachedQuestionMetaDataMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
 }
 
-// Subject returns the value of the "subject" field in the mutation.
-func (m *CachedQuestionMetadataMutation) Subject() (r string, exists bool) {
-	v := m.subject
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *CachedQuestionMetaDataMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSubject returns the old "subject" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldExpiresAt returns the old "expires_at" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldSubject(ctx context.Context) (v string, err error) {
+func (m *CachedQuestionMetaDataMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSubject is only allowed on UpdateOne operations")
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSubject requires an ID field in the mutation")
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSubject: %w", err)
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
 	}
-	return oldValue.Subject, nil
+	return oldValue.ExpiresAt, nil
 }
 
-// ResetSubject resets all changes to the "subject" field.
-func (m *CachedQuestionMetadataMutation) ResetSubject() {
-	m.subject = nil
-}
-
-// SetExam sets the "exam" field.
-func (m *CachedQuestionMetadataMutation) SetExam(s string) {
-	m.exam = &s
-}
-
-// Exam returns the value of the "exam" field in the mutation.
-func (m *CachedQuestionMetadataMutation) Exam() (r string, exists bool) {
-	v := m.exam
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldExam returns the old "exam" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldExam(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldExam is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldExam requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldExam: %w", err)
-	}
-	return oldValue.Exam, nil
-}
-
-// ResetExam resets all changes to the "exam" field.
-func (m *CachedQuestionMetadataMutation) ResetExam() {
-	m.exam = nil
-}
-
-// SetIsProcessed sets the "is_processed" field.
-func (m *CachedQuestionMetadataMutation) SetIsProcessed(b bool) {
-	m.is_processed = &b
-}
-
-// IsProcessed returns the value of the "is_processed" field in the mutation.
-func (m *CachedQuestionMetadataMutation) IsProcessed() (r bool, exists bool) {
-	v := m.is_processed
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsProcessed returns the old "is_processed" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldIsProcessed(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsProcessed is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsProcessed requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsProcessed: %w", err)
-	}
-	return oldValue.IsProcessed, nil
-}
-
-// ResetIsProcessed resets all changes to the "is_processed" field.
-func (m *CachedQuestionMetadataMutation) ResetIsProcessed() {
-	m.is_processed = nil
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *CachedQuestionMetaDataMutation) ResetExpiresAt() {
+	m.expires_at = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (m *CachedQuestionMetadataMutation) SetCreatedAt(t time.Time) {
+func (m *CachedQuestionMetaDataMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
 }
 
 // CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *CachedQuestionMetadataMutation) CreatedAt() (r time.Time, exists bool) {
+func (m *CachedQuestionMetaDataMutation) CreatedAt() (r time.Time, exists bool) {
 	v := m.created_at
 	if v == nil {
 		return
@@ -338,10 +272,10 @@ func (m *CachedQuestionMetadataMutation) CreatedAt() (r time.Time, exists bool) 
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldCreatedAt returns the old "created_at" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *CachedQuestionMetaDataMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -356,17 +290,17 @@ func (m *CachedQuestionMetadataMutation) OldCreatedAt(ctx context.Context) (v ti
 }
 
 // ResetCreatedAt resets all changes to the "created_at" field.
-func (m *CachedQuestionMetadataMutation) ResetCreatedAt() {
+func (m *CachedQuestionMetaDataMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (m *CachedQuestionMetadataMutation) SetUpdatedAt(t time.Time) {
+func (m *CachedQuestionMetaDataMutation) SetUpdatedAt(t time.Time) {
 	m.updated_at = &t
 }
 
 // UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *CachedQuestionMetadataMutation) UpdatedAt() (r time.Time, exists bool) {
+func (m *CachedQuestionMetaDataMutation) UpdatedAt() (r time.Time, exists bool) {
 	v := m.updated_at
 	if v == nil {
 		return
@@ -374,10 +308,10 @@ func (m *CachedQuestionMetadataMutation) UpdatedAt() (r time.Time, exists bool) 
 	return *v, true
 }
 
-// OldUpdatedAt returns the old "updated_at" field's value of the CachedQuestionMetadata entity.
-// If the CachedQuestionMetadata object wasn't provided to the builder, the object is fetched from the database.
+// OldUpdatedAt returns the old "updated_at" field's value of the CachedQuestionMetaData entity.
+// If the CachedQuestionMetaData object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CachedQuestionMetadataMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *CachedQuestionMetaDataMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -392,19 +326,58 @@ func (m *CachedQuestionMetadataMutation) OldUpdatedAt(ctx context.Context) (v ti
 }
 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *CachedQuestionMetadataMutation) ResetUpdatedAt() {
+func (m *CachedQuestionMetaDataMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// Where appends a list predicates to the CachedQuestionMetadataMutation builder.
-func (m *CachedQuestionMetadataMutation) Where(ps ...predicate.CachedQuestionMetadata) {
+// SetExamID sets the "exam" edge to the Exam entity by id.
+func (m *CachedQuestionMetaDataMutation) SetExamID(id int) {
+	m.exam = &id
+}
+
+// ClearExam clears the "exam" edge to the Exam entity.
+func (m *CachedQuestionMetaDataMutation) ClearExam() {
+	m.clearedexam = true
+}
+
+// ExamCleared reports if the "exam" edge to the Exam entity was cleared.
+func (m *CachedQuestionMetaDataMutation) ExamCleared() bool {
+	return m.clearedexam
+}
+
+// ExamID returns the "exam" edge ID in the mutation.
+func (m *CachedQuestionMetaDataMutation) ExamID() (id int, exists bool) {
+	if m.exam != nil {
+		return *m.exam, true
+	}
+	return
+}
+
+// ExamIDs returns the "exam" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ExamID instead. It exists only for internal usage by the builders.
+func (m *CachedQuestionMetaDataMutation) ExamIDs() (ids []int) {
+	if id := m.exam; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetExam resets all changes to the "exam" edge.
+func (m *CachedQuestionMetaDataMutation) ResetExam() {
+	m.exam = nil
+	m.clearedexam = false
+}
+
+// Where appends a list predicates to the CachedQuestionMetaDataMutation builder.
+func (m *CachedQuestionMetaDataMutation) Where(ps ...predicate.CachedQuestionMetaData) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the CachedQuestionMetadataMutation builder. Using this method,
+// WhereP appends storage-level predicates to the CachedQuestionMetaDataMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *CachedQuestionMetadataMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.CachedQuestionMetadata, len(ps))
+func (m *CachedQuestionMetaDataMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.CachedQuestionMetaData, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -412,39 +385,33 @@ func (m *CachedQuestionMetadataMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *CachedQuestionMetadataMutation) Op() Op {
+func (m *CachedQuestionMetaDataMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *CachedQuestionMetadataMutation) SetOp(op Op) {
+func (m *CachedQuestionMetaDataMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (CachedQuestionMetadata).
-func (m *CachedQuestionMetadataMutation) Type() string {
+// Type returns the node type of this mutation (CachedQuestionMetaData).
+func (m *CachedQuestionMetaDataMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *CachedQuestionMetadataMutation) Fields() []string {
-	fields := make([]string, 0, 7)
-	if m.key != nil {
-		fields = append(fields, cachedquestionmetadata.FieldKey)
+func (m *CachedQuestionMetaDataMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.cache_uid != nil {
+		fields = append(fields, cachedquestionmetadata.FieldCacheUID)
 	}
-	if m._type != nil {
-		fields = append(fields, cachedquestionmetadata.FieldType)
+	if m.is_used != nil {
+		fields = append(fields, cachedquestionmetadata.FieldIsUsed)
 	}
-	if m.subject != nil {
-		fields = append(fields, cachedquestionmetadata.FieldSubject)
-	}
-	if m.exam != nil {
-		fields = append(fields, cachedquestionmetadata.FieldExam)
-	}
-	if m.is_processed != nil {
-		fields = append(fields, cachedquestionmetadata.FieldIsProcessed)
+	if m.expires_at != nil {
+		fields = append(fields, cachedquestionmetadata.FieldExpiresAt)
 	}
 	if m.created_at != nil {
 		fields = append(fields, cachedquestionmetadata.FieldCreatedAt)
@@ -458,18 +425,14 @@ func (m *CachedQuestionMetadataMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *CachedQuestionMetadataMutation) Field(name string) (ent.Value, bool) {
+func (m *CachedQuestionMetaDataMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
-		return m.Key()
-	case cachedquestionmetadata.FieldType:
-		return m.GetType()
-	case cachedquestionmetadata.FieldSubject:
-		return m.Subject()
-	case cachedquestionmetadata.FieldExam:
-		return m.Exam()
-	case cachedquestionmetadata.FieldIsProcessed:
-		return m.IsProcessed()
+	case cachedquestionmetadata.FieldCacheUID:
+		return m.CacheUID()
+	case cachedquestionmetadata.FieldIsUsed:
+		return m.IsUsed()
+	case cachedquestionmetadata.FieldExpiresAt:
+		return m.ExpiresAt()
 	case cachedquestionmetadata.FieldCreatedAt:
 		return m.CreatedAt()
 	case cachedquestionmetadata.FieldUpdatedAt:
@@ -481,65 +444,47 @@ func (m *CachedQuestionMetadataMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *CachedQuestionMetadataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *CachedQuestionMetaDataMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
-		return m.OldKey(ctx)
-	case cachedquestionmetadata.FieldType:
-		return m.OldType(ctx)
-	case cachedquestionmetadata.FieldSubject:
-		return m.OldSubject(ctx)
-	case cachedquestionmetadata.FieldExam:
-		return m.OldExam(ctx)
-	case cachedquestionmetadata.FieldIsProcessed:
-		return m.OldIsProcessed(ctx)
+	case cachedquestionmetadata.FieldCacheUID:
+		return m.OldCacheUID(ctx)
+	case cachedquestionmetadata.FieldIsUsed:
+		return m.OldIsUsed(ctx)
+	case cachedquestionmetadata.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
 	case cachedquestionmetadata.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case cachedquestionmetadata.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
 	}
-	return nil, fmt.Errorf("unknown CachedQuestionMetadata field %s", name)
+	return nil, fmt.Errorf("unknown CachedQuestionMetaData field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *CachedQuestionMetadataMutation) SetField(name string, value ent.Value) error {
+func (m *CachedQuestionMetaDataMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
+	case cachedquestionmetadata.FieldCacheUID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetKey(v)
+		m.SetCacheUID(v)
 		return nil
-	case cachedquestionmetadata.FieldType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetType(v)
-		return nil
-	case cachedquestionmetadata.FieldSubject:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSubject(v)
-		return nil
-	case cachedquestionmetadata.FieldExam:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetExam(v)
-		return nil
-	case cachedquestionmetadata.FieldIsProcessed:
+	case cachedquestionmetadata.FieldIsUsed:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsProcessed(v)
+		m.SetIsUsed(v)
+		return nil
+	case cachedquestionmetadata.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
 		return nil
 	case cachedquestionmetadata.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -556,68 +501,62 @@ func (m *CachedQuestionMetadataMutation) SetField(name string, value ent.Value) 
 		m.SetUpdatedAt(v)
 		return nil
 	}
-	return fmt.Errorf("unknown CachedQuestionMetadata field %s", name)
+	return fmt.Errorf("unknown CachedQuestionMetaData field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *CachedQuestionMetadataMutation) AddedFields() []string {
+func (m *CachedQuestionMetaDataMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *CachedQuestionMetadataMutation) AddedField(name string) (ent.Value, bool) {
+func (m *CachedQuestionMetaDataMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *CachedQuestionMetadataMutation) AddField(name string, value ent.Value) error {
+func (m *CachedQuestionMetaDataMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown CachedQuestionMetadata numeric field %s", name)
+	return fmt.Errorf("unknown CachedQuestionMetaData numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *CachedQuestionMetadataMutation) ClearedFields() []string {
+func (m *CachedQuestionMetaDataMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *CachedQuestionMetadataMutation) FieldCleared(name string) bool {
+func (m *CachedQuestionMetaDataMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown CachedQuestionMetadata nullable field %s", name)
+func (m *CachedQuestionMetaDataMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown CachedQuestionMetaData nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ResetField(name string) error {
+func (m *CachedQuestionMetaDataMutation) ResetField(name string) error {
 	switch name {
-	case cachedquestionmetadata.FieldKey:
-		m.ResetKey()
+	case cachedquestionmetadata.FieldCacheUID:
+		m.ResetCacheUID()
 		return nil
-	case cachedquestionmetadata.FieldType:
-		m.ResetType()
+	case cachedquestionmetadata.FieldIsUsed:
+		m.ResetIsUsed()
 		return nil
-	case cachedquestionmetadata.FieldSubject:
-		m.ResetSubject()
-		return nil
-	case cachedquestionmetadata.FieldExam:
-		m.ResetExam()
-		return nil
-	case cachedquestionmetadata.FieldIsProcessed:
-		m.ResetIsProcessed()
+	case cachedquestionmetadata.FieldExpiresAt:
+		m.ResetExpiresAt()
 		return nil
 	case cachedquestionmetadata.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -626,53 +565,2347 @@ func (m *CachedQuestionMetadataMutation) ResetField(name string) error {
 		m.ResetUpdatedAt()
 		return nil
 	}
-	return fmt.Errorf("unknown CachedQuestionMetadata field %s", name)
+	return fmt.Errorf("unknown CachedQuestionMetaData field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *CachedQuestionMetadataMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *CachedQuestionMetaDataMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.exam != nil {
+		edges = append(edges, cachedquestionmetadata.EdgeExam)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *CachedQuestionMetadataMutation) AddedIDs(name string) []ent.Value {
+func (m *CachedQuestionMetaDataMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		if id := m.exam; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *CachedQuestionMetadataMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *CachedQuestionMetaDataMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *CachedQuestionMetadataMutation) RemovedIDs(name string) []ent.Value {
+func (m *CachedQuestionMetaDataMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *CachedQuestionMetadataMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *CachedQuestionMetaDataMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedexam {
+		edges = append(edges, cachedquestionmetadata.EdgeExam)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *CachedQuestionMetadataMutation) EdgeCleared(name string) bool {
+func (m *CachedQuestionMetaDataMutation) EdgeCleared(name string) bool {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		return m.clearedexam
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown CachedQuestionMetadata unique edge %s", name)
+func (m *CachedQuestionMetaDataMutation) ClearEdge(name string) error {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		m.ClearExam()
+		return nil
+	}
+	return fmt.Errorf("unknown CachedQuestionMetaData unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *CachedQuestionMetadataMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown CachedQuestionMetadata edge %s", name)
+func (m *CachedQuestionMetaDataMutation) ResetEdge(name string) error {
+	switch name {
+	case cachedquestionmetadata.EdgeExam:
+		m.ResetExam()
+		return nil
+	}
+	return fmt.Errorf("unknown CachedQuestionMetaData edge %s", name)
+}
+
+// ExamMutation represents an operation that mutates the Exam nodes in the graph.
+type ExamMutation struct {
+	config
+	op                              Op
+	typ                             string
+	id                              *int
+	name                            *string
+	description                     *string
+	is_active                       *bool
+	created_at                      *time.Time
+	updated_at                      *time.Time
+	clearedFields                   map[string]struct{}
+	category                        *int
+	clearedcategory                 bool
+	setting                         *int
+	clearedsetting                  bool
+	cached_question_metadata        map[int]struct{}
+	removedcached_question_metadata map[int]struct{}
+	clearedcached_question_metadata bool
+	done                            bool
+	oldValue                        func(context.Context) (*Exam, error)
+	predicates                      []predicate.Exam
+}
+
+var _ ent.Mutation = (*ExamMutation)(nil)
+
+// examOption allows management of the mutation configuration using functional options.
+type examOption func(*ExamMutation)
+
+// newExamMutation creates new mutation for the Exam entity.
+func newExamMutation(c config, op Op, opts ...examOption) *ExamMutation {
+	m := &ExamMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeExam,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withExamID sets the ID field of the mutation.
+func withExamID(id int) examOption {
+	return func(m *ExamMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Exam
+		)
+		m.oldValue = func(ctx context.Context) (*Exam, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Exam.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withExam sets the old Exam of the mutation.
+func withExam(node *Exam) examOption {
+	return func(m *ExamMutation) {
+		m.oldValue = func(context.Context) (*Exam, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ExamMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ExamMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ExamMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ExamMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Exam.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *ExamMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ExamMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ExamMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *ExamMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ExamMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ExamMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetIsActive sets the "is_active" field.
+func (m *ExamMutation) SetIsActive(b bool) {
+	m.is_active = &b
+}
+
+// IsActive returns the value of the "is_active" field in the mutation.
+func (m *ExamMutation) IsActive() (r bool, exists bool) {
+	v := m.is_active
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsActive returns the old "is_active" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldIsActive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsActive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
+	}
+	return oldValue.IsActive, nil
+}
+
+// ResetIsActive resets all changes to the "is_active" field.
+func (m *ExamMutation) ResetIsActive() {
+	m.is_active = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ExamMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ExamMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ExamMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ExamMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ExamMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ExamMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetCategoryID sets the "category" edge to the ExamCategory entity by id.
+func (m *ExamMutation) SetCategoryID(id int) {
+	m.category = &id
+}
+
+// ClearCategory clears the "category" edge to the ExamCategory entity.
+func (m *ExamMutation) ClearCategory() {
+	m.clearedcategory = true
+}
+
+// CategoryCleared reports if the "category" edge to the ExamCategory entity was cleared.
+func (m *ExamMutation) CategoryCleared() bool {
+	return m.clearedcategory
+}
+
+// CategoryID returns the "category" edge ID in the mutation.
+func (m *ExamMutation) CategoryID() (id int, exists bool) {
+	if m.category != nil {
+		return *m.category, true
+	}
+	return
+}
+
+// CategoryIDs returns the "category" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CategoryID instead. It exists only for internal usage by the builders.
+func (m *ExamMutation) CategoryIDs() (ids []int) {
+	if id := m.category; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCategory resets all changes to the "category" edge.
+func (m *ExamMutation) ResetCategory() {
+	m.category = nil
+	m.clearedcategory = false
+}
+
+// SetSettingID sets the "setting" edge to the ExamSetting entity by id.
+func (m *ExamMutation) SetSettingID(id int) {
+	m.setting = &id
+}
+
+// ClearSetting clears the "setting" edge to the ExamSetting entity.
+func (m *ExamMutation) ClearSetting() {
+	m.clearedsetting = true
+}
+
+// SettingCleared reports if the "setting" edge to the ExamSetting entity was cleared.
+func (m *ExamMutation) SettingCleared() bool {
+	return m.clearedsetting
+}
+
+// SettingID returns the "setting" edge ID in the mutation.
+func (m *ExamMutation) SettingID() (id int, exists bool) {
+	if m.setting != nil {
+		return *m.setting, true
+	}
+	return
+}
+
+// SettingIDs returns the "setting" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SettingID instead. It exists only for internal usage by the builders.
+func (m *ExamMutation) SettingIDs() (ids []int) {
+	if id := m.setting; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSetting resets all changes to the "setting" edge.
+func (m *ExamMutation) ResetSetting() {
+	m.setting = nil
+	m.clearedsetting = false
+}
+
+// AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by ids.
+func (m *ExamMutation) AddCachedQuestionMetadatumIDs(ids ...int) {
+	if m.cached_question_metadata == nil {
+		m.cached_question_metadata = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.cached_question_metadata[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCachedQuestionMetadata clears the "cached_question_metadata" edge to the CachedQuestionMetaData entity.
+func (m *ExamMutation) ClearCachedQuestionMetadata() {
+	m.clearedcached_question_metadata = true
+}
+
+// CachedQuestionMetadataCleared reports if the "cached_question_metadata" edge to the CachedQuestionMetaData entity was cleared.
+func (m *ExamMutation) CachedQuestionMetadataCleared() bool {
+	return m.clearedcached_question_metadata
+}
+
+// RemoveCachedQuestionMetadatumIDs removes the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
+func (m *ExamMutation) RemoveCachedQuestionMetadatumIDs(ids ...int) {
+	if m.removedcached_question_metadata == nil {
+		m.removedcached_question_metadata = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.cached_question_metadata, ids[i])
+		m.removedcached_question_metadata[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCachedQuestionMetadata returns the removed IDs of the "cached_question_metadata" edge to the CachedQuestionMetaData entity.
+func (m *ExamMutation) RemovedCachedQuestionMetadataIDs() (ids []int) {
+	for id := range m.removedcached_question_metadata {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CachedQuestionMetadataIDs returns the "cached_question_metadata" edge IDs in the mutation.
+func (m *ExamMutation) CachedQuestionMetadataIDs() (ids []int) {
+	for id := range m.cached_question_metadata {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCachedQuestionMetadata resets all changes to the "cached_question_metadata" edge.
+func (m *ExamMutation) ResetCachedQuestionMetadata() {
+	m.cached_question_metadata = nil
+	m.clearedcached_question_metadata = false
+	m.removedcached_question_metadata = nil
+}
+
+// Where appends a list predicates to the ExamMutation builder.
+func (m *ExamMutation) Where(ps ...predicate.Exam) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ExamMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ExamMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Exam, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ExamMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ExamMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Exam).
+func (m *ExamMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ExamMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.name != nil {
+		fields = append(fields, exam.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, exam.FieldDescription)
+	}
+	if m.is_active != nil {
+		fields = append(fields, exam.FieldIsActive)
+	}
+	if m.created_at != nil {
+		fields = append(fields, exam.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, exam.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ExamMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case exam.FieldName:
+		return m.Name()
+	case exam.FieldDescription:
+		return m.Description()
+	case exam.FieldIsActive:
+		return m.IsActive()
+	case exam.FieldCreatedAt:
+		return m.CreatedAt()
+	case exam.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ExamMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case exam.FieldName:
+		return m.OldName(ctx)
+	case exam.FieldDescription:
+		return m.OldDescription(ctx)
+	case exam.FieldIsActive:
+		return m.OldIsActive(ctx)
+	case exam.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case exam.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Exam field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ExamMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case exam.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case exam.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case exam.FieldIsActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsActive(v)
+		return nil
+	case exam.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case exam.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Exam field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ExamMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ExamMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ExamMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Exam numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ExamMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ExamMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ExamMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Exam nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ExamMutation) ResetField(name string) error {
+	switch name {
+	case exam.FieldName:
+		m.ResetName()
+		return nil
+	case exam.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case exam.FieldIsActive:
+		m.ResetIsActive()
+		return nil
+	case exam.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case exam.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Exam field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ExamMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.category != nil {
+		edges = append(edges, exam.EdgeCategory)
+	}
+	if m.setting != nil {
+		edges = append(edges, exam.EdgeSetting)
+	}
+	if m.cached_question_metadata != nil {
+		edges = append(edges, exam.EdgeCachedQuestionMetadata)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ExamMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case exam.EdgeCategory:
+		if id := m.category; id != nil {
+			return []ent.Value{*id}
+		}
+	case exam.EdgeSetting:
+		if id := m.setting; id != nil {
+			return []ent.Value{*id}
+		}
+	case exam.EdgeCachedQuestionMetadata:
+		ids := make([]ent.Value, 0, len(m.cached_question_metadata))
+		for id := range m.cached_question_metadata {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ExamMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedcached_question_metadata != nil {
+		edges = append(edges, exam.EdgeCachedQuestionMetadata)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ExamMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case exam.EdgeCachedQuestionMetadata:
+		ids := make([]ent.Value, 0, len(m.removedcached_question_metadata))
+		for id := range m.removedcached_question_metadata {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ExamMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedcategory {
+		edges = append(edges, exam.EdgeCategory)
+	}
+	if m.clearedsetting {
+		edges = append(edges, exam.EdgeSetting)
+	}
+	if m.clearedcached_question_metadata {
+		edges = append(edges, exam.EdgeCachedQuestionMetadata)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ExamMutation) EdgeCleared(name string) bool {
+	switch name {
+	case exam.EdgeCategory:
+		return m.clearedcategory
+	case exam.EdgeSetting:
+		return m.clearedsetting
+	case exam.EdgeCachedQuestionMetadata:
+		return m.clearedcached_question_metadata
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ExamMutation) ClearEdge(name string) error {
+	switch name {
+	case exam.EdgeCategory:
+		m.ClearCategory()
+		return nil
+	case exam.EdgeSetting:
+		m.ClearSetting()
+		return nil
+	}
+	return fmt.Errorf("unknown Exam unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ExamMutation) ResetEdge(name string) error {
+	switch name {
+	case exam.EdgeCategory:
+		m.ResetCategory()
+		return nil
+	case exam.EdgeSetting:
+		m.ResetSetting()
+		return nil
+	case exam.EdgeCachedQuestionMetadata:
+		m.ResetCachedQuestionMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown Exam edge %s", name)
+}
+
+// ExamCategoryMutation represents an operation that mutates the ExamCategory nodes in the graph.
+type ExamCategoryMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	description   *string
+	is_active     *bool
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	exams         map[int]struct{}
+	removedexams  map[int]struct{}
+	clearedexams  bool
+	done          bool
+	oldValue      func(context.Context) (*ExamCategory, error)
+	predicates    []predicate.ExamCategory
+}
+
+var _ ent.Mutation = (*ExamCategoryMutation)(nil)
+
+// examcategoryOption allows management of the mutation configuration using functional options.
+type examcategoryOption func(*ExamCategoryMutation)
+
+// newExamCategoryMutation creates new mutation for the ExamCategory entity.
+func newExamCategoryMutation(c config, op Op, opts ...examcategoryOption) *ExamCategoryMutation {
+	m := &ExamCategoryMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeExamCategory,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withExamCategoryID sets the ID field of the mutation.
+func withExamCategoryID(id int) examcategoryOption {
+	return func(m *ExamCategoryMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ExamCategory
+		)
+		m.oldValue = func(ctx context.Context) (*ExamCategory, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ExamCategory.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withExamCategory sets the old ExamCategory of the mutation.
+func withExamCategory(node *ExamCategory) examcategoryOption {
+	return func(m *ExamCategoryMutation) {
+		m.oldValue = func(context.Context) (*ExamCategory, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ExamCategoryMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ExamCategoryMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ExamCategoryMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ExamCategoryMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ExamCategory.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *ExamCategoryMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ExamCategoryMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ExamCategory entity.
+// If the ExamCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamCategoryMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ExamCategoryMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *ExamCategoryMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ExamCategoryMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the ExamCategory entity.
+// If the ExamCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamCategoryMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ExamCategoryMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetIsActive sets the "is_active" field.
+func (m *ExamCategoryMutation) SetIsActive(b bool) {
+	m.is_active = &b
+}
+
+// IsActive returns the value of the "is_active" field in the mutation.
+func (m *ExamCategoryMutation) IsActive() (r bool, exists bool) {
+	v := m.is_active
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsActive returns the old "is_active" field's value of the ExamCategory entity.
+// If the ExamCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamCategoryMutation) OldIsActive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsActive is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsActive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsActive: %w", err)
+	}
+	return oldValue.IsActive, nil
+}
+
+// ResetIsActive resets all changes to the "is_active" field.
+func (m *ExamCategoryMutation) ResetIsActive() {
+	m.is_active = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ExamCategoryMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ExamCategoryMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ExamCategory entity.
+// If the ExamCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamCategoryMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ExamCategoryMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ExamCategoryMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ExamCategoryMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ExamCategory entity.
+// If the ExamCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamCategoryMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ExamCategoryMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// AddExamIDs adds the "exams" edge to the Exam entity by ids.
+func (m *ExamCategoryMutation) AddExamIDs(ids ...int) {
+	if m.exams == nil {
+		m.exams = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.exams[ids[i]] = struct{}{}
+	}
+}
+
+// ClearExams clears the "exams" edge to the Exam entity.
+func (m *ExamCategoryMutation) ClearExams() {
+	m.clearedexams = true
+}
+
+// ExamsCleared reports if the "exams" edge to the Exam entity was cleared.
+func (m *ExamCategoryMutation) ExamsCleared() bool {
+	return m.clearedexams
+}
+
+// RemoveExamIDs removes the "exams" edge to the Exam entity by IDs.
+func (m *ExamCategoryMutation) RemoveExamIDs(ids ...int) {
+	if m.removedexams == nil {
+		m.removedexams = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.exams, ids[i])
+		m.removedexams[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedExams returns the removed IDs of the "exams" edge to the Exam entity.
+func (m *ExamCategoryMutation) RemovedExamsIDs() (ids []int) {
+	for id := range m.removedexams {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ExamsIDs returns the "exams" edge IDs in the mutation.
+func (m *ExamCategoryMutation) ExamsIDs() (ids []int) {
+	for id := range m.exams {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetExams resets all changes to the "exams" edge.
+func (m *ExamCategoryMutation) ResetExams() {
+	m.exams = nil
+	m.clearedexams = false
+	m.removedexams = nil
+}
+
+// Where appends a list predicates to the ExamCategoryMutation builder.
+func (m *ExamCategoryMutation) Where(ps ...predicate.ExamCategory) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ExamCategoryMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ExamCategoryMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ExamCategory, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ExamCategoryMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ExamCategoryMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ExamCategory).
+func (m *ExamCategoryMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ExamCategoryMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.name != nil {
+		fields = append(fields, examcategory.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, examcategory.FieldDescription)
+	}
+	if m.is_active != nil {
+		fields = append(fields, examcategory.FieldIsActive)
+	}
+	if m.created_at != nil {
+		fields = append(fields, examcategory.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, examcategory.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ExamCategoryMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case examcategory.FieldName:
+		return m.Name()
+	case examcategory.FieldDescription:
+		return m.Description()
+	case examcategory.FieldIsActive:
+		return m.IsActive()
+	case examcategory.FieldCreatedAt:
+		return m.CreatedAt()
+	case examcategory.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ExamCategoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case examcategory.FieldName:
+		return m.OldName(ctx)
+	case examcategory.FieldDescription:
+		return m.OldDescription(ctx)
+	case examcategory.FieldIsActive:
+		return m.OldIsActive(ctx)
+	case examcategory.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case examcategory.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ExamCategory field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ExamCategoryMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case examcategory.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case examcategory.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case examcategory.FieldIsActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsActive(v)
+		return nil
+	case examcategory.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case examcategory.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ExamCategory field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ExamCategoryMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ExamCategoryMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ExamCategoryMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ExamCategory numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ExamCategoryMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ExamCategoryMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ExamCategoryMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ExamCategory nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ExamCategoryMutation) ResetField(name string) error {
+	switch name {
+	case examcategory.FieldName:
+		m.ResetName()
+		return nil
+	case examcategory.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case examcategory.FieldIsActive:
+		m.ResetIsActive()
+		return nil
+	case examcategory.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case examcategory.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ExamCategory field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ExamCategoryMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.exams != nil {
+		edges = append(edges, examcategory.EdgeExams)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ExamCategoryMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case examcategory.EdgeExams:
+		ids := make([]ent.Value, 0, len(m.exams))
+		for id := range m.exams {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ExamCategoryMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedexams != nil {
+		edges = append(edges, examcategory.EdgeExams)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ExamCategoryMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case examcategory.EdgeExams:
+		ids := make([]ent.Value, 0, len(m.removedexams))
+		for id := range m.removedexams {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ExamCategoryMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedexams {
+		edges = append(edges, examcategory.EdgeExams)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ExamCategoryMutation) EdgeCleared(name string) bool {
+	switch name {
+	case examcategory.EdgeExams:
+		return m.clearedexams
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ExamCategoryMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ExamCategory unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ExamCategoryMutation) ResetEdge(name string) error {
+	switch name {
+	case examcategory.EdgeExams:
+		m.ResetExams()
+		return nil
+	}
+	return fmt.Errorf("unknown ExamCategory edge %s", name)
+}
+
+// ExamSettingMutation represents an operation that mutates the ExamSetting nodes in the graph.
+type ExamSettingMutation struct {
+	config
+	op                     Op
+	typ                    string
+	id                     *int
+	number_of_questions    *int
+	addnumber_of_questions *int
+	duration_minutes       *int
+	addduration_minutes    *int
+	negative_marking       *float64
+	addnegative_marking    *float64
+	ai_prompt              *string
+	other_details          *map[string]interface{}
+	created_at             *time.Time
+	updated_at             *time.Time
+	clearedFields          map[string]struct{}
+	exam                   *int
+	clearedexam            bool
+	done                   bool
+	oldValue               func(context.Context) (*ExamSetting, error)
+	predicates             []predicate.ExamSetting
+}
+
+var _ ent.Mutation = (*ExamSettingMutation)(nil)
+
+// examsettingOption allows management of the mutation configuration using functional options.
+type examsettingOption func(*ExamSettingMutation)
+
+// newExamSettingMutation creates new mutation for the ExamSetting entity.
+func newExamSettingMutation(c config, op Op, opts ...examsettingOption) *ExamSettingMutation {
+	m := &ExamSettingMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeExamSetting,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withExamSettingID sets the ID field of the mutation.
+func withExamSettingID(id int) examsettingOption {
+	return func(m *ExamSettingMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ExamSetting
+		)
+		m.oldValue = func(ctx context.Context) (*ExamSetting, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ExamSetting.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withExamSetting sets the old ExamSetting of the mutation.
+func withExamSetting(node *ExamSetting) examsettingOption {
+	return func(m *ExamSettingMutation) {
+		m.oldValue = func(context.Context) (*ExamSetting, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ExamSettingMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ExamSettingMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ExamSettingMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ExamSettingMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ExamSetting.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetNumberOfQuestions sets the "number_of_questions" field.
+func (m *ExamSettingMutation) SetNumberOfQuestions(i int) {
+	m.number_of_questions = &i
+	m.addnumber_of_questions = nil
+}
+
+// NumberOfQuestions returns the value of the "number_of_questions" field in the mutation.
+func (m *ExamSettingMutation) NumberOfQuestions() (r int, exists bool) {
+	v := m.number_of_questions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNumberOfQuestions returns the old "number_of_questions" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldNumberOfQuestions(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNumberOfQuestions is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNumberOfQuestions requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNumberOfQuestions: %w", err)
+	}
+	return oldValue.NumberOfQuestions, nil
+}
+
+// AddNumberOfQuestions adds i to the "number_of_questions" field.
+func (m *ExamSettingMutation) AddNumberOfQuestions(i int) {
+	if m.addnumber_of_questions != nil {
+		*m.addnumber_of_questions += i
+	} else {
+		m.addnumber_of_questions = &i
+	}
+}
+
+// AddedNumberOfQuestions returns the value that was added to the "number_of_questions" field in this mutation.
+func (m *ExamSettingMutation) AddedNumberOfQuestions() (r int, exists bool) {
+	v := m.addnumber_of_questions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetNumberOfQuestions resets all changes to the "number_of_questions" field.
+func (m *ExamSettingMutation) ResetNumberOfQuestions() {
+	m.number_of_questions = nil
+	m.addnumber_of_questions = nil
+}
+
+// SetDurationMinutes sets the "duration_minutes" field.
+func (m *ExamSettingMutation) SetDurationMinutes(i int) {
+	m.duration_minutes = &i
+	m.addduration_minutes = nil
+}
+
+// DurationMinutes returns the value of the "duration_minutes" field in the mutation.
+func (m *ExamSettingMutation) DurationMinutes() (r int, exists bool) {
+	v := m.duration_minutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDurationMinutes returns the old "duration_minutes" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldDurationMinutes(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDurationMinutes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDurationMinutes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDurationMinutes: %w", err)
+	}
+	return oldValue.DurationMinutes, nil
+}
+
+// AddDurationMinutes adds i to the "duration_minutes" field.
+func (m *ExamSettingMutation) AddDurationMinutes(i int) {
+	if m.addduration_minutes != nil {
+		*m.addduration_minutes += i
+	} else {
+		m.addduration_minutes = &i
+	}
+}
+
+// AddedDurationMinutes returns the value that was added to the "duration_minutes" field in this mutation.
+func (m *ExamSettingMutation) AddedDurationMinutes() (r int, exists bool) {
+	v := m.addduration_minutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDurationMinutes resets all changes to the "duration_minutes" field.
+func (m *ExamSettingMutation) ResetDurationMinutes() {
+	m.duration_minutes = nil
+	m.addduration_minutes = nil
+}
+
+// SetNegativeMarking sets the "negative_marking" field.
+func (m *ExamSettingMutation) SetNegativeMarking(f float64) {
+	m.negative_marking = &f
+	m.addnegative_marking = nil
+}
+
+// NegativeMarking returns the value of the "negative_marking" field in the mutation.
+func (m *ExamSettingMutation) NegativeMarking() (r float64, exists bool) {
+	v := m.negative_marking
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNegativeMarking returns the old "negative_marking" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldNegativeMarking(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNegativeMarking is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNegativeMarking requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNegativeMarking: %w", err)
+	}
+	return oldValue.NegativeMarking, nil
+}
+
+// AddNegativeMarking adds f to the "negative_marking" field.
+func (m *ExamSettingMutation) AddNegativeMarking(f float64) {
+	if m.addnegative_marking != nil {
+		*m.addnegative_marking += f
+	} else {
+		m.addnegative_marking = &f
+	}
+}
+
+// AddedNegativeMarking returns the value that was added to the "negative_marking" field in this mutation.
+func (m *ExamSettingMutation) AddedNegativeMarking() (r float64, exists bool) {
+	v := m.addnegative_marking
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearNegativeMarking clears the value of the "negative_marking" field.
+func (m *ExamSettingMutation) ClearNegativeMarking() {
+	m.negative_marking = nil
+	m.addnegative_marking = nil
+	m.clearedFields[examsetting.FieldNegativeMarking] = struct{}{}
+}
+
+// NegativeMarkingCleared returns if the "negative_marking" field was cleared in this mutation.
+func (m *ExamSettingMutation) NegativeMarkingCleared() bool {
+	_, ok := m.clearedFields[examsetting.FieldNegativeMarking]
+	return ok
+}
+
+// ResetNegativeMarking resets all changes to the "negative_marking" field.
+func (m *ExamSettingMutation) ResetNegativeMarking() {
+	m.negative_marking = nil
+	m.addnegative_marking = nil
+	delete(m.clearedFields, examsetting.FieldNegativeMarking)
+}
+
+// SetAiPrompt sets the "ai_prompt" field.
+func (m *ExamSettingMutation) SetAiPrompt(s string) {
+	m.ai_prompt = &s
+}
+
+// AiPrompt returns the value of the "ai_prompt" field in the mutation.
+func (m *ExamSettingMutation) AiPrompt() (r string, exists bool) {
+	v := m.ai_prompt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAiPrompt returns the old "ai_prompt" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldAiPrompt(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAiPrompt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAiPrompt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAiPrompt: %w", err)
+	}
+	return oldValue.AiPrompt, nil
+}
+
+// ClearAiPrompt clears the value of the "ai_prompt" field.
+func (m *ExamSettingMutation) ClearAiPrompt() {
+	m.ai_prompt = nil
+	m.clearedFields[examsetting.FieldAiPrompt] = struct{}{}
+}
+
+// AiPromptCleared returns if the "ai_prompt" field was cleared in this mutation.
+func (m *ExamSettingMutation) AiPromptCleared() bool {
+	_, ok := m.clearedFields[examsetting.FieldAiPrompt]
+	return ok
+}
+
+// ResetAiPrompt resets all changes to the "ai_prompt" field.
+func (m *ExamSettingMutation) ResetAiPrompt() {
+	m.ai_prompt = nil
+	delete(m.clearedFields, examsetting.FieldAiPrompt)
+}
+
+// SetOtherDetails sets the "other_details" field.
+func (m *ExamSettingMutation) SetOtherDetails(value map[string]interface{}) {
+	m.other_details = &value
+}
+
+// OtherDetails returns the value of the "other_details" field in the mutation.
+func (m *ExamSettingMutation) OtherDetails() (r map[string]interface{}, exists bool) {
+	v := m.other_details
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOtherDetails returns the old "other_details" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldOtherDetails(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOtherDetails is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOtherDetails requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOtherDetails: %w", err)
+	}
+	return oldValue.OtherDetails, nil
+}
+
+// ClearOtherDetails clears the value of the "other_details" field.
+func (m *ExamSettingMutation) ClearOtherDetails() {
+	m.other_details = nil
+	m.clearedFields[examsetting.FieldOtherDetails] = struct{}{}
+}
+
+// OtherDetailsCleared returns if the "other_details" field was cleared in this mutation.
+func (m *ExamSettingMutation) OtherDetailsCleared() bool {
+	_, ok := m.clearedFields[examsetting.FieldOtherDetails]
+	return ok
+}
+
+// ResetOtherDetails resets all changes to the "other_details" field.
+func (m *ExamSettingMutation) ResetOtherDetails() {
+	m.other_details = nil
+	delete(m.clearedFields, examsetting.FieldOtherDetails)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ExamSettingMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ExamSettingMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ExamSettingMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ExamSettingMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ExamSettingMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ExamSettingMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetExamID sets the "exam" edge to the Exam entity by id.
+func (m *ExamSettingMutation) SetExamID(id int) {
+	m.exam = &id
+}
+
+// ClearExam clears the "exam" edge to the Exam entity.
+func (m *ExamSettingMutation) ClearExam() {
+	m.clearedexam = true
+}
+
+// ExamCleared reports if the "exam" edge to the Exam entity was cleared.
+func (m *ExamSettingMutation) ExamCleared() bool {
+	return m.clearedexam
+}
+
+// ExamID returns the "exam" edge ID in the mutation.
+func (m *ExamSettingMutation) ExamID() (id int, exists bool) {
+	if m.exam != nil {
+		return *m.exam, true
+	}
+	return
+}
+
+// ExamIDs returns the "exam" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ExamID instead. It exists only for internal usage by the builders.
+func (m *ExamSettingMutation) ExamIDs() (ids []int) {
+	if id := m.exam; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetExam resets all changes to the "exam" edge.
+func (m *ExamSettingMutation) ResetExam() {
+	m.exam = nil
+	m.clearedexam = false
+}
+
+// Where appends a list predicates to the ExamSettingMutation builder.
+func (m *ExamSettingMutation) Where(ps ...predicate.ExamSetting) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ExamSettingMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ExamSettingMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ExamSetting, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ExamSettingMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ExamSettingMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ExamSetting).
+func (m *ExamSettingMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ExamSettingMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.number_of_questions != nil {
+		fields = append(fields, examsetting.FieldNumberOfQuestions)
+	}
+	if m.duration_minutes != nil {
+		fields = append(fields, examsetting.FieldDurationMinutes)
+	}
+	if m.negative_marking != nil {
+		fields = append(fields, examsetting.FieldNegativeMarking)
+	}
+	if m.ai_prompt != nil {
+		fields = append(fields, examsetting.FieldAiPrompt)
+	}
+	if m.other_details != nil {
+		fields = append(fields, examsetting.FieldOtherDetails)
+	}
+	if m.created_at != nil {
+		fields = append(fields, examsetting.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, examsetting.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ExamSettingMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case examsetting.FieldNumberOfQuestions:
+		return m.NumberOfQuestions()
+	case examsetting.FieldDurationMinutes:
+		return m.DurationMinutes()
+	case examsetting.FieldNegativeMarking:
+		return m.NegativeMarking()
+	case examsetting.FieldAiPrompt:
+		return m.AiPrompt()
+	case examsetting.FieldOtherDetails:
+		return m.OtherDetails()
+	case examsetting.FieldCreatedAt:
+		return m.CreatedAt()
+	case examsetting.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ExamSettingMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case examsetting.FieldNumberOfQuestions:
+		return m.OldNumberOfQuestions(ctx)
+	case examsetting.FieldDurationMinutes:
+		return m.OldDurationMinutes(ctx)
+	case examsetting.FieldNegativeMarking:
+		return m.OldNegativeMarking(ctx)
+	case examsetting.FieldAiPrompt:
+		return m.OldAiPrompt(ctx)
+	case examsetting.FieldOtherDetails:
+		return m.OldOtherDetails(ctx)
+	case examsetting.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case examsetting.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ExamSetting field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ExamSettingMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case examsetting.FieldNumberOfQuestions:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNumberOfQuestions(v)
+		return nil
+	case examsetting.FieldDurationMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDurationMinutes(v)
+		return nil
+	case examsetting.FieldNegativeMarking:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNegativeMarking(v)
+		return nil
+	case examsetting.FieldAiPrompt:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAiPrompt(v)
+		return nil
+	case examsetting.FieldOtherDetails:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOtherDetails(v)
+		return nil
+	case examsetting.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case examsetting.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ExamSetting field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ExamSettingMutation) AddedFields() []string {
+	var fields []string
+	if m.addnumber_of_questions != nil {
+		fields = append(fields, examsetting.FieldNumberOfQuestions)
+	}
+	if m.addduration_minutes != nil {
+		fields = append(fields, examsetting.FieldDurationMinutes)
+	}
+	if m.addnegative_marking != nil {
+		fields = append(fields, examsetting.FieldNegativeMarking)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ExamSettingMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case examsetting.FieldNumberOfQuestions:
+		return m.AddedNumberOfQuestions()
+	case examsetting.FieldDurationMinutes:
+		return m.AddedDurationMinutes()
+	case examsetting.FieldNegativeMarking:
+		return m.AddedNegativeMarking()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ExamSettingMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case examsetting.FieldNumberOfQuestions:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddNumberOfQuestions(v)
+		return nil
+	case examsetting.FieldDurationMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDurationMinutes(v)
+		return nil
+	case examsetting.FieldNegativeMarking:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddNegativeMarking(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ExamSetting numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ExamSettingMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(examsetting.FieldNegativeMarking) {
+		fields = append(fields, examsetting.FieldNegativeMarking)
+	}
+	if m.FieldCleared(examsetting.FieldAiPrompt) {
+		fields = append(fields, examsetting.FieldAiPrompt)
+	}
+	if m.FieldCleared(examsetting.FieldOtherDetails) {
+		fields = append(fields, examsetting.FieldOtherDetails)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ExamSettingMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ExamSettingMutation) ClearField(name string) error {
+	switch name {
+	case examsetting.FieldNegativeMarking:
+		m.ClearNegativeMarking()
+		return nil
+	case examsetting.FieldAiPrompt:
+		m.ClearAiPrompt()
+		return nil
+	case examsetting.FieldOtherDetails:
+		m.ClearOtherDetails()
+		return nil
+	}
+	return fmt.Errorf("unknown ExamSetting nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ExamSettingMutation) ResetField(name string) error {
+	switch name {
+	case examsetting.FieldNumberOfQuestions:
+		m.ResetNumberOfQuestions()
+		return nil
+	case examsetting.FieldDurationMinutes:
+		m.ResetDurationMinutes()
+		return nil
+	case examsetting.FieldNegativeMarking:
+		m.ResetNegativeMarking()
+		return nil
+	case examsetting.FieldAiPrompt:
+		m.ResetAiPrompt()
+		return nil
+	case examsetting.FieldOtherDetails:
+		m.ResetOtherDetails()
+		return nil
+	case examsetting.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case examsetting.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ExamSetting field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ExamSettingMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.exam != nil {
+		edges = append(edges, examsetting.EdgeExam)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ExamSettingMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case examsetting.EdgeExam:
+		if id := m.exam; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ExamSettingMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ExamSettingMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ExamSettingMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedexam {
+		edges = append(edges, examsetting.EdgeExam)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ExamSettingMutation) EdgeCleared(name string) bool {
+	switch name {
+	case examsetting.EdgeExam:
+		return m.clearedexam
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ExamSettingMutation) ClearEdge(name string) error {
+	switch name {
+	case examsetting.EdgeExam:
+		m.ClearExam()
+		return nil
+	}
+	return fmt.Errorf("unknown ExamSetting unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ExamSettingMutation) ResetEdge(name string) error {
+	switch name {
+	case examsetting.EdgeExam:
+		m.ResetExam()
+		return nil
+	}
+	return fmt.Errorf("unknown ExamSetting edge %s", name)
 }

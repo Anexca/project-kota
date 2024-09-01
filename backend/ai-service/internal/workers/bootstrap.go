@@ -2,6 +2,8 @@ package workers
 
 import (
 	"ai-service/internal/services"
+	"common/ent"
+	"context"
 	"log"
 
 	"cloud.google.com/go/vertexai/genai"
@@ -10,18 +12,18 @@ import (
 )
 
 type Worker struct {
-	cronHandler     *cron.Cron
-	questionService *services.QuestionService
+	cronHandler *cron.Cron
+	examService *services.ExamService
 }
 
-func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client) *cron.Cron {
+func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 	c := cron.New()
 
-	questionService := services.NewQuestionService(genAiClient, redisClient)
+	examService := services.NewExamService(genAiClient, redisClient, dbClient)
 
 	worker := &Worker{
-		cronHandler:     c,
-		questionService: questionService,
+		cronHandler: c,
+		examService: examService,
 	}
 
 	worker.RegisterWorkers()
@@ -31,11 +33,11 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client) *cron.Cro
 
 func (w *Worker) RegisterWorkers() {
 	w.cronHandler.AddFunc("*/1 * * * *", func() {
-		// ctx := context.Background()
-		log.Println("Every Minute")
-		// _, err := w.questionService.GenerateDescriptiveQuestions(ctx, "IBPS PO Mains", 10)
-		// if err != nil {
-		// 	log.Printf("Failed to generate questions: %v", err)
-		// }
+		log.Println("Starting Worker Job for Populating Exam Question Cache")
+		ctx := context.Background()
+		err := w.examService.PopulateExamQuestionCache(ctx)
+		if err != nil {
+			log.Printf("Failed to generate questions: %v", err)
+		}
 	})
 }
