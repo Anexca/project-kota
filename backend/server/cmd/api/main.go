@@ -22,7 +22,12 @@ func main() {
 	}
 	defer dbClient.Close()
 
-	server := server.InitServer(redisClient, dbClient)
+	supabaseClient, err := client.NewSupabaseClient()
+	if err != nil {
+		log.Fatalln("cannot connect to supabase", err)
+	}
+
+	server := server.InitServer(redisClient, dbClient, supabaseClient)
 
 	log.Println("Starting server on address", server.Addr)
 	err = server.ListenAndServe()
