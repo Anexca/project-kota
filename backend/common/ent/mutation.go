@@ -3101,9 +3101,22 @@ func (m *UserMutation) OldFirstName(ctx context.Context) (v string, err error) {
 	return oldValue.FirstName, nil
 }
 
+// ClearFirstName clears the value of the "first_name" field.
+func (m *UserMutation) ClearFirstName() {
+	m.first_name = nil
+	m.clearedFields[user.FieldFirstName] = struct{}{}
+}
+
+// FirstNameCleared returns if the "first_name" field was cleared in this mutation.
+func (m *UserMutation) FirstNameCleared() bool {
+	_, ok := m.clearedFields[user.FieldFirstName]
+	return ok
+}
+
 // ResetFirstName resets all changes to the "first_name" field.
 func (m *UserMutation) ResetFirstName() {
 	m.first_name = nil
+	delete(m.clearedFields, user.FieldFirstName)
 }
 
 // SetLastName sets the "last_name" field.
@@ -3137,9 +3150,22 @@ func (m *UserMutation) OldLastName(ctx context.Context) (v string, err error) {
 	return oldValue.LastName, nil
 }
 
+// ClearLastName clears the value of the "last_name" field.
+func (m *UserMutation) ClearLastName() {
+	m.last_name = nil
+	m.clearedFields[user.FieldLastName] = struct{}{}
+}
+
+// LastNameCleared returns if the "last_name" field was cleared in this mutation.
+func (m *UserMutation) LastNameCleared() bool {
+	_, ok := m.clearedFields[user.FieldLastName]
+	return ok
+}
+
 // ResetLastName resets all changes to the "last_name" field.
 func (m *UserMutation) ResetLastName() {
 	m.last_name = nil
+	delete(m.clearedFields, user.FieldLastName)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -3374,7 +3400,14 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldFirstName) {
+		fields = append(fields, user.FieldFirstName)
+	}
+	if m.FieldCleared(user.FieldLastName) {
+		fields = append(fields, user.FieldLastName)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3387,6 +3420,14 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldFirstName:
+		m.ClearFirstName()
+		return nil
+	case user.FieldLastName:
+		m.ClearLastName()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 

@@ -33,9 +33,25 @@ func (uc *UserCreate) SetFirstName(s string) *UserCreate {
 	return uc
 }
 
+// SetNillableFirstName sets the "first_name" field if the given value is not nil.
+func (uc *UserCreate) SetNillableFirstName(s *string) *UserCreate {
+	if s != nil {
+		uc.SetFirstName(*s)
+	}
+	return uc
+}
+
 // SetLastName sets the "last_name" field.
 func (uc *UserCreate) SetLastName(s string) *UserCreate {
 	uc.mutation.SetLastName(s)
+	return uc
+}
+
+// SetNillableLastName sets the "last_name" field if the given value is not nil.
+func (uc *UserCreate) SetNillableLastName(s *string) *UserCreate {
+	if s != nil {
+		uc.SetLastName(*s)
+	}
 	return uc
 }
 
@@ -127,12 +143,6 @@ func (uc *UserCreate) check() error {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
 		}
-	}
-	if _, ok := uc.mutation.FirstName(); !ok {
-		return &ValidationError{Name: "first_name", err: errors.New(`ent: missing required field "User.first_name"`)}
-	}
-	if _, ok := uc.mutation.LastName(); !ok {
-		return &ValidationError{Name: "last_name", err: errors.New(`ent: missing required field "User.last_name"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}

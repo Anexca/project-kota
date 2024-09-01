@@ -21,8 +21,8 @@ func (User) Fields() []ent.Field {
 		field.String("email").
 			Unique().
 			NotEmpty(),
-		field.String("first_name"),
-		field.String("last_name"),
+		field.String("first_name").Optional(),
+		field.String("last_name").Optional(),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),
