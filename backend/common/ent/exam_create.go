@@ -7,7 +7,7 @@ import (
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
-	"common/ent/question"
+	"common/ent/generatedexam"
 	"context"
 	"errors"
 	"fmt"
@@ -131,19 +131,19 @@ func (ec *ExamCreate) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData) *E
 	return ec.AddCachedQuestionMetadatumIDs(ids...)
 }
 
-// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (ec *ExamCreate) AddQuestionIDs(ids ...int) *ExamCreate {
-	ec.mutation.AddQuestionIDs(ids...)
+// AddGeneratedexamIDs adds the "generatedexams" edge to the GeneratedExam entity by IDs.
+func (ec *ExamCreate) AddGeneratedexamIDs(ids ...int) *ExamCreate {
+	ec.mutation.AddGeneratedexamIDs(ids...)
 	return ec
 }
 
-// AddQuestions adds the "questions" edges to the Question entity.
-func (ec *ExamCreate) AddQuestions(q ...*Question) *ExamCreate {
-	ids := make([]int, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+// AddGeneratedexams adds the "generatedexams" edges to the GeneratedExam entity.
+func (ec *ExamCreate) AddGeneratedexams(g ...*GeneratedExam) *ExamCreate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
 	}
-	return ec.AddQuestionIDs(ids...)
+	return ec.AddGeneratedexamIDs(ids...)
 }
 
 // Mutation returns the ExamMutation object of the builder.
@@ -307,15 +307,15 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.QuestionsIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.GeneratedexamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.QuestionsTable,
-			Columns: []string{exam.QuestionsColumn},
+			Table:   exam.GeneratedexamsTable,
+			Columns: []string{exam.GeneratedexamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

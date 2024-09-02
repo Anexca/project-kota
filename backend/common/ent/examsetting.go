@@ -29,6 +29,10 @@ type ExamSetting struct {
 	AiPrompt string `json:"ai_prompt,omitempty"`
 	// OtherDetails holds the value of the "other_details" field.
 	OtherDetails map[string]interface{} `json:"other_details,omitempty"`
+	// MaxAttempts holds the value of the "max_attempts" field.
+	MaxAttempts int `json:"max_attempts,omitempty"`
+	// EvaluationAiPrompt holds the value of the "evaluation_ai_prompt" field.
+	EvaluationAiPrompt string `json:"evaluation_ai_prompt,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -69,9 +73,9 @@ func (*ExamSetting) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case examsetting.FieldNegativeMarking:
 			values[i] = new(sql.NullFloat64)
-		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationMinutes:
+		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationMinutes, examsetting.FieldMaxAttempts:
 			values[i] = new(sql.NullInt64)
-		case examsetting.FieldAiPrompt:
+		case examsetting.FieldAiPrompt, examsetting.FieldEvaluationAiPrompt:
 			values[i] = new(sql.NullString)
 		case examsetting.FieldCreatedAt, examsetting.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -129,6 +133,18 @@ func (es *ExamSetting) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &es.OtherDetails); err != nil {
 					return fmt.Errorf("unmarshal field other_details: %w", err)
 				}
+			}
+		case examsetting.FieldMaxAttempts:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field max_attempts", values[i])
+			} else if value.Valid {
+				es.MaxAttempts = int(value.Int64)
+			}
+		case examsetting.FieldEvaluationAiPrompt:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field evaluation_ai_prompt", values[i])
+			} else if value.Valid {
+				es.EvaluationAiPrompt = value.String
 			}
 		case examsetting.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -204,6 +220,12 @@ func (es *ExamSetting) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("other_details=")
 	builder.WriteString(fmt.Sprintf("%v", es.OtherDetails))
+	builder.WriteString(", ")
+	builder.WriteString("max_attempts=")
+	builder.WriteString(fmt.Sprintf("%v", es.MaxAttempts))
+	builder.WriteString(", ")
+	builder.WriteString("evaluation_ai_prompt=")
+	builder.WriteString(es.EvaluationAiPrompt)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(es.CreatedAt.Format(time.ANSIC))

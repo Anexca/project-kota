@@ -9,30 +9,30 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// Question holds the schema definition for the Question entity.
-type Question struct {
+// GeneratedExam holds the schema definition for the GeneratedExam entity.
+type GeneratedExam struct {
 	ent.Schema
 }
 
-// Fields of the Question.
-func (Question) Fields() []ent.Field {
+// Fields of the GeneratedExam.
+func (GeneratedExam) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("is_active").Default(true),
-		field.JSON("raw_question_data", map[string]interface{}{}).
+		field.JSON("raw_exam_data", map[string]interface{}{}).
 			Optional().
 			SchemaType(map[string]string{
-				dialect.Postgres: "json",
+				dialect.Postgres: "jsonb",
 			}),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 
-// Edges of the Question.
-func (Question) Edges() []ent.Edge {
+// Edges of the GeneratedExam.
+func (GeneratedExam) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("exam", Exam.Type).
-			Ref("questions").
+			Ref("generatedexams").
 			Unique(), // Many Questions have one Exam
 	}
 }

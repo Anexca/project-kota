@@ -30,8 +30,8 @@ const (
 	EdgeSetting = "setting"
 	// EdgeCachedQuestionMetadata holds the string denoting the cached_question_metadata edge name in mutations.
 	EdgeCachedQuestionMetadata = "cached_question_metadata"
-	// EdgeQuestions holds the string denoting the questions edge name in mutations.
-	EdgeQuestions = "questions"
+	// EdgeGeneratedexams holds the string denoting the generatedexams edge name in mutations.
+	EdgeGeneratedexams = "generatedexams"
 	// Table holds the table name of the exam in the database.
 	Table = "exams"
 	// CategoryTable is the table that holds the category relation/edge.
@@ -55,13 +55,13 @@ const (
 	CachedQuestionMetadataInverseTable = "cached_question_meta_data"
 	// CachedQuestionMetadataColumn is the table column denoting the cached_question_metadata relation/edge.
 	CachedQuestionMetadataColumn = "exam_cached_question_metadata"
-	// QuestionsTable is the table that holds the questions relation/edge.
-	QuestionsTable = "questions"
-	// QuestionsInverseTable is the table name for the Question entity.
-	// It exists in this package in order to avoid circular dependency with the "question" package.
-	QuestionsInverseTable = "questions"
-	// QuestionsColumn is the table column denoting the questions relation/edge.
-	QuestionsColumn = "exam_questions"
+	// GeneratedexamsTable is the table that holds the generatedexams relation/edge.
+	GeneratedexamsTable = "generated_exams"
+	// GeneratedexamsInverseTable is the table name for the GeneratedExam entity.
+	// It exists in this package in order to avoid circular dependency with the "generatedexam" package.
+	GeneratedexamsInverseTable = "generated_exams"
+	// GeneratedexamsColumn is the table column denoting the generatedexams relation/edge.
+	GeneratedexamsColumn = "exam_generatedexams"
 )
 
 // Columns holds all SQL columns for exam fields.
@@ -167,17 +167,17 @@ func ByCachedQuestionMetadata(term sql.OrderTerm, terms ...sql.OrderTerm) OrderO
 	}
 }
 
-// ByQuestionsCount orders the results by questions count.
-func ByQuestionsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByGeneratedexamsCount orders the results by generatedexams count.
+func ByGeneratedexamsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newQuestionsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newGeneratedexamsStep(), opts...)
 	}
 }
 
-// ByQuestions orders the results by questions terms.
-func ByQuestions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByGeneratedexams orders the results by generatedexams terms.
+func ByGeneratedexams(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newQuestionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newGeneratedexamsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCategoryStep() *sqlgraph.Step {
@@ -201,10 +201,10 @@ func newCachedQuestionMetadataStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, CachedQuestionMetadataTable, CachedQuestionMetadataColumn),
 	)
 }
-func newQuestionsStep() *sqlgraph.Step {
+func newGeneratedexamsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(QuestionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, QuestionsTable, QuestionsColumn),
+		sqlgraph.To(GeneratedexamsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, GeneratedexamsTable, GeneratedexamsColumn),
 	)
 }

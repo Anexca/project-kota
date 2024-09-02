@@ -36,6 +36,6 @@ func (Exam) Edges() []ent.Edge {
 
 		edge.To("cached_question_metadata", CachedQuestionMetaData.Type),
 
-		edge.To("questions", Question.Type), // One Exam can have many Questions
+		edge.To("generatedexams", GeneratedExam.Type), // One Exam can have many Questions
 	}
 }

@@ -75,6 +75,16 @@ func AiPrompt(v string) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldAiPrompt, v))
 }
 
+// MaxAttempts applies equality check predicate on the "max_attempts" field. It's identical to MaxAttemptsEQ.
+func MaxAttempts(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldMaxAttempts, v))
+}
+
+// EvaluationAiPrompt applies equality check predicate on the "evaluation_ai_prompt" field. It's identical to EvaluationAiPromptEQ.
+func EvaluationAiPrompt(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldEvaluationAiPrompt, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldCreatedAt, v))
@@ -298,6 +308,121 @@ func OtherDetailsIsNil() predicate.ExamSetting {
 // OtherDetailsNotNil applies the NotNil predicate on the "other_details" field.
 func OtherDetailsNotNil() predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldNotNull(FieldOtherDetails))
+}
+
+// MaxAttemptsEQ applies the EQ predicate on the "max_attempts" field.
+func MaxAttemptsEQ(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldMaxAttempts, v))
+}
+
+// MaxAttemptsNEQ applies the NEQ predicate on the "max_attempts" field.
+func MaxAttemptsNEQ(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldMaxAttempts, v))
+}
+
+// MaxAttemptsIn applies the In predicate on the "max_attempts" field.
+func MaxAttemptsIn(vs ...int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldMaxAttempts, vs...))
+}
+
+// MaxAttemptsNotIn applies the NotIn predicate on the "max_attempts" field.
+func MaxAttemptsNotIn(vs ...int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldMaxAttempts, vs...))
+}
+
+// MaxAttemptsGT applies the GT predicate on the "max_attempts" field.
+func MaxAttemptsGT(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldMaxAttempts, v))
+}
+
+// MaxAttemptsGTE applies the GTE predicate on the "max_attempts" field.
+func MaxAttemptsGTE(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldMaxAttempts, v))
+}
+
+// MaxAttemptsLT applies the LT predicate on the "max_attempts" field.
+func MaxAttemptsLT(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldMaxAttempts, v))
+}
+
+// MaxAttemptsLTE applies the LTE predicate on the "max_attempts" field.
+func MaxAttemptsLTE(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldMaxAttempts, v))
+}
+
+// EvaluationAiPromptEQ applies the EQ predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptEQ(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptNEQ applies the NEQ predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptNEQ(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptIn applies the In predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptIn(vs ...string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldEvaluationAiPrompt, vs...))
+}
+
+// EvaluationAiPromptNotIn applies the NotIn predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptNotIn(vs ...string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldEvaluationAiPrompt, vs...))
+}
+
+// EvaluationAiPromptGT applies the GT predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptGT(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptGTE applies the GTE predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptGTE(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptLT applies the LT predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptLT(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptLTE applies the LTE predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptLTE(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptContains applies the Contains predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptContains(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldContains(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptHasPrefix applies the HasPrefix predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptHasPrefix(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldHasPrefix(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptHasSuffix applies the HasSuffix predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptHasSuffix(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldHasSuffix(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptIsNil applies the IsNil predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptIsNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIsNull(FieldEvaluationAiPrompt))
+}
+
+// EvaluationAiPromptNotNil applies the NotNil predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptNotNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotNull(FieldEvaluationAiPrompt))
+}
+
+// EvaluationAiPromptEqualFold applies the EqualFold predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptEqualFold(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEqualFold(FieldEvaluationAiPrompt, v))
+}
+
+// EvaluationAiPromptContainsFold applies the ContainsFold predicate on the "evaluation_ai_prompt" field.
+func EvaluationAiPromptContainsFold(v string) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldContainsFold(FieldEvaluationAiPrompt, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

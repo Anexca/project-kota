@@ -71,20 +71,6 @@ func (cqmdu *CachedQuestionMetaDataUpdate) SetNillableExpiresAt(t *time.Time) *C
 	return cqmdu
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (cqmdu *CachedQuestionMetaDataUpdate) SetCreatedAt(t time.Time) *CachedQuestionMetaDataUpdate {
-	cqmdu.mutation.SetCreatedAt(t)
-	return cqmdu
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cqmdu *CachedQuestionMetaDataUpdate) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetaDataUpdate {
-	if t != nil {
-		cqmdu.SetCreatedAt(*t)
-	}
-	return cqmdu
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (cqmdu *CachedQuestionMetaDataUpdate) SetUpdatedAt(t time.Time) *CachedQuestionMetaDataUpdate {
 	cqmdu.mutation.SetUpdatedAt(t)
@@ -178,9 +164,6 @@ func (cqmdu *CachedQuestionMetaDataUpdate) sqlSave(ctx context.Context) (n int, 
 	if value, ok := cqmdu.mutation.ExpiresAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldExpiresAt, field.TypeTime, value)
 	}
-	if value, ok := cqmdu.mutation.CreatedAt(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldCreatedAt, field.TypeTime, value)
-	}
 	if value, ok := cqmdu.mutation.UpdatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -271,20 +254,6 @@ func (cqmduo *CachedQuestionMetaDataUpdateOne) SetExpiresAt(t time.Time) *Cached
 func (cqmduo *CachedQuestionMetaDataUpdateOne) SetNillableExpiresAt(t *time.Time) *CachedQuestionMetaDataUpdateOne {
 	if t != nil {
 		cqmduo.SetExpiresAt(*t)
-	}
-	return cqmduo
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (cqmduo *CachedQuestionMetaDataUpdateOne) SetCreatedAt(t time.Time) *CachedQuestionMetaDataUpdateOne {
-	cqmduo.mutation.SetCreatedAt(t)
-	return cqmduo
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cqmduo *CachedQuestionMetaDataUpdateOne) SetNillableCreatedAt(t *time.Time) *CachedQuestionMetaDataUpdateOne {
-	if t != nil {
-		cqmduo.SetCreatedAt(*t)
 	}
 	return cqmduo
 }
@@ -411,9 +380,6 @@ func (cqmduo *CachedQuestionMetaDataUpdateOne) sqlSave(ctx context.Context) (_no
 	}
 	if value, ok := cqmduo.mutation.ExpiresAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldExpiresAt, field.TypeTime, value)
-	}
-	if value, ok := cqmduo.mutation.CreatedAt(); ok {
-		_spec.SetField(cachedquestionmetadata.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := cqmduo.mutation.UpdatedAt(); ok {
 		_spec.SetField(cachedquestionmetadata.FieldUpdatedAt, field.TypeTime, value)

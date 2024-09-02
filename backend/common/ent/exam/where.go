@@ -369,21 +369,21 @@ func HasCachedQuestionMetadataWith(preds ...predicate.CachedQuestionMetaData) pr
 	})
 }
 
-// HasQuestions applies the HasEdge predicate on the "questions" edge.
-func HasQuestions() predicate.Exam {
+// HasGeneratedexams applies the HasEdge predicate on the "generatedexams" edge.
+func HasGeneratedexams() predicate.Exam {
 	return predicate.Exam(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, QuestionsTable, QuestionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, GeneratedexamsTable, GeneratedexamsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasQuestionsWith applies the HasEdge predicate on the "questions" edge with a given conditions (other predicates).
-func HasQuestionsWith(preds ...predicate.Question) predicate.Exam {
+// HasGeneratedexamsWith applies the HasEdge predicate on the "generatedexams" edge with a given conditions (other predicates).
+func HasGeneratedexamsWith(preds ...predicate.GeneratedExam) predicate.Exam {
 	return predicate.Exam(func(s *sql.Selector) {
-		step := newQuestionsStep()
+		step := newGeneratedexamsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

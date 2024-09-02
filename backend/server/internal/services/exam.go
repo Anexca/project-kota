@@ -15,7 +15,7 @@ import (
 type ExamService struct {
 	redisService                     *commonServices.RedisService
 	examRepository                   *commonRepositories.ExamRepository
-	questionRepository               *commonRepositories.QuestionRepository
+	questionRepository               *commonRepositories.GeneratedExamRepository
 	examCategoryRepository           *commonRepositories.ExamCategoryRepository
 	cachedQuestionMetaDataRepository *commonRepositories.CachedQuestionMetaDataRepository
 }
@@ -25,7 +25,7 @@ func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamServic
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	cachedQuestionMetaDataRepository := commonRepositories.NewCachedQuestionMetaDataRepository(dbClient)
-	questionRepository := commonRepositories.NewQuestionRepository(dbClient)
+	questionRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
 
 	return &ExamService{
 		redisService:                     redisService,
@@ -71,7 +71,7 @@ func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType 
 	return nil
 }
 
-func (e *ExamService) GetQuestionsForExam(ctx context.Context, examType commonConstants.ExamType) ([]*ent.Question, error) {
+func (e *ExamService) GetQuestionsForExam(ctx context.Context, examType commonConstants.ExamType) ([]*ent.GeneratedExam, error) {
 	examName := commonConstants.EXAMS[examType]
 	exam, err := e.examRepository.GetByName(ctx, examName)
 	if err != nil {
