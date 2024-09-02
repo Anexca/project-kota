@@ -130,17 +130,44 @@ func (esu *ExamSettingUpdate) ClearOtherDetails() *ExamSettingUpdate {
 	return esu
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (esu *ExamSettingUpdate) SetCreatedAt(t time.Time) *ExamSettingUpdate {
-	esu.mutation.SetCreatedAt(t)
+// SetMaxAttempts sets the "max_attempts" field.
+func (esu *ExamSettingUpdate) SetMaxAttempts(i int) *ExamSettingUpdate {
+	esu.mutation.ResetMaxAttempts()
+	esu.mutation.SetMaxAttempts(i)
 	return esu
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (esu *ExamSettingUpdate) SetNillableCreatedAt(t *time.Time) *ExamSettingUpdate {
-	if t != nil {
-		esu.SetCreatedAt(*t)
+// SetNillableMaxAttempts sets the "max_attempts" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableMaxAttempts(i *int) *ExamSettingUpdate {
+	if i != nil {
+		esu.SetMaxAttempts(*i)
 	}
+	return esu
+}
+
+// AddMaxAttempts adds i to the "max_attempts" field.
+func (esu *ExamSettingUpdate) AddMaxAttempts(i int) *ExamSettingUpdate {
+	esu.mutation.AddMaxAttempts(i)
+	return esu
+}
+
+// SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
+func (esu *ExamSettingUpdate) SetEvaluationAiPrompt(s string) *ExamSettingUpdate {
+	esu.mutation.SetEvaluationAiPrompt(s)
+	return esu
+}
+
+// SetNillableEvaluationAiPrompt sets the "evaluation_ai_prompt" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableEvaluationAiPrompt(s *string) *ExamSettingUpdate {
+	if s != nil {
+		esu.SetEvaluationAiPrompt(*s)
+	}
+	return esu
+}
+
+// ClearEvaluationAiPrompt clears the value of the "evaluation_ai_prompt" field.
+func (esu *ExamSettingUpdate) ClearEvaluationAiPrompt() *ExamSettingUpdate {
+	esu.mutation.ClearEvaluationAiPrompt()
 	return esu
 }
 
@@ -258,8 +285,17 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if esu.mutation.OtherDetailsCleared() {
 		_spec.ClearField(examsetting.FieldOtherDetails, field.TypeJSON)
 	}
-	if value, ok := esu.mutation.CreatedAt(); ok {
-		_spec.SetField(examsetting.FieldCreatedAt, field.TypeTime, value)
+	if value, ok := esu.mutation.MaxAttempts(); ok {
+		_spec.SetField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esu.mutation.AddedMaxAttempts(); ok {
+		_spec.AddField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esu.mutation.EvaluationAiPrompt(); ok {
+		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)
+	}
+	if esu.mutation.EvaluationAiPromptCleared() {
+		_spec.ClearField(examsetting.FieldEvaluationAiPrompt, field.TypeString)
 	}
 	if value, ok := esu.mutation.UpdatedAt(); ok {
 		_spec.SetField(examsetting.FieldUpdatedAt, field.TypeTime, value)
@@ -414,17 +450,44 @@ func (esuo *ExamSettingUpdateOne) ClearOtherDetails() *ExamSettingUpdateOne {
 	return esuo
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (esuo *ExamSettingUpdateOne) SetCreatedAt(t time.Time) *ExamSettingUpdateOne {
-	esuo.mutation.SetCreatedAt(t)
+// SetMaxAttempts sets the "max_attempts" field.
+func (esuo *ExamSettingUpdateOne) SetMaxAttempts(i int) *ExamSettingUpdateOne {
+	esuo.mutation.ResetMaxAttempts()
+	esuo.mutation.SetMaxAttempts(i)
 	return esuo
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (esuo *ExamSettingUpdateOne) SetNillableCreatedAt(t *time.Time) *ExamSettingUpdateOne {
-	if t != nil {
-		esuo.SetCreatedAt(*t)
+// SetNillableMaxAttempts sets the "max_attempts" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableMaxAttempts(i *int) *ExamSettingUpdateOne {
+	if i != nil {
+		esuo.SetMaxAttempts(*i)
 	}
+	return esuo
+}
+
+// AddMaxAttempts adds i to the "max_attempts" field.
+func (esuo *ExamSettingUpdateOne) AddMaxAttempts(i int) *ExamSettingUpdateOne {
+	esuo.mutation.AddMaxAttempts(i)
+	return esuo
+}
+
+// SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
+func (esuo *ExamSettingUpdateOne) SetEvaluationAiPrompt(s string) *ExamSettingUpdateOne {
+	esuo.mutation.SetEvaluationAiPrompt(s)
+	return esuo
+}
+
+// SetNillableEvaluationAiPrompt sets the "evaluation_ai_prompt" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableEvaluationAiPrompt(s *string) *ExamSettingUpdateOne {
+	if s != nil {
+		esuo.SetEvaluationAiPrompt(*s)
+	}
+	return esuo
+}
+
+// ClearEvaluationAiPrompt clears the value of the "evaluation_ai_prompt" field.
+func (esuo *ExamSettingUpdateOne) ClearEvaluationAiPrompt() *ExamSettingUpdateOne {
+	esuo.mutation.ClearEvaluationAiPrompt()
 	return esuo
 }
 
@@ -572,8 +635,17 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	if esuo.mutation.OtherDetailsCleared() {
 		_spec.ClearField(examsetting.FieldOtherDetails, field.TypeJSON)
 	}
-	if value, ok := esuo.mutation.CreatedAt(); ok {
-		_spec.SetField(examsetting.FieldCreatedAt, field.TypeTime, value)
+	if value, ok := esuo.mutation.MaxAttempts(); ok {
+		_spec.SetField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esuo.mutation.AddedMaxAttempts(); ok {
+		_spec.AddField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esuo.mutation.EvaluationAiPrompt(); ok {
+		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)
+	}
+	if esuo.mutation.EvaluationAiPromptCleared() {
+		_spec.ClearField(examsetting.FieldEvaluationAiPrompt, field.TypeString)
 	}
 	if value, ok := esuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(examsetting.FieldUpdatedAt, field.TypeTime, value)

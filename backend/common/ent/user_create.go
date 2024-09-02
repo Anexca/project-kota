@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/examattempt"
 	"common/ent/user"
 	"context"
 	"errors"
@@ -58,6 +59,21 @@ func (uc *UserCreate) SetNillableLastName(s *string) *UserCreate {
 func (uc *UserCreate) SetID(u uuid.UUID) *UserCreate {
 	uc.mutation.SetID(u)
 	return uc
+}
+
+// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
+func (uc *UserCreate) AddAttemptIDs(ids ...int) *UserCreate {
+	uc.mutation.AddAttemptIDs(ids...)
+	return uc
+}
+
+// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
+func (uc *UserCreate) AddAttempts(e ...*ExamAttempt) *UserCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uc.AddAttemptIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -148,6 +164,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.LastName(); ok {
 		_spec.SetField(user.FieldLastName, field.TypeString, value)
 		_node.LastName = value
+	}
+	if nodes := uc.mutation.AttemptsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AttemptsTable,
+			Columns: []string{user.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/examattempt"
 	"common/ent/predicate"
 	"common/ent/user"
 	"context"
@@ -81,9 +82,45 @@ func (uu *UserUpdate) ClearLastName() *UserUpdate {
 	return uu
 }
 
+// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
+func (uu *UserUpdate) AddAttemptIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddAttemptIDs(ids...)
+	return uu
+}
+
+// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
+func (uu *UserUpdate) AddAttempts(e ...*ExamAttempt) *UserUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uu.AddAttemptIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearAttempts clears all "attempts" edges to the ExamAttempt entity.
+func (uu *UserUpdate) ClearAttempts() *UserUpdate {
+	uu.mutation.ClearAttempts()
+	return uu
+}
+
+// RemoveAttemptIDs removes the "attempts" edge to ExamAttempt entities by IDs.
+func (uu *UserUpdate) RemoveAttemptIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveAttemptIDs(ids...)
+	return uu
+}
+
+// RemoveAttempts removes "attempts" edges to ExamAttempt entities.
+func (uu *UserUpdate) RemoveAttempts(e ...*ExamAttempt) *UserUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uu.RemoveAttemptIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -149,6 +186,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.LastNameCleared() {
 		_spec.ClearField(user.FieldLastName, field.TypeString)
+	}
+	if uu.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AttemptsTable,
+			Columns: []string{user.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedAttemptsIDs(); len(nodes) > 0 && !uu.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AttemptsTable,
+			Columns: []string{user.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.AttemptsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AttemptsTable,
+			Columns: []string{user.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -224,9 +306,45 @@ func (uuo *UserUpdateOne) ClearLastName() *UserUpdateOne {
 	return uuo
 }
 
+// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
+func (uuo *UserUpdateOne) AddAttemptIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddAttemptIDs(ids...)
+	return uuo
+}
+
+// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
+func (uuo *UserUpdateOne) AddAttempts(e ...*ExamAttempt) *UserUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uuo.AddAttemptIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearAttempts clears all "attempts" edges to the ExamAttempt entity.
+func (uuo *UserUpdateOne) ClearAttempts() *UserUpdateOne {
+	uuo.mutation.ClearAttempts()
+	return uuo
+}
+
+// RemoveAttemptIDs removes the "attempts" edge to ExamAttempt entities by IDs.
+func (uuo *UserUpdateOne) RemoveAttemptIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveAttemptIDs(ids...)
+	return uuo
+}
+
+// RemoveAttempts removes "attempts" edges to ExamAttempt entities.
+func (uuo *UserUpdateOne) RemoveAttempts(e ...*ExamAttempt) *UserUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return uuo.RemoveAttemptIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -322,6 +440,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.LastNameCleared() {
 		_spec.ClearField(user.FieldLastName, field.TypeString)
+	}
+	if uuo.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AttemptsTable,
+			Columns: []string{user.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedAttemptsIDs(); len(nodes) > 0 && !uuo.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AttemptsTable,
+			Columns: []string{user.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.AttemptsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AttemptsTable,
+			Columns: []string{user.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

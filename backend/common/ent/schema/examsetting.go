@@ -26,7 +26,9 @@ func (ExamSetting) Fields() []ent.Field {
 			SchemaType(map[string]string{
 				dialect.Postgres: "json",
 			}),
-		field.Time("created_at").Default(time.Now),
+		field.Int("max_attempts").Default(2),
+		field.String("evaluation_ai_prompt").Optional(),
+		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }

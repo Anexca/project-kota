@@ -44,8 +44,8 @@ type ExamEdges struct {
 	Setting *ExamSetting `json:"setting,omitempty"`
 	// CachedQuestionMetadata holds the value of the cached_question_metadata edge.
 	CachedQuestionMetadata []*CachedQuestionMetaData `json:"cached_question_metadata,omitempty"`
-	// Questions holds the value of the questions edge.
-	Questions []*Question `json:"questions,omitempty"`
+	// Generatedexams holds the value of the generatedexams edge.
+	Generatedexams []*GeneratedExam `json:"generatedexams,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [4]bool
@@ -82,13 +82,13 @@ func (e ExamEdges) CachedQuestionMetadataOrErr() ([]*CachedQuestionMetaData, err
 	return nil, &NotLoadedError{edge: "cached_question_metadata"}
 }
 
-// QuestionsOrErr returns the Questions value or an error if the edge
+// GeneratedexamsOrErr returns the Generatedexams value or an error if the edge
 // was not loaded in eager-loading.
-func (e ExamEdges) QuestionsOrErr() ([]*Question, error) {
+func (e ExamEdges) GeneratedexamsOrErr() ([]*GeneratedExam, error) {
 	if e.loadedTypes[3] {
-		return e.Questions, nil
+		return e.Generatedexams, nil
 	}
-	return nil, &NotLoadedError{edge: "questions"}
+	return nil, &NotLoadedError{edge: "generatedexams"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -192,9 +192,9 @@ func (e *Exam) QueryCachedQuestionMetadata() *CachedQuestionMetaDataQuery {
 	return NewExamClient(e.config).QueryCachedQuestionMetadata(e)
 }
 
-// QueryQuestions queries the "questions" edge of the Exam entity.
-func (e *Exam) QueryQuestions() *QuestionQuery {
-	return NewExamClient(e.config).QueryQuestions(e)
+// QueryGeneratedexams queries the "generatedexams" edge of the Exam entity.
+func (e *Exam) QueryGeneratedexams() *GeneratedExamQuery {
+	return NewExamClient(e.config).QueryGeneratedexams(e)
 }
 
 // Update returns a builder for updating this Exam.

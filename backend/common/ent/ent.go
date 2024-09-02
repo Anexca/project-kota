@@ -5,9 +5,11 @@ package ent
 import (
 	"common/ent/cachedquestionmetadata"
 	"common/ent/exam"
+	"common/ent/examattempt"
 	"common/ent/examcategory"
+	"common/ent/examresult"
 	"common/ent/examsetting"
-	"common/ent/question"
+	"common/ent/generatedexam"
 	"common/ent/user"
 	"context"
 	"errors"
@@ -80,9 +82,11 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			cachedquestionmetadata.Table: cachedquestionmetadata.ValidColumn,
 			exam.Table:                   exam.ValidColumn,
+			examattempt.Table:            examattempt.ValidColumn,
 			examcategory.Table:           examcategory.ValidColumn,
+			examresult.Table:             examresult.ValidColumn,
 			examsetting.Table:            examsetting.ValidColumn,
-			question.Table:               question.ValidColumn,
+			generatedexam.Table:          generatedexam.ValidColumn,
 			user.Table:                   user.ValidColumn,
 		})
 	})

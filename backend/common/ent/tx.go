@@ -16,12 +16,16 @@ type Tx struct {
 	CachedQuestionMetaData *CachedQuestionMetaDataClient
 	// Exam is the client for interacting with the Exam builders.
 	Exam *ExamClient
+	// ExamAttempt is the client for interacting with the ExamAttempt builders.
+	ExamAttempt *ExamAttemptClient
 	// ExamCategory is the client for interacting with the ExamCategory builders.
 	ExamCategory *ExamCategoryClient
+	// ExamResult is the client for interacting with the ExamResult builders.
+	ExamResult *ExamResultClient
 	// ExamSetting is the client for interacting with the ExamSetting builders.
 	ExamSetting *ExamSettingClient
-	// Question is the client for interacting with the Question builders.
-	Question *QuestionClient
+	// GeneratedExam is the client for interacting with the GeneratedExam builders.
+	GeneratedExam *GeneratedExamClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -157,9 +161,11 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.CachedQuestionMetaData = NewCachedQuestionMetaDataClient(tx.config)
 	tx.Exam = NewExamClient(tx.config)
+	tx.ExamAttempt = NewExamAttemptClient(tx.config)
 	tx.ExamCategory = NewExamCategoryClient(tx.config)
+	tx.ExamResult = NewExamResultClient(tx.config)
 	tx.ExamSetting = NewExamSettingClient(tx.config)
-	tx.Question = NewQuestionClient(tx.config)
+	tx.GeneratedExam = NewGeneratedExamClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

@@ -12,14 +12,20 @@ type CachedQuestionMetaData func(*sql.Selector)
 // Exam is the predicate function for exam builders.
 type Exam func(*sql.Selector)
 
+// ExamAttempt is the predicate function for examattempt builders.
+type ExamAttempt func(*sql.Selector)
+
 // ExamCategory is the predicate function for examcategory builders.
 type ExamCategory func(*sql.Selector)
+
+// ExamResult is the predicate function for examresult builders.
+type ExamResult func(*sql.Selector)
 
 // ExamSetting is the predicate function for examsetting builders.
 type ExamSetting func(*sql.Selector)
 
-// Question is the predicate function for question builders.
-type Question func(*sql.Selector)
+// GeneratedExam is the predicate function for generatedexam builders.
+type GeneratedExam func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
