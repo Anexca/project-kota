@@ -20,19 +20,19 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// EdgeExam holds the string denoting the exam edge name in mutations.
-	EdgeExam = "exam"
+	// EdgeGeneratedexam holds the string denoting the generatedexam edge name in mutations.
+	EdgeGeneratedexam = "generatedexam"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the examattempt in the database.
 	Table = "exam_attempts"
-	// ExamTable is the table that holds the exam relation/edge.
-	ExamTable = "exam_attempts"
-	// ExamInverseTable is the table name for the Exam entity.
-	// It exists in this package in order to avoid circular dependency with the "exam" package.
-	ExamInverseTable = "exams"
-	// ExamColumn is the table column denoting the exam relation/edge.
-	ExamColumn = "exam_attempts"
+	// GeneratedexamTable is the table that holds the generatedexam relation/edge.
+	GeneratedexamTable = "exam_attempts"
+	// GeneratedexamInverseTable is the table name for the GeneratedExam entity.
+	// It exists in this package in order to avoid circular dependency with the "generatedexam" package.
+	GeneratedexamInverseTable = "generated_exams"
+	// GeneratedexamColumn is the table column denoting the generatedexam relation/edge.
+	GeneratedexamColumn = "generated_exam_attempts"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "exam_attempts"
 	// UserInverseTable is the table name for the User entity.
@@ -53,7 +53,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "exam_attempts"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"exam_attempts",
+	"generated_exam_attempts",
 	"user_attempts",
 }
 
@@ -104,10 +104,10 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByExamField orders the results by exam field.
-func ByExamField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByGeneratedexamField orders the results by generatedexam field.
+func ByGeneratedexamField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newExamStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newGeneratedexamStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -117,11 +117,11 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newExamStep() *sqlgraph.Step {
+func newGeneratedexamStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ExamInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ExamTable, ExamColumn),
+		sqlgraph.To(GeneratedexamInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, GeneratedexamTable, GeneratedexamColumn),
 	)
 }
 func newUserStep() *sqlgraph.Step {

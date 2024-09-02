@@ -34,5 +34,7 @@ func (GeneratedExam) Edges() []ent.Edge {
 		edge.From("exam", Exam.Type).
 			Ref("generatedexams").
 			Unique(), // Many GeneratedExams have one Exam
+
+		edge.To("attempts", ExamAttempt.Type), // One GenratedExam can have Many Attempts
 	}
 }

@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"common/ent/exam"
 	"common/ent/examattempt"
+	"common/ent/generatedexam"
 	"common/ent/user"
 	"context"
 	"errors"
@@ -57,23 +57,23 @@ func (eac *ExamAttemptCreate) SetNillableUpdatedAt(t *time.Time) *ExamAttemptCre
 	return eac
 }
 
-// SetExamID sets the "exam" edge to the Exam entity by ID.
-func (eac *ExamAttemptCreate) SetExamID(id int) *ExamAttemptCreate {
-	eac.mutation.SetExamID(id)
+// SetGeneratedexamID sets the "generatedexam" edge to the GeneratedExam entity by ID.
+func (eac *ExamAttemptCreate) SetGeneratedexamID(id int) *ExamAttemptCreate {
+	eac.mutation.SetGeneratedexamID(id)
 	return eac
 }
 
-// SetNillableExamID sets the "exam" edge to the Exam entity by ID if the given value is not nil.
-func (eac *ExamAttemptCreate) SetNillableExamID(id *int) *ExamAttemptCreate {
+// SetNillableGeneratedexamID sets the "generatedexam" edge to the GeneratedExam entity by ID if the given value is not nil.
+func (eac *ExamAttemptCreate) SetNillableGeneratedexamID(id *int) *ExamAttemptCreate {
 	if id != nil {
-		eac = eac.SetExamID(*id)
+		eac = eac.SetGeneratedexamID(*id)
 	}
 	return eac
 }
 
-// SetExam sets the "exam" edge to the Exam entity.
-func (eac *ExamAttemptCreate) SetExam(e *Exam) *ExamAttemptCreate {
-	return eac.SetExamID(e.ID)
+// SetGeneratedexam sets the "generatedexam" edge to the GeneratedExam entity.
+func (eac *ExamAttemptCreate) SetGeneratedexam(g *GeneratedExam) *ExamAttemptCreate {
+	return eac.SetGeneratedexamID(g.ID)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -189,21 +189,21 @@ func (eac *ExamAttemptCreate) createSpec() (*ExamAttempt, *sqlgraph.CreateSpec) 
 		_spec.SetField(examattempt.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if nodes := eac.mutation.ExamIDs(); len(nodes) > 0 {
+	if nodes := eac.mutation.GeneratedexamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   examattempt.ExamTable,
-			Columns: []string{examattempt.ExamColumn},
+			Table:   examattempt.GeneratedexamTable,
+			Columns: []string{examattempt.GeneratedexamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.exam_attempts = &nodes[0]
+		_node.generated_exam_attempts = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := eac.mutation.UserIDs(); len(nodes) > 0 {

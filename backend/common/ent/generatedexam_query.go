@@ -4,9 +4,11 @@ package ent
 
 import (
 	"common/ent/exam"
+	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -19,12 +21,13 @@ import (
 // GeneratedExamQuery is the builder for querying GeneratedExam entities.
 type GeneratedExamQuery struct {
 	config
-	ctx        *QueryContext
-	order      []generatedexam.OrderOption
-	inters     []Interceptor
-	predicates []predicate.GeneratedExam
-	withExam   *ExamQuery
-	withFKs    bool
+	ctx          *QueryContext
+	order        []generatedexam.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.GeneratedExam
+	withExam     *ExamQuery
+	withAttempts *ExamAttemptQuery
+	withFKs      bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +79,28 @@ func (geq *GeneratedExamQuery) QueryExam() *ExamQuery {
 			sqlgraph.From(generatedexam.Table, generatedexam.FieldID, selector),
 			sqlgraph.To(exam.Table, exam.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, generatedexam.ExamTable, generatedexam.ExamColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(geq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAttempts chains the current query on the "attempts" edge.
+func (geq *GeneratedExamQuery) QueryAttempts() *ExamAttemptQuery {
+	query := (&ExamAttemptClient{config: geq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := geq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := geq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(generatedexam.Table, generatedexam.FieldID, selector),
+			sqlgraph.To(examattempt.Table, examattempt.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, generatedexam.AttemptsTable, generatedexam.AttemptsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(geq.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +295,13 @@ func (geq *GeneratedExamQuery) Clone() *GeneratedExamQuery {
 		return nil
 	}
 	return &GeneratedExamQuery{
-		config:     geq.config,
-		ctx:        geq.ctx.Clone(),
-		order:      append([]generatedexam.OrderOption{}, geq.order...),
-		inters:     append([]Interceptor{}, geq.inters...),
-		predicates: append([]predicate.GeneratedExam{}, geq.predicates...),
-		withExam:   geq.withExam.Clone(),
+		config:       geq.config,
+		ctx:          geq.ctx.Clone(),
+		order:        append([]generatedexam.OrderOption{}, geq.order...),
+		inters:       append([]Interceptor{}, geq.inters...),
+		predicates:   append([]predicate.GeneratedExam{}, geq.predicates...),
+		withExam:     geq.withExam.Clone(),
+		withAttempts: geq.withAttempts.Clone(),
 		// clone intermediate query.
 		sql:  geq.sql.Clone(),
 		path: geq.path,
@@ -290,6 +316,17 @@ func (geq *GeneratedExamQuery) WithExam(opts ...func(*ExamQuery)) *GeneratedExam
 		opt(query)
 	}
 	geq.withExam = query
+	return geq
+}
+
+// WithAttempts tells the query-builder to eager-load the nodes that are connected to
+// the "attempts" edge. The optional arguments are used to configure the query builder of the edge.
+func (geq *GeneratedExamQuery) WithAttempts(opts ...func(*ExamAttemptQuery)) *GeneratedExamQuery {
+	query := (&ExamAttemptClient{config: geq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	geq.withAttempts = query
 	return geq
 }
 
@@ -372,8 +409,9 @@ func (geq *GeneratedExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 		nodes       = []*GeneratedExam{}
 		withFKs     = geq.withFKs
 		_spec       = geq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			geq.withExam != nil,
+			geq.withAttempts != nil,
 		}
 	)
 	if geq.withExam != nil {
@@ -403,6 +441,13 @@ func (geq *GeneratedExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	if query := geq.withExam; query != nil {
 		if err := geq.loadExam(ctx, query, nodes, nil,
 			func(n *GeneratedExam, e *Exam) { n.Edges.Exam = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := geq.withAttempts; query != nil {
+		if err := geq.loadAttempts(ctx, query, nodes,
+			func(n *GeneratedExam) { n.Edges.Attempts = []*ExamAttempt{} },
+			func(n *GeneratedExam, e *ExamAttempt) { n.Edges.Attempts = append(n.Edges.Attempts, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -438,6 +483,37 @@ func (geq *GeneratedExamQuery) loadExam(ctx context.Context, query *ExamQuery, n
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (geq *GeneratedExamQuery) loadAttempts(ctx context.Context, query *ExamAttemptQuery, nodes []*GeneratedExam, init func(*GeneratedExam), assign func(*GeneratedExam, *ExamAttempt)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*GeneratedExam)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ExamAttempt(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(generatedexam.AttemptsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.generated_exam_attempts
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "generated_exam_attempts" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "generated_exam_attempts" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

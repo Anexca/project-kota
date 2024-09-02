@@ -5,7 +5,6 @@ package ent
 import (
 	"common/ent/cachedquestionmetadata"
 	"common/ent/exam"
-	"common/ent/examattempt"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
@@ -119,21 +118,6 @@ func (eu *ExamUpdate) SetSetting(e *ExamSetting) *ExamUpdate {
 	return eu.SetSettingID(e.ID)
 }
 
-// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
-func (eu *ExamUpdate) AddAttemptIDs(ids ...int) *ExamUpdate {
-	eu.mutation.AddAttemptIDs(ids...)
-	return eu
-}
-
-// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
-func (eu *ExamUpdate) AddAttempts(e ...*ExamAttempt) *ExamUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.AddAttemptIDs(ids...)
-}
-
 // AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
 func (eu *ExamUpdate) AddCachedQuestionMetadatumIDs(ids ...int) *ExamUpdate {
 	eu.mutation.AddCachedQuestionMetadatumIDs(ids...)
@@ -179,27 +163,6 @@ func (eu *ExamUpdate) ClearCategory() *ExamUpdate {
 func (eu *ExamUpdate) ClearSetting() *ExamUpdate {
 	eu.mutation.ClearSetting()
 	return eu
-}
-
-// ClearAttempts clears all "attempts" edges to the ExamAttempt entity.
-func (eu *ExamUpdate) ClearAttempts() *ExamUpdate {
-	eu.mutation.ClearAttempts()
-	return eu
-}
-
-// RemoveAttemptIDs removes the "attempts" edge to ExamAttempt entities by IDs.
-func (eu *ExamUpdate) RemoveAttemptIDs(ids ...int) *ExamUpdate {
-	eu.mutation.RemoveAttemptIDs(ids...)
-	return eu
-}
-
-// RemoveAttempts removes "attempts" edges to ExamAttempt entities.
-func (eu *ExamUpdate) RemoveAttempts(e ...*ExamAttempt) *ExamUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.RemoveAttemptIDs(ids...)
 }
 
 // ClearCachedQuestionMetadata clears all "cached_question_metadata" edges to the CachedQuestionMetaData entity.
@@ -352,51 +315,6 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.AttemptsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.AttemptsTable,
-			Columns: []string{exam.AttemptsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedAttemptsIDs(); len(nodes) > 0 && !eu.mutation.AttemptsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.AttemptsTable,
-			Columns: []string{exam.AttemptsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.AttemptsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.AttemptsTable,
-			Columns: []string{exam.AttemptsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -600,21 +518,6 @@ func (euo *ExamUpdateOne) SetSetting(e *ExamSetting) *ExamUpdateOne {
 	return euo.SetSettingID(e.ID)
 }
 
-// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
-func (euo *ExamUpdateOne) AddAttemptIDs(ids ...int) *ExamUpdateOne {
-	euo.mutation.AddAttemptIDs(ids...)
-	return euo
-}
-
-// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
-func (euo *ExamUpdateOne) AddAttempts(e ...*ExamAttempt) *ExamUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.AddAttemptIDs(ids...)
-}
-
 // AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
 func (euo *ExamUpdateOne) AddCachedQuestionMetadatumIDs(ids ...int) *ExamUpdateOne {
 	euo.mutation.AddCachedQuestionMetadatumIDs(ids...)
@@ -660,27 +563,6 @@ func (euo *ExamUpdateOne) ClearCategory() *ExamUpdateOne {
 func (euo *ExamUpdateOne) ClearSetting() *ExamUpdateOne {
 	euo.mutation.ClearSetting()
 	return euo
-}
-
-// ClearAttempts clears all "attempts" edges to the ExamAttempt entity.
-func (euo *ExamUpdateOne) ClearAttempts() *ExamUpdateOne {
-	euo.mutation.ClearAttempts()
-	return euo
-}
-
-// RemoveAttemptIDs removes the "attempts" edge to ExamAttempt entities by IDs.
-func (euo *ExamUpdateOne) RemoveAttemptIDs(ids ...int) *ExamUpdateOne {
-	euo.mutation.RemoveAttemptIDs(ids...)
-	return euo
-}
-
-// RemoveAttempts removes "attempts" edges to ExamAttempt entities.
-func (euo *ExamUpdateOne) RemoveAttempts(e ...*ExamAttempt) *ExamUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.RemoveAttemptIDs(ids...)
 }
 
 // ClearCachedQuestionMetadata clears all "cached_question_metadata" edges to the CachedQuestionMetaData entity.
@@ -863,51 +745,6 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.AttemptsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.AttemptsTable,
-			Columns: []string{exam.AttemptsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedAttemptsIDs(); len(nodes) > 0 && !euo.mutation.AttemptsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.AttemptsTable,
-			Columns: []string{exam.AttemptsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.AttemptsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.AttemptsTable,
-			Columns: []string{exam.AttemptsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

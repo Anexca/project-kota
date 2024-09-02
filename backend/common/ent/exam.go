@@ -42,15 +42,13 @@ type ExamEdges struct {
 	Category *ExamCategory `json:"category,omitempty"`
 	// Setting holds the value of the setting edge.
 	Setting *ExamSetting `json:"setting,omitempty"`
-	// Attempts holds the value of the attempts edge.
-	Attempts []*ExamAttempt `json:"attempts,omitempty"`
 	// CachedQuestionMetadata holds the value of the cached_question_metadata edge.
 	CachedQuestionMetadata []*CachedQuestionMetaData `json:"cached_question_metadata,omitempty"`
 	// Generatedexams holds the value of the generatedexams edge.
 	Generatedexams []*GeneratedExam `json:"generatedexams,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [4]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -75,19 +73,10 @@ func (e ExamEdges) SettingOrErr() (*ExamSetting, error) {
 	return nil, &NotLoadedError{edge: "setting"}
 }
 
-// AttemptsOrErr returns the Attempts value or an error if the edge
-// was not loaded in eager-loading.
-func (e ExamEdges) AttemptsOrErr() ([]*ExamAttempt, error) {
-	if e.loadedTypes[2] {
-		return e.Attempts, nil
-	}
-	return nil, &NotLoadedError{edge: "attempts"}
-}
-
 // CachedQuestionMetadataOrErr returns the CachedQuestionMetadata value or an error if the edge
 // was not loaded in eager-loading.
 func (e ExamEdges) CachedQuestionMetadataOrErr() ([]*CachedQuestionMetaData, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		return e.CachedQuestionMetadata, nil
 	}
 	return nil, &NotLoadedError{edge: "cached_question_metadata"}
@@ -96,7 +85,7 @@ func (e ExamEdges) CachedQuestionMetadataOrErr() ([]*CachedQuestionMetaData, err
 // GeneratedexamsOrErr returns the Generatedexams value or an error if the edge
 // was not loaded in eager-loading.
 func (e ExamEdges) GeneratedexamsOrErr() ([]*GeneratedExam, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.Generatedexams, nil
 	}
 	return nil, &NotLoadedError{edge: "generatedexams"}
@@ -196,11 +185,6 @@ func (e *Exam) QueryCategory() *ExamCategoryQuery {
 // QuerySetting queries the "setting" edge of the Exam entity.
 func (e *Exam) QuerySetting() *ExamSettingQuery {
 	return NewExamClient(e.config).QuerySetting(e)
-}
-
-// QueryAttempts queries the "attempts" edge of the Exam entity.
-func (e *Exam) QueryAttempts() *ExamAttemptQuery {
-	return NewExamClient(e.config).QueryAttempts(e)
 }
 
 // QueryCachedQuestionMetadata queries the "cached_question_metadata" edge of the Exam entity.

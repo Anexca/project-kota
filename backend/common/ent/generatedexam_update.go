@@ -4,6 +4,7 @@ package ent
 
 import (
 	"common/ent/exam"
+	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
 	"context"
@@ -80,6 +81,21 @@ func (geu *GeneratedExamUpdate) SetExam(e *Exam) *GeneratedExamUpdate {
 	return geu.SetExamID(e.ID)
 }
 
+// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
+func (geu *GeneratedExamUpdate) AddAttemptIDs(ids ...int) *GeneratedExamUpdate {
+	geu.mutation.AddAttemptIDs(ids...)
+	return geu
+}
+
+// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
+func (geu *GeneratedExamUpdate) AddAttempts(e ...*ExamAttempt) *GeneratedExamUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return geu.AddAttemptIDs(ids...)
+}
+
 // Mutation returns the GeneratedExamMutation object of the builder.
 func (geu *GeneratedExamUpdate) Mutation() *GeneratedExamMutation {
 	return geu.mutation
@@ -89,6 +105,27 @@ func (geu *GeneratedExamUpdate) Mutation() *GeneratedExamMutation {
 func (geu *GeneratedExamUpdate) ClearExam() *GeneratedExamUpdate {
 	geu.mutation.ClearExam()
 	return geu
+}
+
+// ClearAttempts clears all "attempts" edges to the ExamAttempt entity.
+func (geu *GeneratedExamUpdate) ClearAttempts() *GeneratedExamUpdate {
+	geu.mutation.ClearAttempts()
+	return geu
+}
+
+// RemoveAttemptIDs removes the "attempts" edge to ExamAttempt entities by IDs.
+func (geu *GeneratedExamUpdate) RemoveAttemptIDs(ids ...int) *GeneratedExamUpdate {
+	geu.mutation.RemoveAttemptIDs(ids...)
+	return geu
+}
+
+// RemoveAttempts removes "attempts" edges to ExamAttempt entities.
+func (geu *GeneratedExamUpdate) RemoveAttempts(e ...*ExamAttempt) *GeneratedExamUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return geu.RemoveAttemptIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -177,6 +214,51 @@ func (geu *GeneratedExamUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if geu.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   generatedexam.AttemptsTable,
+			Columns: []string{generatedexam.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := geu.mutation.RemovedAttemptsIDs(); len(nodes) > 0 && !geu.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   generatedexam.AttemptsTable,
+			Columns: []string{generatedexam.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := geu.mutation.AttemptsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   generatedexam.AttemptsTable,
+			Columns: []string{generatedexam.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, geu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{generatedexam.Label}
@@ -248,6 +330,21 @@ func (geuo *GeneratedExamUpdateOne) SetExam(e *Exam) *GeneratedExamUpdateOne {
 	return geuo.SetExamID(e.ID)
 }
 
+// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
+func (geuo *GeneratedExamUpdateOne) AddAttemptIDs(ids ...int) *GeneratedExamUpdateOne {
+	geuo.mutation.AddAttemptIDs(ids...)
+	return geuo
+}
+
+// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
+func (geuo *GeneratedExamUpdateOne) AddAttempts(e ...*ExamAttempt) *GeneratedExamUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return geuo.AddAttemptIDs(ids...)
+}
+
 // Mutation returns the GeneratedExamMutation object of the builder.
 func (geuo *GeneratedExamUpdateOne) Mutation() *GeneratedExamMutation {
 	return geuo.mutation
@@ -257,6 +354,27 @@ func (geuo *GeneratedExamUpdateOne) Mutation() *GeneratedExamMutation {
 func (geuo *GeneratedExamUpdateOne) ClearExam() *GeneratedExamUpdateOne {
 	geuo.mutation.ClearExam()
 	return geuo
+}
+
+// ClearAttempts clears all "attempts" edges to the ExamAttempt entity.
+func (geuo *GeneratedExamUpdateOne) ClearAttempts() *GeneratedExamUpdateOne {
+	geuo.mutation.ClearAttempts()
+	return geuo
+}
+
+// RemoveAttemptIDs removes the "attempts" edge to ExamAttempt entities by IDs.
+func (geuo *GeneratedExamUpdateOne) RemoveAttemptIDs(ids ...int) *GeneratedExamUpdateOne {
+	geuo.mutation.RemoveAttemptIDs(ids...)
+	return geuo
+}
+
+// RemoveAttempts removes "attempts" edges to ExamAttempt entities.
+func (geuo *GeneratedExamUpdateOne) RemoveAttempts(e ...*ExamAttempt) *GeneratedExamUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return geuo.RemoveAttemptIDs(ids...)
 }
 
 // Where appends a list predicates to the GeneratedExamUpdate builder.
@@ -368,6 +486,51 @@ func (geuo *GeneratedExamUpdateOne) sqlSave(ctx context.Context) (_node *Generat
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if geuo.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   generatedexam.AttemptsTable,
+			Columns: []string{generatedexam.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := geuo.mutation.RemovedAttemptsIDs(); len(nodes) > 0 && !geuo.mutation.AttemptsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   generatedexam.AttemptsTable,
+			Columns: []string{generatedexam.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := geuo.mutation.AttemptsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   generatedexam.AttemptsTable,
+			Columns: []string{generatedexam.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

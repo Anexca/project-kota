@@ -25,7 +25,7 @@ func (ExamAttempt) Fields() []ent.Field {
 // Edges of the ExamAttempt.
 func (ExamAttempt) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("exam", Exam.Type).
+		edge.From("generatedexam", GeneratedExam.Type).
 			Ref("attempts").
 			Unique(), // Each Atempts have one exam
 

@@ -190,21 +190,21 @@ func UpdatedAtLTE(v time.Time) predicate.ExamAttempt {
 	return predicate.ExamAttempt(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// HasExam applies the HasEdge predicate on the "exam" edge.
-func HasExam() predicate.ExamAttempt {
+// HasGeneratedexam applies the HasEdge predicate on the "generatedexam" edge.
+func HasGeneratedexam() predicate.ExamAttempt {
 	return predicate.ExamAttempt(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ExamTable, ExamColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, GeneratedexamTable, GeneratedexamColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasExamWith applies the HasEdge predicate on the "exam" edge with a given conditions (other predicates).
-func HasExamWith(preds ...predicate.Exam) predicate.ExamAttempt {
+// HasGeneratedexamWith applies the HasEdge predicate on the "generatedexam" edge with a given conditions (other predicates).
+func HasGeneratedexamWith(preds ...predicate.GeneratedExam) predicate.ExamAttempt {
 	return predicate.ExamAttempt(func(s *sql.Selector) {
-		step := newExamStep()
+		step := newGeneratedexamStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

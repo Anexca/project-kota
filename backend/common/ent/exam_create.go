@@ -5,7 +5,6 @@ package ent
 import (
 	"common/ent/cachedquestionmetadata"
 	"common/ent/exam"
-	"common/ent/examattempt"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
@@ -115,21 +114,6 @@ func (ec *ExamCreate) SetNillableSettingID(id *int) *ExamCreate {
 // SetSetting sets the "setting" edge to the ExamSetting entity.
 func (ec *ExamCreate) SetSetting(e *ExamSetting) *ExamCreate {
 	return ec.SetSettingID(e.ID)
-}
-
-// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
-func (ec *ExamCreate) AddAttemptIDs(ids ...int) *ExamCreate {
-	ec.mutation.AddAttemptIDs(ids...)
-	return ec
-}
-
-// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
-func (ec *ExamCreate) AddAttempts(e ...*ExamAttempt) *ExamCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return ec.AddAttemptIDs(ids...)
 }
 
 // AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
@@ -300,22 +284,6 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examsetting.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ec.mutation.AttemptsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   exam.AttemptsTable,
-			Columns: []string{exam.AttemptsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

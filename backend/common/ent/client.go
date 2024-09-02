@@ -554,22 +554,6 @@ func (c *ExamClient) QuerySetting(e *Exam) *ExamSettingQuery {
 	return query
 }
 
-// QueryAttempts queries the attempts edge of a Exam.
-func (c *ExamClient) QueryAttempts(e *Exam) *ExamAttemptQuery {
-	query := (&ExamAttemptClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(exam.Table, exam.FieldID, id),
-			sqlgraph.To(examattempt.Table, examattempt.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, exam.AttemptsTable, exam.AttemptsColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryCachedQuestionMetadata queries the cached_question_metadata edge of a Exam.
 func (c *ExamClient) QueryCachedQuestionMetadata(e *Exam) *CachedQuestionMetaDataQuery {
 	query := (&CachedQuestionMetaDataClient{config: c.config}).Query()
@@ -735,15 +719,15 @@ func (c *ExamAttemptClient) GetX(ctx context.Context, id int) *ExamAttempt {
 	return obj
 }
 
-// QueryExam queries the exam edge of a ExamAttempt.
-func (c *ExamAttemptClient) QueryExam(ea *ExamAttempt) *ExamQuery {
-	query := (&ExamClient{config: c.config}).Query()
+// QueryGeneratedexam queries the generatedexam edge of a ExamAttempt.
+func (c *ExamAttemptClient) QueryGeneratedexam(ea *ExamAttempt) *GeneratedExamQuery {
+	query := (&GeneratedExamClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ea.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(examattempt.Table, examattempt.FieldID, id),
-			sqlgraph.To(exam.Table, exam.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.ExamTable, examattempt.ExamColumn),
+			sqlgraph.To(generatedexam.Table, generatedexam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.GeneratedexamTable, examattempt.GeneratedexamColumn),
 		)
 		fromV = sqlgraph.Neighbors(ea.driver.Dialect(), step)
 		return fromV, nil
@@ -1340,6 +1324,22 @@ func (c *GeneratedExamClient) QueryExam(ge *GeneratedExam) *ExamQuery {
 			sqlgraph.From(generatedexam.Table, generatedexam.FieldID, id),
 			sqlgraph.To(exam.Table, exam.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, generatedexam.ExamTable, generatedexam.ExamColumn),
+		)
+		fromV = sqlgraph.Neighbors(ge.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAttempts queries the attempts edge of a GeneratedExam.
+func (c *GeneratedExamClient) QueryAttempts(ge *GeneratedExam) *ExamAttemptQuery {
+	query := (&ExamAttemptClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ge.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(generatedexam.Table, generatedexam.FieldID, id),
+			sqlgraph.To(examattempt.Table, examattempt.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, generatedexam.AttemptsTable, generatedexam.AttemptsColumn),
 		)
 		fromV = sqlgraph.Neighbors(ge.driver.Dialect(), step)
 		return fromV, nil

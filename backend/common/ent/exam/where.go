@@ -346,29 +346,6 @@ func HasSettingWith(preds ...predicate.ExamSetting) predicate.Exam {
 	})
 }
 
-// HasAttempts applies the HasEdge predicate on the "attempts" edge.
-func HasAttempts() predicate.Exam {
-	return predicate.Exam(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AttemptsTable, AttemptsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasAttemptsWith applies the HasEdge predicate on the "attempts" edge with a given conditions (other predicates).
-func HasAttemptsWith(preds ...predicate.ExamAttempt) predicate.Exam {
-	return predicate.Exam(func(s *sql.Selector) {
-		step := newAttemptsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasCachedQuestionMetadata applies the HasEdge predicate on the "cached_question_metadata" edge.
 func HasCachedQuestionMetadata() predicate.Exam {
 	return predicate.Exam(func(s *sql.Selector) {

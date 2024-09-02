@@ -4,6 +4,7 @@ package ent
 
 import (
 	"common/ent/exam"
+	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"context"
 	"errors"
@@ -86,6 +87,21 @@ func (gec *GeneratedExamCreate) SetNillableExamID(id *int) *GeneratedExamCreate 
 // SetExam sets the "exam" edge to the Exam entity.
 func (gec *GeneratedExamCreate) SetExam(e *Exam) *GeneratedExamCreate {
 	return gec.SetExamID(e.ID)
+}
+
+// AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
+func (gec *GeneratedExamCreate) AddAttemptIDs(ids ...int) *GeneratedExamCreate {
+	gec.mutation.AddAttemptIDs(ids...)
+	return gec
+}
+
+// AddAttempts adds the "attempts" edges to the ExamAttempt entity.
+func (gec *GeneratedExamCreate) AddAttempts(e ...*ExamAttempt) *GeneratedExamCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return gec.AddAttemptIDs(ids...)
 }
 
 // Mutation returns the GeneratedExamMutation object of the builder.
@@ -205,6 +221,22 @@ func (gec *GeneratedExamCreate) createSpec() (*GeneratedExam, *sqlgraph.CreateSp
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.exam_generatedexams = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := gec.mutation.AttemptsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   generatedexam.AttemptsTable,
+			Columns: []string{generatedexam.AttemptsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

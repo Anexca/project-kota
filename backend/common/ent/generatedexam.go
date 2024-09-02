@@ -38,9 +38,11 @@ type GeneratedExam struct {
 type GeneratedExamEdges struct {
 	// Exam holds the value of the exam edge.
 	Exam *Exam `json:"exam,omitempty"`
+	// Attempts holds the value of the attempts edge.
+	Attempts []*ExamAttempt `json:"attempts,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ExamOrErr returns the Exam value or an error if the edge
@@ -52,6 +54,15 @@ func (e GeneratedExamEdges) ExamOrErr() (*Exam, error) {
 		return nil, &NotFoundError{label: exam.Label}
 	}
 	return nil, &NotLoadedError{edge: "exam"}
+}
+
+// AttemptsOrErr returns the Attempts value or an error if the edge
+// was not loaded in eager-loading.
+func (e GeneratedExamEdges) AttemptsOrErr() ([]*ExamAttempt, error) {
+	if e.loadedTypes[1] {
+		return e.Attempts, nil
+	}
+	return nil, &NotLoadedError{edge: "attempts"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -139,6 +150,11 @@ func (ge *GeneratedExam) Value(name string) (ent.Value, error) {
 // QueryExam queries the "exam" edge of the GeneratedExam entity.
 func (ge *GeneratedExam) QueryExam() *ExamQuery {
 	return NewGeneratedExamClient(ge.config).QueryExam(ge)
+}
+
+// QueryAttempts queries the "attempts" edge of the GeneratedExam entity.
+func (ge *GeneratedExam) QueryAttempts() *ExamAttemptQuery {
+	return NewGeneratedExamClient(ge.config).QueryAttempts(ge)
 }
 
 // Update returns a builder for updating this GeneratedExam.

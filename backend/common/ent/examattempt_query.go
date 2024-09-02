@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"common/ent/exam"
 	"common/ent/examattempt"
+	"common/ent/generatedexam"
 	"common/ent/predicate"
 	"common/ent/user"
 	"context"
@@ -21,13 +21,13 @@ import (
 // ExamAttemptQuery is the builder for querying ExamAttempt entities.
 type ExamAttemptQuery struct {
 	config
-	ctx        *QueryContext
-	order      []examattempt.OrderOption
-	inters     []Interceptor
-	predicates []predicate.ExamAttempt
-	withExam   *ExamQuery
-	withUser   *UserQuery
-	withFKs    bool
+	ctx               *QueryContext
+	order             []examattempt.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.ExamAttempt
+	withGeneratedexam *GeneratedExamQuery
+	withUser          *UserQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -64,9 +64,9 @@ func (eaq *ExamAttemptQuery) Order(o ...examattempt.OrderOption) *ExamAttemptQue
 	return eaq
 }
 
-// QueryExam chains the current query on the "exam" edge.
-func (eaq *ExamAttemptQuery) QueryExam() *ExamQuery {
-	query := (&ExamClient{config: eaq.config}).Query()
+// QueryGeneratedexam chains the current query on the "generatedexam" edge.
+func (eaq *ExamAttemptQuery) QueryGeneratedexam() *GeneratedExamQuery {
+	query := (&GeneratedExamClient{config: eaq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eaq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -77,8 +77,8 @@ func (eaq *ExamAttemptQuery) QueryExam() *ExamQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(examattempt.Table, examattempt.FieldID, selector),
-			sqlgraph.To(exam.Table, exam.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.ExamTable, examattempt.ExamColumn),
+			sqlgraph.To(generatedexam.Table, generatedexam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.GeneratedexamTable, examattempt.GeneratedexamColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eaq.driver.Dialect(), step)
 		return fromU, nil
@@ -295,27 +295,27 @@ func (eaq *ExamAttemptQuery) Clone() *ExamAttemptQuery {
 		return nil
 	}
 	return &ExamAttemptQuery{
-		config:     eaq.config,
-		ctx:        eaq.ctx.Clone(),
-		order:      append([]examattempt.OrderOption{}, eaq.order...),
-		inters:     append([]Interceptor{}, eaq.inters...),
-		predicates: append([]predicate.ExamAttempt{}, eaq.predicates...),
-		withExam:   eaq.withExam.Clone(),
-		withUser:   eaq.withUser.Clone(),
+		config:            eaq.config,
+		ctx:               eaq.ctx.Clone(),
+		order:             append([]examattempt.OrderOption{}, eaq.order...),
+		inters:            append([]Interceptor{}, eaq.inters...),
+		predicates:        append([]predicate.ExamAttempt{}, eaq.predicates...),
+		withGeneratedexam: eaq.withGeneratedexam.Clone(),
+		withUser:          eaq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  eaq.sql.Clone(),
 		path: eaq.path,
 	}
 }
 
-// WithExam tells the query-builder to eager-load the nodes that are connected to
-// the "exam" edge. The optional arguments are used to configure the query builder of the edge.
-func (eaq *ExamAttemptQuery) WithExam(opts ...func(*ExamQuery)) *ExamAttemptQuery {
-	query := (&ExamClient{config: eaq.config}).Query()
+// WithGeneratedexam tells the query-builder to eager-load the nodes that are connected to
+// the "generatedexam" edge. The optional arguments are used to configure the query builder of the edge.
+func (eaq *ExamAttemptQuery) WithGeneratedexam(opts ...func(*GeneratedExamQuery)) *ExamAttemptQuery {
+	query := (&GeneratedExamClient{config: eaq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	eaq.withExam = query
+	eaq.withGeneratedexam = query
 	return eaq
 }
 
@@ -410,11 +410,11 @@ func (eaq *ExamAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		withFKs     = eaq.withFKs
 		_spec       = eaq.querySpec()
 		loadedTypes = [2]bool{
-			eaq.withExam != nil,
+			eaq.withGeneratedexam != nil,
 			eaq.withUser != nil,
 		}
 	)
-	if eaq.withExam != nil || eaq.withUser != nil {
+	if eaq.withGeneratedexam != nil || eaq.withUser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -438,9 +438,9 @@ func (eaq *ExamAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := eaq.withExam; query != nil {
-		if err := eaq.loadExam(ctx, query, nodes, nil,
-			func(n *ExamAttempt, e *Exam) { n.Edges.Exam = e }); err != nil {
+	if query := eaq.withGeneratedexam; query != nil {
+		if err := eaq.loadGeneratedexam(ctx, query, nodes, nil,
+			func(n *ExamAttempt, e *GeneratedExam) { n.Edges.Generatedexam = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -453,14 +453,14 @@ func (eaq *ExamAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	return nodes, nil
 }
 
-func (eaq *ExamAttemptQuery) loadExam(ctx context.Context, query *ExamQuery, nodes []*ExamAttempt, init func(*ExamAttempt), assign func(*ExamAttempt, *Exam)) error {
+func (eaq *ExamAttemptQuery) loadGeneratedexam(ctx context.Context, query *GeneratedExamQuery, nodes []*ExamAttempt, init func(*ExamAttempt), assign func(*ExamAttempt, *GeneratedExam)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ExamAttempt)
 	for i := range nodes {
-		if nodes[i].exam_attempts == nil {
+		if nodes[i].generated_exam_attempts == nil {
 			continue
 		}
-		fk := *nodes[i].exam_attempts
+		fk := *nodes[i].generated_exam_attempts
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -469,7 +469,7 @@ func (eaq *ExamAttemptQuery) loadExam(ctx context.Context, query *ExamQuery, nod
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(exam.IDIn(ids...))
+	query.Where(generatedexam.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -477,7 +477,7 @@ func (eaq *ExamAttemptQuery) loadExam(ctx context.Context, query *ExamQuery, nod
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "exam_attempts" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "generated_exam_attempts" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

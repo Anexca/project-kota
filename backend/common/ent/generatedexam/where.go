@@ -193,6 +193,29 @@ func HasExamWith(preds ...predicate.Exam) predicate.GeneratedExam {
 	})
 }
 
+// HasAttempts applies the HasEdge predicate on the "attempts" edge.
+func HasAttempts() predicate.GeneratedExam {
+	return predicate.GeneratedExam(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AttemptsTable, AttemptsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAttemptsWith applies the HasEdge predicate on the "attempts" edge with a given conditions (other predicates).
+func HasAttemptsWith(preds ...predicate.ExamAttempt) predicate.GeneratedExam {
+	return predicate.GeneratedExam(func(s *sql.Selector) {
+		step := newAttemptsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.GeneratedExam) predicate.GeneratedExam {
 	return predicate.GeneratedExam(sql.AndPredicates(predicates...))

@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"common/ent/exam"
 	"common/ent/examattempt"
+	"common/ent/generatedexam"
 	"common/ent/predicate"
 	"common/ent/user"
 	"context"
@@ -58,23 +58,23 @@ func (eau *ExamAttemptUpdate) SetUpdatedAt(t time.Time) *ExamAttemptUpdate {
 	return eau
 }
 
-// SetExamID sets the "exam" edge to the Exam entity by ID.
-func (eau *ExamAttemptUpdate) SetExamID(id int) *ExamAttemptUpdate {
-	eau.mutation.SetExamID(id)
+// SetGeneratedexamID sets the "generatedexam" edge to the GeneratedExam entity by ID.
+func (eau *ExamAttemptUpdate) SetGeneratedexamID(id int) *ExamAttemptUpdate {
+	eau.mutation.SetGeneratedexamID(id)
 	return eau
 }
 
-// SetNillableExamID sets the "exam" edge to the Exam entity by ID if the given value is not nil.
-func (eau *ExamAttemptUpdate) SetNillableExamID(id *int) *ExamAttemptUpdate {
+// SetNillableGeneratedexamID sets the "generatedexam" edge to the GeneratedExam entity by ID if the given value is not nil.
+func (eau *ExamAttemptUpdate) SetNillableGeneratedexamID(id *int) *ExamAttemptUpdate {
 	if id != nil {
-		eau = eau.SetExamID(*id)
+		eau = eau.SetGeneratedexamID(*id)
 	}
 	return eau
 }
 
-// SetExam sets the "exam" edge to the Exam entity.
-func (eau *ExamAttemptUpdate) SetExam(e *Exam) *ExamAttemptUpdate {
-	return eau.SetExamID(e.ID)
+// SetGeneratedexam sets the "generatedexam" edge to the GeneratedExam entity.
+func (eau *ExamAttemptUpdate) SetGeneratedexam(g *GeneratedExam) *ExamAttemptUpdate {
+	return eau.SetGeneratedexamID(g.ID)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -101,9 +101,9 @@ func (eau *ExamAttemptUpdate) Mutation() *ExamAttemptMutation {
 	return eau.mutation
 }
 
-// ClearExam clears the "exam" edge to the Exam entity.
-func (eau *ExamAttemptUpdate) ClearExam() *ExamAttemptUpdate {
-	eau.mutation.ClearExam()
+// ClearGeneratedexam clears the "generatedexam" edge to the GeneratedExam entity.
+func (eau *ExamAttemptUpdate) ClearGeneratedexam() *ExamAttemptUpdate {
+	eau.mutation.ClearGeneratedexam()
 	return eau
 }
 
@@ -167,28 +167,28 @@ func (eau *ExamAttemptUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eau.mutation.UpdatedAt(); ok {
 		_spec.SetField(examattempt.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if eau.mutation.ExamCleared() {
+	if eau.mutation.GeneratedexamCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   examattempt.ExamTable,
-			Columns: []string{examattempt.ExamColumn},
+			Table:   examattempt.GeneratedexamTable,
+			Columns: []string{examattempt.GeneratedexamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eau.mutation.ExamIDs(); len(nodes) > 0 {
+	if nodes := eau.mutation.GeneratedexamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   examattempt.ExamTable,
-			Columns: []string{examattempt.ExamColumn},
+			Table:   examattempt.GeneratedexamTable,
+			Columns: []string{examattempt.GeneratedexamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -272,23 +272,23 @@ func (eauo *ExamAttemptUpdateOne) SetUpdatedAt(t time.Time) *ExamAttemptUpdateOn
 	return eauo
 }
 
-// SetExamID sets the "exam" edge to the Exam entity by ID.
-func (eauo *ExamAttemptUpdateOne) SetExamID(id int) *ExamAttemptUpdateOne {
-	eauo.mutation.SetExamID(id)
+// SetGeneratedexamID sets the "generatedexam" edge to the GeneratedExam entity by ID.
+func (eauo *ExamAttemptUpdateOne) SetGeneratedexamID(id int) *ExamAttemptUpdateOne {
+	eauo.mutation.SetGeneratedexamID(id)
 	return eauo
 }
 
-// SetNillableExamID sets the "exam" edge to the Exam entity by ID if the given value is not nil.
-func (eauo *ExamAttemptUpdateOne) SetNillableExamID(id *int) *ExamAttemptUpdateOne {
+// SetNillableGeneratedexamID sets the "generatedexam" edge to the GeneratedExam entity by ID if the given value is not nil.
+func (eauo *ExamAttemptUpdateOne) SetNillableGeneratedexamID(id *int) *ExamAttemptUpdateOne {
 	if id != nil {
-		eauo = eauo.SetExamID(*id)
+		eauo = eauo.SetGeneratedexamID(*id)
 	}
 	return eauo
 }
 
-// SetExam sets the "exam" edge to the Exam entity.
-func (eauo *ExamAttemptUpdateOne) SetExam(e *Exam) *ExamAttemptUpdateOne {
-	return eauo.SetExamID(e.ID)
+// SetGeneratedexam sets the "generatedexam" edge to the GeneratedExam entity.
+func (eauo *ExamAttemptUpdateOne) SetGeneratedexam(g *GeneratedExam) *ExamAttemptUpdateOne {
+	return eauo.SetGeneratedexamID(g.ID)
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
@@ -315,9 +315,9 @@ func (eauo *ExamAttemptUpdateOne) Mutation() *ExamAttemptMutation {
 	return eauo.mutation
 }
 
-// ClearExam clears the "exam" edge to the Exam entity.
-func (eauo *ExamAttemptUpdateOne) ClearExam() *ExamAttemptUpdateOne {
-	eauo.mutation.ClearExam()
+// ClearGeneratedexam clears the "generatedexam" edge to the GeneratedExam entity.
+func (eauo *ExamAttemptUpdateOne) ClearGeneratedexam() *ExamAttemptUpdateOne {
+	eauo.mutation.ClearGeneratedexam()
 	return eauo
 }
 
@@ -411,28 +411,28 @@ func (eauo *ExamAttemptUpdateOne) sqlSave(ctx context.Context) (_node *ExamAttem
 	if value, ok := eauo.mutation.UpdatedAt(); ok {
 		_spec.SetField(examattempt.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if eauo.mutation.ExamCleared() {
+	if eauo.mutation.GeneratedexamCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   examattempt.ExamTable,
-			Columns: []string{examattempt.ExamColumn},
+			Table:   examattempt.GeneratedexamTable,
+			Columns: []string{examattempt.GeneratedexamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eauo.mutation.ExamIDs(); len(nodes) > 0 {
+	if nodes := eauo.mutation.GeneratedexamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   examattempt.ExamTable,
-			Columns: []string{examattempt.ExamColumn},
+			Table:   examattempt.GeneratedexamTable,
+			Columns: []string{examattempt.GeneratedexamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

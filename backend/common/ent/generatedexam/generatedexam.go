@@ -24,6 +24,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeExam holds the string denoting the exam edge name in mutations.
 	EdgeExam = "exam"
+	// EdgeAttempts holds the string denoting the attempts edge name in mutations.
+	EdgeAttempts = "attempts"
 	// Table holds the table name of the generatedexam in the database.
 	Table = "generated_exams"
 	// ExamTable is the table that holds the exam relation/edge.
@@ -33,6 +35,13 @@ const (
 	ExamInverseTable = "exams"
 	// ExamColumn is the table column denoting the exam relation/edge.
 	ExamColumn = "exam_generatedexams"
+	// AttemptsTable is the table that holds the attempts relation/edge.
+	AttemptsTable = "exam_attempts"
+	// AttemptsInverseTable is the table name for the ExamAttempt entity.
+	// It exists in this package in order to avoid circular dependency with the "examattempt" package.
+	AttemptsInverseTable = "exam_attempts"
+	// AttemptsColumn is the table column denoting the attempts relation/edge.
+	AttemptsColumn = "generated_exam_attempts"
 )
 
 // Columns holds all SQL columns for generatedexam fields.
@@ -105,10 +114,31 @@ func ByExamField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newExamStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByAttemptsCount orders the results by attempts count.
+func ByAttemptsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAttemptsStep(), opts...)
+	}
+}
+
+// ByAttempts orders the results by attempts terms.
+func ByAttempts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAttemptsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newExamStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ExamInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, ExamTable, ExamColumn),
+	)
+}
+func newAttemptsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AttemptsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AttemptsTable, AttemptsColumn),
 	)
 }

@@ -5,7 +5,6 @@ package ent
 import (
 	"common/ent/cachedquestionmetadata"
 	"common/ent/exam"
-	"common/ent/examattempt"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
@@ -30,7 +29,6 @@ type ExamQuery struct {
 	predicates                 []predicate.Exam
 	withCategory               *ExamCategoryQuery
 	withSetting                *ExamSettingQuery
-	withAttempts               *ExamAttemptQuery
 	withCachedQuestionMetadata *CachedQuestionMetaDataQuery
 	withGeneratedexams         *GeneratedExamQuery
 	withFKs                    bool
@@ -107,28 +105,6 @@ func (eq *ExamQuery) QuerySetting() *ExamSettingQuery {
 			sqlgraph.From(exam.Table, exam.FieldID, selector),
 			sqlgraph.To(examsetting.Table, examsetting.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, exam.SettingTable, exam.SettingColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryAttempts chains the current query on the "attempts" edge.
-func (eq *ExamQuery) QueryAttempts() *ExamAttemptQuery {
-	query := (&ExamAttemptClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(exam.Table, exam.FieldID, selector),
-			sqlgraph.To(examattempt.Table, examattempt.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, exam.AttemptsTable, exam.AttemptsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -374,7 +350,6 @@ func (eq *ExamQuery) Clone() *ExamQuery {
 		predicates:                 append([]predicate.Exam{}, eq.predicates...),
 		withCategory:               eq.withCategory.Clone(),
 		withSetting:                eq.withSetting.Clone(),
-		withAttempts:               eq.withAttempts.Clone(),
 		withCachedQuestionMetadata: eq.withCachedQuestionMetadata.Clone(),
 		withGeneratedexams:         eq.withGeneratedexams.Clone(),
 		// clone intermediate query.
@@ -402,17 +377,6 @@ func (eq *ExamQuery) WithSetting(opts ...func(*ExamSettingQuery)) *ExamQuery {
 		opt(query)
 	}
 	eq.withSetting = query
-	return eq
-}
-
-// WithAttempts tells the query-builder to eager-load the nodes that are connected to
-// the "attempts" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *ExamQuery) WithAttempts(opts ...func(*ExamAttemptQuery)) *ExamQuery {
-	query := (&ExamAttemptClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withAttempts = query
 	return eq
 }
 
@@ -517,10 +481,9 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 		nodes       = []*Exam{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [4]bool{
 			eq.withCategory != nil,
 			eq.withSetting != nil,
-			eq.withAttempts != nil,
 			eq.withCachedQuestionMetadata != nil,
 			eq.withGeneratedexams != nil,
 		}
@@ -558,13 +521,6 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 	if query := eq.withSetting; query != nil {
 		if err := eq.loadSetting(ctx, query, nodes, nil,
 			func(n *Exam, e *ExamSetting) { n.Edges.Setting = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := eq.withAttempts; query != nil {
-		if err := eq.loadAttempts(ctx, query, nodes,
-			func(n *Exam) { n.Edges.Attempts = []*ExamAttempt{} },
-			func(n *Exam, e *ExamAttempt) { n.Edges.Attempts = append(n.Edges.Attempts, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -642,37 +598,6 @@ func (eq *ExamQuery) loadSetting(ctx context.Context, query *ExamSettingQuery, n
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "exam_setting" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (eq *ExamQuery) loadAttempts(ctx context.Context, query *ExamAttemptQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *ExamAttempt)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Exam)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.ExamAttempt(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(exam.AttemptsColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.exam_attempts
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "exam_attempts" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "exam_attempts" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

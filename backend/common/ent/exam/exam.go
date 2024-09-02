@@ -28,8 +28,6 @@ const (
 	EdgeCategory = "category"
 	// EdgeSetting holds the string denoting the setting edge name in mutations.
 	EdgeSetting = "setting"
-	// EdgeAttempts holds the string denoting the attempts edge name in mutations.
-	EdgeAttempts = "attempts"
 	// EdgeCachedQuestionMetadata holds the string denoting the cached_question_metadata edge name in mutations.
 	EdgeCachedQuestionMetadata = "cached_question_metadata"
 	// EdgeGeneratedexams holds the string denoting the generatedexams edge name in mutations.
@@ -50,13 +48,6 @@ const (
 	SettingInverseTable = "exam_settings"
 	// SettingColumn is the table column denoting the setting relation/edge.
 	SettingColumn = "exam_setting"
-	// AttemptsTable is the table that holds the attempts relation/edge.
-	AttemptsTable = "exam_attempts"
-	// AttemptsInverseTable is the table name for the ExamAttempt entity.
-	// It exists in this package in order to avoid circular dependency with the "examattempt" package.
-	AttemptsInverseTable = "exam_attempts"
-	// AttemptsColumn is the table column denoting the attempts relation/edge.
-	AttemptsColumn = "exam_attempts"
 	// CachedQuestionMetadataTable is the table that holds the cached_question_metadata relation/edge.
 	CachedQuestionMetadataTable = "cached_question_meta_data"
 	// CachedQuestionMetadataInverseTable is the table name for the CachedQuestionMetaData entity.
@@ -162,20 +153,6 @@ func BySettingField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByAttemptsCount orders the results by attempts count.
-func ByAttemptsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAttemptsStep(), opts...)
-	}
-}
-
-// ByAttempts orders the results by attempts terms.
-func ByAttempts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAttemptsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByCachedQuestionMetadataCount orders the results by cached_question_metadata count.
 func ByCachedQuestionMetadataCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -215,13 +192,6 @@ func newSettingStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SettingInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, SettingTable, SettingColumn),
-	)
-}
-func newAttemptsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AttemptsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AttemptsTable, AttemptsColumn),
 	)
 }
 func newCachedQuestionMetadataStep() *sqlgraph.Step {
