@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -37,6 +38,34 @@ func (qc *QuestionCreate) SetNillableIsActive(b *bool) *QuestionCreate {
 // SetRawQuestionData sets the "raw_question_data" field.
 func (qc *QuestionCreate) SetRawQuestionData(m map[string]interface{}) *QuestionCreate {
 	qc.mutation.SetRawQuestionData(m)
+	return qc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (qc *QuestionCreate) SetCreatedAt(t time.Time) *QuestionCreate {
+	qc.mutation.SetCreatedAt(t)
+	return qc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (qc *QuestionCreate) SetNillableCreatedAt(t *time.Time) *QuestionCreate {
+	if t != nil {
+		qc.SetCreatedAt(*t)
+	}
+	return qc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (qc *QuestionCreate) SetUpdatedAt(t time.Time) *QuestionCreate {
+	qc.mutation.SetUpdatedAt(t)
+	return qc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (qc *QuestionCreate) SetNillableUpdatedAt(t *time.Time) *QuestionCreate {
+	if t != nil {
+		qc.SetUpdatedAt(*t)
+	}
 	return qc
 }
 
@@ -98,12 +127,26 @@ func (qc *QuestionCreate) defaults() {
 		v := question.DefaultIsActive
 		qc.mutation.SetIsActive(v)
 	}
+	if _, ok := qc.mutation.CreatedAt(); !ok {
+		v := question.DefaultCreatedAt()
+		qc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := qc.mutation.UpdatedAt(); !ok {
+		v := question.DefaultUpdatedAt()
+		qc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (qc *QuestionCreate) check() error {
 	if _, ok := qc.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "Question.is_active"`)}
+	}
+	if _, ok := qc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Question.created_at"`)}
+	}
+	if _, ok := qc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Question.updated_at"`)}
 	}
 	return nil
 }
@@ -138,6 +181,14 @@ func (qc *QuestionCreate) createSpec() (*Question, *sqlgraph.CreateSpec) {
 	if value, ok := qc.mutation.RawQuestionData(); ok {
 		_spec.SetField(question.FieldRawQuestionData, field.TypeJSON, value)
 		_node.RawQuestionData = value
+	}
+	if value, ok := qc.mutation.CreatedAt(); ok {
+		_spec.SetField(question.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := qc.mutation.UpdatedAt(); ok {
+		_spec.SetField(question.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if nodes := qc.mutation.ExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

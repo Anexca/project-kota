@@ -102,6 +102,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "raw_question_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "json"}},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_questions", Type: field.TypeInt, Nullable: true},
 	}
 	// QuestionsTable holds the schema information for the "questions" table.
@@ -112,7 +114,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "questions_exams_questions",
-				Columns:    []*schema.Column{QuestionsColumns[3]},
+				Columns:    []*schema.Column{QuestionsColumns[5]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

@@ -83,6 +83,16 @@ func init() {
 	questionDescIsActive := questionFields[0].Descriptor()
 	// question.DefaultIsActive holds the default value on creation for the is_active field.
 	question.DefaultIsActive = questionDescIsActive.Default.(bool)
+	// questionDescCreatedAt is the schema descriptor for created_at field.
+	questionDescCreatedAt := questionFields[2].Descriptor()
+	// question.DefaultCreatedAt holds the default value on creation for the created_at field.
+	question.DefaultCreatedAt = questionDescCreatedAt.Default.(func() time.Time)
+	// questionDescUpdatedAt is the schema descriptor for updated_at field.
+	questionDescUpdatedAt := questionFields[3].Descriptor()
+	// question.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	question.DefaultUpdatedAt = questionDescUpdatedAt.Default.(func() time.Time)
+	// question.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	question.UpdateDefaultUpdatedAt = questionDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescEmail is the schema descriptor for email field.

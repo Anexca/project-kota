@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -22,6 +23,10 @@ type Question struct {
 	IsActive bool `json:"is_active,omitempty"`
 	// RawQuestionData holds the value of the "raw_question_data" field.
 	RawQuestionData map[string]interface{} `json:"raw_question_data,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the QuestionQuery when eager-loading is set.
 	Edges          QuestionEdges `json:"edges"`
@@ -60,6 +65,8 @@ func (*Question) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case question.FieldID:
 			values[i] = new(sql.NullInt64)
+		case question.FieldCreatedAt, question.FieldUpdatedAt:
+			values[i] = new(sql.NullTime)
 		case question.ForeignKeys[0]: // exam_questions
 			values[i] = new(sql.NullInt64)
 		default:
@@ -96,6 +103,18 @@ func (q *Question) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &q.RawQuestionData); err != nil {
 					return fmt.Errorf("unmarshal field raw_question_data: %w", err)
 				}
+			}
+		case question.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				q.CreatedAt = value.Time
+			}
+		case question.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				q.UpdatedAt = value.Time
 			}
 		case question.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -150,6 +169,12 @@ func (q *Question) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("raw_question_data=")
 	builder.WriteString(fmt.Sprintf("%v", q.RawQuestionData))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(q.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("updated_at=")
+	builder.WriteString(q.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

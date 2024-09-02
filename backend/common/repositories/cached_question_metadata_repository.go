@@ -29,5 +29,12 @@ func (c *CachedQuestionMetaDataRepository) Create(ctx context.Context, cacheUID 
 }
 
 func (c *CachedQuestionMetaDataRepository) GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.CachedQuestionMetaData, error) {
-	return c.dbClient.CachedQuestionMetaData.Query().Where(cachedquestionmetadata.HasExamWith(exam.ID(ex.ID))).All(ctx)
+	return c.dbClient.CachedQuestionMetaData.Query().
+		Where(cachedquestionmetadata.HasExamWith(exam.ID(ex.ID)), cachedquestionmetadata.IsUsed(false)).
+		All(ctx)
+}
+
+func (c *CachedQuestionMetaDataRepository) MarkAsUsed(ctx context.Context, id int) error {
+	_, err := c.dbClient.CachedQuestionMetaData.UpdateOneID(id).SetIsUsed(true).Save(ctx)
+	return err
 }

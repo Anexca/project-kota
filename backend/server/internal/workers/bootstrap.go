@@ -35,7 +35,7 @@ func (w *Worker) RegisterWorkers() {
 
 		err := w.AddDescriptiveQuestionsInDatabase()
 		if err != nil {
-			log.Printf("Failed to generate questions: %v", err)
+			log.Printf("Failed to Add Descriptive Question in Database: %v", err)
 		}
 
 		log.Println("Finished Worker Job for Adding Descriptive Question in Database")

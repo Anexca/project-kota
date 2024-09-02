@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -54,6 +55,12 @@ func (qu *QuestionUpdate) ClearRawQuestionData() *QuestionUpdate {
 	return qu
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (qu *QuestionUpdate) SetUpdatedAt(t time.Time) *QuestionUpdate {
+	qu.mutation.SetUpdatedAt(t)
+	return qu
+}
+
 // SetExamID sets the "exam" edge to the Exam entity by ID.
 func (qu *QuestionUpdate) SetExamID(id int) *QuestionUpdate {
 	qu.mutation.SetExamID(id)
@@ -86,6 +93,7 @@ func (qu *QuestionUpdate) ClearExam() *QuestionUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (qu *QuestionUpdate) Save(ctx context.Context) (int, error) {
+	qu.defaults()
 	return withHooks(ctx, qu.sqlSave, qu.mutation, qu.hooks)
 }
 
@@ -111,6 +119,14 @@ func (qu *QuestionUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (qu *QuestionUpdate) defaults() {
+	if _, ok := qu.mutation.UpdatedAt(); !ok {
+		v := question.UpdateDefaultUpdatedAt()
+		qu.mutation.SetUpdatedAt(v)
+	}
+}
+
 func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(question.Table, question.Columns, sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt))
 	if ps := qu.mutation.predicates; len(ps) > 0 {
@@ -128,6 +144,9 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if qu.mutation.RawQuestionDataCleared() {
 		_spec.ClearField(question.FieldRawQuestionData, field.TypeJSON)
+	}
+	if value, ok := qu.mutation.UpdatedAt(); ok {
+		_spec.SetField(question.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if qu.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -204,6 +223,12 @@ func (quo *QuestionUpdateOne) ClearRawQuestionData() *QuestionUpdateOne {
 	return quo
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (quo *QuestionUpdateOne) SetUpdatedAt(t time.Time) *QuestionUpdateOne {
+	quo.mutation.SetUpdatedAt(t)
+	return quo
+}
+
 // SetExamID sets the "exam" edge to the Exam entity by ID.
 func (quo *QuestionUpdateOne) SetExamID(id int) *QuestionUpdateOne {
 	quo.mutation.SetExamID(id)
@@ -249,6 +274,7 @@ func (quo *QuestionUpdateOne) Select(field string, fields ...string) *QuestionUp
 
 // Save executes the query and returns the updated Question entity.
 func (quo *QuestionUpdateOne) Save(ctx context.Context) (*Question, error) {
+	quo.defaults()
 	return withHooks(ctx, quo.sqlSave, quo.mutation, quo.hooks)
 }
 
@@ -271,6 +297,14 @@ func (quo *QuestionUpdateOne) Exec(ctx context.Context) error {
 func (quo *QuestionUpdateOne) ExecX(ctx context.Context) {
 	if err := quo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (quo *QuestionUpdateOne) defaults() {
+	if _, ok := quo.mutation.UpdatedAt(); !ok {
+		v := question.UpdateDefaultUpdatedAt()
+		quo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -308,6 +342,9 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 	}
 	if quo.mutation.RawQuestionDataCleared() {
 		_spec.ClearField(question.FieldRawQuestionData, field.TypeJSON)
+	}
+	if value, ok := quo.mutation.UpdatedAt(); ok {
+		_spec.SetField(question.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if quo.mutation.ExamCleared() {
 		edge := &sqlgraph.EdgeSpec{

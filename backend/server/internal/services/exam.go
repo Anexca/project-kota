@@ -58,6 +58,7 @@ func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType 
 		return err
 	}
 
+	e.cachedQuestionMetaDataRepository.MarkAsUsed(ctx, cachedMetaData[0].ID)
 	var questions []any
 
 	err = json.Unmarshal([]byte(cachedData), &questions)
