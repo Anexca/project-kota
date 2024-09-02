@@ -13,6 +13,7 @@ import (
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/nedpals/supabase-go"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -20,20 +21,23 @@ type Server struct {
 	port int
 
 	examService  *services.ExamService
+	authService  *services.AuthService
 	redisService *commonService.RedisService
 }
 
-func InitServer(redisClient *redis.Client, dbClient *ent.Client) *http.Server {
+func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient *supabase.Client) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	logger := commonConfig.SetupLogger()
 
-	redisService := commonService.NewRedisService(redisClient)
 	examService := services.NewExamService(redisClient, dbClient)
+	authService := services.NewAuthService(supabaseClient)
+	redisService := commonService.NewRedisService(redisClient)
 
 	NewServer := &Server{
 		port:         port,
 		examService:  examService,
 		redisService: redisService,
+		authService:  authService,
 	}
 
 	// Declare Server config

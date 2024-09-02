@@ -17,6 +17,8 @@ type Environment struct {
 	RedisAddress     string
 	RedisPassword    string
 	RedisDatabase    int
+	SupabaseUrl      string
+	SupabaseKey      string
 }
 
 func LoadEnvironment() (*Environment, error) {
@@ -37,6 +39,8 @@ func LoadEnvironment() (*Environment, error) {
 		RedisAddress:     os.Getenv("REDIS_ADDRESS"),
 		RedisPassword:    os.Getenv("REDIS_PASSWORD"),
 		RedisDatabase:    redisDatabase,
+		SupabaseUrl:      os.Getenv("SUPABASE_URL"),
+		SupabaseKey:      os.Getenv("SUPABASE_KEY"),
 	}
 
 	if env.ServerPort == "" {
@@ -49,6 +53,9 @@ func LoadEnvironment() (*Environment, error) {
 
 	if env.DatabaseHost == "" || env.DatabasePort == "" || env.DatabaseName == "" || env.DatabaseUser == "" || env.DatabasePassword == "" {
 		return nil, errors.New("missing Database environment variables")
+	}
+	if env.SupabaseKey == "" || env.SupabaseUrl == "" {
+		return nil, errors.New("missing Supabase environment variables")
 	}
 
 	return env, nil

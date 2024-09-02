@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"net/http"
+	"server/internal/middlewares"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -28,9 +29,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/sup", s.Sup)
 	r.Get("/health", s.HealthCheck)
 
-	r.Route("/exams", func(r chi.Router) {
-		r.Route("/banking", func(r chi.Router) {
-			r.Get("/descriptive", s.GetBankingDescriptiveQuestions)
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.RequireAuthMiddleware(s.authService))
+
+		r.Route("/exams", func(r chi.Router) {
+			r.Route("/banking", func(r chi.Router) {
+				r.Get("/descriptive", s.GetBankingDescriptiveQuestions)
+			})
 		})
 	})
 

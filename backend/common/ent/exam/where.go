@@ -369,6 +369,29 @@ func HasCachedQuestionMetadataWith(preds ...predicate.CachedQuestionMetaData) pr
 	})
 }
 
+// HasQuestions applies the HasEdge predicate on the "questions" edge.
+func HasQuestions() predicate.Exam {
+	return predicate.Exam(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, QuestionsTable, QuestionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasQuestionsWith applies the HasEdge predicate on the "questions" edge with a given conditions (other predicates).
+func HasQuestionsWith(preds ...predicate.Question) predicate.Exam {
+	return predicate.Exam(func(s *sql.Selector) {
+		step := newQuestionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Exam) predicate.Exam {
 	return predicate.Exam(sql.AndPredicates(predicates...))
