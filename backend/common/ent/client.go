@@ -554,6 +554,22 @@ func (c *ExamClient) QuerySetting(e *Exam) *ExamSettingQuery {
 	return query
 }
 
+// QueryAttempts queries the attempts edge of a Exam.
+func (c *ExamClient) QueryAttempts(e *Exam) *ExamAttemptQuery {
+	query := (&ExamAttemptClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, id),
+			sqlgraph.To(examattempt.Table, examattempt.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, exam.AttemptsTable, exam.AttemptsColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryCachedQuestionMetadata queries the cached_question_metadata edge of a Exam.
 func (c *ExamClient) QueryCachedQuestionMetadata(e *Exam) *CachedQuestionMetaDataQuery {
 	query := (&CachedQuestionMetaDataClient{config: c.config}).Query()
@@ -717,6 +733,38 @@ func (c *ExamAttemptClient) GetX(ctx context.Context, id int) *ExamAttempt {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryExam queries the exam edge of a ExamAttempt.
+func (c *ExamAttemptClient) QueryExam(ea *ExamAttempt) *ExamQuery {
+	query := (&ExamClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ea.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examattempt.Table, examattempt.FieldID, id),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.ExamTable, examattempt.ExamColumn),
+		)
+		fromV = sqlgraph.Neighbors(ea.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a ExamAttempt.
+func (c *ExamAttemptClient) QueryUser(ea *ExamAttempt) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ea.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examattempt.Table, examattempt.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.UserTable, examattempt.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(ea.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -1430,6 +1478,22 @@ func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryAttempts queries the attempts edge of a User.
+func (c *UserClient) QueryAttempts(u *User) *ExamAttemptQuery {
+	query := (&ExamAttemptClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(examattempt.Table, examattempt.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.AttemptsTable, user.AttemptsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

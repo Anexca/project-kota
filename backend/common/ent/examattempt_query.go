@@ -3,8 +3,10 @@
 package ent
 
 import (
+	"common/ent/exam"
 	"common/ent/examattempt"
 	"common/ent/predicate"
+	"common/ent/user"
 	"context"
 	"fmt"
 	"math"
@@ -13,6 +15,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // ExamAttemptQuery is the builder for querying ExamAttempt entities.
@@ -22,6 +25,9 @@ type ExamAttemptQuery struct {
 	order      []examattempt.OrderOption
 	inters     []Interceptor
 	predicates []predicate.ExamAttempt
+	withExam   *ExamQuery
+	withUser   *UserQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -56,6 +62,50 @@ func (eaq *ExamAttemptQuery) Unique(unique bool) *ExamAttemptQuery {
 func (eaq *ExamAttemptQuery) Order(o ...examattempt.OrderOption) *ExamAttemptQuery {
 	eaq.order = append(eaq.order, o...)
 	return eaq
+}
+
+// QueryExam chains the current query on the "exam" edge.
+func (eaq *ExamAttemptQuery) QueryExam() *ExamQuery {
+	query := (&ExamClient{config: eaq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eaq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eaq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examattempt.Table, examattempt.FieldID, selector),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.ExamTable, examattempt.ExamColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eaq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (eaq *ExamAttemptQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: eaq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eaq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eaq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examattempt.Table, examattempt.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.UserTable, examattempt.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eaq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first ExamAttempt entity from the query.
@@ -250,10 +300,34 @@ func (eaq *ExamAttemptQuery) Clone() *ExamAttemptQuery {
 		order:      append([]examattempt.OrderOption{}, eaq.order...),
 		inters:     append([]Interceptor{}, eaq.inters...),
 		predicates: append([]predicate.ExamAttempt{}, eaq.predicates...),
+		withExam:   eaq.withExam.Clone(),
+		withUser:   eaq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  eaq.sql.Clone(),
 		path: eaq.path,
 	}
+}
+
+// WithExam tells the query-builder to eager-load the nodes that are connected to
+// the "exam" edge. The optional arguments are used to configure the query builder of the edge.
+func (eaq *ExamAttemptQuery) WithExam(opts ...func(*ExamQuery)) *ExamAttemptQuery {
+	query := (&ExamClient{config: eaq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eaq.withExam = query
+	return eaq
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (eaq *ExamAttemptQuery) WithUser(opts ...func(*UserQuery)) *ExamAttemptQuery {
+	query := (&UserClient{config: eaq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eaq.withUser = query
+	return eaq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,15 +406,27 @@ func (eaq *ExamAttemptQuery) prepareQuery(ctx context.Context) error {
 
 func (eaq *ExamAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ExamAttempt, error) {
 	var (
-		nodes = []*ExamAttempt{}
-		_spec = eaq.querySpec()
+		nodes       = []*ExamAttempt{}
+		withFKs     = eaq.withFKs
+		_spec       = eaq.querySpec()
+		loadedTypes = [2]bool{
+			eaq.withExam != nil,
+			eaq.withUser != nil,
+		}
 	)
+	if eaq.withExam != nil || eaq.withUser != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, examattempt.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*ExamAttempt).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &ExamAttempt{config: eaq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +438,84 @@ func (eaq *ExamAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := eaq.withExam; query != nil {
+		if err := eaq.loadExam(ctx, query, nodes, nil,
+			func(n *ExamAttempt, e *Exam) { n.Edges.Exam = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eaq.withUser; query != nil {
+		if err := eaq.loadUser(ctx, query, nodes, nil,
+			func(n *ExamAttempt, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (eaq *ExamAttemptQuery) loadExam(ctx context.Context, query *ExamQuery, nodes []*ExamAttempt, init func(*ExamAttempt), assign func(*ExamAttempt, *Exam)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*ExamAttempt)
+	for i := range nodes {
+		if nodes[i].exam_attempts == nil {
+			continue
+		}
+		fk := *nodes[i].exam_attempts
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(exam.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "exam_attempts" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (eaq *ExamAttemptQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*ExamAttempt, init func(*ExamAttempt), assign func(*ExamAttempt, *User)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*ExamAttempt)
+	for i := range nodes {
+		if nodes[i].user_attempts == nil {
+			continue
+		}
+		fk := *nodes[i].user_attempts
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_attempts" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (eaq *ExamAttemptQuery) sqlCount(ctx context.Context) (int, error) {

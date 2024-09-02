@@ -3,7 +3,9 @@
 package ent
 
 import (
+	"common/ent/exam"
 	"common/ent/examattempt"
+	"common/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -11,6 +13,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // ExamAttemptCreate is the builder for creating a ExamAttempt entity.
@@ -52,6 +55,44 @@ func (eac *ExamAttemptCreate) SetNillableUpdatedAt(t *time.Time) *ExamAttemptCre
 		eac.SetUpdatedAt(*t)
 	}
 	return eac
+}
+
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (eac *ExamAttemptCreate) SetExamID(id int) *ExamAttemptCreate {
+	eac.mutation.SetExamID(id)
+	return eac
+}
+
+// SetNillableExamID sets the "exam" edge to the Exam entity by ID if the given value is not nil.
+func (eac *ExamAttemptCreate) SetNillableExamID(id *int) *ExamAttemptCreate {
+	if id != nil {
+		eac = eac.SetExamID(*id)
+	}
+	return eac
+}
+
+// SetExam sets the "exam" edge to the Exam entity.
+func (eac *ExamAttemptCreate) SetExam(e *Exam) *ExamAttemptCreate {
+	return eac.SetExamID(e.ID)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (eac *ExamAttemptCreate) SetUserID(id uuid.UUID) *ExamAttemptCreate {
+	eac.mutation.SetUserID(id)
+	return eac
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (eac *ExamAttemptCreate) SetNillableUserID(id *uuid.UUID) *ExamAttemptCreate {
+	if id != nil {
+		eac = eac.SetUserID(*id)
+	}
+	return eac
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (eac *ExamAttemptCreate) SetUser(u *User) *ExamAttemptCreate {
+	return eac.SetUserID(u.ID)
 }
 
 // Mutation returns the ExamAttemptMutation object of the builder.
@@ -147,6 +188,40 @@ func (eac *ExamAttemptCreate) createSpec() (*ExamAttempt, *sqlgraph.CreateSpec) 
 	if value, ok := eac.mutation.UpdatedAt(); ok {
 		_spec.SetField(examattempt.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if nodes := eac.mutation.ExamIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.ExamTable,
+			Columns: []string{examattempt.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.exam_attempts = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := eac.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.UserTable,
+			Columns: []string{examattempt.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_attempts = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

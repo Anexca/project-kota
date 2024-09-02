@@ -62,12 +62,28 @@ var (
 		{Name: "attempt_number", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_attempts", Type: field.TypeInt, Nullable: true},
+		{Name: "user_attempts", Type: field.TypeUUID, Nullable: true},
 	}
 	// ExamAttemptsTable holds the schema information for the "exam_attempts" table.
 	ExamAttemptsTable = &schema.Table{
 		Name:       "exam_attempts",
 		Columns:    ExamAttemptsColumns,
 		PrimaryKey: []*schema.Column{ExamAttemptsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exam_attempts_exams_attempts",
+				Columns:    []*schema.Column{ExamAttemptsColumns[4]},
+				RefColumns: []*schema.Column{ExamsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "exam_attempts_users_attempts",
+				Columns:    []*schema.Column{ExamAttemptsColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// ExamCategoriesColumns holds the columns for the "exam_categories" table.
 	ExamCategoriesColumns = []*schema.Column{
@@ -174,6 +190,8 @@ var (
 func init() {
 	CachedQuestionMetaDataTable.ForeignKeys[0].RefTable = ExamsTable
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
+	ExamAttemptsTable.ForeignKeys[0].RefTable = ExamsTable
+	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable
 	GeneratedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 }

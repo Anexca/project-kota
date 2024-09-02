@@ -22,8 +22,29 @@ type User struct {
 	// FirstName holds the value of the "first_name" field.
 	FirstName string `json:"first_name,omitempty"`
 	// LastName holds the value of the "last_name" field.
-	LastName     string `json:"last_name,omitempty"`
+	LastName string `json:"last_name,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Attempts holds the value of the attempts edge.
+	Attempts []*ExamAttempt `json:"attempts,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// AttemptsOrErr returns the Attempts value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) AttemptsOrErr() ([]*ExamAttempt, error) {
+	if e.loadedTypes[0] {
+		return e.Attempts, nil
+	}
+	return nil, &NotLoadedError{edge: "attempts"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -85,6 +106,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryAttempts queries the "attempts" edge of the User entity.
+func (u *User) QueryAttempts() *ExamAttemptQuery {
+	return NewUserClient(u.config).QueryAttempts(u)
 }
 
 // Update returns a builder for updating this User.

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -23,5 +24,13 @@ func (ExamAttempt) Fields() []ent.Field {
 
 // Edges of the ExamAttempt.
 func (ExamAttempt) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("exam", Exam.Type).
+			Ref("attempts").
+			Unique(), // Each Atempts have one exam
+
+		edge.From("user", User.Type).
+			Ref("attempts").
+			Unique(), // Each Atempts have one user
+	}
 }

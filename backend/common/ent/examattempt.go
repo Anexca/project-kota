@@ -3,13 +3,16 @@
 package ent
 
 import (
+	"common/ent/exam"
 	"common/ent/examattempt"
+	"common/ent/user"
 	"fmt"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 )
 
 // ExamAttempt is the model entity for the ExamAttempt schema.
@@ -22,8 +25,46 @@ type ExamAttempt struct {
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
-	selectValues sql.SelectValues
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ExamAttemptQuery when eager-loading is set.
+	Edges         ExamAttemptEdges `json:"edges"`
+	exam_attempts *int
+	user_attempts *uuid.UUID
+	selectValues  sql.SelectValues
+}
+
+// ExamAttemptEdges holds the relations/edges for other nodes in the graph.
+type ExamAttemptEdges struct {
+	// Exam holds the value of the exam edge.
+	Exam *Exam `json:"exam,omitempty"`
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// ExamOrErr returns the Exam value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ExamAttemptEdges) ExamOrErr() (*Exam, error) {
+	if e.Exam != nil {
+		return e.Exam, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: exam.Label}
+	}
+	return nil, &NotLoadedError{edge: "exam"}
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ExamAttemptEdges) UserOrErr() (*User, error) {
+	if e.User != nil {
+		return e.User, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,6 +76,10 @@ func (*ExamAttempt) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case examattempt.FieldCreatedAt, examattempt.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case examattempt.ForeignKeys[0]: // exam_attempts
+			values[i] = new(sql.NullInt64)
+		case examattempt.ForeignKeys[1]: // user_attempts
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -74,6 +119,20 @@ func (ea *ExamAttempt) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ea.UpdatedAt = value.Time
 			}
+		case examattempt.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field exam_attempts", value)
+			} else if value.Valid {
+				ea.exam_attempts = new(int)
+				*ea.exam_attempts = int(value.Int64)
+			}
+		case examattempt.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_attempts", values[i])
+			} else if value.Valid {
+				ea.user_attempts = new(uuid.UUID)
+				*ea.user_attempts = *value.S.(*uuid.UUID)
+			}
 		default:
 			ea.selectValues.Set(columns[i], values[i])
 		}
@@ -85,6 +144,16 @@ func (ea *ExamAttempt) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (ea *ExamAttempt) Value(name string) (ent.Value, error) {
 	return ea.selectValues.Get(name)
+}
+
+// QueryExam queries the "exam" edge of the ExamAttempt entity.
+func (ea *ExamAttempt) QueryExam() *ExamQuery {
+	return NewExamAttemptClient(ea.config).QueryExam(ea)
+}
+
+// QueryUser queries the "user" edge of the ExamAttempt entity.
+func (ea *ExamAttempt) QueryUser() *UserQuery {
+	return NewExamAttemptClient(ea.config).QueryUser(ea)
 }
 
 // Update returns a builder for updating this ExamAttempt.

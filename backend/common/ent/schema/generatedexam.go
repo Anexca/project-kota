@@ -33,6 +33,6 @@ func (GeneratedExam) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("exam", Exam.Type).
 			Ref("generatedexams").
-			Unique(), // Many Questions have one Exam
+			Unique(), // Many GeneratedExams have one Exam
 	}
 }

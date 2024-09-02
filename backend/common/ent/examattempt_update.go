@@ -3,8 +3,10 @@
 package ent
 
 import (
+	"common/ent/exam"
 	"common/ent/examattempt"
 	"common/ent/predicate"
+	"common/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -13,6 +15,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // ExamAttemptUpdate is the builder for updating ExamAttempt entities.
@@ -55,9 +58,59 @@ func (eau *ExamAttemptUpdate) SetUpdatedAt(t time.Time) *ExamAttemptUpdate {
 	return eau
 }
 
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (eau *ExamAttemptUpdate) SetExamID(id int) *ExamAttemptUpdate {
+	eau.mutation.SetExamID(id)
+	return eau
+}
+
+// SetNillableExamID sets the "exam" edge to the Exam entity by ID if the given value is not nil.
+func (eau *ExamAttemptUpdate) SetNillableExamID(id *int) *ExamAttemptUpdate {
+	if id != nil {
+		eau = eau.SetExamID(*id)
+	}
+	return eau
+}
+
+// SetExam sets the "exam" edge to the Exam entity.
+func (eau *ExamAttemptUpdate) SetExam(e *Exam) *ExamAttemptUpdate {
+	return eau.SetExamID(e.ID)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (eau *ExamAttemptUpdate) SetUserID(id uuid.UUID) *ExamAttemptUpdate {
+	eau.mutation.SetUserID(id)
+	return eau
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (eau *ExamAttemptUpdate) SetNillableUserID(id *uuid.UUID) *ExamAttemptUpdate {
+	if id != nil {
+		eau = eau.SetUserID(*id)
+	}
+	return eau
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (eau *ExamAttemptUpdate) SetUser(u *User) *ExamAttemptUpdate {
+	return eau.SetUserID(u.ID)
+}
+
 // Mutation returns the ExamAttemptMutation object of the builder.
 func (eau *ExamAttemptUpdate) Mutation() *ExamAttemptMutation {
 	return eau.mutation
+}
+
+// ClearExam clears the "exam" edge to the Exam entity.
+func (eau *ExamAttemptUpdate) ClearExam() *ExamAttemptUpdate {
+	eau.mutation.ClearExam()
+	return eau
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (eau *ExamAttemptUpdate) ClearUser() *ExamAttemptUpdate {
+	eau.mutation.ClearUser()
+	return eau
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -114,6 +167,64 @@ func (eau *ExamAttemptUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eau.mutation.UpdatedAt(); ok {
 		_spec.SetField(examattempt.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if eau.mutation.ExamCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.ExamTable,
+			Columns: []string{examattempt.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eau.mutation.ExamIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.ExamTable,
+			Columns: []string{examattempt.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eau.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.UserTable,
+			Columns: []string{examattempt.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eau.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.UserTable,
+			Columns: []string{examattempt.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eau.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{examattempt.Label}
@@ -161,9 +272,59 @@ func (eauo *ExamAttemptUpdateOne) SetUpdatedAt(t time.Time) *ExamAttemptUpdateOn
 	return eauo
 }
 
+// SetExamID sets the "exam" edge to the Exam entity by ID.
+func (eauo *ExamAttemptUpdateOne) SetExamID(id int) *ExamAttemptUpdateOne {
+	eauo.mutation.SetExamID(id)
+	return eauo
+}
+
+// SetNillableExamID sets the "exam" edge to the Exam entity by ID if the given value is not nil.
+func (eauo *ExamAttemptUpdateOne) SetNillableExamID(id *int) *ExamAttemptUpdateOne {
+	if id != nil {
+		eauo = eauo.SetExamID(*id)
+	}
+	return eauo
+}
+
+// SetExam sets the "exam" edge to the Exam entity.
+func (eauo *ExamAttemptUpdateOne) SetExam(e *Exam) *ExamAttemptUpdateOne {
+	return eauo.SetExamID(e.ID)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (eauo *ExamAttemptUpdateOne) SetUserID(id uuid.UUID) *ExamAttemptUpdateOne {
+	eauo.mutation.SetUserID(id)
+	return eauo
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (eauo *ExamAttemptUpdateOne) SetNillableUserID(id *uuid.UUID) *ExamAttemptUpdateOne {
+	if id != nil {
+		eauo = eauo.SetUserID(*id)
+	}
+	return eauo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (eauo *ExamAttemptUpdateOne) SetUser(u *User) *ExamAttemptUpdateOne {
+	return eauo.SetUserID(u.ID)
+}
+
 // Mutation returns the ExamAttemptMutation object of the builder.
 func (eauo *ExamAttemptUpdateOne) Mutation() *ExamAttemptMutation {
 	return eauo.mutation
+}
+
+// ClearExam clears the "exam" edge to the Exam entity.
+func (eauo *ExamAttemptUpdateOne) ClearExam() *ExamAttemptUpdateOne {
+	eauo.mutation.ClearExam()
+	return eauo
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (eauo *ExamAttemptUpdateOne) ClearUser() *ExamAttemptUpdateOne {
+	eauo.mutation.ClearUser()
+	return eauo
 }
 
 // Where appends a list predicates to the ExamAttemptUpdate builder.
@@ -249,6 +410,64 @@ func (eauo *ExamAttemptUpdateOne) sqlSave(ctx context.Context) (_node *ExamAttem
 	}
 	if value, ok := eauo.mutation.UpdatedAt(); ok {
 		_spec.SetField(examattempt.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if eauo.mutation.ExamCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.ExamTable,
+			Columns: []string{examattempt.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eauo.mutation.ExamIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.ExamTable,
+			Columns: []string{examattempt.ExamColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eauo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.UserTable,
+			Columns: []string{examattempt.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eauo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   examattempt.UserTable,
+			Columns: []string{examattempt.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &ExamAttempt{config: eauo.config}
 	_spec.Assign = _node.assignValues
