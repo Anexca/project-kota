@@ -35,5 +35,7 @@ func (Exam) Edges() []ent.Edge {
 			Unique(), // Each Exam has one ExamSetting
 
 		edge.To("cached_question_metadata", CachedQuestionMetaData.Type),
+
+		edge.To("questions", Question.Type), // One Exam can have many Questions
 	}
 }

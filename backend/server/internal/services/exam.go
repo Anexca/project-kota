@@ -15,6 +15,7 @@ import (
 type ExamService struct {
 	redisService                     *commonServices.RedisService
 	examRepository                   *commonRepositories.ExamRepository
+	questionRepository               *commonRepositories.QuestionRepository
 	examCategoryRepository           *commonRepositories.ExamCategoryRepository
 	cachedQuestionMetaDataRepository *commonRepositories.CachedQuestionMetaDataRepository
 }
@@ -24,41 +25,58 @@ func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamServic
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	cachedQuestionMetaDataRepository := commonRepositories.NewCachedQuestionMetaDataRepository(dbClient)
+	questionRepository := commonRepositories.NewQuestionRepository(dbClient)
 
 	return &ExamService{
 		redisService:                     redisService,
 		examRepository:                   examRepository,
 		examCategoryRepository:           examCategoryRepository,
 		cachedQuestionMetaDataRepository: cachedQuestionMetaDataRepository,
+		questionRepository:               questionRepository,
 	}
 }
 
-func (e *ExamService) GetCachedQuestions(ctx context.Context, examType commonConstants.ExamType, returnType interface{}) (interface{}, error) {
+func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType commonConstants.ExamType) error {
 	examName := commonConstants.EXAMS[examType]
 
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return err
+	}
+
+	cachedMetaData, err := e.cachedQuestionMetaDataRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	if len(cachedMetaData) == 0 {
+		return fmt.Errorf("no cached metadata found for exam: %s", examName)
+	}
+
+	cachedData, err := e.redisService.Get(ctx, cachedMetaData[0].CacheUID)
+	if err != nil {
+		return err
+	}
+
+	e.cachedQuestionMetaDataRepository.MarkAsUsed(ctx, cachedMetaData[0].ID)
+	var questions []any
+
+	err = json.Unmarshal([]byte(cachedData), &questions)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal cached data: %w", err)
+	}
+
+	e.questionRepository.AddMany(ctx, questions, exam)
+
+	return nil
+}
+
+func (e *ExamService) GetQuestionsForExam(ctx context.Context, examType commonConstants.ExamType) ([]*ent.Question, error) {
+	examName := commonConstants.EXAMS[examType]
 	exam, err := e.examRepository.GetByName(ctx, examName)
 	if err != nil {
 		return nil, err
 	}
 
-	cachedMetaData, err := e.cachedQuestionMetaDataRepository.GetByExam(ctx, exam)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(cachedMetaData) == 0 {
-		return nil, fmt.Errorf("no cached metadata found for exam: %s", examName)
-	}
-
-	cachedData, err := e.redisService.Get(ctx, cachedMetaData[0].CacheUID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal([]byte(cachedData), returnType)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal cached data: %w", err)
-	}
-
-	return returnType, nil
+	return e.questionRepository.GetByExam(ctx, exam)
 }

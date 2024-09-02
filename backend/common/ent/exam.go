@@ -44,9 +44,11 @@ type ExamEdges struct {
 	Setting *ExamSetting `json:"setting,omitempty"`
 	// CachedQuestionMetadata holds the value of the cached_question_metadata edge.
 	CachedQuestionMetadata []*CachedQuestionMetaData `json:"cached_question_metadata,omitempty"`
+	// Questions holds the value of the questions edge.
+	Questions []*Question `json:"questions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -78,6 +80,15 @@ func (e ExamEdges) CachedQuestionMetadataOrErr() ([]*CachedQuestionMetaData, err
 		return e.CachedQuestionMetadata, nil
 	}
 	return nil, &NotLoadedError{edge: "cached_question_metadata"}
+}
+
+// QuestionsOrErr returns the Questions value or an error if the edge
+// was not loaded in eager-loading.
+func (e ExamEdges) QuestionsOrErr() ([]*Question, error) {
+	if e.loadedTypes[3] {
+		return e.Questions, nil
+	}
+	return nil, &NotLoadedError{edge: "questions"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -179,6 +190,11 @@ func (e *Exam) QuerySetting() *ExamSettingQuery {
 // QueryCachedQuestionMetadata queries the "cached_question_metadata" edge of the Exam entity.
 func (e *Exam) QueryCachedQuestionMetadata() *CachedQuestionMetaDataQuery {
 	return NewExamClient(e.config).QueryCachedQuestionMetadata(e)
+}
+
+// QueryQuestions queries the "questions" edge of the Exam entity.
+func (e *Exam) QueryQuestions() *QuestionQuery {
+	return NewExamClient(e.config).QueryQuestions(e)
 }
 
 // Update returns a builder for updating this Exam.

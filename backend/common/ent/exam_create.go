@@ -7,6 +7,7 @@ import (
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
+	"common/ent/question"
 	"context"
 	"errors"
 	"fmt"
@@ -128,6 +129,21 @@ func (ec *ExamCreate) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData) *E
 		ids[i] = c[i].ID
 	}
 	return ec.AddCachedQuestionMetadatumIDs(ids...)
+}
+
+// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
+func (ec *ExamCreate) AddQuestionIDs(ids ...int) *ExamCreate {
+	ec.mutation.AddQuestionIDs(ids...)
+	return ec
+}
+
+// AddQuestions adds the "questions" edges to the Question entity.
+func (ec *ExamCreate) AddQuestions(q ...*Question) *ExamCreate {
+	ids := make([]int, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return ec.AddQuestionIDs(ids...)
 }
 
 // Mutation returns the ExamMutation object of the builder.
@@ -284,6 +300,22 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.QuestionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.QuestionsTable,
+			Columns: []string{exam.QuestionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

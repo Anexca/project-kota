@@ -7,6 +7,8 @@ import (
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
+	"common/ent/question"
+	"common/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -80,6 +82,8 @@ func checkColumn(table, column string) error {
 			exam.Table:                   exam.ValidColumn,
 			examcategory.Table:           examcategory.ValidColumn,
 			examsetting.Table:            examsetting.ValidColumn,
+			question.Table:               question.ValidColumn,
+			user.Table:                   user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

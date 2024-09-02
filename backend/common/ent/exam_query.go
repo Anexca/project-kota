@@ -8,6 +8,7 @@ import (
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/predicate"
+	"common/ent/question"
 	"context"
 	"database/sql/driver"
 	"fmt"
@@ -29,6 +30,7 @@ type ExamQuery struct {
 	withCategory               *ExamCategoryQuery
 	withSetting                *ExamSettingQuery
 	withCachedQuestionMetadata *CachedQuestionMetaDataQuery
+	withQuestions              *QuestionQuery
 	withFKs                    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -125,6 +127,28 @@ func (eq *ExamQuery) QueryCachedQuestionMetadata() *CachedQuestionMetaDataQuery 
 			sqlgraph.From(exam.Table, exam.FieldID, selector),
 			sqlgraph.To(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, exam.CachedQuestionMetadataTable, exam.CachedQuestionMetadataColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryQuestions chains the current query on the "questions" edge.
+func (eq *ExamQuery) QueryQuestions() *QuestionQuery {
+	query := (&QuestionClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, selector),
+			sqlgraph.To(question.Table, question.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, exam.QuestionsTable, exam.QuestionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -327,6 +351,7 @@ func (eq *ExamQuery) Clone() *ExamQuery {
 		withCategory:               eq.withCategory.Clone(),
 		withSetting:                eq.withSetting.Clone(),
 		withCachedQuestionMetadata: eq.withCachedQuestionMetadata.Clone(),
+		withQuestions:              eq.withQuestions.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -363,6 +388,17 @@ func (eq *ExamQuery) WithCachedQuestionMetadata(opts ...func(*CachedQuestionMeta
 		opt(query)
 	}
 	eq.withCachedQuestionMetadata = query
+	return eq
+}
+
+// WithQuestions tells the query-builder to eager-load the nodes that are connected to
+// the "questions" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *ExamQuery) WithQuestions(opts ...func(*QuestionQuery)) *ExamQuery {
+	query := (&QuestionClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withQuestions = query
 	return eq
 }
 
@@ -445,10 +481,11 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 		nodes       = []*Exam{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			eq.withCategory != nil,
 			eq.withSetting != nil,
 			eq.withCachedQuestionMetadata != nil,
+			eq.withQuestions != nil,
 		}
 	)
 	if eq.withCategory != nil {
@@ -493,6 +530,13 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 			func(n *Exam, e *CachedQuestionMetaData) {
 				n.Edges.CachedQuestionMetadata = append(n.Edges.CachedQuestionMetadata, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withQuestions; query != nil {
+		if err := eq.loadQuestions(ctx, query, nodes,
+			func(n *Exam) { n.Edges.Questions = []*Question{} },
+			func(n *Exam, e *Question) { n.Edges.Questions = append(n.Edges.Questions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -585,6 +629,37 @@ func (eq *ExamQuery) loadCachedQuestionMetadata(ctx context.Context, query *Cach
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "exam_cached_question_metadata" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *ExamQuery) loadQuestions(ctx context.Context, query *QuestionQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *Question)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Exam)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Question(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(exam.QuestionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.exam_questions
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "exam_questions" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "exam_questions" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
