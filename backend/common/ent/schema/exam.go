@@ -19,7 +19,7 @@ func (Exam) Fields() []ent.Field {
 		field.String("name"),
 		field.String("description"),
 		field.Bool("is_active").Default(true),
-		field.Time("created_at").Default(time.Now),
+		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
@@ -36,6 +36,6 @@ func (Exam) Edges() []ent.Edge {
 
 		edge.To("cached_question_metadata", CachedQuestionMetaData.Type),
 
-		edge.To("questions", Question.Type), // One Exam can have many Questions
+		edge.To("generatedexams", GeneratedExam.Type), // One Exam can have many Questions
 	}
 }

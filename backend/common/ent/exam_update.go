@@ -7,8 +7,8 @@ import (
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
+	"common/ent/generatedexam"
 	"common/ent/predicate"
-	"common/ent/question"
 	"context"
 	"errors"
 	"fmt"
@@ -74,20 +74,6 @@ func (eu *ExamUpdate) SetNillableIsActive(b *bool) *ExamUpdate {
 	return eu
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (eu *ExamUpdate) SetCreatedAt(t time.Time) *ExamUpdate {
-	eu.mutation.SetCreatedAt(t)
-	return eu
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (eu *ExamUpdate) SetNillableCreatedAt(t *time.Time) *ExamUpdate {
-	if t != nil {
-		eu.SetCreatedAt(*t)
-	}
-	return eu
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (eu *ExamUpdate) SetUpdatedAt(t time.Time) *ExamUpdate {
 	eu.mutation.SetUpdatedAt(t)
@@ -147,19 +133,19 @@ func (eu *ExamUpdate) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData) *E
 	return eu.AddCachedQuestionMetadatumIDs(ids...)
 }
 
-// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (eu *ExamUpdate) AddQuestionIDs(ids ...int) *ExamUpdate {
-	eu.mutation.AddQuestionIDs(ids...)
+// AddGeneratedexamIDs adds the "generatedexams" edge to the GeneratedExam entity by IDs.
+func (eu *ExamUpdate) AddGeneratedexamIDs(ids ...int) *ExamUpdate {
+	eu.mutation.AddGeneratedexamIDs(ids...)
 	return eu
 }
 
-// AddQuestions adds the "questions" edges to the Question entity.
-func (eu *ExamUpdate) AddQuestions(q ...*Question) *ExamUpdate {
-	ids := make([]int, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+// AddGeneratedexams adds the "generatedexams" edges to the GeneratedExam entity.
+func (eu *ExamUpdate) AddGeneratedexams(g ...*GeneratedExam) *ExamUpdate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
 	}
-	return eu.AddQuestionIDs(ids...)
+	return eu.AddGeneratedexamIDs(ids...)
 }
 
 // Mutation returns the ExamMutation object of the builder.
@@ -200,25 +186,25 @@ func (eu *ExamUpdate) RemoveCachedQuestionMetadata(c ...*CachedQuestionMetaData)
 	return eu.RemoveCachedQuestionMetadatumIDs(ids...)
 }
 
-// ClearQuestions clears all "questions" edges to the Question entity.
-func (eu *ExamUpdate) ClearQuestions() *ExamUpdate {
-	eu.mutation.ClearQuestions()
+// ClearGeneratedexams clears all "generatedexams" edges to the GeneratedExam entity.
+func (eu *ExamUpdate) ClearGeneratedexams() *ExamUpdate {
+	eu.mutation.ClearGeneratedexams()
 	return eu
 }
 
-// RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
-func (eu *ExamUpdate) RemoveQuestionIDs(ids ...int) *ExamUpdate {
-	eu.mutation.RemoveQuestionIDs(ids...)
+// RemoveGeneratedexamIDs removes the "generatedexams" edge to GeneratedExam entities by IDs.
+func (eu *ExamUpdate) RemoveGeneratedexamIDs(ids ...int) *ExamUpdate {
+	eu.mutation.RemoveGeneratedexamIDs(ids...)
 	return eu
 }
 
-// RemoveQuestions removes "questions" edges to Question entities.
-func (eu *ExamUpdate) RemoveQuestions(q ...*Question) *ExamUpdate {
-	ids := make([]int, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+// RemoveGeneratedexams removes "generatedexams" edges to GeneratedExam entities.
+func (eu *ExamUpdate) RemoveGeneratedexams(g ...*GeneratedExam) *ExamUpdate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
 	}
-	return eu.RemoveQuestionIDs(ids...)
+	return eu.RemoveGeneratedexamIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -274,9 +260,6 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
-	}
-	if value, ok := eu.mutation.CreatedAt(); ok {
-		_spec.SetField(exam.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := eu.mutation.UpdatedAt(); ok {
 		_spec.SetField(exam.FieldUpdatedAt, field.TypeTime, value)
@@ -384,28 +367,28 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.QuestionsCleared() {
+	if eu.mutation.GeneratedexamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.QuestionsTable,
-			Columns: []string{exam.QuestionsColumn},
+			Table:   exam.GeneratedexamsTable,
+			Columns: []string{exam.GeneratedexamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !eu.mutation.QuestionsCleared() {
+	if nodes := eu.mutation.RemovedGeneratedexamsIDs(); len(nodes) > 0 && !eu.mutation.GeneratedexamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.QuestionsTable,
-			Columns: []string{exam.QuestionsColumn},
+			Table:   exam.GeneratedexamsTable,
+			Columns: []string{exam.GeneratedexamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -413,15 +396,15 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.QuestionsIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.GeneratedexamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.QuestionsTable,
-			Columns: []string{exam.QuestionsColumn},
+			Table:   exam.GeneratedexamsTable,
+			Columns: []string{exam.GeneratedexamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -491,20 +474,6 @@ func (euo *ExamUpdateOne) SetNillableIsActive(b *bool) *ExamUpdateOne {
 	return euo
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (euo *ExamUpdateOne) SetCreatedAt(t time.Time) *ExamUpdateOne {
-	euo.mutation.SetCreatedAt(t)
-	return euo
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (euo *ExamUpdateOne) SetNillableCreatedAt(t *time.Time) *ExamUpdateOne {
-	if t != nil {
-		euo.SetCreatedAt(*t)
-	}
-	return euo
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (euo *ExamUpdateOne) SetUpdatedAt(t time.Time) *ExamUpdateOne {
 	euo.mutation.SetUpdatedAt(t)
@@ -564,19 +533,19 @@ func (euo *ExamUpdateOne) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData
 	return euo.AddCachedQuestionMetadatumIDs(ids...)
 }
 
-// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (euo *ExamUpdateOne) AddQuestionIDs(ids ...int) *ExamUpdateOne {
-	euo.mutation.AddQuestionIDs(ids...)
+// AddGeneratedexamIDs adds the "generatedexams" edge to the GeneratedExam entity by IDs.
+func (euo *ExamUpdateOne) AddGeneratedexamIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.AddGeneratedexamIDs(ids...)
 	return euo
 }
 
-// AddQuestions adds the "questions" edges to the Question entity.
-func (euo *ExamUpdateOne) AddQuestions(q ...*Question) *ExamUpdateOne {
-	ids := make([]int, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+// AddGeneratedexams adds the "generatedexams" edges to the GeneratedExam entity.
+func (euo *ExamUpdateOne) AddGeneratedexams(g ...*GeneratedExam) *ExamUpdateOne {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
 	}
-	return euo.AddQuestionIDs(ids...)
+	return euo.AddGeneratedexamIDs(ids...)
 }
 
 // Mutation returns the ExamMutation object of the builder.
@@ -617,25 +586,25 @@ func (euo *ExamUpdateOne) RemoveCachedQuestionMetadata(c ...*CachedQuestionMetaD
 	return euo.RemoveCachedQuestionMetadatumIDs(ids...)
 }
 
-// ClearQuestions clears all "questions" edges to the Question entity.
-func (euo *ExamUpdateOne) ClearQuestions() *ExamUpdateOne {
-	euo.mutation.ClearQuestions()
+// ClearGeneratedexams clears all "generatedexams" edges to the GeneratedExam entity.
+func (euo *ExamUpdateOne) ClearGeneratedexams() *ExamUpdateOne {
+	euo.mutation.ClearGeneratedexams()
 	return euo
 }
 
-// RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
-func (euo *ExamUpdateOne) RemoveQuestionIDs(ids ...int) *ExamUpdateOne {
-	euo.mutation.RemoveQuestionIDs(ids...)
+// RemoveGeneratedexamIDs removes the "generatedexams" edge to GeneratedExam entities by IDs.
+func (euo *ExamUpdateOne) RemoveGeneratedexamIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.RemoveGeneratedexamIDs(ids...)
 	return euo
 }
 
-// RemoveQuestions removes "questions" edges to Question entities.
-func (euo *ExamUpdateOne) RemoveQuestions(q ...*Question) *ExamUpdateOne {
-	ids := make([]int, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+// RemoveGeneratedexams removes "generatedexams" edges to GeneratedExam entities.
+func (euo *ExamUpdateOne) RemoveGeneratedexams(g ...*GeneratedExam) *ExamUpdateOne {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
 	}
-	return euo.RemoveQuestionIDs(ids...)
+	return euo.RemoveGeneratedexamIDs(ids...)
 }
 
 // Where appends a list predicates to the ExamUpdate builder.
@@ -721,9 +690,6 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if value, ok := euo.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
-	}
-	if value, ok := euo.mutation.CreatedAt(); ok {
-		_spec.SetField(exam.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := euo.mutation.UpdatedAt(); ok {
 		_spec.SetField(exam.FieldUpdatedAt, field.TypeTime, value)
@@ -831,28 +797,28 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.QuestionsCleared() {
+	if euo.mutation.GeneratedexamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.QuestionsTable,
-			Columns: []string{exam.QuestionsColumn},
+			Table:   exam.GeneratedexamsTable,
+			Columns: []string{exam.GeneratedexamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !euo.mutation.QuestionsCleared() {
+	if nodes := euo.mutation.RemovedGeneratedexamsIDs(); len(nodes) > 0 && !euo.mutation.GeneratedexamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.QuestionsTable,
-			Columns: []string{exam.QuestionsColumn},
+			Table:   exam.GeneratedexamsTable,
+			Columns: []string{exam.GeneratedexamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -860,15 +826,15 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.QuestionsIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.GeneratedexamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.QuestionsTable,
-			Columns: []string{exam.QuestionsColumn},
+			Table:   exam.GeneratedexamsTable,
+			Columns: []string{exam.GeneratedexamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(generatedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

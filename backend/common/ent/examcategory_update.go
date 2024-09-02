@@ -71,20 +71,6 @@ func (ecu *ExamCategoryUpdate) SetNillableIsActive(b *bool) *ExamCategoryUpdate 
 	return ecu
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (ecu *ExamCategoryUpdate) SetCreatedAt(t time.Time) *ExamCategoryUpdate {
-	ecu.mutation.SetCreatedAt(t)
-	return ecu
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ecu *ExamCategoryUpdate) SetNillableCreatedAt(t *time.Time) *ExamCategoryUpdate {
-	if t != nil {
-		ecu.SetCreatedAt(*t)
-	}
-	return ecu
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (ecu *ExamCategoryUpdate) SetUpdatedAt(t time.Time) *ExamCategoryUpdate {
 	ecu.mutation.SetUpdatedAt(t)
@@ -185,9 +171,6 @@ func (ecu *ExamCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ecu.mutation.IsActive(); ok {
 		_spec.SetField(examcategory.FieldIsActive, field.TypeBool, value)
-	}
-	if value, ok := ecu.mutation.CreatedAt(); ok {
-		_spec.SetField(examcategory.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := ecu.mutation.UpdatedAt(); ok {
 		_spec.SetField(examcategory.FieldUpdatedAt, field.TypeTime, value)
@@ -295,20 +278,6 @@ func (ecuo *ExamCategoryUpdateOne) SetIsActive(b bool) *ExamCategoryUpdateOne {
 func (ecuo *ExamCategoryUpdateOne) SetNillableIsActive(b *bool) *ExamCategoryUpdateOne {
 	if b != nil {
 		ecuo.SetIsActive(*b)
-	}
-	return ecuo
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (ecuo *ExamCategoryUpdateOne) SetCreatedAt(t time.Time) *ExamCategoryUpdateOne {
-	ecuo.mutation.SetCreatedAt(t)
-	return ecuo
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ecuo *ExamCategoryUpdateOne) SetNillableCreatedAt(t *time.Time) *ExamCategoryUpdateOne {
-	if t != nil {
-		ecuo.SetCreatedAt(*t)
 	}
 	return ecuo
 }
@@ -443,9 +412,6 @@ func (ecuo *ExamCategoryUpdateOne) sqlSave(ctx context.Context) (_node *ExamCate
 	}
 	if value, ok := ecuo.mutation.IsActive(); ok {
 		_spec.SetField(examcategory.FieldIsActive, field.TypeBool, value)
-	}
-	if value, ok := ecuo.mutation.CreatedAt(); ok {
-		_spec.SetField(examcategory.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := ecuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(examcategory.FieldUpdatedAt, field.TypeTime, value)

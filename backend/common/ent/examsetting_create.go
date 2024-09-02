@@ -67,6 +67,34 @@ func (esc *ExamSettingCreate) SetOtherDetails(m map[string]interface{}) *ExamSet
 	return esc
 }
 
+// SetMaxAttempts sets the "max_attempts" field.
+func (esc *ExamSettingCreate) SetMaxAttempts(i int) *ExamSettingCreate {
+	esc.mutation.SetMaxAttempts(i)
+	return esc
+}
+
+// SetNillableMaxAttempts sets the "max_attempts" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableMaxAttempts(i *int) *ExamSettingCreate {
+	if i != nil {
+		esc.SetMaxAttempts(*i)
+	}
+	return esc
+}
+
+// SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
+func (esc *ExamSettingCreate) SetEvaluationAiPrompt(s string) *ExamSettingCreate {
+	esc.mutation.SetEvaluationAiPrompt(s)
+	return esc
+}
+
+// SetNillableEvaluationAiPrompt sets the "evaluation_ai_prompt" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableEvaluationAiPrompt(s *string) *ExamSettingCreate {
+	if s != nil {
+		esc.SetEvaluationAiPrompt(*s)
+	}
+	return esc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (esc *ExamSettingCreate) SetCreatedAt(t time.Time) *ExamSettingCreate {
 	esc.mutation.SetCreatedAt(t)
@@ -149,6 +177,10 @@ func (esc *ExamSettingCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (esc *ExamSettingCreate) defaults() {
+	if _, ok := esc.mutation.MaxAttempts(); !ok {
+		v := examsetting.DefaultMaxAttempts
+		esc.mutation.SetMaxAttempts(v)
+	}
 	if _, ok := esc.mutation.CreatedAt(); !ok {
 		v := examsetting.DefaultCreatedAt()
 		esc.mutation.SetCreatedAt(v)
@@ -166,6 +198,9 @@ func (esc *ExamSettingCreate) check() error {
 	}
 	if _, ok := esc.mutation.DurationMinutes(); !ok {
 		return &ValidationError{Name: "duration_minutes", err: errors.New(`ent: missing required field "ExamSetting.duration_minutes"`)}
+	}
+	if _, ok := esc.mutation.MaxAttempts(); !ok {
+		return &ValidationError{Name: "max_attempts", err: errors.New(`ent: missing required field "ExamSetting.max_attempts"`)}
 	}
 	if _, ok := esc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ExamSetting.created_at"`)}
@@ -218,6 +253,14 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 	if value, ok := esc.mutation.OtherDetails(); ok {
 		_spec.SetField(examsetting.FieldOtherDetails, field.TypeJSON, value)
 		_node.OtherDetails = value
+	}
+	if value, ok := esc.mutation.MaxAttempts(); ok {
+		_spec.SetField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+		_node.MaxAttempts = value
+	}
+	if value, ok := esc.mutation.EvaluationAiPrompt(); ok {
+		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)
+		_node.EvaluationAiPrompt = value
 	}
 	if value, ok := esc.mutation.CreatedAt(); ok {
 		_spec.SetField(examsetting.FieldCreatedAt, field.TypeTime, value)
