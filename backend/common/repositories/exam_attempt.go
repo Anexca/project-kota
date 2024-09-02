@@ -13,8 +13,8 @@ type ExamAttemptRepository struct {
 	dbClient *ent.Client
 }
 
-func NewExamAttemptRepository(dbClient *ent.Client) *ExamSettingRepository {
-	return &ExamSettingRepository{
+func NewExamAttemptRepository(dbClient *ent.Client) *ExamAttemptRepository {
+	return &ExamAttemptRepository{
 		dbClient: dbClient,
 	}
 }

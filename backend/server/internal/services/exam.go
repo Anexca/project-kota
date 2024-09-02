@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"server/pkg/models"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -15,8 +16,10 @@ import (
 type ExamService struct {
 	redisService                     *commonServices.RedisService
 	examRepository                   *commonRepositories.ExamRepository
-	questionRepository               *commonRepositories.GeneratedExamRepository
+	generatedExamRepository          *commonRepositories.GeneratedExamRepository
 	examCategoryRepository           *commonRepositories.ExamCategoryRepository
+	examSettingRepository            *commonRepositories.ExamSettingRepository
+	examAttemptRepository            *commonRepositories.ExamAttemptRepository
 	cachedQuestionMetaDataRepository *commonRepositories.CachedQuestionMetaDataRepository
 }
 
@@ -25,14 +28,18 @@ func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamServic
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	cachedQuestionMetaDataRepository := commonRepositories.NewCachedQuestionMetaDataRepository(dbClient)
-	questionRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
+	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
+	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
+	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 
 	return &ExamService{
 		redisService:                     redisService,
 		examRepository:                   examRepository,
 		examCategoryRepository:           examCategoryRepository,
 		cachedQuestionMetaDataRepository: cachedQuestionMetaDataRepository,
-		questionRepository:               questionRepository,
+		generatedExamRepository:          generatedExamRepository,
+		examSettingRepository:            examSettingRepository,
+		examAttemptRepository:            examAttemptRepository,
 	}
 }
 
@@ -66,17 +73,52 @@ func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType 
 		return fmt.Errorf("failed to unmarshal cached data: %w", err)
 	}
 
-	e.questionRepository.AddMany(ctx, questions, exam)
+	e.generatedExamRepository.AddMany(ctx, questions, exam)
 
 	return nil
 }
 
-func (e *ExamService) GetQuestionsForExam(ctx context.Context, examType commonConstants.ExamType) ([]*ent.GeneratedExam, error) {
+func (e *ExamService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType) ([]models.GeneratedExamOverview, error) {
 	examName := commonConstants.EXAMS[examType]
+
 	exam, err := e.examRepository.GetByName(ctx, examName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	return e.questionRepository.GetByExam(ctx, exam)
+	examSettings, err := e.examSettingRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get exam settings: %w", err)
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get generated exams: %w", err)
+	}
+
+	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(generatedExams))
+
+	for _, generatedExam := range generatedExams {
+		userExamAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get exam attempts for exam ID %d: %w", generatedExam.ID, err)
+		}
+
+		userAttempts := len(userExamAttempts)
+
+		generatedExamOverview := models.GeneratedExamOverview{
+			Id:                generatedExam.ID,
+			RawExamData:       generatedExam.RawExamData,
+			CreatedAt:         generatedExam.CreatedAt,
+			UpdatedAt:         generatedExam.UpdatedAt,
+			UserAttempts:      userAttempts,
+			MaxAttempts:       examSettings.MaxAttempts,
+			DurationMinutes:   examSettings.DurationMinutes,
+			NumberOfQuestions: examSettings.NumberOfQuestions,
+		}
+
+		generatedExamOverviewList = append(generatedExamOverviewList, generatedExamOverview)
+	}
+
+	return generatedExamOverviewList, nil
 }
