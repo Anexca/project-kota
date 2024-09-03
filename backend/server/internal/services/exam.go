@@ -14,32 +14,32 @@ import (
 )
 
 type ExamService struct {
-	redisService                     *commonServices.RedisService
-	examRepository                   *commonRepositories.ExamRepository
-	generatedExamRepository          *commonRepositories.GeneratedExamRepository
-	examCategoryRepository           *commonRepositories.ExamCategoryRepository
-	examSettingRepository            *commonRepositories.ExamSettingRepository
-	examAttemptRepository            *commonRepositories.ExamAttemptRepository
-	cachedQuestionMetaDataRepository *commonRepositories.CachedQuestionMetaDataRepository
+	redisService            *commonServices.RedisService
+	examRepository          *commonRepositories.ExamRepository
+	generatedExamRepository *commonRepositories.GeneratedExamRepository
+	examCategoryRepository  *commonRepositories.ExamCategoryRepository
+	examSettingRepository   *commonRepositories.ExamSettingRepository
+	examAttemptRepository   *commonRepositories.ExamAttemptRepository
+	cachedExamRepository    *commonRepositories.CachedExamRepository
 }
 
 func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamService {
 	redisService := commonServices.NewRedisService(redisClient)
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
-	cachedQuestionMetaDataRepository := commonRepositories.NewCachedQuestionMetaDataRepository(dbClient)
+	cachedExamRepository := commonRepositories.NewCachedExamRepository(dbClient)
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
 	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 
 	return &ExamService{
-		redisService:                     redisService,
-		examRepository:                   examRepository,
-		examCategoryRepository:           examCategoryRepository,
-		cachedQuestionMetaDataRepository: cachedQuestionMetaDataRepository,
-		generatedExamRepository:          generatedExamRepository,
-		examSettingRepository:            examSettingRepository,
-		examAttemptRepository:            examAttemptRepository,
+		redisService:            redisService,
+		examRepository:          examRepository,
+		examCategoryRepository:  examCategoryRepository,
+		cachedExamRepository:    cachedExamRepository,
+		generatedExamRepository: generatedExamRepository,
+		examSettingRepository:   examSettingRepository,
+		examAttemptRepository:   examAttemptRepository,
 	}
 }
 
@@ -51,7 +51,7 @@ func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType 
 		return err
 	}
 
-	cachedMetaData, err := e.cachedQuestionMetaDataRepository.GetByExam(ctx, exam)
+	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType 
 		return err
 	}
 
-	e.cachedQuestionMetaDataRepository.MarkAsUsed(ctx, cachedMetaData[0].ID)
+	e.cachedExamRepository.MarkAsUsed(ctx, cachedMetaData[0].ID)
 	var questions []any
 
 	err = json.Unmarshal([]byte(cachedData), &questions)
@@ -108,7 +108,7 @@ func (e *ExamService) GetGeneratedExams(ctx context.Context, examType commonCons
 
 		generatedExamOverview := models.GeneratedExamOverview{
 			Id:                generatedExam.ID,
-			RawExamData:       generatedExam.RawExamData,
+			RawExamData:       generatedExam.RawData,
 			CreatedAt:         generatedExam.CreatedAt,
 			UpdatedAt:         generatedExam.UpdatedAt,
 			UserAttempts:      userAttempts,

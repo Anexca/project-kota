@@ -12,8 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// CachedQuestionMetaData is the client for interacting with the CachedQuestionMetaData builders.
-	CachedQuestionMetaData *CachedQuestionMetaDataClient
+	// CachedExam is the client for interacting with the CachedExam builders.
+	CachedExam *CachedExamClient
 	// Exam is the client for interacting with the Exam builders.
 	Exam *ExamClient
 	// ExamAttempt is the client for interacting with the ExamAttempt builders.
@@ -159,7 +159,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.CachedQuestionMetaData = NewCachedQuestionMetaDataClient(tx.config)
+	tx.CachedExam = NewCachedExamClient(tx.config)
 	tx.Exam = NewExamClient(tx.config)
 	tx.ExamAttempt = NewExamAttemptClient(tx.config)
 	tx.ExamCategory = NewExamCategoryClient(tx.config)
@@ -176,7 +176,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: CachedQuestionMetaData.QueryXXX(), the query will be executed
+// applies a query, for example: CachedExam.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

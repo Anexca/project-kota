@@ -8,25 +8,25 @@ import (
 )
 
 var (
-	// CachedQuestionMetaDataColumns holds the columns for the "cached_question_meta_data" table.
-	CachedQuestionMetaDataColumns = []*schema.Column{
+	// CachedExamsColumns holds the columns for the "cached_exams" table.
+	CachedExamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "cache_uid", Type: field.TypeString, Unique: true},
 		{Name: "is_used", Type: field.TypeBool, Default: false},
 		{Name: "expires_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "exam_cached_question_metadata", Type: field.TypeInt},
+		{Name: "exam_cached_exam", Type: field.TypeInt},
 	}
-	// CachedQuestionMetaDataTable holds the schema information for the "cached_question_meta_data" table.
-	CachedQuestionMetaDataTable = &schema.Table{
-		Name:       "cached_question_meta_data",
-		Columns:    CachedQuestionMetaDataColumns,
-		PrimaryKey: []*schema.Column{CachedQuestionMetaDataColumns[0]},
+	// CachedExamsTable holds the schema information for the "cached_exams" table.
+	CachedExamsTable = &schema.Table{
+		Name:       "cached_exams",
+		Columns:    CachedExamsColumns,
+		PrimaryKey: []*schema.Column{CachedExamsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "cached_question_meta_data_exams_cached_question_metadata",
-				Columns:    []*schema.Column{CachedQuestionMetaDataColumns[6]},
+				Symbol:     "cached_exams_exams_cached_exam",
+				Columns:    []*schema.Column{CachedExamsColumns[6]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -177,7 +177,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		CachedQuestionMetaDataTable,
+		CachedExamsTable,
 		ExamsTable,
 		ExamAttemptsTable,
 		ExamCategoriesTable,
@@ -189,7 +189,7 @@ var (
 )
 
 func init() {
-	CachedQuestionMetaDataTable.ForeignKeys[0].RefTable = ExamsTable
+	CachedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
 	ExamAttemptsTable.ForeignKeys[0].RefTable = GeneratedExamsTable
 	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable

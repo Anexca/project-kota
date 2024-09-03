@@ -42,8 +42,8 @@ type ExamEdges struct {
 	Category *ExamCategory `json:"category,omitempty"`
 	// Setting holds the value of the setting edge.
 	Setting *ExamSetting `json:"setting,omitempty"`
-	// CachedQuestionMetadata holds the value of the cached_question_metadata edge.
-	CachedQuestionMetadata []*CachedQuestionMetaData `json:"cached_question_metadata,omitempty"`
+	// CachedExam holds the value of the cached_exam edge.
+	CachedExam []*CachedExam `json:"cached_exam,omitempty"`
 	// Generatedexams holds the value of the generatedexams edge.
 	Generatedexams []*GeneratedExam `json:"generatedexams,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -73,13 +73,13 @@ func (e ExamEdges) SettingOrErr() (*ExamSetting, error) {
 	return nil, &NotLoadedError{edge: "setting"}
 }
 
-// CachedQuestionMetadataOrErr returns the CachedQuestionMetadata value or an error if the edge
+// CachedExamOrErr returns the CachedExam value or an error if the edge
 // was not loaded in eager-loading.
-func (e ExamEdges) CachedQuestionMetadataOrErr() ([]*CachedQuestionMetaData, error) {
+func (e ExamEdges) CachedExamOrErr() ([]*CachedExam, error) {
 	if e.loadedTypes[2] {
-		return e.CachedQuestionMetadata, nil
+		return e.CachedExam, nil
 	}
-	return nil, &NotLoadedError{edge: "cached_question_metadata"}
+	return nil, &NotLoadedError{edge: "cached_exam"}
 }
 
 // GeneratedexamsOrErr returns the Generatedexams value or an error if the edge
@@ -187,9 +187,9 @@ func (e *Exam) QuerySetting() *ExamSettingQuery {
 	return NewExamClient(e.config).QuerySetting(e)
 }
 
-// QueryCachedQuestionMetadata queries the "cached_question_metadata" edge of the Exam entity.
-func (e *Exam) QueryCachedQuestionMetadata() *CachedQuestionMetaDataQuery {
-	return NewExamClient(e.config).QueryCachedQuestionMetadata(e)
+// QueryCachedExam queries the "cached_exam" edge of the Exam entity.
+func (e *Exam) QueryCachedExam() *CachedExamQuery {
+	return NewExamClient(e.config).QueryCachedExam(e)
 }
 
 // QueryGeneratedexams queries the "generatedexams" edge of the Exam entity.

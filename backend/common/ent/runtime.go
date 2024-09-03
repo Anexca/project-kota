@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"common/ent/cachedquestionmetadata"
+	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
@@ -18,22 +18,22 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	cachedquestionmetadataFields := schema.CachedQuestionMetaData{}.Fields()
-	_ = cachedquestionmetadataFields
-	// cachedquestionmetadataDescIsUsed is the schema descriptor for is_used field.
-	cachedquestionmetadataDescIsUsed := cachedquestionmetadataFields[1].Descriptor()
-	// cachedquestionmetadata.DefaultIsUsed holds the default value on creation for the is_used field.
-	cachedquestionmetadata.DefaultIsUsed = cachedquestionmetadataDescIsUsed.Default.(bool)
-	// cachedquestionmetadataDescCreatedAt is the schema descriptor for created_at field.
-	cachedquestionmetadataDescCreatedAt := cachedquestionmetadataFields[3].Descriptor()
-	// cachedquestionmetadata.DefaultCreatedAt holds the default value on creation for the created_at field.
-	cachedquestionmetadata.DefaultCreatedAt = cachedquestionmetadataDescCreatedAt.Default.(func() time.Time)
-	// cachedquestionmetadataDescUpdatedAt is the schema descriptor for updated_at field.
-	cachedquestionmetadataDescUpdatedAt := cachedquestionmetadataFields[4].Descriptor()
-	// cachedquestionmetadata.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	cachedquestionmetadata.DefaultUpdatedAt = cachedquestionmetadataDescUpdatedAt.Default.(func() time.Time)
-	// cachedquestionmetadata.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	cachedquestionmetadata.UpdateDefaultUpdatedAt = cachedquestionmetadataDescUpdatedAt.UpdateDefault.(func() time.Time)
+	cachedexamFields := schema.CachedExam{}.Fields()
+	_ = cachedexamFields
+	// cachedexamDescIsUsed is the schema descriptor for is_used field.
+	cachedexamDescIsUsed := cachedexamFields[1].Descriptor()
+	// cachedexam.DefaultIsUsed holds the default value on creation for the is_used field.
+	cachedexam.DefaultIsUsed = cachedexamDescIsUsed.Default.(bool)
+	// cachedexamDescCreatedAt is the schema descriptor for created_at field.
+	cachedexamDescCreatedAt := cachedexamFields[3].Descriptor()
+	// cachedexam.DefaultCreatedAt holds the default value on creation for the created_at field.
+	cachedexam.DefaultCreatedAt = cachedexamDescCreatedAt.Default.(func() time.Time)
+	// cachedexamDescUpdatedAt is the schema descriptor for updated_at field.
+	cachedexamDescUpdatedAt := cachedexamFields[4].Descriptor()
+	// cachedexam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	cachedexam.DefaultUpdatedAt = cachedexamDescUpdatedAt.Default.(func() time.Time)
+	// cachedexam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	cachedexam.UpdateDefaultUpdatedAt = cachedexamDescUpdatedAt.UpdateDefault.(func() time.Time)
 	examFields := schema.Exam{}.Fields()
 	_ = examFields
 	// examDescIsActive is the schema descriptor for is_active field.

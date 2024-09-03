@@ -8,16 +8,16 @@ import (
 	"fmt"
 )
 
-// The CachedQuestionMetaDataFunc type is an adapter to allow the use of ordinary
-// function as CachedQuestionMetaData mutator.
-type CachedQuestionMetaDataFunc func(context.Context, *ent.CachedQuestionMetaDataMutation) (ent.Value, error)
+// The CachedExamFunc type is an adapter to allow the use of ordinary
+// function as CachedExam mutator.
+type CachedExamFunc func(context.Context, *ent.CachedExamMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CachedQuestionMetaDataFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CachedQuestionMetaDataMutation); ok {
+func (f CachedExamFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CachedExamMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CachedQuestionMetaDataMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CachedExamMutation", m)
 }
 
 // The ExamFunc type is an adapter to allow the use of ordinary

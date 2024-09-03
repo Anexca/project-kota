@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"common/ent/cachedquestionmetadata"
+	"common/ent/cachedexam"
 	"common/ent/exam"
 	"fmt"
 	"strings"
@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// CachedQuestionMetaData is the model entity for the CachedQuestionMetaData schema.
-type CachedQuestionMetaData struct {
+// CachedExam is the model entity for the CachedExam schema.
+type CachedExam struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -29,14 +29,14 @@ type CachedQuestionMetaData struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the CachedQuestionMetaDataQuery when eager-loading is set.
-	Edges                         CachedQuestionMetaDataEdges `json:"edges"`
-	exam_cached_question_metadata *int
-	selectValues                  sql.SelectValues
+	// The values are being populated by the CachedExamQuery when eager-loading is set.
+	Edges            CachedExamEdges `json:"edges"`
+	exam_cached_exam *int
+	selectValues     sql.SelectValues
 }
 
-// CachedQuestionMetaDataEdges holds the relations/edges for other nodes in the graph.
-type CachedQuestionMetaDataEdges struct {
+// CachedExamEdges holds the relations/edges for other nodes in the graph.
+type CachedExamEdges struct {
 	// Exam holds the value of the exam edge.
 	Exam *Exam `json:"exam,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -46,7 +46,7 @@ type CachedQuestionMetaDataEdges struct {
 
 // ExamOrErr returns the Exam value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CachedQuestionMetaDataEdges) ExamOrErr() (*Exam, error) {
+func (e CachedExamEdges) ExamOrErr() (*Exam, error) {
 	if e.Exam != nil {
 		return e.Exam, nil
 	} else if e.loadedTypes[0] {
@@ -56,19 +56,19 @@ func (e CachedQuestionMetaDataEdges) ExamOrErr() (*Exam, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*CachedQuestionMetaData) scanValues(columns []string) ([]any, error) {
+func (*CachedExam) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case cachedquestionmetadata.FieldIsUsed:
+		case cachedexam.FieldIsUsed:
 			values[i] = new(sql.NullBool)
-		case cachedquestionmetadata.FieldID:
+		case cachedexam.FieldID:
 			values[i] = new(sql.NullInt64)
-		case cachedquestionmetadata.FieldCacheUID:
+		case cachedexam.FieldCacheUID:
 			values[i] = new(sql.NullString)
-		case cachedquestionmetadata.FieldExpiresAt, cachedquestionmetadata.FieldCreatedAt, cachedquestionmetadata.FieldUpdatedAt:
+		case cachedexam.FieldExpiresAt, cachedexam.FieldCreatedAt, cachedexam.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case cachedquestionmetadata.ForeignKeys[0]: // exam_cached_question_metadata
+		case cachedexam.ForeignKeys[0]: // exam_cached_exam
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -78,114 +78,114 @@ func (*CachedQuestionMetaData) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the CachedQuestionMetaData fields.
-func (cqmd *CachedQuestionMetaData) assignValues(columns []string, values []any) error {
+// to the CachedExam fields.
+func (ce *CachedExam) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case cachedquestionmetadata.FieldID:
+		case cachedexam.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			cqmd.ID = int(value.Int64)
-		case cachedquestionmetadata.FieldCacheUID:
+			ce.ID = int(value.Int64)
+		case cachedexam.FieldCacheUID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field cache_uid", values[i])
 			} else if value.Valid {
-				cqmd.CacheUID = value.String
+				ce.CacheUID = value.String
 			}
-		case cachedquestionmetadata.FieldIsUsed:
+		case cachedexam.FieldIsUsed:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_used", values[i])
 			} else if value.Valid {
-				cqmd.IsUsed = value.Bool
+				ce.IsUsed = value.Bool
 			}
-		case cachedquestionmetadata.FieldExpiresAt:
+		case cachedexam.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
 			} else if value.Valid {
-				cqmd.ExpiresAt = value.Time
+				ce.ExpiresAt = value.Time
 			}
-		case cachedquestionmetadata.FieldCreatedAt:
+		case cachedexam.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				cqmd.CreatedAt = value.Time
+				ce.CreatedAt = value.Time
 			}
-		case cachedquestionmetadata.FieldUpdatedAt:
+		case cachedexam.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				cqmd.UpdatedAt = value.Time
+				ce.UpdatedAt = value.Time
 			}
-		case cachedquestionmetadata.ForeignKeys[0]:
+		case cachedexam.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field exam_cached_question_metadata", value)
+				return fmt.Errorf("unexpected type %T for edge-field exam_cached_exam", value)
 			} else if value.Valid {
-				cqmd.exam_cached_question_metadata = new(int)
-				*cqmd.exam_cached_question_metadata = int(value.Int64)
+				ce.exam_cached_exam = new(int)
+				*ce.exam_cached_exam = int(value.Int64)
 			}
 		default:
-			cqmd.selectValues.Set(columns[i], values[i])
+			ce.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the CachedQuestionMetaData.
+// Value returns the ent.Value that was dynamically selected and assigned to the CachedExam.
 // This includes values selected through modifiers, order, etc.
-func (cqmd *CachedQuestionMetaData) Value(name string) (ent.Value, error) {
-	return cqmd.selectValues.Get(name)
+func (ce *CachedExam) Value(name string) (ent.Value, error) {
+	return ce.selectValues.Get(name)
 }
 
-// QueryExam queries the "exam" edge of the CachedQuestionMetaData entity.
-func (cqmd *CachedQuestionMetaData) QueryExam() *ExamQuery {
-	return NewCachedQuestionMetaDataClient(cqmd.config).QueryExam(cqmd)
+// QueryExam queries the "exam" edge of the CachedExam entity.
+func (ce *CachedExam) QueryExam() *ExamQuery {
+	return NewCachedExamClient(ce.config).QueryExam(ce)
 }
 
-// Update returns a builder for updating this CachedQuestionMetaData.
-// Note that you need to call CachedQuestionMetaData.Unwrap() before calling this method if this CachedQuestionMetaData
+// Update returns a builder for updating this CachedExam.
+// Note that you need to call CachedExam.Unwrap() before calling this method if this CachedExam
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (cqmd *CachedQuestionMetaData) Update() *CachedQuestionMetaDataUpdateOne {
-	return NewCachedQuestionMetaDataClient(cqmd.config).UpdateOne(cqmd)
+func (ce *CachedExam) Update() *CachedExamUpdateOne {
+	return NewCachedExamClient(ce.config).UpdateOne(ce)
 }
 
-// Unwrap unwraps the CachedQuestionMetaData entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the CachedExam entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (cqmd *CachedQuestionMetaData) Unwrap() *CachedQuestionMetaData {
-	_tx, ok := cqmd.config.driver.(*txDriver)
+func (ce *CachedExam) Unwrap() *CachedExam {
+	_tx, ok := ce.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: CachedQuestionMetaData is not a transactional entity")
+		panic("ent: CachedExam is not a transactional entity")
 	}
-	cqmd.config.driver = _tx.drv
-	return cqmd
+	ce.config.driver = _tx.drv
+	return ce
 }
 
 // String implements the fmt.Stringer.
-func (cqmd *CachedQuestionMetaData) String() string {
+func (ce *CachedExam) String() string {
 	var builder strings.Builder
-	builder.WriteString("CachedQuestionMetaData(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", cqmd.ID))
+	builder.WriteString("CachedExam(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", ce.ID))
 	builder.WriteString("cache_uid=")
-	builder.WriteString(cqmd.CacheUID)
+	builder.WriteString(ce.CacheUID)
 	builder.WriteString(", ")
 	builder.WriteString("is_used=")
-	builder.WriteString(fmt.Sprintf("%v", cqmd.IsUsed))
+	builder.WriteString(fmt.Sprintf("%v", ce.IsUsed))
 	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
-	builder.WriteString(cqmd.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(ce.ExpiresAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(cqmd.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(ce.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(cqmd.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(ce.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// CachedQuestionMetaDataSlice is a parsable slice of CachedQuestionMetaData.
-type CachedQuestionMetaDataSlice []*CachedQuestionMetaData
+// CachedExams is a parsable slice of CachedExam.
+type CachedExams []*CachedExam

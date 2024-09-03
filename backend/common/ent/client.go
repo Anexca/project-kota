@@ -11,7 +11,7 @@ import (
 
 	"common/ent/migrate"
 
-	"common/ent/cachedquestionmetadata"
+	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
@@ -32,8 +32,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// CachedQuestionMetaData is the client for interacting with the CachedQuestionMetaData builders.
-	CachedQuestionMetaData *CachedQuestionMetaDataClient
+	// CachedExam is the client for interacting with the CachedExam builders.
+	CachedExam *CachedExamClient
 	// Exam is the client for interacting with the Exam builders.
 	Exam *ExamClient
 	// ExamAttempt is the client for interacting with the ExamAttempt builders.
@@ -59,7 +59,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.CachedQuestionMetaData = NewCachedQuestionMetaDataClient(c.config)
+	c.CachedExam = NewCachedExamClient(c.config)
 	c.Exam = NewExamClient(c.config)
 	c.ExamAttempt = NewExamAttemptClient(c.config)
 	c.ExamCategory = NewExamCategoryClient(c.config)
@@ -157,16 +157,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:                    ctx,
-		config:                 cfg,
-		CachedQuestionMetaData: NewCachedQuestionMetaDataClient(cfg),
-		Exam:                   NewExamClient(cfg),
-		ExamAttempt:            NewExamAttemptClient(cfg),
-		ExamCategory:           NewExamCategoryClient(cfg),
-		ExamResult:             NewExamResultClient(cfg),
-		ExamSetting:            NewExamSettingClient(cfg),
-		GeneratedExam:          NewGeneratedExamClient(cfg),
-		User:                   NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		CachedExam:    NewCachedExamClient(cfg),
+		Exam:          NewExamClient(cfg),
+		ExamAttempt:   NewExamAttemptClient(cfg),
+		ExamCategory:  NewExamCategoryClient(cfg),
+		ExamResult:    NewExamResultClient(cfg),
+		ExamSetting:   NewExamSettingClient(cfg),
+		GeneratedExam: NewGeneratedExamClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
@@ -184,23 +184,23 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:                    ctx,
-		config:                 cfg,
-		CachedQuestionMetaData: NewCachedQuestionMetaDataClient(cfg),
-		Exam:                   NewExamClient(cfg),
-		ExamAttempt:            NewExamAttemptClient(cfg),
-		ExamCategory:           NewExamCategoryClient(cfg),
-		ExamResult:             NewExamResultClient(cfg),
-		ExamSetting:            NewExamSettingClient(cfg),
-		GeneratedExam:          NewGeneratedExamClient(cfg),
-		User:                   NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		CachedExam:    NewCachedExamClient(cfg),
+		Exam:          NewExamClient(cfg),
+		ExamAttempt:   NewExamAttemptClient(cfg),
+		ExamCategory:  NewExamCategoryClient(cfg),
+		ExamResult:    NewExamResultClient(cfg),
+		ExamSetting:   NewExamSettingClient(cfg),
+		GeneratedExam: NewGeneratedExamClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		CachedQuestionMetaData.
+//		CachedExam.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -223,7 +223,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.CachedQuestionMetaData, c.Exam, c.ExamAttempt, c.ExamCategory, c.ExamResult,
+		c.CachedExam, c.Exam, c.ExamAttempt, c.ExamCategory, c.ExamResult,
 		c.ExamSetting, c.GeneratedExam, c.User,
 	} {
 		n.Use(hooks...)
@@ -234,7 +234,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.CachedQuestionMetaData, c.Exam, c.ExamAttempt, c.ExamCategory, c.ExamResult,
+		c.CachedExam, c.Exam, c.ExamAttempt, c.ExamCategory, c.ExamResult,
 		c.ExamSetting, c.GeneratedExam, c.User,
 	} {
 		n.Intercept(interceptors...)
@@ -244,8 +244,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *CachedQuestionMetaDataMutation:
-		return c.CachedQuestionMetaData.mutate(ctx, m)
+	case *CachedExamMutation:
+		return c.CachedExam.mutate(ctx, m)
 	case *ExamMutation:
 		return c.Exam.mutate(ctx, m)
 	case *ExamAttemptMutation:
@@ -265,107 +265,107 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	}
 }
 
-// CachedQuestionMetaDataClient is a client for the CachedQuestionMetaData schema.
-type CachedQuestionMetaDataClient struct {
+// CachedExamClient is a client for the CachedExam schema.
+type CachedExamClient struct {
 	config
 }
 
-// NewCachedQuestionMetaDataClient returns a client for the CachedQuestionMetaData from the given config.
-func NewCachedQuestionMetaDataClient(c config) *CachedQuestionMetaDataClient {
-	return &CachedQuestionMetaDataClient{config: c}
+// NewCachedExamClient returns a client for the CachedExam from the given config.
+func NewCachedExamClient(c config) *CachedExamClient {
+	return &CachedExamClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `cachedquestionmetadata.Hooks(f(g(h())))`.
-func (c *CachedQuestionMetaDataClient) Use(hooks ...Hook) {
-	c.hooks.CachedQuestionMetaData = append(c.hooks.CachedQuestionMetaData, hooks...)
+// A call to `Use(f, g, h)` equals to `cachedexam.Hooks(f(g(h())))`.
+func (c *CachedExamClient) Use(hooks ...Hook) {
+	c.hooks.CachedExam = append(c.hooks.CachedExam, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `cachedquestionmetadata.Intercept(f(g(h())))`.
-func (c *CachedQuestionMetaDataClient) Intercept(interceptors ...Interceptor) {
-	c.inters.CachedQuestionMetaData = append(c.inters.CachedQuestionMetaData, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `cachedexam.Intercept(f(g(h())))`.
+func (c *CachedExamClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CachedExam = append(c.inters.CachedExam, interceptors...)
 }
 
-// Create returns a builder for creating a CachedQuestionMetaData entity.
-func (c *CachedQuestionMetaDataClient) Create() *CachedQuestionMetaDataCreate {
-	mutation := newCachedQuestionMetaDataMutation(c.config, OpCreate)
-	return &CachedQuestionMetaDataCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a CachedExam entity.
+func (c *CachedExamClient) Create() *CachedExamCreate {
+	mutation := newCachedExamMutation(c.config, OpCreate)
+	return &CachedExamCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of CachedQuestionMetaData entities.
-func (c *CachedQuestionMetaDataClient) CreateBulk(builders ...*CachedQuestionMetaDataCreate) *CachedQuestionMetaDataCreateBulk {
-	return &CachedQuestionMetaDataCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of CachedExam entities.
+func (c *CachedExamClient) CreateBulk(builders ...*CachedExamCreate) *CachedExamCreateBulk {
+	return &CachedExamCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *CachedQuestionMetaDataClient) MapCreateBulk(slice any, setFunc func(*CachedQuestionMetaDataCreate, int)) *CachedQuestionMetaDataCreateBulk {
+func (c *CachedExamClient) MapCreateBulk(slice any, setFunc func(*CachedExamCreate, int)) *CachedExamCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &CachedQuestionMetaDataCreateBulk{err: fmt.Errorf("calling to CachedQuestionMetaDataClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &CachedExamCreateBulk{err: fmt.Errorf("calling to CachedExamClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*CachedQuestionMetaDataCreate, rv.Len())
+	builders := make([]*CachedExamCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &CachedQuestionMetaDataCreateBulk{config: c.config, builders: builders}
+	return &CachedExamCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for CachedQuestionMetaData.
-func (c *CachedQuestionMetaDataClient) Update() *CachedQuestionMetaDataUpdate {
-	mutation := newCachedQuestionMetaDataMutation(c.config, OpUpdate)
-	return &CachedQuestionMetaDataUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for CachedExam.
+func (c *CachedExamClient) Update() *CachedExamUpdate {
+	mutation := newCachedExamMutation(c.config, OpUpdate)
+	return &CachedExamUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CachedQuestionMetaDataClient) UpdateOne(cqmd *CachedQuestionMetaData) *CachedQuestionMetaDataUpdateOne {
-	mutation := newCachedQuestionMetaDataMutation(c.config, OpUpdateOne, withCachedQuestionMetaData(cqmd))
-	return &CachedQuestionMetaDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CachedExamClient) UpdateOne(ce *CachedExam) *CachedExamUpdateOne {
+	mutation := newCachedExamMutation(c.config, OpUpdateOne, withCachedExam(ce))
+	return &CachedExamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CachedQuestionMetaDataClient) UpdateOneID(id int) *CachedQuestionMetaDataUpdateOne {
-	mutation := newCachedQuestionMetaDataMutation(c.config, OpUpdateOne, withCachedQuestionMetaDataID(id))
-	return &CachedQuestionMetaDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CachedExamClient) UpdateOneID(id int) *CachedExamUpdateOne {
+	mutation := newCachedExamMutation(c.config, OpUpdateOne, withCachedExamID(id))
+	return &CachedExamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for CachedQuestionMetaData.
-func (c *CachedQuestionMetaDataClient) Delete() *CachedQuestionMetaDataDelete {
-	mutation := newCachedQuestionMetaDataMutation(c.config, OpDelete)
-	return &CachedQuestionMetaDataDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for CachedExam.
+func (c *CachedExamClient) Delete() *CachedExamDelete {
+	mutation := newCachedExamMutation(c.config, OpDelete)
+	return &CachedExamDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CachedQuestionMetaDataClient) DeleteOne(cqmd *CachedQuestionMetaData) *CachedQuestionMetaDataDeleteOne {
-	return c.DeleteOneID(cqmd.ID)
+func (c *CachedExamClient) DeleteOne(ce *CachedExam) *CachedExamDeleteOne {
+	return c.DeleteOneID(ce.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CachedQuestionMetaDataClient) DeleteOneID(id int) *CachedQuestionMetaDataDeleteOne {
-	builder := c.Delete().Where(cachedquestionmetadata.ID(id))
+func (c *CachedExamClient) DeleteOneID(id int) *CachedExamDeleteOne {
+	builder := c.Delete().Where(cachedexam.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CachedQuestionMetaDataDeleteOne{builder}
+	return &CachedExamDeleteOne{builder}
 }
 
-// Query returns a query builder for CachedQuestionMetaData.
-func (c *CachedQuestionMetaDataClient) Query() *CachedQuestionMetaDataQuery {
-	return &CachedQuestionMetaDataQuery{
+// Query returns a query builder for CachedExam.
+func (c *CachedExamClient) Query() *CachedExamQuery {
+	return &CachedExamQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeCachedQuestionMetaData},
+		ctx:    &QueryContext{Type: TypeCachedExam},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a CachedQuestionMetaData entity by its id.
-func (c *CachedQuestionMetaDataClient) Get(ctx context.Context, id int) (*CachedQuestionMetaData, error) {
-	return c.Query().Where(cachedquestionmetadata.ID(id)).Only(ctx)
+// Get returns a CachedExam entity by its id.
+func (c *CachedExamClient) Get(ctx context.Context, id int) (*CachedExam, error) {
+	return c.Query().Where(cachedexam.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CachedQuestionMetaDataClient) GetX(ctx context.Context, id int) *CachedQuestionMetaData {
+func (c *CachedExamClient) GetX(ctx context.Context, id int) *CachedExam {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -373,44 +373,44 @@ func (c *CachedQuestionMetaDataClient) GetX(ctx context.Context, id int) *Cached
 	return obj
 }
 
-// QueryExam queries the exam edge of a CachedQuestionMetaData.
-func (c *CachedQuestionMetaDataClient) QueryExam(cqmd *CachedQuestionMetaData) *ExamQuery {
+// QueryExam queries the exam edge of a CachedExam.
+func (c *CachedExamClient) QueryExam(ce *CachedExam) *ExamQuery {
 	query := (&ExamClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cqmd.ID
+		id := ce.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID, id),
+			sqlgraph.From(cachedexam.Table, cachedexam.FieldID, id),
 			sqlgraph.To(exam.Table, exam.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, cachedquestionmetadata.ExamTable, cachedquestionmetadata.ExamColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, cachedexam.ExamTable, cachedexam.ExamColumn),
 		)
-		fromV = sqlgraph.Neighbors(cqmd.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(ce.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *CachedQuestionMetaDataClient) Hooks() []Hook {
-	return c.hooks.CachedQuestionMetaData
+func (c *CachedExamClient) Hooks() []Hook {
+	return c.hooks.CachedExam
 }
 
 // Interceptors returns the client interceptors.
-func (c *CachedQuestionMetaDataClient) Interceptors() []Interceptor {
-	return c.inters.CachedQuestionMetaData
+func (c *CachedExamClient) Interceptors() []Interceptor {
+	return c.inters.CachedExam
 }
 
-func (c *CachedQuestionMetaDataClient) mutate(ctx context.Context, m *CachedQuestionMetaDataMutation) (Value, error) {
+func (c *CachedExamClient) mutate(ctx context.Context, m *CachedExamMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&CachedQuestionMetaDataCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CachedExamCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&CachedQuestionMetaDataUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CachedExamUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&CachedQuestionMetaDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CachedExamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&CachedQuestionMetaDataDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&CachedExamDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown CachedQuestionMetaData mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown CachedExam mutation op: %q", m.Op())
 	}
 }
 
@@ -554,15 +554,15 @@ func (c *ExamClient) QuerySetting(e *Exam) *ExamSettingQuery {
 	return query
 }
 
-// QueryCachedQuestionMetadata queries the cached_question_metadata edge of a Exam.
-func (c *ExamClient) QueryCachedQuestionMetadata(e *Exam) *CachedQuestionMetaDataQuery {
-	query := (&CachedQuestionMetaDataClient{config: c.config}).Query()
+// QueryCachedExam queries the cached_exam edge of a Exam.
+func (c *ExamClient) QueryCachedExam(e *Exam) *CachedExamQuery {
+	query := (&CachedExamClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(exam.Table, exam.FieldID, id),
-			sqlgraph.To(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, exam.CachedQuestionMetadataTable, exam.CachedQuestionMetadataColumn),
+			sqlgraph.To(cachedexam.Table, cachedexam.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, exam.CachedExamTable, exam.CachedExamColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1524,11 +1524,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		CachedQuestionMetaData, Exam, ExamAttempt, ExamCategory, ExamResult,
-		ExamSetting, GeneratedExam, User []ent.Hook
+		CachedExam, Exam, ExamAttempt, ExamCategory, ExamResult, ExamSetting,
+		GeneratedExam, User []ent.Hook
 	}
 	inters struct {
-		CachedQuestionMetaData, Exam, ExamAttempt, ExamCategory, ExamResult,
-		ExamSetting, GeneratedExam, User []ent.Interceptor
+		CachedExam, Exam, ExamAttempt, ExamCategory, ExamResult, ExamSetting,
+		GeneratedExam, User []ent.Interceptor
 	}
 )

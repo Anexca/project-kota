@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"common/ent/cachedquestionmetadata"
+	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
@@ -80,14 +80,14 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			cachedquestionmetadata.Table: cachedquestionmetadata.ValidColumn,
-			exam.Table:                   exam.ValidColumn,
-			examattempt.Table:            examattempt.ValidColumn,
-			examcategory.Table:           examcategory.ValidColumn,
-			examresult.Table:             examresult.ValidColumn,
-			examsetting.Table:            examsetting.ValidColumn,
-			generatedexam.Table:          generatedexam.ValidColumn,
-			user.Table:                   user.ValidColumn,
+			cachedexam.Table:    cachedexam.ValidColumn,
+			exam.Table:          exam.ValidColumn,
+			examattempt.Table:   examattempt.ValidColumn,
+			examcategory.Table:  examcategory.ValidColumn,
+			examresult.Table:    examresult.ValidColumn,
+			examsetting.Table:   examsetting.ValidColumn,
+			generatedexam.Table: generatedexam.ValidColumn,
+			user.Table:          user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)
