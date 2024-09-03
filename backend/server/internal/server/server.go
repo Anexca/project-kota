@@ -20,7 +20,7 @@ import (
 type Server struct {
 	port int
 
-	examService  *services.ExamService
+	examService  *services.ExamGenerationService
 	authService  *services.AuthService
 	redisService *commonService.RedisService
 }
@@ -29,7 +29,7 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	logger := commonConfig.SetupLogger()
 
-	examService := services.NewExamService(redisClient, dbClient)
+	examService := services.NewExamGenerationService(redisClient, dbClient)
 	authService := services.NewAuthService(supabaseClient)
 	redisService := commonService.NewRedisService(redisClient)
 

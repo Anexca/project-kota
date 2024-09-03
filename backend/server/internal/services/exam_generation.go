@@ -13,7 +13,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type ExamService struct {
+type ExamGenerationService struct {
 	redisService            *commonServices.RedisService
 	examRepository          *commonRepositories.ExamRepository
 	generatedExamRepository *commonRepositories.GeneratedExamRepository
@@ -23,7 +23,7 @@ type ExamService struct {
 	cachedExamRepository    *commonRepositories.CachedExamRepository
 }
 
-func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamService {
+func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *ExamGenerationService {
 	redisService := commonServices.NewRedisService(redisClient)
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
@@ -32,7 +32,7 @@ func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamServic
 	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 
-	return &ExamService{
+	return &ExamGenerationService{
 		redisService:            redisService,
 		examRepository:          examRepository,
 		examCategoryRepository:  examCategoryRepository,
@@ -43,7 +43,7 @@ func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamServic
 	}
 }
 
-func (e *ExamService) GenerateExams(ctx context.Context, examType commonConstants.ExamType, modelType models.ExamModelType) error {
+func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType commonConstants.ExamType, modelType models.ExamModelType) error {
 	examName := commonConstants.EXAMS[examType]
 
 	exam, err := e.examRepository.GetByName(ctx, examName)
@@ -64,7 +64,7 @@ func (e *ExamService) GenerateExams(ctx context.Context, examType commonConstant
 	return nil
 }
 
-func (e *ExamService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (string, error) {
+func (e *ExamGenerationService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (string, error) {
 
 	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
 	if err != nil {
@@ -85,7 +85,7 @@ func (e *ExamService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (
 	return cachedData, nil
 }
 
-func (e *ExamService) ProcessExamData(ctx context.Context, exam *ent.Exam, modelType models.ExamModelType, cachedData string) error {
+func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.Exam, modelType models.ExamModelType, cachedData string) error {
 	switch modelType {
 	case models.DescriptiveExamType:
 		var descriptiveExams []models.DescriptiveExam
@@ -114,7 +114,7 @@ func (e *ExamService) ProcessExamData(ctx context.Context, exam *ent.Exam, model
 	return nil
 }
 
-func (e *ExamService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType) ([]models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType) ([]models.GeneratedExamOverview, error) {
 	examName := commonConstants.EXAMS[examType]
 
 	exam, err := e.examRepository.GetByName(ctx, examName)
