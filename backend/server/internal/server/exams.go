@@ -3,7 +3,6 @@ package server
 import (
 	"common/ent"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,7 +17,7 @@ func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	generatedExam, err := s.examService.GetGeneratedExamById(r.Context(), generatedExamId)
+	generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -26,7 +25,7 @@ func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		s.ErrorJson(w, fmt.Errorf("something went wrong"), http.StatusInternalServerError)
+		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}
 

@@ -149,7 +149,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get generated exam: %w", err)
 	}
 
-	examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam)
+	examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam.ID)
 	if err != nil {
 		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get exam settings: %w", err)
 	}
