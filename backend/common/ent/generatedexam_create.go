@@ -36,9 +36,15 @@ func (gec *GeneratedExamCreate) SetNillableIsActive(b *bool) *GeneratedExamCreat
 	return gec
 }
 
-// SetRawExamData sets the "raw_exam_data" field.
-func (gec *GeneratedExamCreate) SetRawExamData(m map[string]interface{}) *GeneratedExamCreate {
-	gec.mutation.SetRawExamData(m)
+// SetRawData sets the "raw_data" field.
+func (gec *GeneratedExamCreate) SetRawData(m map[string]interface{}) *GeneratedExamCreate {
+	gec.mutation.SetRawData(m)
+	return gec
+}
+
+// SetRawMetadata sets the "raw_metadata" field.
+func (gec *GeneratedExamCreate) SetRawMetadata(m map[string]interface{}) *GeneratedExamCreate {
+	gec.mutation.SetRawMetadata(m)
 	return gec
 }
 
@@ -194,9 +200,13 @@ func (gec *GeneratedExamCreate) createSpec() (*GeneratedExam, *sqlgraph.CreateSp
 		_spec.SetField(generatedexam.FieldIsActive, field.TypeBool, value)
 		_node.IsActive = value
 	}
-	if value, ok := gec.mutation.RawExamData(); ok {
-		_spec.SetField(generatedexam.FieldRawExamData, field.TypeJSON, value)
-		_node.RawExamData = value
+	if value, ok := gec.mutation.RawData(); ok {
+		_spec.SetField(generatedexam.FieldRawData, field.TypeJSON, value)
+		_node.RawData = value
+	}
+	if value, ok := gec.mutation.RawMetadata(); ok {
+		_spec.SetField(generatedexam.FieldRawMetadata, field.TypeJSON, value)
+		_node.RawMetadata = value
 	}
 	if value, ok := gec.mutation.CreatedAt(); ok {
 		_spec.SetField(generatedexam.FieldCreatedAt, field.TypeTime, value)

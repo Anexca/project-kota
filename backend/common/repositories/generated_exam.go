@@ -28,7 +28,7 @@ func (q *GeneratedExamRepository) AddMany(ctx context.Context, questions []any, 
 		}
 
 		bulk[i] = q.dbClient.GeneratedExam.Create().
-			SetRawExamData(jsonData).
+			SetRawData(jsonData).
 			SetExam(ex)
 	}
 

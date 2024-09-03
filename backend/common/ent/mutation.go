@@ -4028,7 +4028,8 @@ type GeneratedExamMutation struct {
 	typ             string
 	id              *int
 	is_active       *bool
-	raw_exam_data   *map[string]interface{}
+	raw_data        *map[string]interface{}
+	raw_metadata    *map[string]interface{}
 	created_at      *time.Time
 	updated_at      *time.Time
 	clearedFields   map[string]struct{}
@@ -4176,53 +4177,102 @@ func (m *GeneratedExamMutation) ResetIsActive() {
 	m.is_active = nil
 }
 
-// SetRawExamData sets the "raw_exam_data" field.
-func (m *GeneratedExamMutation) SetRawExamData(value map[string]interface{}) {
-	m.raw_exam_data = &value
+// SetRawData sets the "raw_data" field.
+func (m *GeneratedExamMutation) SetRawData(value map[string]interface{}) {
+	m.raw_data = &value
 }
 
-// RawExamData returns the value of the "raw_exam_data" field in the mutation.
-func (m *GeneratedExamMutation) RawExamData() (r map[string]interface{}, exists bool) {
-	v := m.raw_exam_data
+// RawData returns the value of the "raw_data" field in the mutation.
+func (m *GeneratedExamMutation) RawData() (r map[string]interface{}, exists bool) {
+	v := m.raw_data
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldRawExamData returns the old "raw_exam_data" field's value of the GeneratedExam entity.
+// OldRawData returns the old "raw_data" field's value of the GeneratedExam entity.
 // If the GeneratedExam object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GeneratedExamMutation) OldRawExamData(ctx context.Context) (v map[string]interface{}, err error) {
+func (m *GeneratedExamMutation) OldRawData(ctx context.Context) (v map[string]interface{}, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRawExamData is only allowed on UpdateOne operations")
+		return v, errors.New("OldRawData is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRawExamData requires an ID field in the mutation")
+		return v, errors.New("OldRawData requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRawExamData: %w", err)
+		return v, fmt.Errorf("querying old value for OldRawData: %w", err)
 	}
-	return oldValue.RawExamData, nil
+	return oldValue.RawData, nil
 }
 
-// ClearRawExamData clears the value of the "raw_exam_data" field.
-func (m *GeneratedExamMutation) ClearRawExamData() {
-	m.raw_exam_data = nil
-	m.clearedFields[generatedexam.FieldRawExamData] = struct{}{}
+// ClearRawData clears the value of the "raw_data" field.
+func (m *GeneratedExamMutation) ClearRawData() {
+	m.raw_data = nil
+	m.clearedFields[generatedexam.FieldRawData] = struct{}{}
 }
 
-// RawExamDataCleared returns if the "raw_exam_data" field was cleared in this mutation.
-func (m *GeneratedExamMutation) RawExamDataCleared() bool {
-	_, ok := m.clearedFields[generatedexam.FieldRawExamData]
+// RawDataCleared returns if the "raw_data" field was cleared in this mutation.
+func (m *GeneratedExamMutation) RawDataCleared() bool {
+	_, ok := m.clearedFields[generatedexam.FieldRawData]
 	return ok
 }
 
-// ResetRawExamData resets all changes to the "raw_exam_data" field.
-func (m *GeneratedExamMutation) ResetRawExamData() {
-	m.raw_exam_data = nil
-	delete(m.clearedFields, generatedexam.FieldRawExamData)
+// ResetRawData resets all changes to the "raw_data" field.
+func (m *GeneratedExamMutation) ResetRawData() {
+	m.raw_data = nil
+	delete(m.clearedFields, generatedexam.FieldRawData)
+}
+
+// SetRawMetadata sets the "raw_metadata" field.
+func (m *GeneratedExamMutation) SetRawMetadata(value map[string]interface{}) {
+	m.raw_metadata = &value
+}
+
+// RawMetadata returns the value of the "raw_metadata" field in the mutation.
+func (m *GeneratedExamMutation) RawMetadata() (r map[string]interface{}, exists bool) {
+	v := m.raw_metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRawMetadata returns the old "raw_metadata" field's value of the GeneratedExam entity.
+// If the GeneratedExam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GeneratedExamMutation) OldRawMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRawMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRawMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRawMetadata: %w", err)
+	}
+	return oldValue.RawMetadata, nil
+}
+
+// ClearRawMetadata clears the value of the "raw_metadata" field.
+func (m *GeneratedExamMutation) ClearRawMetadata() {
+	m.raw_metadata = nil
+	m.clearedFields[generatedexam.FieldRawMetadata] = struct{}{}
+}
+
+// RawMetadataCleared returns if the "raw_metadata" field was cleared in this mutation.
+func (m *GeneratedExamMutation) RawMetadataCleared() bool {
+	_, ok := m.clearedFields[generatedexam.FieldRawMetadata]
+	return ok
+}
+
+// ResetRawMetadata resets all changes to the "raw_metadata" field.
+func (m *GeneratedExamMutation) ResetRawMetadata() {
+	m.raw_metadata = nil
+	delete(m.clearedFields, generatedexam.FieldRawMetadata)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -4424,12 +4474,15 @@ func (m *GeneratedExamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GeneratedExamMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.is_active != nil {
 		fields = append(fields, generatedexam.FieldIsActive)
 	}
-	if m.raw_exam_data != nil {
-		fields = append(fields, generatedexam.FieldRawExamData)
+	if m.raw_data != nil {
+		fields = append(fields, generatedexam.FieldRawData)
+	}
+	if m.raw_metadata != nil {
+		fields = append(fields, generatedexam.FieldRawMetadata)
 	}
 	if m.created_at != nil {
 		fields = append(fields, generatedexam.FieldCreatedAt)
@@ -4447,8 +4500,10 @@ func (m *GeneratedExamMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case generatedexam.FieldIsActive:
 		return m.IsActive()
-	case generatedexam.FieldRawExamData:
-		return m.RawExamData()
+	case generatedexam.FieldRawData:
+		return m.RawData()
+	case generatedexam.FieldRawMetadata:
+		return m.RawMetadata()
 	case generatedexam.FieldCreatedAt:
 		return m.CreatedAt()
 	case generatedexam.FieldUpdatedAt:
@@ -4464,8 +4519,10 @@ func (m *GeneratedExamMutation) OldField(ctx context.Context, name string) (ent.
 	switch name {
 	case generatedexam.FieldIsActive:
 		return m.OldIsActive(ctx)
-	case generatedexam.FieldRawExamData:
-		return m.OldRawExamData(ctx)
+	case generatedexam.FieldRawData:
+		return m.OldRawData(ctx)
+	case generatedexam.FieldRawMetadata:
+		return m.OldRawMetadata(ctx)
 	case generatedexam.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case generatedexam.FieldUpdatedAt:
@@ -4486,12 +4543,19 @@ func (m *GeneratedExamMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetIsActive(v)
 		return nil
-	case generatedexam.FieldRawExamData:
+	case generatedexam.FieldRawData:
 		v, ok := value.(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetRawExamData(v)
+		m.SetRawData(v)
+		return nil
+	case generatedexam.FieldRawMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRawMetadata(v)
 		return nil
 	case generatedexam.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -4537,8 +4601,11 @@ func (m *GeneratedExamMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *GeneratedExamMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(generatedexam.FieldRawExamData) {
-		fields = append(fields, generatedexam.FieldRawExamData)
+	if m.FieldCleared(generatedexam.FieldRawData) {
+		fields = append(fields, generatedexam.FieldRawData)
+	}
+	if m.FieldCleared(generatedexam.FieldRawMetadata) {
+		fields = append(fields, generatedexam.FieldRawMetadata)
 	}
 	return fields
 }
@@ -4554,8 +4621,11 @@ func (m *GeneratedExamMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *GeneratedExamMutation) ClearField(name string) error {
 	switch name {
-	case generatedexam.FieldRawExamData:
-		m.ClearRawExamData()
+	case generatedexam.FieldRawData:
+		m.ClearRawData()
+		return nil
+	case generatedexam.FieldRawMetadata:
+		m.ClearRawMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown GeneratedExam nullable field %s", name)
@@ -4568,8 +4638,11 @@ func (m *GeneratedExamMutation) ResetField(name string) error {
 	case generatedexam.FieldIsActive:
 		m.ResetIsActive()
 		return nil
-	case generatedexam.FieldRawExamData:
-		m.ResetRawExamData()
+	case generatedexam.FieldRawData:
+		m.ResetRawData()
+		return nil
+	case generatedexam.FieldRawMetadata:
+		m.ResetRawMetadata()
 		return nil
 	case generatedexam.FieldCreatedAt:
 		m.ResetCreatedAt()

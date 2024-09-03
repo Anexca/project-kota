@@ -16,8 +16,10 @@ const (
 	FieldID = "id"
 	// FieldIsActive holds the string denoting the is_active field in the database.
 	FieldIsActive = "is_active"
-	// FieldRawExamData holds the string denoting the raw_exam_data field in the database.
-	FieldRawExamData = "raw_exam_data"
+	// FieldRawData holds the string denoting the raw_data field in the database.
+	FieldRawData = "raw_data"
+	// FieldRawMetadata holds the string denoting the raw_metadata field in the database.
+	FieldRawMetadata = "raw_metadata"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -48,7 +50,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldIsActive,
-	FieldRawExamData,
+	FieldRawData,
+	FieldRawMetadata,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
