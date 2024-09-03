@@ -6,6 +6,7 @@ import (
 	"errors"
 	"server/pkg/constants"
 	"strconv"
+	"strings"
 
 	"net/http"
 
@@ -44,6 +45,11 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
 			s.ErrorJson(w, errors.New("exam not found"))
+			return
+		}
+
+		if strings.Contains(err.Error(), "max attempts for exam exceeded") {
+			s.ErrorJson(w, err, http.StatusBadRequest)
 			return
 		}
 
