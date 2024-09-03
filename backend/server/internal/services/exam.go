@@ -43,7 +43,7 @@ func NewExamService(redisClient *redis.Client, dbClient *ent.Client) *ExamServic
 	}
 }
 
-func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType commonConstants.ExamType) error {
+func (e *ExamService) GenerateExams(ctx context.Context, examType commonConstants.ExamType, modelType models.ExamModelType) error {
 	examName := commonConstants.EXAMS[examType]
 
 	exam, err := e.examRepository.GetByName(ctx, examName)
@@ -51,29 +51,60 @@ func (e *ExamService) AddCachedQuestionInDatabase(ctx context.Context, examType 
 		return err
 	}
 
-	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
+	cachedData, err := e.FetchCachedExamData(ctx, exam)
 	if err != nil {
 		return err
 	}
 
+	err = e.ProcessExamData(ctx, exam, modelType, cachedData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e *ExamService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) ([]byte, error) {
+
+	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return nil, err
+	}
+
 	if len(cachedMetaData) == 0 {
-		return fmt.Errorf("no cached metadata found for exam: %s", examName)
+		return nil, fmt.Errorf("no cached metadata found for exam: %s", exam.Name)
 	}
 
 	cachedData, err := e.redisService.Get(ctx, cachedMetaData[0].CacheUID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	e.cachedExamRepository.MarkAsUsed(ctx, cachedMetaData[0].ID)
-	var questions []any
 
-	err = json.Unmarshal([]byte(cachedData), &questions)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal cached data: %w", err)
+	return []byte(cachedData), nil
+}
+
+func (e *ExamService) ProcessExamData(ctx context.Context, exam *ent.Exam, modelType models.ExamModelType, cachedData []byte) error {
+	switch modelType {
+	case models.DescriptiveExamType:
+		var exams []models.DescriptiveExam
+		err := json.Unmarshal(cachedData, &exams)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal cached data for DescriptiveExam: %w", err)
+		}
+		anyExams := make([]any, len(exams))
+		for i, exam := range exams {
+			anyExams[i] = exam
+		}
+		_, err = e.generatedExamRepository.AddMany(ctx, anyExams, exam)
+		if err != nil {
+			return fmt.Errorf("failed to generate DescriptiveExams : %w", err)
+		}
+
+	default:
+		return fmt.Errorf("unsupported exam model type")
 	}
-
-	e.generatedExamRepository.AddMany(ctx, questions, exam)
 
 	return nil
 }
