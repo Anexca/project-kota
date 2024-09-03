@@ -158,3 +158,28 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 
 	return generatedExamOverviewList, nil
 }
+
+func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int) (models.GeneratedExamOverview, error) {
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	if err != nil {
+		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get generated exam: %w", err)
+	}
+
+	examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam)
+	if err != nil {
+		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get exam settings: %w", err)
+	}
+
+	generatedExamOverview := models.GeneratedExamOverview{
+		Id:                generatedExam.ID,
+		RawExamData:       generatedExam.RawExamData,
+		CreatedAt:         generatedExam.CreatedAt,
+		UpdatedAt:         generatedExam.UpdatedAt,
+		UserAttempts:      len(generatedExam.Edges.Attempts),
+		MaxAttempts:       examSettings.MaxAttempts,
+		DurationMinutes:   examSettings.DurationMinutes,
+		NumberOfQuestions: examSettings.NumberOfQuestions,
+	}
+
+	return generatedExamOverview, nil
+}

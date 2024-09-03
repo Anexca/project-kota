@@ -35,6 +35,18 @@ func (q *GeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *
 	return q.dbClient.GeneratedExam.CreateBulk(bulk...).Save(ctx)
 }
 
+func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.ID(generatedExamId)).
+		WithExam().
+		WithAttempts().
+		Only(ctx)
+}
+
 func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
-	return q.dbClient.GeneratedExam.Query().Where(generatedexam.HasExamWith(exam.ID(ex.ID)), generatedexam.IsActive(true)).All(ctx)
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.HasExamWith(exam.ID(ex.ID)), generatedexam.IsActive(true)).
+		WithAttempts().
+		WithExam().
+		All(ctx)
 }
