@@ -33,3 +33,7 @@ func (e *ExamAssesmentService) StartNewAssesment(ctx context.Context, attempt *e
 	return e.examAssesmentRepository.Create(ctx, attempt.ID, assesmentModel)
 
 }
+
+func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*ent.ExamAssesment, error) {
+	return e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
+}

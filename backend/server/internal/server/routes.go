@@ -38,6 +38,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 				r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
 			})
 
+			r.Route("/assesments", func(r chi.Router) {
+				r.Get("/{id}", s.GetAssesmentById)
+			})
+
 			r.Get("/{id}", s.GetGeneratedExamById)
 		})
 	})
