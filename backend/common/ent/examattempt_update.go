@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
@@ -96,6 +97,25 @@ func (eau *ExamAttemptUpdate) SetUser(u *User) *ExamAttemptUpdate {
 	return eau.SetUserID(u.ID)
 }
 
+// SetAssesmentID sets the "assesment" edge to the ExamAssesment entity by ID.
+func (eau *ExamAttemptUpdate) SetAssesmentID(id int) *ExamAttemptUpdate {
+	eau.mutation.SetAssesmentID(id)
+	return eau
+}
+
+// SetNillableAssesmentID sets the "assesment" edge to the ExamAssesment entity by ID if the given value is not nil.
+func (eau *ExamAttemptUpdate) SetNillableAssesmentID(id *int) *ExamAttemptUpdate {
+	if id != nil {
+		eau = eau.SetAssesmentID(*id)
+	}
+	return eau
+}
+
+// SetAssesment sets the "assesment" edge to the ExamAssesment entity.
+func (eau *ExamAttemptUpdate) SetAssesment(e *ExamAssesment) *ExamAttemptUpdate {
+	return eau.SetAssesmentID(e.ID)
+}
+
 // Mutation returns the ExamAttemptMutation object of the builder.
 func (eau *ExamAttemptUpdate) Mutation() *ExamAttemptMutation {
 	return eau.mutation
@@ -110,6 +130,12 @@ func (eau *ExamAttemptUpdate) ClearGeneratedexam() *ExamAttemptUpdate {
 // ClearUser clears the "user" edge to the User entity.
 func (eau *ExamAttemptUpdate) ClearUser() *ExamAttemptUpdate {
 	eau.mutation.ClearUser()
+	return eau
+}
+
+// ClearAssesment clears the "assesment" edge to the ExamAssesment entity.
+func (eau *ExamAttemptUpdate) ClearAssesment() *ExamAttemptUpdate {
+	eau.mutation.ClearAssesment()
 	return eau
 }
 
@@ -225,6 +251,35 @@ func (eau *ExamAttemptUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eau.mutation.AssesmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   examattempt.AssesmentTable,
+			Columns: []string{examattempt.AssesmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eau.mutation.AssesmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   examattempt.AssesmentTable,
+			Columns: []string{examattempt.AssesmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eau.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{examattempt.Label}
@@ -310,6 +365,25 @@ func (eauo *ExamAttemptUpdateOne) SetUser(u *User) *ExamAttemptUpdateOne {
 	return eauo.SetUserID(u.ID)
 }
 
+// SetAssesmentID sets the "assesment" edge to the ExamAssesment entity by ID.
+func (eauo *ExamAttemptUpdateOne) SetAssesmentID(id int) *ExamAttemptUpdateOne {
+	eauo.mutation.SetAssesmentID(id)
+	return eauo
+}
+
+// SetNillableAssesmentID sets the "assesment" edge to the ExamAssesment entity by ID if the given value is not nil.
+func (eauo *ExamAttemptUpdateOne) SetNillableAssesmentID(id *int) *ExamAttemptUpdateOne {
+	if id != nil {
+		eauo = eauo.SetAssesmentID(*id)
+	}
+	return eauo
+}
+
+// SetAssesment sets the "assesment" edge to the ExamAssesment entity.
+func (eauo *ExamAttemptUpdateOne) SetAssesment(e *ExamAssesment) *ExamAttemptUpdateOne {
+	return eauo.SetAssesmentID(e.ID)
+}
+
 // Mutation returns the ExamAttemptMutation object of the builder.
 func (eauo *ExamAttemptUpdateOne) Mutation() *ExamAttemptMutation {
 	return eauo.mutation
@@ -324,6 +398,12 @@ func (eauo *ExamAttemptUpdateOne) ClearGeneratedexam() *ExamAttemptUpdateOne {
 // ClearUser clears the "user" edge to the User entity.
 func (eauo *ExamAttemptUpdateOne) ClearUser() *ExamAttemptUpdateOne {
 	eauo.mutation.ClearUser()
+	return eauo
+}
+
+// ClearAssesment clears the "assesment" edge to the ExamAssesment entity.
+func (eauo *ExamAttemptUpdateOne) ClearAssesment() *ExamAttemptUpdateOne {
+	eauo.mutation.ClearAssesment()
 	return eauo
 }
 
@@ -462,6 +542,35 @@ func (eauo *ExamAttemptUpdateOne) sqlSave(ctx context.Context) (_node *ExamAttem
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eauo.mutation.AssesmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   examattempt.AssesmentTable,
+			Columns: []string{examattempt.AssesmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eauo.mutation.AssesmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   examattempt.AssesmentTable,
+			Columns: []string{examattempt.AssesmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -5,9 +5,9 @@ package ent
 import (
 	"common/ent/cachedexam"
 	"common/ent/exam"
+	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
-	"common/ent/examresult"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/user"
@@ -82,9 +82,9 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			cachedexam.Table:    cachedexam.ValidColumn,
 			exam.Table:          exam.ValidColumn,
+			examassesment.Table: examassesment.ValidColumn,
 			examattempt.Table:   examattempt.ValidColumn,
 			examcategory.Table:  examcategory.ValidColumn,
-			examresult.Table:    examresult.ValidColumn,
 			examsetting.Table:   examsetting.ValidColumn,
 			generatedexam.Table: generatedexam.ValidColumn,
 			user.Table:          user.ValidColumn,

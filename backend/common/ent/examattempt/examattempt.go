@@ -24,6 +24,8 @@ const (
 	EdgeGeneratedexam = "generatedexam"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
+	// EdgeAssesment holds the string denoting the assesment edge name in mutations.
+	EdgeAssesment = "assesment"
 	// Table holds the table name of the examattempt in the database.
 	Table = "exam_attempts"
 	// GeneratedexamTable is the table that holds the generatedexam relation/edge.
@@ -40,6 +42,13 @@ const (
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_attempts"
+	// AssesmentTable is the table that holds the assesment relation/edge.
+	AssesmentTable = "exam_assesments"
+	// AssesmentInverseTable is the table name for the ExamAssesment entity.
+	// It exists in this package in order to avoid circular dependency with the "examassesment" package.
+	AssesmentInverseTable = "exam_assesments"
+	// AssesmentColumn is the table column denoting the assesment relation/edge.
+	AssesmentColumn = "exam_attempt_assesment"
 )
 
 // Columns holds all SQL columns for examattempt fields.
@@ -117,6 +126,13 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByAssesmentField orders the results by assesment field.
+func ByAssesmentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAssesmentStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newGeneratedexamStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -129,5 +145,12 @@ func newUserStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+	)
+}
+func newAssesmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AssesmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, AssesmentTable, AssesmentColumn),
 	)
 }

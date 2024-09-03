@@ -56,6 +56,30 @@ var (
 			},
 		},
 	}
+	// ExamAssesmentsColumns holds the columns for the "exam_assesments" table.
+	ExamAssesmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "completed_minutes", Type: field.TypeInt},
+		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
+		{Name: "is_ready", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_attempt_assesment", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// ExamAssesmentsTable holds the schema information for the "exam_assesments" table.
+	ExamAssesmentsTable = &schema.Table{
+		Name:       "exam_assesments",
+		Columns:    ExamAssesmentsColumns,
+		PrimaryKey: []*schema.Column{ExamAssesmentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exam_assesments_exam_attempts_assesment",
+				Columns:    []*schema.Column{ExamAssesmentsColumns[6]},
+				RefColumns: []*schema.Column{ExamAttemptsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// ExamAttemptsColumns holds the columns for the "exam_attempts" table.
 	ExamAttemptsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -99,16 +123,6 @@ var (
 		Name:       "exam_categories",
 		Columns:    ExamCategoriesColumns,
 		PrimaryKey: []*schema.Column{ExamCategoriesColumns[0]},
-	}
-	// ExamResultsColumns holds the columns for the "exam_results" table.
-	ExamResultsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-	}
-	// ExamResultsTable holds the schema information for the "exam_results" table.
-	ExamResultsTable = &schema.Table{
-		Name:       "exam_results",
-		Columns:    ExamResultsColumns,
-		PrimaryKey: []*schema.Column{ExamResultsColumns[0]},
 	}
 	// ExamSettingsColumns holds the columns for the "exam_settings" table.
 	ExamSettingsColumns = []*schema.Column{
@@ -178,9 +192,9 @@ var (
 	Tables = []*schema.Table{
 		CachedExamsTable,
 		ExamsTable,
+		ExamAssesmentsTable,
 		ExamAttemptsTable,
 		ExamCategoriesTable,
-		ExamResultsTable,
 		ExamSettingsTable,
 		GeneratedExamsTable,
 		UsersTable,
@@ -190,6 +204,7 @@ var (
 func init() {
 	CachedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
+	ExamAssesmentsTable.ForeignKeys[0].RefTable = ExamAttemptsTable
 	ExamAttemptsTable.ForeignKeys[0].RefTable = GeneratedExamsTable
 	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable

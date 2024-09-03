@@ -32,6 +32,18 @@ func (f ExamFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamMutation", m)
 }
 
+// The ExamAssesmentFunc type is an adapter to allow the use of ordinary
+// function as ExamAssesment mutator.
+type ExamAssesmentFunc func(context.Context, *ent.ExamAssesmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ExamAssesmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ExamAssesmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamAssesmentMutation", m)
+}
+
 // The ExamAttemptFunc type is an adapter to allow the use of ordinary
 // function as ExamAttempt mutator.
 type ExamAttemptFunc func(context.Context, *ent.ExamAttemptMutation) (ent.Value, error)
@@ -54,18 +66,6 @@ func (f ExamCategoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamCategoryMutation", m)
-}
-
-// The ExamResultFunc type is an adapter to allow the use of ordinary
-// function as ExamResult mutator.
-type ExamResultFunc func(context.Context, *ent.ExamResultMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ExamResultFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ExamResultMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamResultMutation", m)
 }
 
 // The ExamSettingFunc type is an adapter to allow the use of ordinary
