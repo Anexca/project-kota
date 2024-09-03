@@ -64,40 +64,45 @@ func (e *ExamService) GenerateExams(ctx context.Context, examType commonConstant
 	return nil
 }
 
-func (e *ExamService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) ([]byte, error) {
+func (e *ExamService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (string, error) {
 
 	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if len(cachedMetaData) == 0 {
-		return nil, fmt.Errorf("no cached metadata found for exam: %s", exam.Name)
+		return "", fmt.Errorf("no cached metadata found for exam: %s", exam.Name)
 	}
 
 	cachedData, err := e.redisService.Get(ctx, cachedMetaData[0].CacheUID)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	e.cachedExamRepository.MarkAsUsed(ctx, cachedMetaData[0].ID)
 
-	return []byte(cachedData), nil
+	return cachedData, nil
 }
 
-func (e *ExamService) ProcessExamData(ctx context.Context, exam *ent.Exam, modelType models.ExamModelType, cachedData []byte) error {
+func (e *ExamService) ProcessExamData(ctx context.Context, exam *ent.Exam, modelType models.ExamModelType, cachedData string) error {
 	switch modelType {
 	case models.DescriptiveExamType:
-		var exams []models.DescriptiveExam
-		err := json.Unmarshal(cachedData, &exams)
+		var descriptiveExams []models.DescriptiveExam
+
+		err := json.Unmarshal([]byte(cachedData), &descriptiveExams)
 		if err != nil {
-			return fmt.Errorf("failed to unmarshal cached data for DescriptiveExam: %w", err)
+			return fmt.Errorf("failed to validate cached data for DescriptiveExam: %w", err)
 		}
-		anyExams := make([]any, len(exams))
-		for i, exam := range exams {
-			anyExams[i] = exam
+
+		var exams []any
+
+		err = json.Unmarshal([]byte(cachedData), &exams)
+		if err != nil {
+			return fmt.Errorf("failed to generate DescriptiveExam: %w", err)
 		}
-		_, err = e.generatedExamRepository.AddMany(ctx, anyExams, exam)
+
+		_, err = e.generatedExamRepository.AddMany(ctx, exams, exam)
 		if err != nil {
 			return fmt.Errorf("failed to generate DescriptiveExams : %w", err)
 		}
