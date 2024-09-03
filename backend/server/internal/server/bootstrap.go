@@ -22,6 +22,7 @@ type Server struct {
 
 	examGenerationService *services.ExamGenerationService
 	examAttemptService    *services.ExamAttemptService
+	examAssesmentService  *services.ExamAssesmentService
 	authService           *services.AuthService
 	redisService          *commonService.RedisService
 }
@@ -32,6 +33,7 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 
 	examGenerationService := services.NewExamGenerationService(redisClient, dbClient)
 	examAttemptService := services.NewExamAttemptService(dbClient)
+	examAssesmentService := services.NewExamAssesmentService(dbClient)
 	authService := services.NewAuthService(supabaseClient)
 	redisService := commonService.NewRedisService(redisClient)
 
@@ -41,6 +43,7 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 		redisService:          redisService,
 		authService:           authService,
 		examAttemptService:    examAttemptService,
+		examAssesmentService:  examAssesmentService,
 	}
 
 	// Declare Server config

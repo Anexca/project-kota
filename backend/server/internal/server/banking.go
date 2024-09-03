@@ -4,6 +4,7 @@ import (
 	commonConstants "common/constants"
 	"common/ent"
 	"errors"
+	"server/internal/services"
 	"server/pkg/constants"
 	"strconv"
 	"strings"
@@ -40,6 +41,18 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
+	var request services.AssesmentRequest
+
+	if err := s.ReadJson(w, r, &request); err != nil {
+		s.ErrorJson(w, errors.New("invalid json request body"))
+		return
+	}
+
+	if err := ValidateInput(&request); err != nil {
+		s.ErrorJson(w, err, http.StatusBadRequest)
+		return
+	}
+
 	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
@@ -57,8 +70,20 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	assesment, err := s.examAssesmentService.StartNewAssesment(r.Context(), attempt, &request)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("exam not found"))
+			return
+		}
+
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
 	responsePayload := Response{
-		Data: attempt,
+		Data: assesment,
 	}
 
 	s.WriteJson(w, http.StatusAccepted, &responsePayload)

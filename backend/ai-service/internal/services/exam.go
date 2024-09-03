@@ -68,7 +68,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 				go func(exam *ent.Exam) {
 					defer wg.Done()
 
-					examSetting, err := q.examSettingRepository.GetByExam(ctx, exam)
+					examSetting, err := q.examSettingRepository.GetByExam(ctx, exam.ID)
 					if err != nil {
 						log.Printf("Error getting exam setting for exam %s: %v", exam.Name, err)
 						return
