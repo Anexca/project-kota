@@ -27,5 +27,9 @@ func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategory *en
 }
 
 func (e *ExamRepository) GetByName(ctx context.Context, name string) (*ent.Exam, error) {
-	return e.dbClient.Exam.Query().Where(exam.Name(name)).First(ctx)
+	return e.dbClient.Exam.Query().
+		Where(exam.Name(name)).
+		WithSetting().
+		WithGeneratedexams().
+		First(ctx)
 }

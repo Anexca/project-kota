@@ -122,35 +122,19 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	examSettings, err := e.examSettingRepository.GetByExam(ctx, exam)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get exam settings: %w", err)
-	}
+	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(exam.Edges.Generatedexams))
 
-	generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get generated exams: %w", err)
-	}
-
-	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(generatedExams))
-
-	for _, generatedExam := range generatedExams {
-		userExamAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get exam attempts for exam ID %d: %w", generatedExam.ID, err)
-		}
-
-		userAttempts := len(userExamAttempts)
+	for _, generatedExam := range exam.Edges.Generatedexams {
 
 		generatedExamOverview := models.GeneratedExamOverview{
 			Id:                generatedExam.ID,
 			RawExamData:       generatedExam.RawExamData,
 			CreatedAt:         generatedExam.CreatedAt,
 			UpdatedAt:         generatedExam.UpdatedAt,
-			UserAttempts:      userAttempts,
-			MaxAttempts:       examSettings.MaxAttempts,
-			DurationMinutes:   examSettings.DurationMinutes,
-			NumberOfQuestions: examSettings.NumberOfQuestions,
+			UserAttempts:      len(generatedExam.Edges.Attempts),
+			MaxAttempts:       exam.Edges.Setting.MaxAttempts,
+			DurationMinutes:   exam.Edges.Setting.DurationMinutes,
+			NumberOfQuestions: exam.Edges.Setting.NumberOfQuestions,
 		}
 
 		generatedExamOverviewList = append(generatedExamOverviewList, generatedExamOverview)
