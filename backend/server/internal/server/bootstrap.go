@@ -20,24 +20,30 @@ import (
 type Server struct {
 	port int
 
-	examService  *services.ExamService
-	authService  *services.AuthService
-	redisService *commonService.RedisService
+	examGenerationService *services.ExamGenerationService
+	examAttemptService    *services.ExamAttemptService
+	examAssesmentService  *services.ExamAssesmentService
+	authService           *services.AuthService
+	redisService          *commonService.RedisService
 }
 
 func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient *supabase.Client) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	logger := commonConfig.SetupLogger()
 
-	examService := services.NewExamService(redisClient, dbClient)
+	examGenerationService := services.NewExamGenerationService(redisClient, dbClient)
+	examAttemptService := services.NewExamAttemptService(dbClient)
+	examAssesmentService := services.NewExamAssesmentService(dbClient)
 	authService := services.NewAuthService(supabaseClient)
 	redisService := commonService.NewRedisService(redisClient)
 
 	NewServer := &Server{
-		port:         port,
-		examService:  examService,
-		redisService: redisService,
-		authService:  authService,
+		port:                  port,
+		examGenerationService: examGenerationService,
+		redisService:          redisService,
+		authService:           authService,
+		examAttemptService:    examAttemptService,
+		examAssesmentService:  examAssesmentService,
 	}
 
 	// Declare Server config

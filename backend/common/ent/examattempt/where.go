@@ -236,6 +236,29 @@ func HasUserWith(preds ...predicate.User) predicate.ExamAttempt {
 	})
 }
 
+// HasAssesment applies the HasEdge predicate on the "assesment" edge.
+func HasAssesment() predicate.ExamAttempt {
+	return predicate.ExamAttempt(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, AssesmentTable, AssesmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAssesmentWith applies the HasEdge predicate on the "assesment" edge with a given conditions (other predicates).
+func HasAssesmentWith(preds ...predicate.ExamAssesment) predicate.ExamAttempt {
+	return predicate.ExamAttempt(func(s *sql.Selector) {
+		step := newAssesmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.ExamAttempt) predicate.ExamAttempt {
 	return predicate.ExamAttempt(sql.AndPredicates(predicates...))

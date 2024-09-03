@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/user"
@@ -40,9 +41,11 @@ type ExamAttemptEdges struct {
 	Generatedexam *GeneratedExam `json:"generatedexam,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
+	// Assesment holds the value of the assesment edge.
+	Assesment *ExamAssesment `json:"assesment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // GeneratedexamOrErr returns the Generatedexam value or an error if the edge
@@ -65,6 +68,17 @@ func (e ExamAttemptEdges) UserOrErr() (*User, error) {
 		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
+}
+
+// AssesmentOrErr returns the Assesment value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ExamAttemptEdges) AssesmentOrErr() (*ExamAssesment, error) {
+	if e.Assesment != nil {
+		return e.Assesment, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: examassesment.Label}
+	}
+	return nil, &NotLoadedError{edge: "assesment"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -154,6 +168,11 @@ func (ea *ExamAttempt) QueryGeneratedexam() *GeneratedExamQuery {
 // QueryUser queries the "user" edge of the ExamAttempt entity.
 func (ea *ExamAttempt) QueryUser() *UserQuery {
 	return NewExamAttemptClient(ea.config).QueryUser(ea)
+}
+
+// QueryAssesment queries the "assesment" edge of the ExamAttempt entity.
+func (ea *ExamAttempt) QueryAssesment() *ExamAssesmentQuery {
+	return NewExamAttemptClient(ea.config).QueryAssesment(ea)
 }
 
 // Update returns a builder for updating this ExamAttempt.

@@ -8,25 +8,25 @@ import (
 )
 
 var (
-	// CachedQuestionMetaDataColumns holds the columns for the "cached_question_meta_data" table.
-	CachedQuestionMetaDataColumns = []*schema.Column{
+	// CachedExamsColumns holds the columns for the "cached_exams" table.
+	CachedExamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "cache_uid", Type: field.TypeString, Unique: true},
 		{Name: "is_used", Type: field.TypeBool, Default: false},
 		{Name: "expires_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "exam_cached_question_metadata", Type: field.TypeInt},
+		{Name: "exam_cached_exam", Type: field.TypeInt},
 	}
-	// CachedQuestionMetaDataTable holds the schema information for the "cached_question_meta_data" table.
-	CachedQuestionMetaDataTable = &schema.Table{
-		Name:       "cached_question_meta_data",
-		Columns:    CachedQuestionMetaDataColumns,
-		PrimaryKey: []*schema.Column{CachedQuestionMetaDataColumns[0]},
+	// CachedExamsTable holds the schema information for the "cached_exams" table.
+	CachedExamsTable = &schema.Table{
+		Name:       "cached_exams",
+		Columns:    CachedExamsColumns,
+		PrimaryKey: []*schema.Column{CachedExamsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "cached_question_meta_data_exams_cached_question_metadata",
-				Columns:    []*schema.Column{CachedQuestionMetaDataColumns[6]},
+				Symbol:     "cached_exams_exams_cached_exam",
+				Columns:    []*schema.Column{CachedExamsColumns[6]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -52,6 +52,30 @@ var (
 				Symbol:     "exams_exam_categories_exams",
 				Columns:    []*schema.Column{ExamsColumns[6]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ExamAssesmentsColumns holds the columns for the "exam_assesments" table.
+	ExamAssesmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "completed_minutes", Type: field.TypeInt},
+		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
+		{Name: "is_ready", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_attempt_assesment", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// ExamAssesmentsTable holds the schema information for the "exam_assesments" table.
+	ExamAssesmentsTable = &schema.Table{
+		Name:       "exam_assesments",
+		Columns:    ExamAssesmentsColumns,
+		PrimaryKey: []*schema.Column{ExamAssesmentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exam_assesments_exam_attempts_assesment",
+				Columns:    []*schema.Column{ExamAssesmentsColumns[6]},
+				RefColumns: []*schema.Column{ExamAttemptsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -99,16 +123,6 @@ var (
 		Name:       "exam_categories",
 		Columns:    ExamCategoriesColumns,
 		PrimaryKey: []*schema.Column{ExamCategoriesColumns[0]},
-	}
-	// ExamResultsColumns holds the columns for the "exam_results" table.
-	ExamResultsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-	}
-	// ExamResultsTable holds the schema information for the "exam_results" table.
-	ExamResultsTable = &schema.Table{
-		Name:       "exam_results",
-		Columns:    ExamResultsColumns,
-		PrimaryKey: []*schema.Column{ExamResultsColumns[0]},
 	}
 	// ExamSettingsColumns holds the columns for the "exam_settings" table.
 	ExamSettingsColumns = []*schema.Column{
@@ -176,11 +190,11 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		CachedQuestionMetaDataTable,
+		CachedExamsTable,
 		ExamsTable,
+		ExamAssesmentsTable,
 		ExamAttemptsTable,
 		ExamCategoriesTable,
-		ExamResultsTable,
 		ExamSettingsTable,
 		GeneratedExamsTable,
 		UsersTable,
@@ -188,8 +202,9 @@ var (
 )
 
 func init() {
-	CachedQuestionMetaDataTable.ForeignKeys[0].RefTable = ExamsTable
+	CachedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
+	ExamAssesmentsTable.ForeignKeys[0].RefTable = ExamAttemptsTable
 	ExamAttemptsTable.ForeignKeys[0].RefTable = GeneratedExamsTable
 	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable

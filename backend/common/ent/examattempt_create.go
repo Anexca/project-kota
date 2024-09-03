@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/user"
@@ -93,6 +94,25 @@ func (eac *ExamAttemptCreate) SetNillableUserID(id *uuid.UUID) *ExamAttemptCreat
 // SetUser sets the "user" edge to the User entity.
 func (eac *ExamAttemptCreate) SetUser(u *User) *ExamAttemptCreate {
 	return eac.SetUserID(u.ID)
+}
+
+// SetAssesmentID sets the "assesment" edge to the ExamAssesment entity by ID.
+func (eac *ExamAttemptCreate) SetAssesmentID(id int) *ExamAttemptCreate {
+	eac.mutation.SetAssesmentID(id)
+	return eac
+}
+
+// SetNillableAssesmentID sets the "assesment" edge to the ExamAssesment entity by ID if the given value is not nil.
+func (eac *ExamAttemptCreate) SetNillableAssesmentID(id *int) *ExamAttemptCreate {
+	if id != nil {
+		eac = eac.SetAssesmentID(*id)
+	}
+	return eac
+}
+
+// SetAssesment sets the "assesment" edge to the ExamAssesment entity.
+func (eac *ExamAttemptCreate) SetAssesment(e *ExamAssesment) *ExamAttemptCreate {
+	return eac.SetAssesmentID(e.ID)
 }
 
 // Mutation returns the ExamAttemptMutation object of the builder.
@@ -221,6 +241,22 @@ func (eac *ExamAttemptCreate) createSpec() (*ExamAttempt, *sqlgraph.CreateSpec) 
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.user_attempts = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := eac.mutation.AssesmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   examattempt.AssesmentTable,
+			Columns: []string{examattempt.AssesmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

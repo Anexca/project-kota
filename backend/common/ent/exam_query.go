@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"common/ent/cachedquestionmetadata"
+	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
@@ -23,15 +23,15 @@ import (
 // ExamQuery is the builder for querying Exam entities.
 type ExamQuery struct {
 	config
-	ctx                        *QueryContext
-	order                      []exam.OrderOption
-	inters                     []Interceptor
-	predicates                 []predicate.Exam
-	withCategory               *ExamCategoryQuery
-	withSetting                *ExamSettingQuery
-	withCachedQuestionMetadata *CachedQuestionMetaDataQuery
-	withGeneratedexams         *GeneratedExamQuery
-	withFKs                    bool
+	ctx                *QueryContext
+	order              []exam.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Exam
+	withCategory       *ExamCategoryQuery
+	withSetting        *ExamSettingQuery
+	withCachedExam     *CachedExamQuery
+	withGeneratedexams *GeneratedExamQuery
+	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -112,9 +112,9 @@ func (eq *ExamQuery) QuerySetting() *ExamSettingQuery {
 	return query
 }
 
-// QueryCachedQuestionMetadata chains the current query on the "cached_question_metadata" edge.
-func (eq *ExamQuery) QueryCachedQuestionMetadata() *CachedQuestionMetaDataQuery {
-	query := (&CachedQuestionMetaDataClient{config: eq.config}).Query()
+// QueryCachedExam chains the current query on the "cached_exam" edge.
+func (eq *ExamQuery) QueryCachedExam() *CachedExamQuery {
+	query := (&CachedExamClient{config: eq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -125,8 +125,8 @@ func (eq *ExamQuery) QueryCachedQuestionMetadata() *CachedQuestionMetaDataQuery 
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(exam.Table, exam.FieldID, selector),
-			sqlgraph.To(cachedquestionmetadata.Table, cachedquestionmetadata.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, exam.CachedQuestionMetadataTable, exam.CachedQuestionMetadataColumn),
+			sqlgraph.To(cachedexam.Table, cachedexam.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, exam.CachedExamTable, exam.CachedExamColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -343,15 +343,15 @@ func (eq *ExamQuery) Clone() *ExamQuery {
 		return nil
 	}
 	return &ExamQuery{
-		config:                     eq.config,
-		ctx:                        eq.ctx.Clone(),
-		order:                      append([]exam.OrderOption{}, eq.order...),
-		inters:                     append([]Interceptor{}, eq.inters...),
-		predicates:                 append([]predicate.Exam{}, eq.predicates...),
-		withCategory:               eq.withCategory.Clone(),
-		withSetting:                eq.withSetting.Clone(),
-		withCachedQuestionMetadata: eq.withCachedQuestionMetadata.Clone(),
-		withGeneratedexams:         eq.withGeneratedexams.Clone(),
+		config:             eq.config,
+		ctx:                eq.ctx.Clone(),
+		order:              append([]exam.OrderOption{}, eq.order...),
+		inters:             append([]Interceptor{}, eq.inters...),
+		predicates:         append([]predicate.Exam{}, eq.predicates...),
+		withCategory:       eq.withCategory.Clone(),
+		withSetting:        eq.withSetting.Clone(),
+		withCachedExam:     eq.withCachedExam.Clone(),
+		withGeneratedexams: eq.withGeneratedexams.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -380,14 +380,14 @@ func (eq *ExamQuery) WithSetting(opts ...func(*ExamSettingQuery)) *ExamQuery {
 	return eq
 }
 
-// WithCachedQuestionMetadata tells the query-builder to eager-load the nodes that are connected to
-// the "cached_question_metadata" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *ExamQuery) WithCachedQuestionMetadata(opts ...func(*CachedQuestionMetaDataQuery)) *ExamQuery {
-	query := (&CachedQuestionMetaDataClient{config: eq.config}).Query()
+// WithCachedExam tells the query-builder to eager-load the nodes that are connected to
+// the "cached_exam" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *ExamQuery) WithCachedExam(opts ...func(*CachedExamQuery)) *ExamQuery {
+	query := (&CachedExamClient{config: eq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withCachedQuestionMetadata = query
+	eq.withCachedExam = query
 	return eq
 }
 
@@ -484,7 +484,7 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 		loadedTypes = [4]bool{
 			eq.withCategory != nil,
 			eq.withSetting != nil,
-			eq.withCachedQuestionMetadata != nil,
+			eq.withCachedExam != nil,
 			eq.withGeneratedexams != nil,
 		}
 	)
@@ -524,12 +524,10 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 			return nil, err
 		}
 	}
-	if query := eq.withCachedQuestionMetadata; query != nil {
-		if err := eq.loadCachedQuestionMetadata(ctx, query, nodes,
-			func(n *Exam) { n.Edges.CachedQuestionMetadata = []*CachedQuestionMetaData{} },
-			func(n *Exam, e *CachedQuestionMetaData) {
-				n.Edges.CachedQuestionMetadata = append(n.Edges.CachedQuestionMetadata, e)
-			}); err != nil {
+	if query := eq.withCachedExam; query != nil {
+		if err := eq.loadCachedExam(ctx, query, nodes,
+			func(n *Exam) { n.Edges.CachedExam = []*CachedExam{} },
+			func(n *Exam, e *CachedExam) { n.Edges.CachedExam = append(n.Edges.CachedExam, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -603,7 +601,7 @@ func (eq *ExamQuery) loadSetting(ctx context.Context, query *ExamSettingQuery, n
 	}
 	return nil
 }
-func (eq *ExamQuery) loadCachedQuestionMetadata(ctx context.Context, query *CachedQuestionMetaDataQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *CachedQuestionMetaData)) error {
+func (eq *ExamQuery) loadCachedExam(ctx context.Context, query *CachedExamQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *CachedExam)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Exam)
 	for i := range nodes {
@@ -614,21 +612,21 @@ func (eq *ExamQuery) loadCachedQuestionMetadata(ctx context.Context, query *Cach
 		}
 	}
 	query.withFKs = true
-	query.Where(predicate.CachedQuestionMetaData(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(exam.CachedQuestionMetadataColumn), fks...))
+	query.Where(predicate.CachedExam(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(exam.CachedExamColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.exam_cached_question_metadata
+		fk := n.exam_cached_exam
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "exam_cached_question_metadata" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "exam_cached_exam" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "exam_cached_question_metadata" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "exam_cached_exam" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

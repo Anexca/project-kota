@@ -32,5 +32,8 @@ func (ExamAttempt) Edges() []ent.Edge {
 		edge.From("user", User.Type).
 			Ref("attempts").
 			Unique(), // Each Atempts have one user
+
+		edge.To("assesment", ExamAssesment.Type).
+			Unique(), // Each attempt has one assesment
 	}
 }
