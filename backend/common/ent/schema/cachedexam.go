@@ -8,13 +8,13 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// CachedQuestionMetaData holds the schema definition for the CachedQuestionMetaData entity.
-type CachedQuestionMetaData struct {
+// CachedExam holds the schema definition for the CachedExam entity.
+type CachedExam struct {
 	ent.Schema
 }
 
-// Fields of the CachedQuestionMetaData.
-func (CachedQuestionMetaData) Fields() []ent.Field {
+// Fields of the CachedExam.
+func (CachedExam) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("cache_uid").Unique(),
 		field.Bool("is_used").Default(false),
@@ -24,11 +24,11 @@ func (CachedQuestionMetaData) Fields() []ent.Field {
 	}
 }
 
-// Edges of the CachedQuestionMetaData.
-func (CachedQuestionMetaData) Edges() []ent.Edge {
+// Edges of the CachedExam.
+func (CachedExam) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("exam", Exam.Type).
-			Ref("cached_question_metadata").
+			Ref("cached_exam").
 			Unique().
 			Required(),
 	}

@@ -3,11 +3,13 @@
 package ent
 
 import (
+	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
 	"common/ent/user"
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -27,6 +29,7 @@ type ExamAttemptQuery struct {
 	predicates        []predicate.ExamAttempt
 	withGeneratedexam *GeneratedExamQuery
 	withUser          *UserQuery
+	withAssesment     *ExamAssesmentQuery
 	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -101,6 +104,28 @@ func (eaq *ExamAttemptQuery) QueryUser() *UserQuery {
 			sqlgraph.From(examattempt.Table, examattempt.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, examattempt.UserTable, examattempt.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eaq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAssesment chains the current query on the "assesment" edge.
+func (eaq *ExamAttemptQuery) QueryAssesment() *ExamAssesmentQuery {
+	query := (&ExamAssesmentClient{config: eaq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eaq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eaq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examattempt.Table, examattempt.FieldID, selector),
+			sqlgraph.To(examassesment.Table, examassesment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, examattempt.AssesmentTable, examattempt.AssesmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eaq.driver.Dialect(), step)
 		return fromU, nil
@@ -302,6 +327,7 @@ func (eaq *ExamAttemptQuery) Clone() *ExamAttemptQuery {
 		predicates:        append([]predicate.ExamAttempt{}, eaq.predicates...),
 		withGeneratedexam: eaq.withGeneratedexam.Clone(),
 		withUser:          eaq.withUser.Clone(),
+		withAssesment:     eaq.withAssesment.Clone(),
 		// clone intermediate query.
 		sql:  eaq.sql.Clone(),
 		path: eaq.path,
@@ -327,6 +353,17 @@ func (eaq *ExamAttemptQuery) WithUser(opts ...func(*UserQuery)) *ExamAttemptQuer
 		opt(query)
 	}
 	eaq.withUser = query
+	return eaq
+}
+
+// WithAssesment tells the query-builder to eager-load the nodes that are connected to
+// the "assesment" edge. The optional arguments are used to configure the query builder of the edge.
+func (eaq *ExamAttemptQuery) WithAssesment(opts ...func(*ExamAssesmentQuery)) *ExamAttemptQuery {
+	query := (&ExamAssesmentClient{config: eaq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eaq.withAssesment = query
 	return eaq
 }
 
@@ -409,9 +446,10 @@ func (eaq *ExamAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		nodes       = []*ExamAttempt{}
 		withFKs     = eaq.withFKs
 		_spec       = eaq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			eaq.withGeneratedexam != nil,
 			eaq.withUser != nil,
+			eaq.withAssesment != nil,
 		}
 	)
 	if eaq.withGeneratedexam != nil || eaq.withUser != nil {
@@ -447,6 +485,12 @@ func (eaq *ExamAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if query := eaq.withUser; query != nil {
 		if err := eaq.loadUser(ctx, query, nodes, nil,
 			func(n *ExamAttempt, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eaq.withAssesment; query != nil {
+		if err := eaq.loadAssesment(ctx, query, nodes, nil,
+			func(n *ExamAttempt, e *ExamAssesment) { n.Edges.Assesment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -514,6 +558,34 @@ func (eaq *ExamAttemptQuery) loadUser(ctx context.Context, query *UserQuery, nod
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (eaq *ExamAttemptQuery) loadAssesment(ctx context.Context, query *ExamAssesmentQuery, nodes []*ExamAttempt, init func(*ExamAttempt), assign func(*ExamAttempt, *ExamAssesment)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*ExamAttempt)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.ExamAssesment(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(examattempt.AssesmentColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.exam_attempt_assesment
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "exam_attempt_assesment" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "exam_attempt_assesment" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

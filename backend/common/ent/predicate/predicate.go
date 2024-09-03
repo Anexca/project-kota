@@ -6,20 +6,20 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// CachedQuestionMetaData is the predicate function for cachedquestionmetadata builders.
-type CachedQuestionMetaData func(*sql.Selector)
+// CachedExam is the predicate function for cachedexam builders.
+type CachedExam func(*sql.Selector)
 
 // Exam is the predicate function for exam builders.
 type Exam func(*sql.Selector)
+
+// ExamAssesment is the predicate function for examassesment builders.
+type ExamAssesment func(*sql.Selector)
 
 // ExamAttempt is the predicate function for examattempt builders.
 type ExamAttempt func(*sql.Selector)
 
 // ExamCategory is the predicate function for examcategory builders.
 type ExamCategory func(*sql.Selector)
-
-// ExamResult is the predicate function for examresult builders.
-type ExamResult func(*sql.Selector)
 
 // ExamSetting is the predicate function for examsetting builders.
 type ExamSetting func(*sql.Selector)

@@ -18,11 +18,11 @@ func NewGeneratedExamRepository(dbClient *ent.Client) *GeneratedExamRepository {
 	}
 }
 
-func (q *GeneratedExamRepository) AddMany(ctx context.Context, questions []any, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
-	bulk := make([]*ent.GeneratedExamCreate, len(questions))
+func (q *GeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
+	bulk := make([]*ent.GeneratedExamCreate, len(exams))
 
-	for i, questionData := range questions {
-		jsonData, ok := questionData.(map[string]interface{})
+	for i, exam := range exams {
+		jsonData, ok := exam.(map[string]interface{})
 		if !ok {
 			return nil, fmt.Errorf("invalid exam data type at index %d", i)
 		}
@@ -35,6 +35,18 @@ func (q *GeneratedExamRepository) AddMany(ctx context.Context, questions []any, 
 	return q.dbClient.GeneratedExam.CreateBulk(bulk...).Save(ctx)
 }
 
+func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.ID(generatedExamId)).
+		WithExam().
+		WithAttempts().
+		Only(ctx)
+}
+
 func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
-	return q.dbClient.GeneratedExam.Query().Where(generatedexam.HasExamWith(exam.ID(ex.ID)), generatedexam.IsActive(true)).All(ctx)
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.HasExamWith(exam.ID(ex.ID)), generatedexam.IsActive(true)).
+		WithAttempts().
+		WithExam().
+		All(ctx)
 }

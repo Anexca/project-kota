@@ -20,7 +20,7 @@ type ExamService struct {
 	examRepository                   *commonRepositories.ExamRepository
 	examCategoryRepository           *commonRepositories.ExamCategoryRepository
 	examSettingRepository            *commonRepositories.ExamSettingRepository
-	cachedQuestionMetaDataRepository *commonRepositories.CachedQuestionMetaDataRepository
+	cachedQuestionMetaDataRepository *commonRepositories.CachedExamRepository
 }
 
 func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *ExamService {
@@ -29,7 +29,7 @@ func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClie
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
-	cachedQuestionMetaDataRepository := commonRepositories.NewCachedQuestionMetaDataRepository(dbClient)
+	cachedQuestionMetaDataRepository := commonRepositories.NewCachedExamRepository(dbClient)
 
 	return &ExamService{
 		genAIService:                     genAIService,
@@ -68,7 +68,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 				go func(exam *ent.Exam) {
 					defer wg.Done()
 
-					examSetting, err := q.examSettingRepository.GetByExam(ctx, exam)
+					examSetting, err := q.examSettingRepository.GetByExam(ctx, exam.ID)
 					if err != nil {
 						log.Printf("Error getting exam setting for exam %s: %v", exam.Name, err)
 						return

@@ -17,9 +17,10 @@ func NewExamSettingRepository(dbClient *ent.Client) *ExamSettingRepository {
 	}
 }
 
-func (e *ExamSettingRepository) GetByExam(ctx context.Context, ex *ent.Exam) (*ent.ExamSetting, error) {
+func (e *ExamSettingRepository) GetByExam(ctx context.Context, examId int) (*ent.ExamSetting, error) {
 	return e.dbClient.ExamSetting.
 		Query().
-		Where(examsetting.HasExamWith(exam.ID(ex.ID))).
+		Where(examsetting.HasExamWith(exam.ID(examId))).
+		WithExam().
 		Only(ctx)
 }

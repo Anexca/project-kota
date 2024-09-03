@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"common/ent/cachedquestionmetadata"
+	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examsetting"
@@ -116,19 +116,19 @@ func (ec *ExamCreate) SetSetting(e *ExamSetting) *ExamCreate {
 	return ec.SetSettingID(e.ID)
 }
 
-// AddCachedQuestionMetadatumIDs adds the "cached_question_metadata" edge to the CachedQuestionMetaData entity by IDs.
-func (ec *ExamCreate) AddCachedQuestionMetadatumIDs(ids ...int) *ExamCreate {
-	ec.mutation.AddCachedQuestionMetadatumIDs(ids...)
+// AddCachedExamIDs adds the "cached_exam" edge to the CachedExam entity by IDs.
+func (ec *ExamCreate) AddCachedExamIDs(ids ...int) *ExamCreate {
+	ec.mutation.AddCachedExamIDs(ids...)
 	return ec
 }
 
-// AddCachedQuestionMetadata adds the "cached_question_metadata" edges to the CachedQuestionMetaData entity.
-func (ec *ExamCreate) AddCachedQuestionMetadata(c ...*CachedQuestionMetaData) *ExamCreate {
+// AddCachedExam adds the "cached_exam" edges to the CachedExam entity.
+func (ec *ExamCreate) AddCachedExam(c ...*CachedExam) *ExamCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return ec.AddCachedQuestionMetadatumIDs(ids...)
+	return ec.AddCachedExamIDs(ids...)
 }
 
 // AddGeneratedexamIDs adds the "generatedexams" edge to the GeneratedExam entity by IDs.
@@ -291,15 +291,15 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.CachedQuestionMetadataIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.CachedExamIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   exam.CachedQuestionMetadataTable,
-			Columns: []string{exam.CachedQuestionMetadataColumn},
+			Table:   exam.CachedExamTable,
+			Columns: []string{exam.CachedExamColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cachedquestionmetadata.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(cachedexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -22,12 +22,19 @@ func NewExamAttemptRepository(dbClient *ent.Client) *ExamAttemptRepository {
 func (e *ExamAttemptRepository) GetByExam(ctx context.Context, generatedExamId int) ([]*ent.ExamAttempt, error) {
 	return e.dbClient.ExamAttempt.Query().
 		Where(examattempt.HasGeneratedexamWith(generatedexam.ID(generatedExamId))).
+		WithGeneratedexam().
 		All(ctx)
 }
 
-func (e *ExamAttemptRepository) Create(ctx context.Context, currentAttempt int, generatedExamId int, userId uuid.UUID) (*ent.ExamAttempt, error) {
+func (e *ExamAttemptRepository) Create(ctx context.Context, currentAttempt int, generatedExamId int, userId string) (*ent.ExamAttempt, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
 	return e.dbClient.ExamAttempt.Create().
+		SetAttemptNumber(currentAttempt + 1).
 		SetGeneratedexamID(generatedExamId).
-		SetUserID(userId).
+		SetUserID(userUid).
 		Save(ctx)
 }

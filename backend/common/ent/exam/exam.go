@@ -28,8 +28,8 @@ const (
 	EdgeCategory = "category"
 	// EdgeSetting holds the string denoting the setting edge name in mutations.
 	EdgeSetting = "setting"
-	// EdgeCachedQuestionMetadata holds the string denoting the cached_question_metadata edge name in mutations.
-	EdgeCachedQuestionMetadata = "cached_question_metadata"
+	// EdgeCachedExam holds the string denoting the cached_exam edge name in mutations.
+	EdgeCachedExam = "cached_exam"
 	// EdgeGeneratedexams holds the string denoting the generatedexams edge name in mutations.
 	EdgeGeneratedexams = "generatedexams"
 	// Table holds the table name of the exam in the database.
@@ -48,13 +48,13 @@ const (
 	SettingInverseTable = "exam_settings"
 	// SettingColumn is the table column denoting the setting relation/edge.
 	SettingColumn = "exam_setting"
-	// CachedQuestionMetadataTable is the table that holds the cached_question_metadata relation/edge.
-	CachedQuestionMetadataTable = "cached_question_meta_data"
-	// CachedQuestionMetadataInverseTable is the table name for the CachedQuestionMetaData entity.
-	// It exists in this package in order to avoid circular dependency with the "cachedquestionmetadata" package.
-	CachedQuestionMetadataInverseTable = "cached_question_meta_data"
-	// CachedQuestionMetadataColumn is the table column denoting the cached_question_metadata relation/edge.
-	CachedQuestionMetadataColumn = "exam_cached_question_metadata"
+	// CachedExamTable is the table that holds the cached_exam relation/edge.
+	CachedExamTable = "cached_exams"
+	// CachedExamInverseTable is the table name for the CachedExam entity.
+	// It exists in this package in order to avoid circular dependency with the "cachedexam" package.
+	CachedExamInverseTable = "cached_exams"
+	// CachedExamColumn is the table column denoting the cached_exam relation/edge.
+	CachedExamColumn = "exam_cached_exam"
 	// GeneratedexamsTable is the table that holds the generatedexams relation/edge.
 	GeneratedexamsTable = "generated_exams"
 	// GeneratedexamsInverseTable is the table name for the GeneratedExam entity.
@@ -153,17 +153,17 @@ func BySettingField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByCachedQuestionMetadataCount orders the results by cached_question_metadata count.
-func ByCachedQuestionMetadataCount(opts ...sql.OrderTermOption) OrderOption {
+// ByCachedExamCount orders the results by cached_exam count.
+func ByCachedExamCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCachedQuestionMetadataStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newCachedExamStep(), opts...)
 	}
 }
 
-// ByCachedQuestionMetadata orders the results by cached_question_metadata terms.
-func ByCachedQuestionMetadata(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByCachedExam orders the results by cached_exam terms.
+func ByCachedExam(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCachedQuestionMetadataStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newCachedExamStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -194,11 +194,11 @@ func newSettingStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2O, false, SettingTable, SettingColumn),
 	)
 }
-func newCachedQuestionMetadataStep() *sqlgraph.Step {
+func newCachedExamStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CachedQuestionMetadataInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, CachedQuestionMetadataTable, CachedQuestionMetadataColumn),
+		sqlgraph.To(CachedExamInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CachedExamTable, CachedExamColumn),
 	)
 }
 func newGeneratedexamsStep() *sqlgraph.Step {
