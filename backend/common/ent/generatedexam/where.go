@@ -80,24 +80,14 @@ func IsActiveNEQ(v bool) predicate.GeneratedExam {
 	return predicate.GeneratedExam(sql.FieldNEQ(FieldIsActive, v))
 }
 
-// RawDataIsNil applies the IsNil predicate on the "raw_data" field.
-func RawDataIsNil() predicate.GeneratedExam {
-	return predicate.GeneratedExam(sql.FieldIsNull(FieldRawData))
+// RawExamDataIsNil applies the IsNil predicate on the "raw_exam_data" field.
+func RawExamDataIsNil() predicate.GeneratedExam {
+	return predicate.GeneratedExam(sql.FieldIsNull(FieldRawExamData))
 }
 
-// RawDataNotNil applies the NotNil predicate on the "raw_data" field.
-func RawDataNotNil() predicate.GeneratedExam {
-	return predicate.GeneratedExam(sql.FieldNotNull(FieldRawData))
-}
-
-// RawMetadataIsNil applies the IsNil predicate on the "raw_metadata" field.
-func RawMetadataIsNil() predicate.GeneratedExam {
-	return predicate.GeneratedExam(sql.FieldIsNull(FieldRawMetadata))
-}
-
-// RawMetadataNotNil applies the NotNil predicate on the "raw_metadata" field.
-func RawMetadataNotNil() predicate.GeneratedExam {
-	return predicate.GeneratedExam(sql.FieldNotNull(FieldRawMetadata))
+// RawExamDataNotNil applies the NotNil predicate on the "raw_exam_data" field.
+func RawExamDataNotNil() predicate.GeneratedExam {
+	return predicate.GeneratedExam(sql.FieldNotNull(FieldRawExamData))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

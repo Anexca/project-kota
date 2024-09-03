@@ -44,27 +44,15 @@ func (geu *GeneratedExamUpdate) SetNillableIsActive(b *bool) *GeneratedExamUpdat
 	return geu
 }
 
-// SetRawData sets the "raw_data" field.
-func (geu *GeneratedExamUpdate) SetRawData(m map[string]interface{}) *GeneratedExamUpdate {
-	geu.mutation.SetRawData(m)
+// SetRawExamData sets the "raw_exam_data" field.
+func (geu *GeneratedExamUpdate) SetRawExamData(m map[string]interface{}) *GeneratedExamUpdate {
+	geu.mutation.SetRawExamData(m)
 	return geu
 }
 
-// ClearRawData clears the value of the "raw_data" field.
-func (geu *GeneratedExamUpdate) ClearRawData() *GeneratedExamUpdate {
-	geu.mutation.ClearRawData()
-	return geu
-}
-
-// SetRawMetadata sets the "raw_metadata" field.
-func (geu *GeneratedExamUpdate) SetRawMetadata(m map[string]interface{}) *GeneratedExamUpdate {
-	geu.mutation.SetRawMetadata(m)
-	return geu
-}
-
-// ClearRawMetadata clears the value of the "raw_metadata" field.
-func (geu *GeneratedExamUpdate) ClearRawMetadata() *GeneratedExamUpdate {
-	geu.mutation.ClearRawMetadata()
+// ClearRawExamData clears the value of the "raw_exam_data" field.
+func (geu *GeneratedExamUpdate) ClearRawExamData() *GeneratedExamUpdate {
+	geu.mutation.ClearRawExamData()
 	return geu
 }
 
@@ -188,17 +176,11 @@ func (geu *GeneratedExamUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := geu.mutation.IsActive(); ok {
 		_spec.SetField(generatedexam.FieldIsActive, field.TypeBool, value)
 	}
-	if value, ok := geu.mutation.RawData(); ok {
-		_spec.SetField(generatedexam.FieldRawData, field.TypeJSON, value)
+	if value, ok := geu.mutation.RawExamData(); ok {
+		_spec.SetField(generatedexam.FieldRawExamData, field.TypeJSON, value)
 	}
-	if geu.mutation.RawDataCleared() {
-		_spec.ClearField(generatedexam.FieldRawData, field.TypeJSON)
-	}
-	if value, ok := geu.mutation.RawMetadata(); ok {
-		_spec.SetField(generatedexam.FieldRawMetadata, field.TypeJSON, value)
-	}
-	if geu.mutation.RawMetadataCleared() {
-		_spec.ClearField(generatedexam.FieldRawMetadata, field.TypeJSON)
+	if geu.mutation.RawExamDataCleared() {
+		_spec.ClearField(generatedexam.FieldRawExamData, field.TypeJSON)
 	}
 	if value, ok := geu.mutation.UpdatedAt(); ok {
 		_spec.SetField(generatedexam.FieldUpdatedAt, field.TypeTime, value)
@@ -311,27 +293,15 @@ func (geuo *GeneratedExamUpdateOne) SetNillableIsActive(b *bool) *GeneratedExamU
 	return geuo
 }
 
-// SetRawData sets the "raw_data" field.
-func (geuo *GeneratedExamUpdateOne) SetRawData(m map[string]interface{}) *GeneratedExamUpdateOne {
-	geuo.mutation.SetRawData(m)
+// SetRawExamData sets the "raw_exam_data" field.
+func (geuo *GeneratedExamUpdateOne) SetRawExamData(m map[string]interface{}) *GeneratedExamUpdateOne {
+	geuo.mutation.SetRawExamData(m)
 	return geuo
 }
 
-// ClearRawData clears the value of the "raw_data" field.
-func (geuo *GeneratedExamUpdateOne) ClearRawData() *GeneratedExamUpdateOne {
-	geuo.mutation.ClearRawData()
-	return geuo
-}
-
-// SetRawMetadata sets the "raw_metadata" field.
-func (geuo *GeneratedExamUpdateOne) SetRawMetadata(m map[string]interface{}) *GeneratedExamUpdateOne {
-	geuo.mutation.SetRawMetadata(m)
-	return geuo
-}
-
-// ClearRawMetadata clears the value of the "raw_metadata" field.
-func (geuo *GeneratedExamUpdateOne) ClearRawMetadata() *GeneratedExamUpdateOne {
-	geuo.mutation.ClearRawMetadata()
+// ClearRawExamData clears the value of the "raw_exam_data" field.
+func (geuo *GeneratedExamUpdateOne) ClearRawExamData() *GeneratedExamUpdateOne {
+	geuo.mutation.ClearRawExamData()
 	return geuo
 }
 
@@ -485,17 +455,11 @@ func (geuo *GeneratedExamUpdateOne) sqlSave(ctx context.Context) (_node *Generat
 	if value, ok := geuo.mutation.IsActive(); ok {
 		_spec.SetField(generatedexam.FieldIsActive, field.TypeBool, value)
 	}
-	if value, ok := geuo.mutation.RawData(); ok {
-		_spec.SetField(generatedexam.FieldRawData, field.TypeJSON, value)
+	if value, ok := geuo.mutation.RawExamData(); ok {
+		_spec.SetField(generatedexam.FieldRawExamData, field.TypeJSON, value)
 	}
-	if geuo.mutation.RawDataCleared() {
-		_spec.ClearField(generatedexam.FieldRawData, field.TypeJSON)
-	}
-	if value, ok := geuo.mutation.RawMetadata(); ok {
-		_spec.SetField(generatedexam.FieldRawMetadata, field.TypeJSON, value)
-	}
-	if geuo.mutation.RawMetadataCleared() {
-		_spec.ClearField(generatedexam.FieldRawMetadata, field.TypeJSON)
+	if geuo.mutation.RawExamDataCleared() {
+		_spec.ClearField(generatedexam.FieldRawExamData, field.TypeJSON)
 	}
 	if value, ok := geuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(generatedexam.FieldUpdatedAt, field.TypeTime, value)

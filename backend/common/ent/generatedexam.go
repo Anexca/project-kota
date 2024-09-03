@@ -21,10 +21,8 @@ type GeneratedExam struct {
 	ID int `json:"id,omitempty"`
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
-	// RawData holds the value of the "raw_data" field.
-	RawData map[string]interface{} `json:"raw_data,omitempty"`
-	// RawMetadata holds the value of the "raw_metadata" field.
-	RawMetadata map[string]interface{} `json:"raw_metadata,omitempty"`
+	// RawExamData holds the value of the "raw_exam_data" field.
+	RawExamData map[string]interface{} `json:"raw_exam_data,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -72,7 +70,7 @@ func (*GeneratedExam) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case generatedexam.FieldRawData, generatedexam.FieldRawMetadata:
+		case generatedexam.FieldRawExamData:
 			values[i] = new([]byte)
 		case generatedexam.FieldIsActive:
 			values[i] = new(sql.NullBool)
@@ -109,20 +107,12 @@ func (ge *GeneratedExam) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ge.IsActive = value.Bool
 			}
-		case generatedexam.FieldRawData:
+		case generatedexam.FieldRawExamData:
 			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field raw_data", values[i])
+				return fmt.Errorf("unexpected type %T for field raw_exam_data", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &ge.RawData); err != nil {
-					return fmt.Errorf("unmarshal field raw_data: %w", err)
-				}
-			}
-		case generatedexam.FieldRawMetadata:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field raw_metadata", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &ge.RawMetadata); err != nil {
-					return fmt.Errorf("unmarshal field raw_metadata: %w", err)
+				if err := json.Unmarshal(*value, &ge.RawExamData); err != nil {
+					return fmt.Errorf("unmarshal field raw_exam_data: %w", err)
 				}
 			}
 		case generatedexam.FieldCreatedAt:
@@ -193,11 +183,8 @@ func (ge *GeneratedExam) String() string {
 	builder.WriteString("is_active=")
 	builder.WriteString(fmt.Sprintf("%v", ge.IsActive))
 	builder.WriteString(", ")
-	builder.WriteString("raw_data=")
-	builder.WriteString(fmt.Sprintf("%v", ge.RawData))
-	builder.WriteString(", ")
-	builder.WriteString("raw_metadata=")
-	builder.WriteString(fmt.Sprintf("%v", ge.RawMetadata))
+	builder.WriteString("raw_exam_data=")
+	builder.WriteString(fmt.Sprintf("%v", ge.RawExamData))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(ge.CreatedAt.Format(time.ANSIC))

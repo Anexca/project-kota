@@ -18,17 +18,17 @@ func NewGeneratedExamRepository(dbClient *ent.Client) *GeneratedExamRepository {
 	}
 }
 
-func (q *GeneratedExamRepository) AddMany(ctx context.Context, questions []any, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
-	bulk := make([]*ent.GeneratedExamCreate, len(questions))
+func (q *GeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
+	bulk := make([]*ent.GeneratedExamCreate, len(exams))
 
-	for i, questionData := range questions {
-		jsonData, ok := questionData.(map[string]interface{})
+	for i, exam := range exams {
+		jsonData, ok := exam.(map[string]interface{})
 		if !ok {
 			return nil, fmt.Errorf("invalid exam data type at index %d", i)
 		}
 
 		bulk[i] = q.dbClient.GeneratedExam.Create().
-			SetRawData(jsonData).
+			SetRawExamData(jsonData).
 			SetExam(ex)
 	}
 

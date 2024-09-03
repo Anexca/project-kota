@@ -139,7 +139,7 @@ func (e *ExamService) GetGeneratedExams(ctx context.Context, examType commonCons
 
 		generatedExamOverview := models.GeneratedExamOverview{
 			Id:                generatedExam.ID,
-			RawExamData:       generatedExam.RawData,
+			RawExamData:       generatedExam.RawExamData,
 			CreatedAt:         generatedExam.CreatedAt,
 			UpdatedAt:         generatedExam.UpdatedAt,
 			UserAttempts:      userAttempts,

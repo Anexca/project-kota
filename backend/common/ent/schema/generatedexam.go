@@ -18,12 +18,7 @@ type GeneratedExam struct {
 func (GeneratedExam) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("is_active").Default(true),
-		field.JSON("raw_data", map[string]interface{}{}).
-			Optional().
-			SchemaType(map[string]string{
-				dialect.Postgres: "jsonb",
-			}),
-		field.JSON("raw_metadata", map[string]interface{}{}).
+		field.JSON("raw_exam_data", map[string]interface{}{}).
 			Optional().
 			SchemaType(map[string]string{
 				dialect.Postgres: "jsonb",

@@ -142,8 +142,7 @@ var (
 	GeneratedExamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
-		{Name: "raw_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
-		{Name: "raw_metadata", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
+		{Name: "raw_exam_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_generatedexams", Type: field.TypeInt, Nullable: true},
@@ -156,7 +155,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "generated_exams_exams_generatedexams",
-				Columns:    []*schema.Column{GeneratedExamsColumns[6]},
+				Columns:    []*schema.Column{GeneratedExamsColumns[5]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
