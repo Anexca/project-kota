@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"server/pkg/config"
 	"time"
@@ -25,7 +26,9 @@ func (p *PromptService) GetPromptResult(ctx context.Context, prompt string, mode
 		return "", fmt.Errorf("failed to load environment: %v", err)
 	}
 
-	req, err := prepareRequest(ctx, env.AIServiceUrl, env.AIServiceAccessKey, prompt, model)
+	promptUrl := fmt.Sprintf("%s/prompt", env.AIServiceUrl)
+
+	req, err := prepareRequest(ctx, promptUrl, env.AIServiceAccessKey, prompt, model)
 	if err != nil {
 		return "", err
 	}
@@ -43,6 +46,8 @@ func prepareRequest(ctx context.Context, url, accessKey, prompt string, model co
 		"prompt": prompt,
 		"model":  string(model),
 	}
+
+	log.Println(postData)
 
 	jsonData, err := json.Marshal(postData)
 	if err != nil {

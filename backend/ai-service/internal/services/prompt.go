@@ -2,6 +2,7 @@ package services
 
 import (
 	commonConstants "common/constants"
+	"strings"
 
 	"ai-service/pkg/models"
 	"context"
@@ -24,7 +25,7 @@ func NewPromptService(genAiClient *genai.Client) *PromptService {
 func (p *PromptService) GetPromptResults(ctx context.Context, request *models.GetPromptResultsRequest) (string, error) {
 	model := commonConstants.FLASH_15
 
-	if request.Model == "pro" {
+	if strings.Contains(request.Model, "gemini-1.5-pro") {
 		model = commonConstants.PRO_15
 	}
 
