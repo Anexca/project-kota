@@ -27,7 +27,7 @@ func NewExamAssesmentService(dbClient *ent.Client) *ExamAssesmentService {
 
 func (e *ExamAssesmentService) StartNewAssesment(ctx context.Context, attempt *ent.ExamAttempt, request *AssesmentRequest) (*ent.ExamAssesment, error) {
 	assesmentModel := commonRepositories.AssesmentModel{
-		CompletedMinutes: request.CompletedMinutes,
+		CompletedSeconds: request.CompletedMinutes,
 	}
 
 	return e.examAssesmentRepository.Create(ctx, attempt.ID, assesmentModel)

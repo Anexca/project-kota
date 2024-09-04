@@ -60,9 +60,9 @@ func NumberOfQuestions(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldNumberOfQuestions, v))
 }
 
-// DurationMinutes applies equality check predicate on the "duration_minutes" field. It's identical to DurationMinutesEQ.
-func DurationMinutes(v int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldEQ(FieldDurationMinutes, v))
+// DurationSeconds applies equality check predicate on the "duration_seconds" field. It's identical to DurationSecondsEQ.
+func DurationSeconds(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldDurationSeconds, v))
 }
 
 // NegativeMarking applies equality check predicate on the "negative_marking" field. It's identical to NegativeMarkingEQ.
@@ -135,44 +135,44 @@ func NumberOfQuestionsLTE(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldLTE(FieldNumberOfQuestions, v))
 }
 
-// DurationMinutesEQ applies the EQ predicate on the "duration_minutes" field.
-func DurationMinutesEQ(v int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldEQ(FieldDurationMinutes, v))
+// DurationSecondsEQ applies the EQ predicate on the "duration_seconds" field.
+func DurationSecondsEQ(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldDurationSeconds, v))
 }
 
-// DurationMinutesNEQ applies the NEQ predicate on the "duration_minutes" field.
-func DurationMinutesNEQ(v int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldNEQ(FieldDurationMinutes, v))
+// DurationSecondsNEQ applies the NEQ predicate on the "duration_seconds" field.
+func DurationSecondsNEQ(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldDurationSeconds, v))
 }
 
-// DurationMinutesIn applies the In predicate on the "duration_minutes" field.
-func DurationMinutesIn(vs ...int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldIn(FieldDurationMinutes, vs...))
+// DurationSecondsIn applies the In predicate on the "duration_seconds" field.
+func DurationSecondsIn(vs ...int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldDurationSeconds, vs...))
 }
 
-// DurationMinutesNotIn applies the NotIn predicate on the "duration_minutes" field.
-func DurationMinutesNotIn(vs ...int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldNotIn(FieldDurationMinutes, vs...))
+// DurationSecondsNotIn applies the NotIn predicate on the "duration_seconds" field.
+func DurationSecondsNotIn(vs ...int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldDurationSeconds, vs...))
 }
 
-// DurationMinutesGT applies the GT predicate on the "duration_minutes" field.
-func DurationMinutesGT(v int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldGT(FieldDurationMinutes, v))
+// DurationSecondsGT applies the GT predicate on the "duration_seconds" field.
+func DurationSecondsGT(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldDurationSeconds, v))
 }
 
-// DurationMinutesGTE applies the GTE predicate on the "duration_minutes" field.
-func DurationMinutesGTE(v int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldGTE(FieldDurationMinutes, v))
+// DurationSecondsGTE applies the GTE predicate on the "duration_seconds" field.
+func DurationSecondsGTE(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldDurationSeconds, v))
 }
 
-// DurationMinutesLT applies the LT predicate on the "duration_minutes" field.
-func DurationMinutesLT(v int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldLT(FieldDurationMinutes, v))
+// DurationSecondsLT applies the LT predicate on the "duration_seconds" field.
+func DurationSecondsLT(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldDurationSeconds, v))
 }
 
-// DurationMinutesLTE applies the LTE predicate on the "duration_minutes" field.
-func DurationMinutesLTE(v int) predicate.ExamSetting {
-	return predicate.ExamSetting(sql.FieldLTE(FieldDurationMinutes, v))
+// DurationSecondsLTE applies the LTE predicate on the "duration_seconds" field.
+func DurationSecondsLTE(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldDurationSeconds, v))
 }
 
 // NegativeMarkingEQ applies the EQ predicate on the "negative_marking" field.

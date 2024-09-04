@@ -55,9 +55,9 @@ func IDLTE(id int) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldLTE(FieldID, id))
 }
 
-// CompletedMinutes applies equality check predicate on the "completed_minutes" field. It's identical to CompletedMinutesEQ.
-func CompletedMinutes(v int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldEQ(FieldCompletedMinutes, v))
+// CompletedSeconds applies equality check predicate on the "completed_seconds" field. It's identical to CompletedSecondsEQ.
+func CompletedSeconds(v int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEQ(FieldCompletedSeconds, v))
 }
 
 // IsReady applies equality check predicate on the "is_ready" field. It's identical to IsReadyEQ.
@@ -75,44 +75,44 @@ func UpdatedAt(v time.Time) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// CompletedMinutesEQ applies the EQ predicate on the "completed_minutes" field.
-func CompletedMinutesEQ(v int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldEQ(FieldCompletedMinutes, v))
+// CompletedSecondsEQ applies the EQ predicate on the "completed_seconds" field.
+func CompletedSecondsEQ(v int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEQ(FieldCompletedSeconds, v))
 }
 
-// CompletedMinutesNEQ applies the NEQ predicate on the "completed_minutes" field.
-func CompletedMinutesNEQ(v int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldNEQ(FieldCompletedMinutes, v))
+// CompletedSecondsNEQ applies the NEQ predicate on the "completed_seconds" field.
+func CompletedSecondsNEQ(v int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNEQ(FieldCompletedSeconds, v))
 }
 
-// CompletedMinutesIn applies the In predicate on the "completed_minutes" field.
-func CompletedMinutesIn(vs ...int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldIn(FieldCompletedMinutes, vs...))
+// CompletedSecondsIn applies the In predicate on the "completed_seconds" field.
+func CompletedSecondsIn(vs ...int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldIn(FieldCompletedSeconds, vs...))
 }
 
-// CompletedMinutesNotIn applies the NotIn predicate on the "completed_minutes" field.
-func CompletedMinutesNotIn(vs ...int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldNotIn(FieldCompletedMinutes, vs...))
+// CompletedSecondsNotIn applies the NotIn predicate on the "completed_seconds" field.
+func CompletedSecondsNotIn(vs ...int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNotIn(FieldCompletedSeconds, vs...))
 }
 
-// CompletedMinutesGT applies the GT predicate on the "completed_minutes" field.
-func CompletedMinutesGT(v int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldGT(FieldCompletedMinutes, v))
+// CompletedSecondsGT applies the GT predicate on the "completed_seconds" field.
+func CompletedSecondsGT(v int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldGT(FieldCompletedSeconds, v))
 }
 
-// CompletedMinutesGTE applies the GTE predicate on the "completed_minutes" field.
-func CompletedMinutesGTE(v int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldGTE(FieldCompletedMinutes, v))
+// CompletedSecondsGTE applies the GTE predicate on the "completed_seconds" field.
+func CompletedSecondsGTE(v int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldGTE(FieldCompletedSeconds, v))
 }
 
-// CompletedMinutesLT applies the LT predicate on the "completed_minutes" field.
-func CompletedMinutesLT(v int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldLT(FieldCompletedMinutes, v))
+// CompletedSecondsLT applies the LT predicate on the "completed_seconds" field.
+func CompletedSecondsLT(v int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldLT(FieldCompletedSeconds, v))
 }
 
-// CompletedMinutesLTE applies the LTE predicate on the "completed_minutes" field.
-func CompletedMinutesLTE(v int) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldLTE(FieldCompletedMinutes, v))
+// CompletedSecondsLTE applies the LTE predicate on the "completed_seconds" field.
+func CompletedSecondsLTE(v int) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldLTE(FieldCompletedSeconds, v))
 }
 
 // RawAssesmentDataIsNil applies the IsNil predicate on the "raw_assesment_data" field.

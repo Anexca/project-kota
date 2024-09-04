@@ -133,7 +133,7 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 			UpdatedAt:         generatedExam.UpdatedAt,
 			UserAttempts:      len(generatedExam.Edges.Attempts),
 			MaxAttempts:       exam.Edges.Setting.MaxAttempts,
-			DurationMinutes:   exam.Edges.Setting.DurationMinutes,
+			DurationMinutes:   exam.Edges.Setting.DurationSeconds,
 			NumberOfQuestions: exam.Edges.Setting.NumberOfQuestions,
 		}
 
@@ -161,7 +161,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		UpdatedAt:         generatedExam.UpdatedAt,
 		UserAttempts:      len(generatedExam.Edges.Attempts),
 		MaxAttempts:       examSettings.MaxAttempts,
-		DurationMinutes:   examSettings.DurationMinutes,
+		DurationMinutes:   examSettings.DurationSeconds,
 		NumberOfQuestions: examSettings.NumberOfQuestions,
 	}
 

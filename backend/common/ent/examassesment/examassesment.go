@@ -14,8 +14,8 @@ const (
 	Label = "exam_assesment"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCompletedMinutes holds the string denoting the completed_minutes field in the database.
-	FieldCompletedMinutes = "completed_minutes"
+	// FieldCompletedSeconds holds the string denoting the completed_seconds field in the database.
+	FieldCompletedSeconds = "completed_seconds"
 	// FieldRawAssesmentData holds the string denoting the raw_assesment_data field in the database.
 	FieldRawAssesmentData = "raw_assesment_data"
 	// FieldIsReady holds the string denoting the is_ready field in the database.
@@ -40,7 +40,7 @@ const (
 // Columns holds all SQL columns for examassesment fields.
 var Columns = []string{
 	FieldID,
-	FieldCompletedMinutes,
+	FieldCompletedSeconds,
 	FieldRawAssesmentData,
 	FieldIsReady,
 	FieldCreatedAt,
@@ -87,9 +87,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCompletedMinutes orders the results by the completed_minutes field.
-func ByCompletedMinutes(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCompletedMinutes, opts...).ToFunc()
+// ByCompletedSeconds orders the results by the completed_seconds field.
+func ByCompletedSeconds(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCompletedSeconds, opts...).ToFunc()
 }
 
 // ByIsReady orders the results by the is_ready field.

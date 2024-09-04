@@ -27,9 +27,9 @@ func (esc *ExamSettingCreate) SetNumberOfQuestions(i int) *ExamSettingCreate {
 	return esc
 }
 
-// SetDurationMinutes sets the "duration_minutes" field.
-func (esc *ExamSettingCreate) SetDurationMinutes(i int) *ExamSettingCreate {
-	esc.mutation.SetDurationMinutes(i)
+// SetDurationSeconds sets the "duration_seconds" field.
+func (esc *ExamSettingCreate) SetDurationSeconds(i int) *ExamSettingCreate {
+	esc.mutation.SetDurationSeconds(i)
 	return esc
 }
 
@@ -196,8 +196,8 @@ func (esc *ExamSettingCreate) check() error {
 	if _, ok := esc.mutation.NumberOfQuestions(); !ok {
 		return &ValidationError{Name: "number_of_questions", err: errors.New(`ent: missing required field "ExamSetting.number_of_questions"`)}
 	}
-	if _, ok := esc.mutation.DurationMinutes(); !ok {
-		return &ValidationError{Name: "duration_minutes", err: errors.New(`ent: missing required field "ExamSetting.duration_minutes"`)}
+	if _, ok := esc.mutation.DurationSeconds(); !ok {
+		return &ValidationError{Name: "duration_seconds", err: errors.New(`ent: missing required field "ExamSetting.duration_seconds"`)}
 	}
 	if _, ok := esc.mutation.MaxAttempts(); !ok {
 		return &ValidationError{Name: "max_attempts", err: errors.New(`ent: missing required field "ExamSetting.max_attempts"`)}
@@ -238,9 +238,9 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 		_spec.SetField(examsetting.FieldNumberOfQuestions, field.TypeInt, value)
 		_node.NumberOfQuestions = value
 	}
-	if value, ok := esc.mutation.DurationMinutes(); ok {
-		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeInt, value)
-		_node.DurationMinutes = value
+	if value, ok := esc.mutation.DurationSeconds(); ok {
+		_spec.SetField(examsetting.FieldDurationSeconds, field.TypeInt, value)
+		_node.DurationSeconds = value
 	}
 	if value, ok := esc.mutation.NegativeMarking(); ok {
 		_spec.SetField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)

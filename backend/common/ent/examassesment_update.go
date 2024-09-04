@@ -29,24 +29,24 @@ func (eau *ExamAssesmentUpdate) Where(ps ...predicate.ExamAssesment) *ExamAssesm
 	return eau
 }
 
-// SetCompletedMinutes sets the "completed_minutes" field.
-func (eau *ExamAssesmentUpdate) SetCompletedMinutes(i int) *ExamAssesmentUpdate {
-	eau.mutation.ResetCompletedMinutes()
-	eau.mutation.SetCompletedMinutes(i)
+// SetCompletedSeconds sets the "completed_seconds" field.
+func (eau *ExamAssesmentUpdate) SetCompletedSeconds(i int) *ExamAssesmentUpdate {
+	eau.mutation.ResetCompletedSeconds()
+	eau.mutation.SetCompletedSeconds(i)
 	return eau
 }
 
-// SetNillableCompletedMinutes sets the "completed_minutes" field if the given value is not nil.
-func (eau *ExamAssesmentUpdate) SetNillableCompletedMinutes(i *int) *ExamAssesmentUpdate {
+// SetNillableCompletedSeconds sets the "completed_seconds" field if the given value is not nil.
+func (eau *ExamAssesmentUpdate) SetNillableCompletedSeconds(i *int) *ExamAssesmentUpdate {
 	if i != nil {
-		eau.SetCompletedMinutes(*i)
+		eau.SetCompletedSeconds(*i)
 	}
 	return eau
 }
 
-// AddCompletedMinutes adds i to the "completed_minutes" field.
-func (eau *ExamAssesmentUpdate) AddCompletedMinutes(i int) *ExamAssesmentUpdate {
-	eau.mutation.AddCompletedMinutes(i)
+// AddCompletedSeconds adds i to the "completed_seconds" field.
+func (eau *ExamAssesmentUpdate) AddCompletedSeconds(i int) *ExamAssesmentUpdate {
+	eau.mutation.AddCompletedSeconds(i)
 	return eau
 }
 
@@ -157,11 +157,11 @@ func (eau *ExamAssesmentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			}
 		}
 	}
-	if value, ok := eau.mutation.CompletedMinutes(); ok {
-		_spec.SetField(examassesment.FieldCompletedMinutes, field.TypeInt, value)
+	if value, ok := eau.mutation.CompletedSeconds(); ok {
+		_spec.SetField(examassesment.FieldCompletedSeconds, field.TypeInt, value)
 	}
-	if value, ok := eau.mutation.AddedCompletedMinutes(); ok {
-		_spec.AddField(examassesment.FieldCompletedMinutes, field.TypeInt, value)
+	if value, ok := eau.mutation.AddedCompletedSeconds(); ok {
+		_spec.AddField(examassesment.FieldCompletedSeconds, field.TypeInt, value)
 	}
 	if value, ok := eau.mutation.RawAssesmentData(); ok {
 		_spec.SetField(examassesment.FieldRawAssesmentData, field.TypeJSON, value)
@@ -224,24 +224,24 @@ type ExamAssesmentUpdateOne struct {
 	mutation *ExamAssesmentMutation
 }
 
-// SetCompletedMinutes sets the "completed_minutes" field.
-func (eauo *ExamAssesmentUpdateOne) SetCompletedMinutes(i int) *ExamAssesmentUpdateOne {
-	eauo.mutation.ResetCompletedMinutes()
-	eauo.mutation.SetCompletedMinutes(i)
+// SetCompletedSeconds sets the "completed_seconds" field.
+func (eauo *ExamAssesmentUpdateOne) SetCompletedSeconds(i int) *ExamAssesmentUpdateOne {
+	eauo.mutation.ResetCompletedSeconds()
+	eauo.mutation.SetCompletedSeconds(i)
 	return eauo
 }
 
-// SetNillableCompletedMinutes sets the "completed_minutes" field if the given value is not nil.
-func (eauo *ExamAssesmentUpdateOne) SetNillableCompletedMinutes(i *int) *ExamAssesmentUpdateOne {
+// SetNillableCompletedSeconds sets the "completed_seconds" field if the given value is not nil.
+func (eauo *ExamAssesmentUpdateOne) SetNillableCompletedSeconds(i *int) *ExamAssesmentUpdateOne {
 	if i != nil {
-		eauo.SetCompletedMinutes(*i)
+		eauo.SetCompletedSeconds(*i)
 	}
 	return eauo
 }
 
-// AddCompletedMinutes adds i to the "completed_minutes" field.
-func (eauo *ExamAssesmentUpdateOne) AddCompletedMinutes(i int) *ExamAssesmentUpdateOne {
-	eauo.mutation.AddCompletedMinutes(i)
+// AddCompletedSeconds adds i to the "completed_seconds" field.
+func (eauo *ExamAssesmentUpdateOne) AddCompletedSeconds(i int) *ExamAssesmentUpdateOne {
+	eauo.mutation.AddCompletedSeconds(i)
 	return eauo
 }
 
@@ -382,11 +382,11 @@ func (eauo *ExamAssesmentUpdateOne) sqlSave(ctx context.Context) (_node *ExamAss
 			}
 		}
 	}
-	if value, ok := eauo.mutation.CompletedMinutes(); ok {
-		_spec.SetField(examassesment.FieldCompletedMinutes, field.TypeInt, value)
+	if value, ok := eauo.mutation.CompletedSeconds(); ok {
+		_spec.SetField(examassesment.FieldCompletedSeconds, field.TypeInt, value)
 	}
-	if value, ok := eauo.mutation.AddedCompletedMinutes(); ok {
-		_spec.AddField(examassesment.FieldCompletedMinutes, field.TypeInt, value)
+	if value, ok := eauo.mutation.AddedCompletedSeconds(); ok {
+		_spec.AddField(examassesment.FieldCompletedSeconds, field.TypeInt, value)
 	}
 	if value, ok := eauo.mutation.RawAssesmentData(); ok {
 		_spec.SetField(examassesment.FieldRawAssesmentData, field.TypeJSON, value)
