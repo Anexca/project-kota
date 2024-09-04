@@ -5,45 +5,57 @@ import { RegisterPage } from "../pages/register/register";
 import HomePage from "../pages/homepage/homepage";
 import ProtectedRoute from "./protected-route";
 import { ForgotPassword } from "../pages/forgot-password/forgot-password";
-import SupabaseAuth from "../pages/supabase-auth/supabase-auth";
 import QuestionPaper from "../pages/question-paper/question-paper";
 import DiscriptiveExam from "../pages/discriptive-exam/discriptive-exam";
+import SignedInRoute from "./signedin-route";
 
 const routes: RouteObject[] = [
   {
     path: paths.HOMEPAGE,
     element: (
-      <ProtectedRoute>
+      <SignedInRoute>
         <HomePage />
-      </ProtectedRoute>
+      </SignedInRoute>
     ),
   },
   {
     path: paths.REGISTER,
-    element: <RegisterPage />,
+    element: (
+      <SignedInRoute>
+        <RegisterPage />
+      </SignedInRoute>
+    ),
   },
   {
     path: paths.LOGIN,
-    element: <Login />,
+    element: (
+      <SignedInRoute>
+        <Login />
+      </SignedInRoute>
+    ),
   },
   {
     path: paths.FORGOT_PASSWORD,
     element: <ForgotPassword />,
   },
   {
-    path: paths.SUPABASE_AUTH,
-    element: <SupabaseAuth />,
-  },
-  {
     path: paths.QUESTION_PAPER,
-    element: <QuestionPaper />,
+    element: (
+      <ProtectedRoute>
+        <QuestionPaper />
+      </ProtectedRoute>
+    ),
   },
   {
     path: paths.EXAMS,
     children: [
       {
         path: `${paths.DISCRIPTIVE}/:questionId`,
-        element: <DiscriptiveExam />,
+        element: (
+          <ProtectedRoute>
+            <DiscriptiveExam />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

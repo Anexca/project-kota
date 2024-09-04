@@ -1,24 +1,23 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Label } from "../../componnets/base/label/label";
-import { Button } from "../../componnets/base/button/button";
-import { Input } from "../../componnets/base/input/input";
-import { BackgroundGradientAnimation } from "../../componnets/shared/background-blob/background-blob";
-import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { LoginSchema, LoginType } from "../../validation-schema/auth";
-import { supabase } from "../../supabase/client";
-import { useToast } from "../../hooks/use-toast";
-import useSessionStore from "../../store/auth-store";
-import ControlledInput from "../../componnets/base/controlled-input";
-import { paths } from "../../routes/route.constant";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import GoogleIcon from "../../assets/svg/google-icon";
+import { Button } from "../../componnets/base/button/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "../../componnets/base/card/card";
-import GoogleIcon from "../../assets/svg/google-icon";
+import ControlledInput from "../../componnets/base/controlled-input";
+import { Label } from "../../componnets/base/label/label";
+import { BackgroundGradientAnimation } from "../../componnets/shared/background-blob/background-blob";
+import { useToast } from "../../hooks/use-toast";
+import { paths } from "../../routes/route.constant";
+import useSessionStore from "../../store/auth-store";
+import { supabase } from "../../supabase/client";
+import { LoginSchema, LoginType } from "../../validation-schema/auth";
 
 export function Login() {
   const navigate = useNavigate();
@@ -57,7 +56,7 @@ export function Login() {
       return;
     }
     if (data) {
-      const session = await loadSession();
+      await loadSession();
     }
   };
   return (

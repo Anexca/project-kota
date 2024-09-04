@@ -2,8 +2,6 @@ import clsx from "clsx";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-type Props = {};
-
 const links = [
   {
     to: "/#features",
@@ -18,7 +16,7 @@ const links = [
     label: "Reviews",
   },
 ];
-const Header = (props: Props) => {
+const Header = () => {
   const [mobileViewHeader, setMobileViewHeader] = useState(false);
   return (
     <header className="sticky top-0 z-10 ">

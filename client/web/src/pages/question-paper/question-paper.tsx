@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getQuestions } from "../../services/exam.service";
 
-import Header from "../../componnets/shared/header/header";
-import useLocalStorageStore from "../../store/local-storage";
-import DescriptiveQuestionCard from "../../componnets/shared/descriptive-question-card";
-import { Checkbox } from "../../componnets/base/checkbox";
 import { useNavigate } from "react-router-dom";
+import { Checkbox } from "../../componnets/base/checkbox";
+import DescriptiveQuestionCard from "../../componnets/shared/descriptive-question-card";
+import Header from "../../componnets/shared/header/header";
+import { IQuestion } from "../../interface/question";
 import { paths } from "../../routes/route.constant";
 import { supabase } from "../../supabase/client";
-import { IQuestion } from "../../interface/question";
 
-type Props = {};
-
-const QuestionPaper = (props: Props) => {
-  const { items, addItem, removeItem } = useLocalStorageStore();
+const QuestionPaper = () => {
   const [questions, setQuestions] = useState<IQuestion[]>([]);
   const navigate = useNavigate();
   const getQuestionsList = async () => {
@@ -67,8 +63,8 @@ const QuestionPaper = (props: Props) => {
               type={item.raw_exam_data.type}
               srNumber={index + 1}
               isAttemped={isAttemped}
-              handleAttemptClick={() => attempQuestion(index)}
-              duration={item.duration_minutes}
+              handleAttemptClick={() => attempQuestion(item.id)}
+              duration={item.duration_minutes / 60}
             />
           );
         })}

@@ -36,7 +36,7 @@ const TestHeader = ({ currentTime, active }: Props) => {
                   active && "text-orange-500"
                 )}
               >
-                {time} Remaining
+                {time} Left
               </div>
             </div>
             <div
@@ -53,7 +53,7 @@ const TestHeader = ({ currentTime, active }: Props) => {
                 active && "text-orange-500"
               )}
             >
-              {time} Remaining
+              {time} Left
             </div>
           </div>
         </div>

@@ -11,7 +11,8 @@
       "@/*": ["./src/*"],
       "@componnets/*": ["./src/componnets/*"],
       "@assets/*": ["./src/assets/*"]
-
-    }
+    },
+    "jsx": "react",
+    "esModuleInterop": true
   }
 }

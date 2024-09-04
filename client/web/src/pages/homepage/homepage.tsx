@@ -1,10 +1,6 @@
-import { useState } from "react";
-import Header from "../../componnets/shared/header/header";
-import useSessionStore from "../../store/auth-store";
 import { Link } from "react-router-dom";
+import Header from "../../componnets/shared/header/header";
 import { paths } from "../../routes/route.constant";
-
-type Props = {};
 
 const card = (
   <a
@@ -52,7 +48,7 @@ const card = (
   </a>
 );
 
-const HomePage = (props: Props) => {
+const HomePage = () => {
   return (
     <>
       <Header />
