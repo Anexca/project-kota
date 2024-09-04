@@ -21,8 +21,8 @@ type ExamSetting struct {
 	ID int `json:"id,omitempty"`
 	// NumberOfQuestions holds the value of the "number_of_questions" field.
 	NumberOfQuestions int `json:"number_of_questions,omitempty"`
-	// DurationMinutes holds the value of the "duration_minutes" field.
-	DurationMinutes int `json:"duration_minutes,omitempty"`
+	// DurationSeconds holds the value of the "duration_seconds" field.
+	DurationSeconds int `json:"duration_seconds,omitempty"`
 	// NegativeMarking holds the value of the "negative_marking" field.
 	NegativeMarking float64 `json:"negative_marking,omitempty"`
 	// AiPrompt holds the value of the "ai_prompt" field.
@@ -73,7 +73,7 @@ func (*ExamSetting) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case examsetting.FieldNegativeMarking:
 			values[i] = new(sql.NullFloat64)
-		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationMinutes, examsetting.FieldMaxAttempts:
+		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationSeconds, examsetting.FieldMaxAttempts:
 			values[i] = new(sql.NullInt64)
 		case examsetting.FieldAiPrompt, examsetting.FieldEvaluationAiPrompt:
 			values[i] = new(sql.NullString)
@@ -108,11 +108,11 @@ func (es *ExamSetting) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				es.NumberOfQuestions = int(value.Int64)
 			}
-		case examsetting.FieldDurationMinutes:
+		case examsetting.FieldDurationSeconds:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field duration_minutes", values[i])
+				return fmt.Errorf("unexpected type %T for field duration_seconds", values[i])
 			} else if value.Valid {
-				es.DurationMinutes = int(value.Int64)
+				es.DurationSeconds = int(value.Int64)
 			}
 		case examsetting.FieldNegativeMarking:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -209,8 +209,8 @@ func (es *ExamSetting) String() string {
 	builder.WriteString("number_of_questions=")
 	builder.WriteString(fmt.Sprintf("%v", es.NumberOfQuestions))
 	builder.WriteString(", ")
-	builder.WriteString("duration_minutes=")
-	builder.WriteString(fmt.Sprintf("%v", es.DurationMinutes))
+	builder.WriteString("duration_seconds=")
+	builder.WriteString(fmt.Sprintf("%v", es.DurationSeconds))
 	builder.WriteString(", ")
 	builder.WriteString("negative_marking=")
 	builder.WriteString(fmt.Sprintf("%v", es.NegativeMarking))

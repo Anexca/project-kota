@@ -50,24 +50,24 @@ func (esu *ExamSettingUpdate) AddNumberOfQuestions(i int) *ExamSettingUpdate {
 	return esu
 }
 
-// SetDurationMinutes sets the "duration_minutes" field.
-func (esu *ExamSettingUpdate) SetDurationMinutes(i int) *ExamSettingUpdate {
-	esu.mutation.ResetDurationMinutes()
-	esu.mutation.SetDurationMinutes(i)
+// SetDurationSeconds sets the "duration_seconds" field.
+func (esu *ExamSettingUpdate) SetDurationSeconds(i int) *ExamSettingUpdate {
+	esu.mutation.ResetDurationSeconds()
+	esu.mutation.SetDurationSeconds(i)
 	return esu
 }
 
-// SetNillableDurationMinutes sets the "duration_minutes" field if the given value is not nil.
-func (esu *ExamSettingUpdate) SetNillableDurationMinutes(i *int) *ExamSettingUpdate {
+// SetNillableDurationSeconds sets the "duration_seconds" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableDurationSeconds(i *int) *ExamSettingUpdate {
 	if i != nil {
-		esu.SetDurationMinutes(*i)
+		esu.SetDurationSeconds(*i)
 	}
 	return esu
 }
 
-// AddDurationMinutes adds i to the "duration_minutes" field.
-func (esu *ExamSettingUpdate) AddDurationMinutes(i int) *ExamSettingUpdate {
-	esu.mutation.AddDurationMinutes(i)
+// AddDurationSeconds adds i to the "duration_seconds" field.
+func (esu *ExamSettingUpdate) AddDurationSeconds(i int) *ExamSettingUpdate {
+	esu.mutation.AddDurationSeconds(i)
 	return esu
 }
 
@@ -258,11 +258,11 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := esu.mutation.AddedNumberOfQuestions(); ok {
 		_spec.AddField(examsetting.FieldNumberOfQuestions, field.TypeInt, value)
 	}
-	if value, ok := esu.mutation.DurationMinutes(); ok {
-		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeInt, value)
+	if value, ok := esu.mutation.DurationSeconds(); ok {
+		_spec.SetField(examsetting.FieldDurationSeconds, field.TypeInt, value)
 	}
-	if value, ok := esu.mutation.AddedDurationMinutes(); ok {
-		_spec.AddField(examsetting.FieldDurationMinutes, field.TypeInt, value)
+	if value, ok := esu.mutation.AddedDurationSeconds(); ok {
+		_spec.AddField(examsetting.FieldDurationSeconds, field.TypeInt, value)
 	}
 	if value, ok := esu.mutation.NegativeMarking(); ok {
 		_spec.SetField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)
@@ -370,24 +370,24 @@ func (esuo *ExamSettingUpdateOne) AddNumberOfQuestions(i int) *ExamSettingUpdate
 	return esuo
 }
 
-// SetDurationMinutes sets the "duration_minutes" field.
-func (esuo *ExamSettingUpdateOne) SetDurationMinutes(i int) *ExamSettingUpdateOne {
-	esuo.mutation.ResetDurationMinutes()
-	esuo.mutation.SetDurationMinutes(i)
+// SetDurationSeconds sets the "duration_seconds" field.
+func (esuo *ExamSettingUpdateOne) SetDurationSeconds(i int) *ExamSettingUpdateOne {
+	esuo.mutation.ResetDurationSeconds()
+	esuo.mutation.SetDurationSeconds(i)
 	return esuo
 }
 
-// SetNillableDurationMinutes sets the "duration_minutes" field if the given value is not nil.
-func (esuo *ExamSettingUpdateOne) SetNillableDurationMinutes(i *int) *ExamSettingUpdateOne {
+// SetNillableDurationSeconds sets the "duration_seconds" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableDurationSeconds(i *int) *ExamSettingUpdateOne {
 	if i != nil {
-		esuo.SetDurationMinutes(*i)
+		esuo.SetDurationSeconds(*i)
 	}
 	return esuo
 }
 
-// AddDurationMinutes adds i to the "duration_minutes" field.
-func (esuo *ExamSettingUpdateOne) AddDurationMinutes(i int) *ExamSettingUpdateOne {
-	esuo.mutation.AddDurationMinutes(i)
+// AddDurationSeconds adds i to the "duration_seconds" field.
+func (esuo *ExamSettingUpdateOne) AddDurationSeconds(i int) *ExamSettingUpdateOne {
+	esuo.mutation.AddDurationSeconds(i)
 	return esuo
 }
 
@@ -608,11 +608,11 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	if value, ok := esuo.mutation.AddedNumberOfQuestions(); ok {
 		_spec.AddField(examsetting.FieldNumberOfQuestions, field.TypeInt, value)
 	}
-	if value, ok := esuo.mutation.DurationMinutes(); ok {
-		_spec.SetField(examsetting.FieldDurationMinutes, field.TypeInt, value)
+	if value, ok := esuo.mutation.DurationSeconds(); ok {
+		_spec.SetField(examsetting.FieldDurationSeconds, field.TypeInt, value)
 	}
-	if value, ok := esuo.mutation.AddedDurationMinutes(); ok {
-		_spec.AddField(examsetting.FieldDurationMinutes, field.TypeInt, value)
+	if value, ok := esuo.mutation.AddedDurationSeconds(); ok {
+		_spec.AddField(examsetting.FieldDurationSeconds, field.TypeInt, value)
 	}
 	if value, ok := esuo.mutation.NegativeMarking(); ok {
 		_spec.SetField(examsetting.FieldNegativeMarking, field.TypeFloat64, value)

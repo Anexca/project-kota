@@ -15,7 +15,7 @@ type ExamAssesmentRepository struct {
 }
 
 type AssesmentModel struct {
-	CompletedMinutes int
+	CompletedSeconds int
 }
 
 func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
@@ -27,7 +27,7 @@ func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
 func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, model AssesmentModel) (*ent.ExamAssesment, error) {
 	return e.dbClient.ExamAssesment.Create().
 		SetAttemptID(attemptId).
-		SetCompletedMinutes(model.CompletedMinutes).
+		SetCompletedSeconds(model.CompletedSeconds).
 		Save(ctx)
 }
 

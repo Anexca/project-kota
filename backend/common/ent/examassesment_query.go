@@ -299,12 +299,12 @@ func (eaq *ExamAssesmentQuery) WithAttempt(opts ...func(*ExamAttemptQuery)) *Exa
 // Example:
 //
 //	var v []struct {
-//		CompletedMinutes int `json:"completed_minutes,omitempty"`
+//		CompletedSeconds int `json:"completed_seconds,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ExamAssesment.Query().
-//		GroupBy(examassesment.FieldCompletedMinutes).
+//		GroupBy(examassesment.FieldCompletedSeconds).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (eaq *ExamAssesmentQuery) GroupBy(field string, fields ...string) *ExamAssesmentGroupBy {
@@ -322,11 +322,11 @@ func (eaq *ExamAssesmentQuery) GroupBy(field string, fields ...string) *ExamAsse
 // Example:
 //
 //	var v []struct {
-//		CompletedMinutes int `json:"completed_minutes,omitempty"`
+//		CompletedSeconds int `json:"completed_seconds,omitempty"`
 //	}
 //
 //	client.ExamAssesment.Query().
-//		Select(examassesment.FieldCompletedMinutes).
+//		Select(examassesment.FieldCompletedSeconds).
 //		Scan(ctx, &v)
 func (eaq *ExamAssesmentQuery) Select(fields ...string) *ExamAssesmentSelect {
 	eaq.ctx.Fields = append(eaq.ctx.Fields, fields...)

@@ -17,7 +17,7 @@ type ExamAssesment struct {
 // Fields of the ExamAssesment.
 func (ExamAssesment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("completed_minutes"),
+		field.Int("completed_seconds"),
 		field.JSON("raw_assesment_data", map[string]interface{}{}).
 			Optional().
 			SchemaType(map[string]string{

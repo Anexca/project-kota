@@ -16,8 +16,8 @@ const (
 	FieldID = "id"
 	// FieldNumberOfQuestions holds the string denoting the number_of_questions field in the database.
 	FieldNumberOfQuestions = "number_of_questions"
-	// FieldDurationMinutes holds the string denoting the duration_minutes field in the database.
-	FieldDurationMinutes = "duration_minutes"
+	// FieldDurationSeconds holds the string denoting the duration_seconds field in the database.
+	FieldDurationSeconds = "duration_seconds"
 	// FieldNegativeMarking holds the string denoting the negative_marking field in the database.
 	FieldNegativeMarking = "negative_marking"
 	// FieldAiPrompt holds the string denoting the ai_prompt field in the database.
@@ -49,7 +49,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldNumberOfQuestions,
-	FieldDurationMinutes,
+	FieldDurationSeconds,
 	FieldNegativeMarking,
 	FieldAiPrompt,
 	FieldOtherDetails,
@@ -104,9 +104,9 @@ func ByNumberOfQuestions(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNumberOfQuestions, opts...).ToFunc()
 }
 
-// ByDurationMinutes orders the results by the duration_minutes field.
-func ByDurationMinutes(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDurationMinutes, opts...).ToFunc()
+// ByDurationSeconds orders the results by the duration_seconds field.
+func ByDurationSeconds(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDurationSeconds, opts...).ToFunc()
 }
 
 // ByNegativeMarking orders the results by the negative_marking field.

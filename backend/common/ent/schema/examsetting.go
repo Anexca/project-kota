@@ -18,7 +18,7 @@ type ExamSetting struct {
 func (ExamSetting) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("number_of_questions"),
-		field.Int("duration_minutes"),
+		field.Int("duration_seconds"),
 		field.Float("negative_marking").Optional(),
 		field.String("ai_prompt").Optional(),
 		field.JSON("other_details", map[string]interface{}{}).

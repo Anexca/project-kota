@@ -1493,8 +1493,8 @@ type ExamAssesmentMutation struct {
 	op                   Op
 	typ                  string
 	id                   *int
-	completed_minutes    *int
-	addcompleted_minutes *int
+	completed_seconds    *int
+	addcompleted_seconds *int
 	raw_assesment_data   *map[string]interface{}
 	is_ready             *bool
 	created_at           *time.Time
@@ -1605,60 +1605,60 @@ func (m *ExamAssesmentMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetCompletedMinutes sets the "completed_minutes" field.
-func (m *ExamAssesmentMutation) SetCompletedMinutes(i int) {
-	m.completed_minutes = &i
-	m.addcompleted_minutes = nil
+// SetCompletedSeconds sets the "completed_seconds" field.
+func (m *ExamAssesmentMutation) SetCompletedSeconds(i int) {
+	m.completed_seconds = &i
+	m.addcompleted_seconds = nil
 }
 
-// CompletedMinutes returns the value of the "completed_minutes" field in the mutation.
-func (m *ExamAssesmentMutation) CompletedMinutes() (r int, exists bool) {
-	v := m.completed_minutes
+// CompletedSeconds returns the value of the "completed_seconds" field in the mutation.
+func (m *ExamAssesmentMutation) CompletedSeconds() (r int, exists bool) {
+	v := m.completed_seconds
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCompletedMinutes returns the old "completed_minutes" field's value of the ExamAssesment entity.
+// OldCompletedSeconds returns the old "completed_seconds" field's value of the ExamAssesment entity.
 // If the ExamAssesment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ExamAssesmentMutation) OldCompletedMinutes(ctx context.Context) (v int, err error) {
+func (m *ExamAssesmentMutation) OldCompletedSeconds(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCompletedMinutes is only allowed on UpdateOne operations")
+		return v, errors.New("OldCompletedSeconds is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCompletedMinutes requires an ID field in the mutation")
+		return v, errors.New("OldCompletedSeconds requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCompletedMinutes: %w", err)
+		return v, fmt.Errorf("querying old value for OldCompletedSeconds: %w", err)
 	}
-	return oldValue.CompletedMinutes, nil
+	return oldValue.CompletedSeconds, nil
 }
 
-// AddCompletedMinutes adds i to the "completed_minutes" field.
-func (m *ExamAssesmentMutation) AddCompletedMinutes(i int) {
-	if m.addcompleted_minutes != nil {
-		*m.addcompleted_minutes += i
+// AddCompletedSeconds adds i to the "completed_seconds" field.
+func (m *ExamAssesmentMutation) AddCompletedSeconds(i int) {
+	if m.addcompleted_seconds != nil {
+		*m.addcompleted_seconds += i
 	} else {
-		m.addcompleted_minutes = &i
+		m.addcompleted_seconds = &i
 	}
 }
 
-// AddedCompletedMinutes returns the value that was added to the "completed_minutes" field in this mutation.
-func (m *ExamAssesmentMutation) AddedCompletedMinutes() (r int, exists bool) {
-	v := m.addcompleted_minutes
+// AddedCompletedSeconds returns the value that was added to the "completed_seconds" field in this mutation.
+func (m *ExamAssesmentMutation) AddedCompletedSeconds() (r int, exists bool) {
+	v := m.addcompleted_seconds
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetCompletedMinutes resets all changes to the "completed_minutes" field.
-func (m *ExamAssesmentMutation) ResetCompletedMinutes() {
-	m.completed_minutes = nil
-	m.addcompleted_minutes = nil
+// ResetCompletedSeconds resets all changes to the "completed_seconds" field.
+func (m *ExamAssesmentMutation) ResetCompletedSeconds() {
+	m.completed_seconds = nil
+	m.addcompleted_seconds = nil
 }
 
 // SetRawAssesmentData sets the "raw_assesment_data" field.
@@ -1892,8 +1892,8 @@ func (m *ExamAssesmentMutation) Type() string {
 // AddedFields().
 func (m *ExamAssesmentMutation) Fields() []string {
 	fields := make([]string, 0, 5)
-	if m.completed_minutes != nil {
-		fields = append(fields, examassesment.FieldCompletedMinutes)
+	if m.completed_seconds != nil {
+		fields = append(fields, examassesment.FieldCompletedSeconds)
 	}
 	if m.raw_assesment_data != nil {
 		fields = append(fields, examassesment.FieldRawAssesmentData)
@@ -1915,8 +1915,8 @@ func (m *ExamAssesmentMutation) Fields() []string {
 // schema.
 func (m *ExamAssesmentMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case examassesment.FieldCompletedMinutes:
-		return m.CompletedMinutes()
+	case examassesment.FieldCompletedSeconds:
+		return m.CompletedSeconds()
 	case examassesment.FieldRawAssesmentData:
 		return m.RawAssesmentData()
 	case examassesment.FieldIsReady:
@@ -1934,8 +1934,8 @@ func (m *ExamAssesmentMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ExamAssesmentMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case examassesment.FieldCompletedMinutes:
-		return m.OldCompletedMinutes(ctx)
+	case examassesment.FieldCompletedSeconds:
+		return m.OldCompletedSeconds(ctx)
 	case examassesment.FieldRawAssesmentData:
 		return m.OldRawAssesmentData(ctx)
 	case examassesment.FieldIsReady:
@@ -1953,12 +1953,12 @@ func (m *ExamAssesmentMutation) OldField(ctx context.Context, name string) (ent.
 // type.
 func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case examassesment.FieldCompletedMinutes:
+	case examassesment.FieldCompletedSeconds:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCompletedMinutes(v)
+		m.SetCompletedSeconds(v)
 		return nil
 	case examassesment.FieldRawAssesmentData:
 		v, ok := value.(map[string]interface{})
@@ -1996,8 +1996,8 @@ func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ExamAssesmentMutation) AddedFields() []string {
 	var fields []string
-	if m.addcompleted_minutes != nil {
-		fields = append(fields, examassesment.FieldCompletedMinutes)
+	if m.addcompleted_seconds != nil {
+		fields = append(fields, examassesment.FieldCompletedSeconds)
 	}
 	return fields
 }
@@ -2007,8 +2007,8 @@ func (m *ExamAssesmentMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ExamAssesmentMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case examassesment.FieldCompletedMinutes:
-		return m.AddedCompletedMinutes()
+	case examassesment.FieldCompletedSeconds:
+		return m.AddedCompletedSeconds()
 	}
 	return nil, false
 }
@@ -2018,12 +2018,12 @@ func (m *ExamAssesmentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ExamAssesmentMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case examassesment.FieldCompletedMinutes:
+	case examassesment.FieldCompletedSeconds:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddCompletedMinutes(v)
+		m.AddCompletedSeconds(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ExamAssesment numeric field %s", name)
@@ -2061,8 +2061,8 @@ func (m *ExamAssesmentMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ExamAssesmentMutation) ResetField(name string) error {
 	switch name {
-	case examassesment.FieldCompletedMinutes:
-		m.ResetCompletedMinutes()
+	case examassesment.FieldCompletedSeconds:
+		m.ResetCompletedSeconds()
 		return nil
 	case examassesment.FieldRawAssesmentData:
 		m.ResetRawAssesmentData()
@@ -3452,8 +3452,8 @@ type ExamSettingMutation struct {
 	id                     *int
 	number_of_questions    *int
 	addnumber_of_questions *int
-	duration_minutes       *int
-	addduration_minutes    *int
+	duration_seconds       *int
+	addduration_seconds    *int
 	negative_marking       *float64
 	addnegative_marking    *float64
 	ai_prompt              *string
@@ -3625,60 +3625,60 @@ func (m *ExamSettingMutation) ResetNumberOfQuestions() {
 	m.addnumber_of_questions = nil
 }
 
-// SetDurationMinutes sets the "duration_minutes" field.
-func (m *ExamSettingMutation) SetDurationMinutes(i int) {
-	m.duration_minutes = &i
-	m.addduration_minutes = nil
+// SetDurationSeconds sets the "duration_seconds" field.
+func (m *ExamSettingMutation) SetDurationSeconds(i int) {
+	m.duration_seconds = &i
+	m.addduration_seconds = nil
 }
 
-// DurationMinutes returns the value of the "duration_minutes" field in the mutation.
-func (m *ExamSettingMutation) DurationMinutes() (r int, exists bool) {
-	v := m.duration_minutes
+// DurationSeconds returns the value of the "duration_seconds" field in the mutation.
+func (m *ExamSettingMutation) DurationSeconds() (r int, exists bool) {
+	v := m.duration_seconds
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDurationMinutes returns the old "duration_minutes" field's value of the ExamSetting entity.
+// OldDurationSeconds returns the old "duration_seconds" field's value of the ExamSetting entity.
 // If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ExamSettingMutation) OldDurationMinutes(ctx context.Context) (v int, err error) {
+func (m *ExamSettingMutation) OldDurationSeconds(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDurationMinutes is only allowed on UpdateOne operations")
+		return v, errors.New("OldDurationSeconds is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDurationMinutes requires an ID field in the mutation")
+		return v, errors.New("OldDurationSeconds requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDurationMinutes: %w", err)
+		return v, fmt.Errorf("querying old value for OldDurationSeconds: %w", err)
 	}
-	return oldValue.DurationMinutes, nil
+	return oldValue.DurationSeconds, nil
 }
 
-// AddDurationMinutes adds i to the "duration_minutes" field.
-func (m *ExamSettingMutation) AddDurationMinutes(i int) {
-	if m.addduration_minutes != nil {
-		*m.addduration_minutes += i
+// AddDurationSeconds adds i to the "duration_seconds" field.
+func (m *ExamSettingMutation) AddDurationSeconds(i int) {
+	if m.addduration_seconds != nil {
+		*m.addduration_seconds += i
 	} else {
-		m.addduration_minutes = &i
+		m.addduration_seconds = &i
 	}
 }
 
-// AddedDurationMinutes returns the value that was added to the "duration_minutes" field in this mutation.
-func (m *ExamSettingMutation) AddedDurationMinutes() (r int, exists bool) {
-	v := m.addduration_minutes
+// AddedDurationSeconds returns the value that was added to the "duration_seconds" field in this mutation.
+func (m *ExamSettingMutation) AddedDurationSeconds() (r int, exists bool) {
+	v := m.addduration_seconds
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetDurationMinutes resets all changes to the "duration_minutes" field.
-func (m *ExamSettingMutation) ResetDurationMinutes() {
-	m.duration_minutes = nil
-	m.addduration_minutes = nil
+// ResetDurationSeconds resets all changes to the "duration_seconds" field.
+func (m *ExamSettingMutation) ResetDurationSeconds() {
+	m.duration_seconds = nil
+	m.addduration_seconds = nil
 }
 
 // SetNegativeMarking sets the "negative_marking" field.
@@ -4103,8 +4103,8 @@ func (m *ExamSettingMutation) Fields() []string {
 	if m.number_of_questions != nil {
 		fields = append(fields, examsetting.FieldNumberOfQuestions)
 	}
-	if m.duration_minutes != nil {
-		fields = append(fields, examsetting.FieldDurationMinutes)
+	if m.duration_seconds != nil {
+		fields = append(fields, examsetting.FieldDurationSeconds)
 	}
 	if m.negative_marking != nil {
 		fields = append(fields, examsetting.FieldNegativeMarking)
@@ -4137,8 +4137,8 @@ func (m *ExamSettingMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case examsetting.FieldNumberOfQuestions:
 		return m.NumberOfQuestions()
-	case examsetting.FieldDurationMinutes:
-		return m.DurationMinutes()
+	case examsetting.FieldDurationSeconds:
+		return m.DurationSeconds()
 	case examsetting.FieldNegativeMarking:
 		return m.NegativeMarking()
 	case examsetting.FieldAiPrompt:
@@ -4164,8 +4164,8 @@ func (m *ExamSettingMutation) OldField(ctx context.Context, name string) (ent.Va
 	switch name {
 	case examsetting.FieldNumberOfQuestions:
 		return m.OldNumberOfQuestions(ctx)
-	case examsetting.FieldDurationMinutes:
-		return m.OldDurationMinutes(ctx)
+	case examsetting.FieldDurationSeconds:
+		return m.OldDurationSeconds(ctx)
 	case examsetting.FieldNegativeMarking:
 		return m.OldNegativeMarking(ctx)
 	case examsetting.FieldAiPrompt:
@@ -4196,12 +4196,12 @@ func (m *ExamSettingMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetNumberOfQuestions(v)
 		return nil
-	case examsetting.FieldDurationMinutes:
+	case examsetting.FieldDurationSeconds:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetDurationMinutes(v)
+		m.SetDurationSeconds(v)
 		return nil
 	case examsetting.FieldNegativeMarking:
 		v, ok := value.(float64)
@@ -4263,8 +4263,8 @@ func (m *ExamSettingMutation) AddedFields() []string {
 	if m.addnumber_of_questions != nil {
 		fields = append(fields, examsetting.FieldNumberOfQuestions)
 	}
-	if m.addduration_minutes != nil {
-		fields = append(fields, examsetting.FieldDurationMinutes)
+	if m.addduration_seconds != nil {
+		fields = append(fields, examsetting.FieldDurationSeconds)
 	}
 	if m.addnegative_marking != nil {
 		fields = append(fields, examsetting.FieldNegativeMarking)
@@ -4282,8 +4282,8 @@ func (m *ExamSettingMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case examsetting.FieldNumberOfQuestions:
 		return m.AddedNumberOfQuestions()
-	case examsetting.FieldDurationMinutes:
-		return m.AddedDurationMinutes()
+	case examsetting.FieldDurationSeconds:
+		return m.AddedDurationSeconds()
 	case examsetting.FieldNegativeMarking:
 		return m.AddedNegativeMarking()
 	case examsetting.FieldMaxAttempts:
@@ -4304,12 +4304,12 @@ func (m *ExamSettingMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddNumberOfQuestions(v)
 		return nil
-	case examsetting.FieldDurationMinutes:
+	case examsetting.FieldDurationSeconds:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddDurationMinutes(v)
+		m.AddDurationSeconds(v)
 		return nil
 	case examsetting.FieldNegativeMarking:
 		v, ok := value.(float64)
@@ -4382,8 +4382,8 @@ func (m *ExamSettingMutation) ResetField(name string) error {
 	case examsetting.FieldNumberOfQuestions:
 		m.ResetNumberOfQuestions()
 		return nil
-	case examsetting.FieldDurationMinutes:
-		m.ResetDurationMinutes()
+	case examsetting.FieldDurationSeconds:
+		m.ResetDurationSeconds()
 		return nil
 	case examsetting.FieldNegativeMarking:
 		m.ResetNegativeMarking()
