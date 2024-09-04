@@ -1,9 +1,10 @@
 package services
 
 import (
-	"ai-service/pkg/constants"
 	"context"
 	"fmt"
+
+	commonConstants "common/constants"
 
 	"cloud.google.com/go/vertexai/genai"
 	"google.golang.org/api/iterator"
@@ -19,7 +20,7 @@ func NewGenAIService(client *genai.Client) *GenAIService {
 	}
 }
 
-func (g *GenAIService) GetContentStream(ctx context.Context, prompt string, modelName constants.GenAiModel) (string, error) {
+func (g *GenAIService) GetContentStream(ctx context.Context, prompt string, modelName commonConstants.GenAiModel) (string, error) {
 	if prompt == "" {
 		return "", fmt.Errorf("prompt cannot be empty")
 	}

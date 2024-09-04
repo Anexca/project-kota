@@ -1,7 +1,8 @@
 package services
 
 import (
-	"ai-service/pkg/constants"
+	commonConstants "common/constants"
+
 	"ai-service/pkg/models"
 	"context"
 
@@ -21,10 +22,10 @@ func NewPromptService(genAiClient *genai.Client) *PromptService {
 }
 
 func (p *PromptService) GetPromptResults(ctx context.Context, request *models.GetPromptResultsRequest) (string, error) {
-	model := constants.FLASH_15
+	model := commonConstants.FLASH_15
 
 	if request.Model == "pro" {
-		model = constants.PRO_15
+		model = commonConstants.PRO_15
 	}
 
 	return p.genAIService.GetContentStream(ctx, request.Prompt, model)
