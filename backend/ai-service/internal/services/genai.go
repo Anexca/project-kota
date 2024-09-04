@@ -18,6 +18,7 @@ func NewGenAIService(client *genai.Client) *GenAIService {
 		client: client,
 	}
 }
+
 func (g *GenAIService) GetContentStream(ctx context.Context, prompt string, modelName constants.GenAiModel) (string, error) {
 	if prompt == "" {
 		return "", fmt.Errorf("prompt cannot be empty")
