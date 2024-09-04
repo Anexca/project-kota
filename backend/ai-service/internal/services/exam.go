@@ -41,7 +41,7 @@ func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClie
 	}
 }
 
-const GEN_AI_MODEL = "gemini-1.5-pro"
+const GEN_AI_MODEL = "gemini-1.5-flash"
 const DEFAULT_CACHE_EXPIRY = 24 * time.Hour
 
 func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	commonConstants "common/constants"
+
 	"cloud.google.com/go/vertexai/genai"
 	"google.golang.org/api/iterator"
 )
@@ -18,10 +20,23 @@ func NewGenAIService(client *genai.Client) *GenAIService {
 	}
 }
 
-func (g *GenAIService) GetContentStream(ctx context.Context, prompt, modelName string) (string, error) {
-	model := g.client.GenerativeModel(modelName)
+func (g *GenAIService) GetContentStream(ctx context.Context, prompt string, modelName commonConstants.GenAiModel) (string, error) {
+	if prompt == "" {
+		return "", fmt.Errorf("prompt cannot be empty")
+	}
+	if modelName == "" {
+		return "", fmt.Errorf("model name cannot be empty")
+	}
+
+	model := g.client.GenerativeModel(string(modelName))
+	if model == nil {
+		return "", fmt.Errorf("failed to initialize generative model: %s", modelName)
+	}
 
 	iter := model.GenerateContentStream(ctx, genai.Text(prompt))
+	if iter == nil {
+		return "", fmt.Errorf("failed to create content stream iterator")
+	}
 
 	var completeResponse string
 
@@ -30,19 +45,27 @@ func (g *GenAIService) GetContentStream(ctx context.Context, prompt, modelName s
 		if err == iterator.Done {
 			break
 		}
-		if len(resp.Candidates) == 0 || len(resp.Candidates[0].Content.Parts) == 0 {
-			return "", fmt.Errorf("empty response from model")
-		}
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("error retrieving next content: %w", err)
 		}
+
+		if resp == nil || len(resp.Candidates) == 0 {
+			return "", fmt.Errorf("empty or invalid response from model")
+		}
+
 		for _, c := range resp.Candidates {
+			if c.Content == nil || len(c.Content.Parts) == 0 {
+				continue // Skip candidates with no content parts
+			}
 			for _, p := range c.Content.Parts {
-				completeResponse += fmt.Sprintf("%v", p) // Combine all parts into a single string
+				completeResponse += fmt.Sprintf("%v", p)
 			}
 		}
 	}
 
-	return completeResponse, nil
+	if completeResponse == "" {
+		return "", fmt.Errorf("no content generated from model")
+	}
 
+	return completeResponse, nil
 }
