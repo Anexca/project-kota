@@ -8,10 +8,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@componnets/*": ["src/componnets/*"],
-      "@assets/*": ["src/assets/*"]
-
-    }
+      "@/*": ["./src/*"],
+      "@componnets/*": ["./src/componnets/*"],
+      "@assets/*": ["./src/assets/*"]
+    },
+    "jsx": "react",
+    "esModuleInterop": true
   }
 }

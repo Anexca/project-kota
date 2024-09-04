@@ -6,4 +6,7 @@ export enum paths {
   MCQ = "mcq",
   LOGIN = "login",
   REGISTER = "register",
+  FORGOT_PASSWORD = "forgot-password",
+  SUPABASE_AUTH = "supabase-auth",
+  QUESTION_PAPER = "question-paper",
 }

@@ -7,16 +7,12 @@ import { MathJaxContext, MathJax } from "better-react-mathjax";
 import { questionsList } from "./questionList";
 import { Button } from "../../componnets/base/button/button";
 
-type Props = {};
-
-const ExamCenter = (props: Props) => {
-  const [questions, setQuestions] = useState(questionsList);
+const ExamCenter = () => {
+  const [questions, _] = useState(questionsList);
   const {
     control,
-    handleSubmit,
-    register,
+
     setValue,
-    formState: { errors },
   } = useForm({
     defaultValues: {
       answers: questions.map((_) => ({
@@ -31,7 +27,7 @@ const ExamCenter = (props: Props) => {
 
   const renderQuestion = (question: string) => {
     const parts = question.split(/(\\\(.*?\\\))/g);
-    return parts.map((part, index) => {
+    return parts.map((part) => {
       if (part.startsWith("\\(") && part.endsWith("\\)")) {
         // It's a LaTeX part, render it with KaTeX
         return <MathJax style={{ display: "inline" }}>{part}</MathJax>;

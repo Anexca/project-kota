@@ -6,70 +6,105 @@ import {
   CardTitle,
 } from "../../componnets/base/card/card";
 import { Label } from "../../componnets/base/label/label";
-import { Input } from "../../componnets/base/input/input";
+
 import { Button } from "../../componnets/base/button/button";
 import { BackgroundGradientAnimation } from "../../componnets/shared/background-blob/background-blob";
+import { paths } from "../../routes/route.constant";
+import { Link } from "react-router-dom";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import ControlledInput from "../../componnets/base/controlled-input";
+import { useToast } from "../../hooks/use-toast";
+import useSessionStore from "../../store/auth-store";
+import { LoginSchema, LoginType } from "../../validation-schema/auth";
+import { supabase } from "../../supabase/client";
+import GoogleIcon from "../../assets/svg/google-icon";
 
-export function RegisterForm() {
+export function RegisterPage() {
+  const { setSession } = useSessionStore();
+  const { toast } = useToast();
+  const { handleSubmit, control } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    resolver: yupResolver(LoginSchema),
+  });
+  const onSumbit = async (formData: LoginType) => {
+    const { email, password } = formData;
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) {
+      toast({ title: error.message || "Something went wrong." });
+      return;
+    }
+    if (data) {
+      toast({ title: "Successfully logged in." });
+      setSession(data.session);
+    }
+  };
   return (
     <div className="w-full h-screen max-h-screen lg:grid lg:grid-cols-2 ">
       <div className="flex items-center justify-center py-12">
-        <Card className="max-w-sm">
+        <Card className="max-w-[20rem]">
           <CardHeader>
-            <CardTitle className="text-xl">Sign Up</CardTitle>
+            <CardTitle className="text-xl flex">
+              Register
+              <Link className="ml-auto" to={`/${paths.HOMEPAGE}`}>
+                <i className="fa-solid fa-xmark"></i>
+              </Link>
+            </CardTitle>
             <CardDescription>
               Enter your information to create an account
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="first-name">First name</Label>
-                  <Input id="first-name" placeholder="Max" required />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="last-name">Last name</Label>
-                  <Input id="last-name" placeholder="Robinson" required />
-                </div>
-              </div>
+            <form
+              onSubmit={handleSubmit(onSumbit)}
+              noValidate
+              className="grid gap-4"
+            >
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
+                <div className="flex items-center">
+                  <Label htmlFor="email">Email</Label>
+                </div>
+                <ControlledInput
+                  control={control}
+                  name="email"
+                  inputProps={{
+                    placeholder: "m@example.com",
+                  }}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" />
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <ControlledInput
+                  control={control}
+                  inputProps={{ type: "password" }}
+                  name="password"
+                />
               </div>
               <Button type="submit" className="w-full">
-                Create an account
+                Register
               </Button>
               <Button variant="outline" className="w-full">
-                Sign up with GitHub
+                <GoogleIcon className="mr-2" /> Login with Google
               </Button>
-            </div>
+            </form>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
-              {/* <Link href="#" className="underline">
-            Sign in
-          </Link> */}
+              <Link to={`/${paths.LOGIN}`} className="underline">
+                Login
+              </Link>
             </div>
           </CardContent>
         </Card>
       </div>
       <div className="hidden bg-muted lg:block">
-        {/* <img
-          src="/placeholder.svg"
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        /> */}
         <BackgroundGradientAnimation containerClassName="w-full h-full" />
       </div>
     </div>

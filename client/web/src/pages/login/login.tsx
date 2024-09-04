@@ -1,67 +1,137 @@
-import { Link } from "react-router-dom";
-import { Label } from "../../componnets/base/label/label";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import GoogleIcon from "../../assets/svg/google-icon";
 import { Button } from "../../componnets/base/button/button";
-import { Input } from "../../componnets/base/input/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../componnets/base/card/card";
+import ControlledInput from "../../componnets/base/controlled-input";
+import { Label } from "../../componnets/base/label/label";
 import { BackgroundGradientAnimation } from "../../componnets/shared/background-blob/background-blob";
+import { useToast } from "../../hooks/use-toast";
+import { paths } from "../../routes/route.constant";
+import useSessionStore from "../../store/auth-store";
+import { supabase } from "../../supabase/client";
+import { LoginSchema, LoginType } from "../../validation-schema/auth";
 
-export function Dashboard() {
+export function Login() {
+  const navigate = useNavigate();
+  const { loadSession } = useSessionStore();
+  const { toast } = useToast();
+  const { handleSubmit, control } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    resolver: yupResolver(LoginSchema),
+  });
+  const onSumbit = async (formData: LoginType) => {
+    const { email, password } = formData;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      toast({ title: error.message || "Something went wrong." });
+      return;
+    }
+    if (data) {
+      const session = await loadSession();
+      session && navigate(`/${paths.HOMEPAGE}`);
+    }
+  };
+  const loginWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+
+    if (error) {
+      toast({ title: error.message || "Something went wrong." });
+      return;
+    }
+    if (data) {
+      await loadSession();
+    }
+  };
   return (
     <div className="w-full h-screen max-h-screen lg:grid lg:grid-cols-2 ">
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
-            <p className="text-balance text-muted-foreground">
-              Enter your email below to login to your account
-            </p>
-          </div>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="email">Email</Label>
-              </div>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                {/* <Link
-                  to="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link> */}
-              </div>
-              <Input id="password" type="password" required />
-            </div>
-            <Button type="submit" className="w-full">
+        <Card className="max-w-[20rem]">
+          <CardHeader>
+            <CardTitle className="text-xl flex">
               Login
-            </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
-          </div>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            {/* <Link to="#" className="underline">
-              Sign up
-            </Link> */}
-          </div>
-        </div>
+              <Link className="ml-auto" to={`/${paths.HOMEPAGE}`}>
+                <i className="fa-solid fa-xmark"></i>
+              </Link>
+            </CardTitle>
+            <CardDescription>
+              Enter your email below to login to your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form
+              onSubmit={handleSubmit(onSumbit)}
+              noValidate
+              className="grid gap-4"
+            >
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="email">Email</Label>
+                </div>
+                <ControlledInput
+                  control={control}
+                  name="email"
+                  inputProps={{
+                    placeholder: "m@example.com",
+                  }}
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <Link
+                    to="/forgot-password"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <ControlledInput
+                  control={control}
+                  inputProps={{
+                    type: "password",
+                  }}
+                  name="password"
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                Login
+              </Button>
+              <Button
+                onClick={loginWithGoogle}
+                variant="outline"
+                className="w-full"
+              >
+                <GoogleIcon className="mr-2" />
+                Login with Google
+              </Button>
+            </form>
+            <div className="mt-4 text-center text-sm">
+              Don&apos;t have an account?{" "}
+              <Link to={`/${paths.REGISTER}`} className="underline">
+                Sign up
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       <div className="hidden bg-muted lg:block">
-        {/* <img
-          src="/placeholder.svg"
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        /> */}
         <BackgroundGradientAnimation containerClassName="w-full h-full" />
       </div>
     </div>
