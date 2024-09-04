@@ -1,6 +1,7 @@
 package server
 
 import (
+	"ai-service/internal/services"
 	commonConfig "common/config"
 	commonService "common/services"
 	"fmt"
@@ -15,8 +16,9 @@ import (
 )
 
 type Server struct {
-	port         int
-	redisService *commonService.RedisService
+	port          int
+	promptService *services.PromptService
+	redisService  *commonService.RedisService
 }
 
 func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Server {
@@ -24,11 +26,13 @@ func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Serv
 
 	logger := commonConfig.SetupLogger()
 
+	promptService := services.NewPromptService(genAiClient)
 	redisService := commonService.NewRedisService(redisClient)
 
 	NewServer := &Server{
-		port:         port,
-		redisService: redisService,
+		port:          port,
+		redisService:  redisService,
+		promptService: promptService,
 	}
 
 	// Declare Server config

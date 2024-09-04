@@ -7,18 +7,20 @@ import (
 )
 
 type Environment struct {
-	ServerPort       string
-	DatabaseHost     string
-	DatabasePort     string
-	DatabaseName     string
-	DatabaseUser     string
-	DatabasePassword string
-	RedisPort        string
-	RedisAddress     string
-	RedisPassword    string
-	RedisDatabase    int
-	SupabaseUrl      string
-	SupabaseKey      string
+	ServerPort         string
+	DatabaseHost       string
+	DatabasePort       string
+	DatabaseName       string
+	DatabaseUser       string
+	DatabasePassword   string
+	RedisPort          string
+	RedisAddress       string
+	RedisPassword      string
+	RedisDatabase      int
+	SupabaseUrl        string
+	SupabaseKey        string
+	AIServiceAccessKey string
+	AIServiceUrl       string
 }
 
 func LoadEnvironment() (*Environment, error) {
@@ -29,18 +31,20 @@ func LoadEnvironment() (*Environment, error) {
 	}
 
 	env := &Environment{
-		ServerPort:       os.Getenv("PORT"),
-		RedisPort:        os.Getenv("REDIS_PORT"),
-		DatabaseHost:     os.Getenv("DB_HOST"),
-		DatabasePort:     os.Getenv("DB_PORT"),
-		DatabaseName:     os.Getenv("DB_NAME"),
-		DatabaseUser:     os.Getenv("DB_USER"),
-		DatabasePassword: os.Getenv("DB_PASSWORD"),
-		RedisAddress:     os.Getenv("REDIS_ADDRESS"),
-		RedisPassword:    os.Getenv("REDIS_PASSWORD"),
-		RedisDatabase:    redisDatabase,
-		SupabaseUrl:      os.Getenv("SUPABASE_URL"),
-		SupabaseKey:      os.Getenv("SUPABASE_KEY"),
+		ServerPort:         os.Getenv("PORT"),
+		RedisPort:          os.Getenv("REDIS_PORT"),
+		DatabaseHost:       os.Getenv("DB_HOST"),
+		DatabasePort:       os.Getenv("DB_PORT"),
+		DatabaseName:       os.Getenv("DB_NAME"),
+		DatabaseUser:       os.Getenv("DB_USER"),
+		DatabasePassword:   os.Getenv("DB_PASSWORD"),
+		RedisAddress:       os.Getenv("REDIS_ADDRESS"),
+		RedisPassword:      os.Getenv("REDIS_PASSWORD"),
+		RedisDatabase:      redisDatabase,
+		SupabaseUrl:        os.Getenv("SUPABASE_URL"),
+		SupabaseKey:        os.Getenv("SUPABASE_KEY"),
+		AIServiceAccessKey: os.Getenv("AI_SERVICE_ACCESS_KEY"),
+		AIServiceUrl:       os.Getenv("AI_SERVICE_URL"),
 	}
 
 	if env.ServerPort == "" {
@@ -54,8 +58,13 @@ func LoadEnvironment() (*Environment, error) {
 	if env.DatabaseHost == "" || env.DatabasePort == "" || env.DatabaseName == "" || env.DatabaseUser == "" || env.DatabasePassword == "" {
 		return nil, errors.New("missing Database environment variables")
 	}
+
 	if env.SupabaseKey == "" || env.SupabaseUrl == "" {
 		return nil, errors.New("missing Supabase environment variables")
+	}
+
+	if env.AIServiceAccessKey == "" || env.AIServiceUrl == "" {
+		return nil, errors.New("missing AI Service environment variables")
 	}
 
 	return env, nil

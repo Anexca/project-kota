@@ -20,7 +20,7 @@ type GeneratedExamOverview struct {
 	RawExamData       map[string]interface{} `json:"raw_exam_data"`
 	UserAttempts      int                    `json:"user_attempts"`
 	MaxAttempts       int                    `json:"max_attempts"`
-	DurationMinutes   int                    `json:"duration_minutes"`
+	DurationSeconds   int                    `json:"duration_seconds"`
 	NumberOfQuestions int                    `json:"number_of_questions"`
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`

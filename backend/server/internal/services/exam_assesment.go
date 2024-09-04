@@ -7,6 +7,7 @@ import (
 )
 
 type ExamAssesmentService struct {
+	promptService           *PromptService
 	examAttemptRepository   *commonRepositories.ExamAttemptRepository
 	examAssesmentRepository *commonRepositories.ExamAssesmentRepository
 }
@@ -16,10 +17,12 @@ type AssesmentRequest struct {
 }
 
 func NewExamAssesmentService(dbClient *ent.Client) *ExamAssesmentService {
+	promptService := NewPromptService()
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examAssesmentRepository := commonRepositories.NewExamAssesmentRepository(dbClient)
 
 	return &ExamAssesmentService{
+		promptService:           promptService,
 		examAttemptRepository:   examAttemptRepository,
 		examAssesmentRepository: examAssesmentRepository,
 	}
