@@ -1,19 +1,13 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { RouterProvider } from "react-router-dom";
 import "./App.css";
-import ExamCenter from "./pages/exam-center/exam-center";
-import DiscriptiveExam from "./pages/discriptive-exam/discriptive-exam";
-import { Dashboard } from "./pages/login/login";
-import { RegisterForm } from "./pages/register/register";
+import { router } from "./routes/router";
+import { Toaster } from "./componnets/base/toaster";
 
 function App() {
   return (
     <>
-      {/* <ExamCenter/> */}
-      {/* <DiscriptiveExam /> */}
-      <Dashboard />
-      {/* <RegisterForm /> */}
+      <Toaster />
+      <RouterProvider router={router} />
     </>
   );
 }
