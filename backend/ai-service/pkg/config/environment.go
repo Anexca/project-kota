@@ -19,6 +19,7 @@ type Environment struct {
 	RedisDatabase            int
 	GoogleCloudProjectId     string
 	GoogleCloudProjectRegion string
+	ServerAccessKey          string
 }
 
 func LoadEnvironment() (*Environment, error) {
@@ -41,6 +42,7 @@ func LoadEnvironment() (*Environment, error) {
 		RedisDatabase:            redisDatabase,
 		GoogleCloudProjectId:     os.Getenv("GCLOUD_PROJECT_ID"),
 		GoogleCloudProjectRegion: os.Getenv("GCLOUD_PROJECT_REGION"),
+		ServerAccessKey:          os.Getenv("SERVER_ACCESS_KEY"),
 	}
 
 	if env.ServerPort == "" {
@@ -57,6 +59,10 @@ func LoadEnvironment() (*Environment, error) {
 
 	if env.GoogleCloudProjectId == "" || env.GoogleCloudProjectRegion == "" {
 		return nil, errors.New("missing Google Cloud environment variables")
+	}
+
+	if env.ServerAccessKey == "" {
+		return nil, errors.New("missing Server Access Key environment variable")
 	}
 
 	return env, nil
