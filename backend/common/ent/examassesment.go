@@ -19,8 +19,8 @@ type ExamAssesment struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CompletedMinutes holds the value of the "completed_minutes" field.
-	CompletedMinutes int `json:"completed_minutes,omitempty"`
+	// CompletedSeconds holds the value of the "completed_seconds" field.
+	CompletedSeconds int `json:"completed_seconds,omitempty"`
 	// RawAssesmentData holds the value of the "raw_assesment_data" field.
 	RawAssesmentData map[string]interface{} `json:"raw_assesment_data,omitempty"`
 	// IsReady holds the value of the "is_ready" field.
@@ -65,7 +65,7 @@ func (*ExamAssesment) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case examassesment.FieldIsReady:
 			values[i] = new(sql.NullBool)
-		case examassesment.FieldID, examassesment.FieldCompletedMinutes:
+		case examassesment.FieldID, examassesment.FieldCompletedSeconds:
 			values[i] = new(sql.NullInt64)
 		case examassesment.FieldCreatedAt, examassesment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -92,11 +92,11 @@ func (ea *ExamAssesment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ea.ID = int(value.Int64)
-		case examassesment.FieldCompletedMinutes:
+		case examassesment.FieldCompletedSeconds:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field completed_minutes", values[i])
+				return fmt.Errorf("unexpected type %T for field completed_seconds", values[i])
 			} else if value.Valid {
-				ea.CompletedMinutes = int(value.Int64)
+				ea.CompletedSeconds = int(value.Int64)
 			}
 		case examassesment.FieldRawAssesmentData:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -172,8 +172,8 @@ func (ea *ExamAssesment) String() string {
 	var builder strings.Builder
 	builder.WriteString("ExamAssesment(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ea.ID))
-	builder.WriteString("completed_minutes=")
-	builder.WriteString(fmt.Sprintf("%v", ea.CompletedMinutes))
+	builder.WriteString("completed_seconds=")
+	builder.WriteString(fmt.Sprintf("%v", ea.CompletedSeconds))
 	builder.WriteString(", ")
 	builder.WriteString("raw_assesment_data=")
 	builder.WriteString(fmt.Sprintf("%v", ea.RawAssesmentData))

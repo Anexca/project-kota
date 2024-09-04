@@ -59,7 +59,7 @@ var (
 	// ExamAssesmentsColumns holds the columns for the "exam_assesments" table.
 	ExamAssesmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "completed_minutes", Type: field.TypeInt},
+		{Name: "completed_seconds", Type: field.TypeInt},
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "is_ready", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
@@ -128,7 +128,7 @@ var (
 	ExamSettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "number_of_questions", Type: field.TypeInt},
-		{Name: "duration_minutes", Type: field.TypeInt},
+		{Name: "duration_seconds", Type: field.TypeInt},
 		{Name: "negative_marking", Type: field.TypeFloat64, Nullable: true},
 		{Name: "ai_prompt", Type: field.TypeString, Nullable: true},
 		{Name: "other_details", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "json"}},

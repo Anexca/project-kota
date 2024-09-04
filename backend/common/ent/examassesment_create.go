@@ -21,9 +21,9 @@ type ExamAssesmentCreate struct {
 	hooks    []Hook
 }
 
-// SetCompletedMinutes sets the "completed_minutes" field.
-func (eac *ExamAssesmentCreate) SetCompletedMinutes(i int) *ExamAssesmentCreate {
-	eac.mutation.SetCompletedMinutes(i)
+// SetCompletedSeconds sets the "completed_seconds" field.
+func (eac *ExamAssesmentCreate) SetCompletedSeconds(i int) *ExamAssesmentCreate {
+	eac.mutation.SetCompletedSeconds(i)
 	return eac
 }
 
@@ -145,8 +145,8 @@ func (eac *ExamAssesmentCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (eac *ExamAssesmentCreate) check() error {
-	if _, ok := eac.mutation.CompletedMinutes(); !ok {
-		return &ValidationError{Name: "completed_minutes", err: errors.New(`ent: missing required field "ExamAssesment.completed_minutes"`)}
+	if _, ok := eac.mutation.CompletedSeconds(); !ok {
+		return &ValidationError{Name: "completed_seconds", err: errors.New(`ent: missing required field "ExamAssesment.completed_seconds"`)}
 	}
 	if _, ok := eac.mutation.IsReady(); !ok {
 		return &ValidationError{Name: "is_ready", err: errors.New(`ent: missing required field "ExamAssesment.is_ready"`)}
@@ -183,9 +183,9 @@ func (eac *ExamAssesmentCreate) createSpec() (*ExamAssesment, *sqlgraph.CreateSp
 		_node = &ExamAssesment{config: eac.config}
 		_spec = sqlgraph.NewCreateSpec(examassesment.Table, sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt))
 	)
-	if value, ok := eac.mutation.CompletedMinutes(); ok {
-		_spec.SetField(examassesment.FieldCompletedMinutes, field.TypeInt, value)
-		_node.CompletedMinutes = value
+	if value, ok := eac.mutation.CompletedSeconds(); ok {
+		_spec.SetField(examassesment.FieldCompletedSeconds, field.TypeInt, value)
+		_node.CompletedSeconds = value
 	}
 	if value, ok := eac.mutation.RawAssesmentData(); ok {
 		_spec.SetField(examassesment.FieldRawAssesmentData, field.TypeJSON, value)
