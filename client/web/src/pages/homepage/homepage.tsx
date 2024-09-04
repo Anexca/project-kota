@@ -53,7 +53,6 @@ const card = (
 );
 
 const HomePage = (props: Props) => {
-  const { logout } = useSessionStore();
   return (
     <>
       <Header />

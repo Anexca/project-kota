@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
 @layer base {
   :root {
     color-scheme: light;
@@ -31,6 +37,18 @@
 
     --destructive: 0 100% 50%;
     --destructive-foreground: 210 40% 98%;
+
+    --success: 120 61% 34%;
+    --success-foreground: 210 40% 98%;
+
+    --info: 270 71.9% 47.8%; /* Updated to #7e22ce in HSL */
+    --info-foreground: 210 40% 98%;
+
+    --danger: 0 100% 50%;
+    --danger-foreground: 210 40% 98%;
+
+    --warning: 39 100% 50%;
+    --warning-foreground: 210 40% 98%;
 
     --ring: 215 20.2% 65.1%;
 
@@ -64,6 +82,18 @@
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
+
+    --success: 120 61% 28%;
+    --success-foreground: 210 40% 98%;
+
+    --info: 270 71.9% 47.8%; /* Updated for dark mode */
+    --info-foreground: 210 40% 98%;
+
+    --danger: 0 63% 31%;
+    --danger-foreground: 210 40% 98%;
+
+    --warning: 39 100% 40%;
+    --warning-foreground: 210 40% 98%;
 
     --ring: 216 34% 17%;
 

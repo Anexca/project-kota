@@ -51,6 +51,7 @@ export function Login() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
     });
+
     if (error) {
       toast({ title: error.message || "Something went wrong." });
       return;

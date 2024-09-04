@@ -6,6 +6,8 @@ import HomePage from "../pages/homepage/homepage";
 import ProtectedRoute from "./protected-route";
 import { ForgotPassword } from "../pages/forgot-password/forgot-password";
 import SupabaseAuth from "../pages/supabase-auth/supabase-auth";
+import QuestionPaper from "../pages/question-paper/question-paper";
+import DiscriptiveExam from "../pages/discriptive-exam/discriptive-exam";
 
 const routes: RouteObject[] = [
   {
@@ -31,6 +33,19 @@ const routes: RouteObject[] = [
   {
     path: paths.SUPABASE_AUTH,
     element: <SupabaseAuth />,
+  },
+  {
+    path: paths.QUESTION_PAPER,
+    element: <QuestionPaper />,
+  },
+  {
+    path: paths.EXAMS,
+    children: [
+      {
+        path: `${paths.DISCRIPTIVE}/:questionId`,
+        element: <DiscriptiveExam />,
+      },
+    ],
   },
 ];
 

@@ -32,7 +32,7 @@ export function RegisterPage() {
   });
   const onSumbit = async (formData: LoginType) => {
     const { email, password } = formData;
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
