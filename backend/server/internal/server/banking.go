@@ -41,7 +41,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	var request services.AssesmentRequest
+	var request services.DescriptiveExamAssesmentRequest
 
 	if err := s.ReadJson(w, r, &request); err != nil {
 		s.ErrorJson(w, errors.New("invalid json request body"))
@@ -70,7 +70,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	assesment, err := s.examAssesmentService.StartNewAssesment(r.Context(), attempt, &request)
+	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
