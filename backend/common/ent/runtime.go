@@ -53,16 +53,12 @@ func init() {
 	exam.UpdateDefaultUpdatedAt = examDescUpdatedAt.UpdateDefault.(func() time.Time)
 	examassesmentFields := schema.ExamAssesment{}.Fields()
 	_ = examassesmentFields
-	// examassesmentDescIsReady is the schema descriptor for is_ready field.
-	examassesmentDescIsReady := examassesmentFields[2].Descriptor()
-	// examassesment.DefaultIsReady holds the default value on creation for the is_ready field.
-	examassesment.DefaultIsReady = examassesmentDescIsReady.Default.(bool)
 	// examassesmentDescCreatedAt is the schema descriptor for created_at field.
-	examassesmentDescCreatedAt := examassesmentFields[3].Descriptor()
+	examassesmentDescCreatedAt := examassesmentFields[4].Descriptor()
 	// examassesment.DefaultCreatedAt holds the default value on creation for the created_at field.
 	examassesment.DefaultCreatedAt = examassesmentDescCreatedAt.Default.(func() time.Time)
 	// examassesmentDescUpdatedAt is the schema descriptor for updated_at field.
-	examassesmentDescUpdatedAt := examassesmentFields[4].Descriptor()
+	examassesmentDescUpdatedAt := examassesmentFields[5].Descriptor()
 	// examassesment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	examassesment.DefaultUpdatedAt = examassesmentDescUpdatedAt.Default.(func() time.Time)
 	// examassesment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

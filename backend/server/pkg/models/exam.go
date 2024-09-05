@@ -25,3 +25,20 @@ type GeneratedExamOverview struct {
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
 }
+
+type DescriptiveExamAssessmentResult struct {
+	Rating           string   `json:"rating,omitempty"`
+	Strengths        []string `json:"strengths,omitempty"`
+	Weakness         []string `json:"weakness,omitempty"`
+	CorrectedVersion string   `json:"corrected_version,omitempty"`
+}
+
+type AssessmentDetails struct {
+	Id                int                    `json:"id"`
+	CompletedSeconds  int                    `json:"completed_seconds"`
+	RawAssesmentData  map[string]interface{} `json:"raw_assesment_data,omitempty"`
+	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
+	Status            string                 `json:"status"`
+	CreatedAt         time.Time              `json:"created_at"`
+	UpdatedAt         time.Time              `json:"updated_at"`
+}

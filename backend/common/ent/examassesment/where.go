@@ -60,11 +60,6 @@ func CompletedSeconds(v int) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldCompletedSeconds, v))
 }
 
-// IsReady applies equality check predicate on the "is_ready" field. It's identical to IsReadyEQ.
-func IsReady(v bool) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldEQ(FieldIsReady, v))
-}
-
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldCreatedAt, v))
@@ -125,14 +120,24 @@ func RawAssesmentDataNotNil() predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldNotNull(FieldRawAssesmentData))
 }
 
-// IsReadyEQ applies the EQ predicate on the "is_ready" field.
-func IsReadyEQ(v bool) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldEQ(FieldIsReady, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEQ(FieldStatus, v))
 }
 
-// IsReadyNEQ applies the NEQ predicate on the "is_ready" field.
-func IsReadyNEQ(v bool) predicate.ExamAssesment {
-	return predicate.ExamAssesment(sql.FieldNEQ(FieldIsReady, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -62,16 +62,22 @@ func (eau *ExamAssesmentUpdate) ClearRawAssesmentData() *ExamAssesmentUpdate {
 	return eau
 }
 
-// SetIsReady sets the "is_ready" field.
-func (eau *ExamAssesmentUpdate) SetIsReady(b bool) *ExamAssesmentUpdate {
-	eau.mutation.SetIsReady(b)
+// SetRawUserSubmission sets the "raw_user_submission" field.
+func (eau *ExamAssesmentUpdate) SetRawUserSubmission(m map[string]interface{}) *ExamAssesmentUpdate {
+	eau.mutation.SetRawUserSubmission(m)
 	return eau
 }
 
-// SetNillableIsReady sets the "is_ready" field if the given value is not nil.
-func (eau *ExamAssesmentUpdate) SetNillableIsReady(b *bool) *ExamAssesmentUpdate {
-	if b != nil {
-		eau.SetIsReady(*b)
+// SetStatus sets the "status" field.
+func (eau *ExamAssesmentUpdate) SetStatus(e examassesment.Status) *ExamAssesmentUpdate {
+	eau.mutation.SetStatus(e)
+	return eau
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (eau *ExamAssesmentUpdate) SetNillableStatus(e *examassesment.Status) *ExamAssesmentUpdate {
+	if e != nil {
+		eau.SetStatus(*e)
 	}
 	return eau
 }
@@ -148,7 +154,20 @@ func (eau *ExamAssesmentUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (eau *ExamAssesmentUpdate) check() error {
+	if v, ok := eau.mutation.Status(); ok {
+		if err := examassesment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ExamAssesment.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (eau *ExamAssesmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := eau.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(examassesment.Table, examassesment.Columns, sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt))
 	if ps := eau.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -169,8 +188,11 @@ func (eau *ExamAssesmentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if eau.mutation.RawAssesmentDataCleared() {
 		_spec.ClearField(examassesment.FieldRawAssesmentData, field.TypeJSON)
 	}
-	if value, ok := eau.mutation.IsReady(); ok {
-		_spec.SetField(examassesment.FieldIsReady, field.TypeBool, value)
+	if value, ok := eau.mutation.RawUserSubmission(); ok {
+		_spec.SetField(examassesment.FieldRawUserSubmission, field.TypeJSON, value)
+	}
+	if value, ok := eau.mutation.Status(); ok {
+		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := eau.mutation.UpdatedAt(); ok {
 		_spec.SetField(examassesment.FieldUpdatedAt, field.TypeTime, value)
@@ -257,16 +279,22 @@ func (eauo *ExamAssesmentUpdateOne) ClearRawAssesmentData() *ExamAssesmentUpdate
 	return eauo
 }
 
-// SetIsReady sets the "is_ready" field.
-func (eauo *ExamAssesmentUpdateOne) SetIsReady(b bool) *ExamAssesmentUpdateOne {
-	eauo.mutation.SetIsReady(b)
+// SetRawUserSubmission sets the "raw_user_submission" field.
+func (eauo *ExamAssesmentUpdateOne) SetRawUserSubmission(m map[string]interface{}) *ExamAssesmentUpdateOne {
+	eauo.mutation.SetRawUserSubmission(m)
 	return eauo
 }
 
-// SetNillableIsReady sets the "is_ready" field if the given value is not nil.
-func (eauo *ExamAssesmentUpdateOne) SetNillableIsReady(b *bool) *ExamAssesmentUpdateOne {
-	if b != nil {
-		eauo.SetIsReady(*b)
+// SetStatus sets the "status" field.
+func (eauo *ExamAssesmentUpdateOne) SetStatus(e examassesment.Status) *ExamAssesmentUpdateOne {
+	eauo.mutation.SetStatus(e)
+	return eauo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (eauo *ExamAssesmentUpdateOne) SetNillableStatus(e *examassesment.Status) *ExamAssesmentUpdateOne {
+	if e != nil {
+		eauo.SetStatus(*e)
 	}
 	return eauo
 }
@@ -356,7 +384,20 @@ func (eauo *ExamAssesmentUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (eauo *ExamAssesmentUpdateOne) check() error {
+	if v, ok := eauo.mutation.Status(); ok {
+		if err := examassesment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ExamAssesment.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (eauo *ExamAssesmentUpdateOne) sqlSave(ctx context.Context) (_node *ExamAssesment, err error) {
+	if err := eauo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(examassesment.Table, examassesment.Columns, sqlgraph.NewFieldSpec(examassesment.FieldID, field.TypeInt))
 	id, ok := eauo.mutation.ID()
 	if !ok {
@@ -394,8 +435,11 @@ func (eauo *ExamAssesmentUpdateOne) sqlSave(ctx context.Context) (_node *ExamAss
 	if eauo.mutation.RawAssesmentDataCleared() {
 		_spec.ClearField(examassesment.FieldRawAssesmentData, field.TypeJSON)
 	}
-	if value, ok := eauo.mutation.IsReady(); ok {
-		_spec.SetField(examassesment.FieldIsReady, field.TypeBool, value)
+	if value, ok := eauo.mutation.RawUserSubmission(); ok {
+		_spec.SetField(examassesment.FieldRawUserSubmission, field.TypeJSON, value)
+	}
+	if value, ok := eauo.mutation.Status(); ok {
+		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := eauo.mutation.UpdatedAt(); ok {
 		_spec.SetField(examassesment.FieldUpdatedAt, field.TypeTime, value)

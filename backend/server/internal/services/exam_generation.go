@@ -125,13 +125,17 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(exam.Edges.Generatedexams))
 
 	for _, generatedExam := range exam.Edges.Generatedexams {
+		userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get exam by name: %w", err)
+		}
 
 		generatedExamOverview := models.GeneratedExamOverview{
 			Id:                generatedExam.ID,
 			RawExamData:       generatedExam.RawExamData,
 			CreatedAt:         generatedExam.CreatedAt,
 			UpdatedAt:         generatedExam.UpdatedAt,
-			UserAttempts:      len(generatedExam.Edges.Attempts),
+			UserAttempts:      len(userAttempts),
 			MaxAttempts:       exam.Edges.Setting.MaxAttempts,
 			DurationSeconds:   exam.Edges.Setting.DurationSeconds,
 			NumberOfQuestions: exam.Edges.Setting.NumberOfQuestions,

@@ -23,8 +23,10 @@ type ExamAssesment struct {
 	CompletedSeconds int `json:"completed_seconds,omitempty"`
 	// RawAssesmentData holds the value of the "raw_assesment_data" field.
 	RawAssesmentData map[string]interface{} `json:"raw_assesment_data,omitempty"`
-	// IsReady holds the value of the "is_ready" field.
-	IsReady bool `json:"is_ready,omitempty"`
+	// RawUserSubmission holds the value of the "raw_user_submission" field.
+	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
+	// Status holds the value of the "status" field.
+	Status examassesment.Status `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -61,12 +63,12 @@ func (*ExamAssesment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case examassesment.FieldRawAssesmentData:
+		case examassesment.FieldRawAssesmentData, examassesment.FieldRawUserSubmission:
 			values[i] = new([]byte)
-		case examassesment.FieldIsReady:
-			values[i] = new(sql.NullBool)
 		case examassesment.FieldID, examassesment.FieldCompletedSeconds:
 			values[i] = new(sql.NullInt64)
+		case examassesment.FieldStatus:
+			values[i] = new(sql.NullString)
 		case examassesment.FieldCreatedAt, examassesment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case examassesment.ForeignKeys[0]: // exam_attempt_assesment
@@ -106,11 +108,19 @@ func (ea *ExamAssesment) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field raw_assesment_data: %w", err)
 				}
 			}
-		case examassesment.FieldIsReady:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_ready", values[i])
+		case examassesment.FieldRawUserSubmission:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field raw_user_submission", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &ea.RawUserSubmission); err != nil {
+					return fmt.Errorf("unmarshal field raw_user_submission: %w", err)
+				}
+			}
+		case examassesment.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				ea.IsReady = value.Bool
+				ea.Status = examassesment.Status(value.String)
 			}
 		case examassesment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -178,8 +188,11 @@ func (ea *ExamAssesment) String() string {
 	builder.WriteString("raw_assesment_data=")
 	builder.WriteString(fmt.Sprintf("%v", ea.RawAssesmentData))
 	builder.WriteString(", ")
-	builder.WriteString("is_ready=")
-	builder.WriteString(fmt.Sprintf("%v", ea.IsReady))
+	builder.WriteString("raw_user_submission=")
+	builder.WriteString(fmt.Sprintf("%v", ea.RawUserSubmission))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", ea.Status))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(ea.CreatedAt.Format(time.ANSIC))
