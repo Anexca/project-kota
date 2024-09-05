@@ -25,9 +25,5 @@ func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responsePayload := Response{
-		Data: promptResults,
-	}
-
-	s.WriteJson(w, http.StatusOK, &responsePayload)
+	w.Write([]byte(promptResults))
 }

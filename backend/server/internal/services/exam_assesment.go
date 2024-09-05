@@ -58,14 +58,20 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 	return assessment, nil
 }
 
-func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*ent.ExamAssesment, error) {
+func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) {
 	assessment, err := e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
 	if err != nil {
 		return nil, err
 	}
 
+	assessmentModel := &models.AssessmentDetails{
+		Id:               assessment.ID,
+		CompletedSeconds: assessment.CompletedSeconds,
+		Status:           assessment.Status.String(),
+	}
+
 	if assessment.RawAssesmentData == nil {
-		return assessment, nil
+		return assessmentModel, nil
 	}
 
 	jsonData, err := json.Marshal(assessment.RawAssesmentData)
@@ -73,31 +79,33 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 		return nil, err
 	}
 
-	var assessmentData models.DescriptiveExamAssessmentResult
-	if err = json.Unmarshal(jsonData, &assessmentData); err != nil {
+	var assessmentJsonData models.DescriptiveExamAssessmentResult
+	if err = json.Unmarshal(jsonData, &assessmentJsonData); err != nil {
 		return nil, err
 	}
 
-	return assessment, nil
+	assessmentModel.RawAssesmentData = assessmentJsonData
+
+	return assessmentModel, nil
 }
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string) {
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId)
 	if err != nil {
-		log.Println("error getting exam")
+		log.Println("error getting exam", err)
 		return
 	}
 
 	jsonData, err := json.Marshal(generatedExam.RawExamData)
 	if err != nil {
-		log.Println("error processing exam data")
+		log.Println("error processing exam data", err)
 		return
 	}
 
 	var descriptiveExam models.DescriptiveExam
 	err = json.Unmarshal(jsonData, &descriptiveExam)
 	if err != nil {
-		log.Println("error processing exam data")
+		log.Println("error processing exam data", err)
 		return
 	}
 
@@ -129,7 +137,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	var rawJsonData map[string]interface{}
 	err = json.Unmarshal([]byte(response), &rawJsonData)
 	if err != nil {
-		log.Println("error response from AI service")
+		log.Println("error response from AI service", err)
 		assesmentModel.Status = constants.ASSESSMENT_REJECTED
 		e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
 		return
@@ -138,7 +146,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	var assessmentResult models.DescriptiveExamAssessmentResult
 	err = json.Unmarshal([]byte(response), &assessmentResult)
 	if err != nil {
-		log.Println("response from AI service does not match criteria")
+		log.Println("response from AI service does not match criteria", err)
 		assesmentModel.Status = constants.ASSESSMENT_REJECTED
 		e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
 	}

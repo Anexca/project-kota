@@ -60,6 +60,10 @@ func (e *ExamAssesmentRepository) GetById(ctx context.Context, assesmentId int, 
 	}
 
 	return e.dbClient.ExamAssesment.Query().
-		Where(examassesment.HasAttemptWith(examattempt.HasUserWith(user.ID(userUid))), examassesment.ID(assesmentId)).
+		Where(
+			examassesment.HasAttemptWith(examattempt.HasUserWith(user.ID(userUid))),
+			examassesment.ID(assesmentId),
+		).
+		WithAttempt().
 		Only(ctx)
 }

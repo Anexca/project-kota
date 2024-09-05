@@ -27,8 +27,15 @@ type GeneratedExamOverview struct {
 }
 
 type DescriptiveExamAssessmentResult struct {
-	Rating           string   `json:"string"`
-	Strengths        []string `json:"strengths"`
-	Weakness         []string `json:"weakness"`
-	CorrectedVersion string   `json:"corrected_version"`
+	Rating           string   `json:"rating,omitempty"`
+	Strengths        []string `json:"strengths,omitempty"`
+	Weakness         []string `json:"weakness,omitempty"`
+	CorrectedVersion string   `json:"corrected_version,omitempty"`
+}
+
+type AssessmentDetails struct {
+	Id               int                             `json:"id"`
+	CompletedSeconds int                             `json:"completed_seconds"`
+	RawAssesmentData DescriptiveExamAssessmentResult `json:"raw_assesment_data,omitempty"`
+	Status           string                          `json:"status"`
 }
