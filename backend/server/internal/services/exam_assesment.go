@@ -59,13 +59,13 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 		bgCtx := context.Background()
 		e.AssessDescriptiveExam(bgCtx, generatedExamId, assessment.ID, request.Content)
 	}()
+
 	assessmentModel := &models.AssessmentDetails{
-		Id:                assessment.ID,
-		CompletedSeconds:  assessment.CompletedSeconds,
-		Status:            assessment.Status.String(),
-		RawUserSubmission: assessment.RawUserSubmission,
-		CreatedAt:         assessment.CreatedAt,
-		UpdatedAt:         assessment.UpdatedAt,
+		Id:               assessment.ID,
+		CompletedSeconds: assessment.CompletedSeconds,
+		Status:           assessment.Status.String(),
+		CreatedAt:        assessment.CreatedAt,
+		UpdatedAt:        assessment.UpdatedAt,
 	}
 
 	return assessmentModel, nil
@@ -90,17 +90,7 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 		return assessmentModel, nil
 	}
 
-	jsonData, err := json.Marshal(assessment.RawAssesmentData)
-	if err != nil {
-		return nil, err
-	}
-
-	var assessmentJsonData models.DescriptiveExamAssessmentResult
-	if err = json.Unmarshal(jsonData, &assessmentJsonData); err != nil {
-		return nil, err
-	}
-
-	assessmentModel.RawAssesmentData = assessmentJsonData
+	assessmentModel.RawAssesmentData = assessment.RawAssesmentData
 
 	return assessmentModel, nil
 }
