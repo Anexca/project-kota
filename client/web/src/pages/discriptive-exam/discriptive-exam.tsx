@@ -99,7 +99,7 @@ const DiscriptiveExam = () => {
   const fetcherTimeOut = useRef<NodeJS.Timeout>();
   const [evaluationResult, setEvaluationResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, formState } = useForm({
     defaultValues: { answer: "" },
     resolver: yupResolver(DiscriptiveExamSchema),
   });
@@ -110,7 +110,7 @@ const DiscriptiveExam = () => {
     const response = await getQuestionById(param?.questionId);
     console.log(response);
     // setExamTime(response.data.duration_minutes);
-    setExamTime(response.data.duration_minutes);
+    setExamTime(response.data.duration_seconds);
     setQuestion(response.data);
   };
   const getResultByExamId = (examId: number) => {
@@ -124,7 +124,7 @@ const DiscriptiveExam = () => {
     if (!question) return;
     setLoading(true);
     interval.stop();
-    const timeTaken = question!.duration_minutes - examTime;
+    const timeTaken = question!.duration_seconds - examTime;
 
     const response = await sendAnswerForAssesment({
       questionId: question!.id,
@@ -156,11 +156,12 @@ const DiscriptiveExam = () => {
   useEffect(() => {
     fetchQuestionById();
   }, []);
+
   return (
     <div className="flex flex-col">
       <ConformationDialog
         timerStart={() => interval.start()}
-        time={question ? question?.duration_minutes / 60 : 0}
+        time={question ? question?.duration_seconds / 60 : 0}
       />
       <TestHeader currentTime={examTime} active={interval.active} />
       <Container className="p-2">
@@ -189,6 +190,11 @@ const DiscriptiveExam = () => {
                 }}
               />
             </div>
+            {formState?.errors?.answer && (
+              <div className="text-destructive text-sm px-4 font-semibold">
+                {formState?.errors?.answer?.message}
+              </div>
+            )}
             <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
               <Button
                 disabled={loading || !!evaluationResult}
@@ -202,14 +208,18 @@ const DiscriptiveExam = () => {
                   "Submit Answer"
                 )}
               </Button>
-              <div className="text-sm">{textLength.length}/250</div>
+              <div className="text-sm">
+                {textLength?.match(/\b\w+(?:[.,!;?])?\b/g)?.length || 0}/250
+              </div>
             </div>
           </div>
         </form>
 
         <p className="ms-auto text-xs font-semibold text-gray-500 dark:text-gray-400">
           Remember, you have only{" "}
-          {question?.max_attempts || 0 - (question?.user_attempts || 0)}{" "}
+          <span className="text-fuchsia-700">
+            {(question?.max_attempts || 0) - (question?.user_attempts || 0)}
+          </span>{" "}
           attempts left for this exam.
         </p>
 
