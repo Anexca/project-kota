@@ -25,7 +25,7 @@ const DiffChecker = ({
       <h2 className="mb-2">AI Assesed answer :</h2>
       <p
         style={{ whiteSpace: "pre-wrap" }}
-        className="text-sm rounded p-2 border"
+        className="text-sm rounded p-2 border shadow-sm"
       >
         {diffResult.map((part, index) =>
           part.removed || part.added ? (

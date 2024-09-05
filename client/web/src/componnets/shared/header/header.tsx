@@ -1,8 +1,9 @@
 import clsx from "clsx";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import useSessionStore from "../../../store/auth-store";
 
-const links = [
+const loggedOutLinks = [
   {
     to: "/#features",
     label: "Features",
@@ -16,8 +17,16 @@ const links = [
     label: "Reviews",
   },
 ];
+const loggedInLinks = [
+  {
+    to: "/submissions",
+    label: "My Submissions",
+  },
+];
 const Header = () => {
   const [mobileViewHeader, setMobileViewHeader] = useState(false);
+  const { session } = useSessionStore();
+  const links = session ? loggedInLinks : loggedOutLinks;
   return (
     <header className="sticky top-0 z-10 ">
       <nav className="z-10 w-full border-b border-black/5 dark:border-white/5  bg-white/30 backdrop-blur-md">
@@ -92,32 +101,44 @@ const Header = () => {
                       </a>
                     </li>
                   ))}
-                  <li>
-                    <a
-                      href="https://tailus.gumroad.com/l/astls-premium"
-                      target="_blank"
-                      className="flex gap-2 font-semibold text-gray-700 transition hover:text-primary dark:text-white dark:hover:text-white md:px-4"
-                    >
-                      <span>Premium</span>
-                      <span className="flex rounded-full bg-primary/20 px-1.5 py-0.5 text-xs tracking-wider text-purple-700 dark:bg-white/10 dark:text-orange-300">
-                        {" "}
-                        new
-                      </span>
-                    </a>
-                  </li>
+                  {!session && (
+                    <li>
+                      <a
+                        href="https://tailus.gumroad.com/l/astls-premium"
+                        target="_blank"
+                        className="flex gap-2 font-semibold text-gray-700 transition hover:text-primary dark:text-white dark:hover:text-white md:px-4"
+                      >
+                        <span>Premium</span>
+                        <span className="flex rounded-full bg-primary/20 px-1.5 py-0.5 text-xs tracking-wider text-purple-700 dark:bg-white/10 dark:text-orange-300">
+                          {" "}
+                          new
+                        </span>
+                      </a>
+                    </li>
+                  )}
                 </ul>
               </div>
 
               <div className="mt-12 lg:mt-0">
-                <a
-                  href="/register"
-                  className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max"
-                >
-                  <span className="relative text-sm font-semibold text-white">
-                    {" "}
-                    Sign Up
-                  </span>
-                </a>
+                {session ? (
+                  <Link
+                    to="/profile"
+                    className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max"
+                  >
+                    <span className="capitalize relative text-sm font-semibold text-white">
+                      {session?.user?.email?.[0]}{" "}
+                    </span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/register"
+                    className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max"
+                  >
+                    <span className="relative text-sm font-semibold text-white">
+                      Sign Up
+                    </span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

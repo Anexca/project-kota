@@ -8,6 +8,8 @@ import { ForgotPassword } from "../pages/forgot-password/forgot-password";
 import QuestionPaper from "../pages/question-paper/question-paper";
 import DiscriptiveExam from "../pages/discriptive-exam/discriptive-exam";
 import SignedInRoute from "./signedin-route";
+import PreviousSolutions from "../pages/previous-solutions/previous-solutions";
+import UserProfile from "../pages/user-profle";
 
 const routes: RouteObject[] = [
   {
@@ -47,6 +49,14 @@ const routes: RouteObject[] = [
     ),
   },
   {
+    path: paths.PROFILE,
+    element: (
+      <ProtectedRoute>
+        <UserProfile />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: paths.EXAMS,
     children: [
       {
@@ -54,6 +64,14 @@ const routes: RouteObject[] = [
         element: (
           <ProtectedRoute>
             <DiscriptiveExam />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: `${paths.PREVIOUS_SOLUTIONS}/:questionId`,
+        element: (
+          <ProtectedRoute>
+            <PreviousSolutions />
           </ProtectedRoute>
         ),
       },

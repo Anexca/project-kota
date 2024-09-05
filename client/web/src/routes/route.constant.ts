@@ -9,4 +9,6 @@ export enum paths {
   FORGOT_PASSWORD = "forgot-password",
   SUPABASE_AUTH = "supabase-auth",
   QUESTION_PAPER = "question-paper",
+  PREVIOUS_SOLUTIONS = "pevious-solutions",
+  PROFILE = "profile",
 }
