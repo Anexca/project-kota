@@ -25,6 +25,7 @@ import {
   sendAnswerForAssesment,
 } from "../../services/exam.service";
 import { useParams } from "react-router-dom";
+import { modified, original } from "./testdata";
 
 const ConformationDialog = ({ timerStart, time }: any) => {
   const [open, setOpen] = useState(true);
@@ -158,7 +159,7 @@ const DiscriptiveExam = () => {
   }, []);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-4">
       <ConformationDialog
         timerStart={() => interval.start()}
         time={question ? question?.duration_seconds / 60 : 0}
@@ -224,7 +225,23 @@ const DiscriptiveExam = () => {
         </p>
 
         {evaluationResult ? (
-          <DiffChecker modifiedText="" originalText="" />
+          <DiffChecker
+            rating={"19/25"}
+            weaknesses={[
+              "Over-dependence on technology",
+              "Limited access for non-tech-savvy customers",
+              "Security vulnerabilities (cyber threats)",
+              "System downtime or technical glitches",
+            ]}
+            strength={[
+              "Increased convenience and accessibility",
+              "Enhanced security with biometrics and encryption",
+              "Faster transaction processing",
+              "Personalized banking services through data analytics",
+            ]}
+            modifiedText={original}
+            originalText={modified}
+          />
         ) : null}
       </Container>
     </div>
