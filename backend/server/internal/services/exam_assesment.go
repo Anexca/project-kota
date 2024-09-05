@@ -25,13 +25,6 @@ type DescriptiveExamAssesmentRequest struct {
 	Content          string `json:"content" validate:"required"`
 }
 
-type DescriptiveExamAssessmentResult struct {
-	Rating           string   `json:"string"`
-	Strengths        []string `json:"strengths"`
-	Weakness         []string `json:"weakness"`
-	CorrectedVersion string   `json:"corrected_version"`
-}
-
 func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *ExamAssesmentService {
 	promptService := NewPromptService()
 	examGenerationService := NewExamGenerationService(redisClient, dbClient)
@@ -66,7 +59,26 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 }
 
 func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*ent.ExamAssesment, error) {
-	return e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
+	assessment, err := e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	if assessment.RawAssesmentData == nil {
+		return assessment, nil
+	}
+
+	jsonData, err := json.Marshal(assessment.RawAssesmentData)
+	if err != nil {
+		return nil, err
+	}
+
+	var assessmentData models.DescriptiveExamAssessmentResult
+	if err = json.Unmarshal(jsonData, &assessmentData); err != nil {
+		return nil, err
+	}
+
+	return assessment, nil
 }
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string) {
@@ -123,7 +135,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		return
 	}
 
-	var assessmentResult DescriptiveExamAssessmentResult
+	var assessmentResult models.DescriptiveExamAssessmentResult
 	err = json.Unmarshal([]byte(response), &assessmentResult)
 	if err != nil {
 		log.Println("response from AI service does not match criteria")
