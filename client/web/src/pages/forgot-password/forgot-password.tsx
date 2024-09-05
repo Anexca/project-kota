@@ -57,7 +57,7 @@ export function ForgotPassword() {
           <CardHeader>
             <CardTitle className="text-xl">Forgot Password</CardTitle>
             <CardDescription>
-              Enter your email address below to get password recovery email.
+              Enter your email address below to get password recovery mail.
             </CardDescription>
           </CardHeader>
           <CardContent>
