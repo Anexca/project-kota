@@ -61,7 +61,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "completed_seconds", Type: field.TypeInt},
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
-		{Name: "is_ready", Type: field.TypeBool, Default: false},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}, SchemaType: map[string]string{"postgres": "status"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_attempt_assesment", Type: field.TypeInt, Unique: true, Nullable: true},

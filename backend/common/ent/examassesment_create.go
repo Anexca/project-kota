@@ -33,17 +33,9 @@ func (eac *ExamAssesmentCreate) SetRawAssesmentData(m map[string]interface{}) *E
 	return eac
 }
 
-// SetIsReady sets the "is_ready" field.
-func (eac *ExamAssesmentCreate) SetIsReady(b bool) *ExamAssesmentCreate {
-	eac.mutation.SetIsReady(b)
-	return eac
-}
-
-// SetNillableIsReady sets the "is_ready" field if the given value is not nil.
-func (eac *ExamAssesmentCreate) SetNillableIsReady(b *bool) *ExamAssesmentCreate {
-	if b != nil {
-		eac.SetIsReady(*b)
-	}
+// SetStatus sets the "status" field.
+func (eac *ExamAssesmentCreate) SetStatus(e examassesment.Status) *ExamAssesmentCreate {
+	eac.mutation.SetStatus(e)
 	return eac
 }
 
@@ -129,10 +121,6 @@ func (eac *ExamAssesmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (eac *ExamAssesmentCreate) defaults() {
-	if _, ok := eac.mutation.IsReady(); !ok {
-		v := examassesment.DefaultIsReady
-		eac.mutation.SetIsReady(v)
-	}
 	if _, ok := eac.mutation.CreatedAt(); !ok {
 		v := examassesment.DefaultCreatedAt()
 		eac.mutation.SetCreatedAt(v)
@@ -148,8 +136,13 @@ func (eac *ExamAssesmentCreate) check() error {
 	if _, ok := eac.mutation.CompletedSeconds(); !ok {
 		return &ValidationError{Name: "completed_seconds", err: errors.New(`ent: missing required field "ExamAssesment.completed_seconds"`)}
 	}
-	if _, ok := eac.mutation.IsReady(); !ok {
-		return &ValidationError{Name: "is_ready", err: errors.New(`ent: missing required field "ExamAssesment.is_ready"`)}
+	if _, ok := eac.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ExamAssesment.status"`)}
+	}
+	if v, ok := eac.mutation.Status(); ok {
+		if err := examassesment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ExamAssesment.status": %w`, err)}
+		}
 	}
 	if _, ok := eac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ExamAssesment.created_at"`)}
@@ -191,9 +184,9 @@ func (eac *ExamAssesmentCreate) createSpec() (*ExamAssesment, *sqlgraph.CreateSp
 		_spec.SetField(examassesment.FieldRawAssesmentData, field.TypeJSON, value)
 		_node.RawAssesmentData = value
 	}
-	if value, ok := eac.mutation.IsReady(); ok {
-		_spec.SetField(examassesment.FieldIsReady, field.TypeBool, value)
-		_node.IsReady = value
+	if value, ok := eac.mutation.Status(); ok {
+		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
 	if value, ok := eac.mutation.CreatedAt(); ok {
 		_spec.SetField(examassesment.FieldCreatedAt, field.TypeTime, value)

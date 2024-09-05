@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"common/constants"
 	"common/ent"
 	"common/ent/examassesment"
 	"common/ent/examattempt"
@@ -16,6 +17,7 @@ type ExamAssesmentRepository struct {
 
 type AssesmentModel struct {
 	CompletedSeconds int
+	Status           constants.AssessmentStatus
 }
 
 func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
@@ -28,6 +30,7 @@ func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, mod
 	return e.dbClient.ExamAssesment.Create().
 		SetAttemptID(attemptId).
 		SetCompletedSeconds(model.CompletedSeconds).
+		SetStatus(examassesment.Status(model.Status)).
 		Save(ctx)
 }
 

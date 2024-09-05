@@ -23,7 +23,10 @@ func (ExamAssesment) Fields() []ent.Field {
 			SchemaType(map[string]string{
 				dialect.Postgres: "jsonb",
 			}),
-		field.Bool("is_ready").Default(false),
+		field.Enum("status").Values("COMPLETED", "REJECTED", "PENDING").
+			SchemaType(map[string]string{
+				dialect.Postgres: "status",
+			}),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

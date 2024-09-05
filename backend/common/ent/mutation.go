@@ -1496,7 +1496,7 @@ type ExamAssesmentMutation struct {
 	completed_seconds    *int
 	addcompleted_seconds *int
 	raw_assesment_data   *map[string]interface{}
-	is_ready             *bool
+	status               *examassesment.Status
 	created_at           *time.Time
 	updated_at           *time.Time
 	clearedFields        map[string]struct{}
@@ -1710,40 +1710,40 @@ func (m *ExamAssesmentMutation) ResetRawAssesmentData() {
 	delete(m.clearedFields, examassesment.FieldRawAssesmentData)
 }
 
-// SetIsReady sets the "is_ready" field.
-func (m *ExamAssesmentMutation) SetIsReady(b bool) {
-	m.is_ready = &b
+// SetStatus sets the "status" field.
+func (m *ExamAssesmentMutation) SetStatus(e examassesment.Status) {
+	m.status = &e
 }
 
-// IsReady returns the value of the "is_ready" field in the mutation.
-func (m *ExamAssesmentMutation) IsReady() (r bool, exists bool) {
-	v := m.is_ready
+// Status returns the value of the "status" field in the mutation.
+func (m *ExamAssesmentMutation) Status() (r examassesment.Status, exists bool) {
+	v := m.status
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIsReady returns the old "is_ready" field's value of the ExamAssesment entity.
+// OldStatus returns the old "status" field's value of the ExamAssesment entity.
 // If the ExamAssesment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ExamAssesmentMutation) OldIsReady(ctx context.Context) (v bool, err error) {
+func (m *ExamAssesmentMutation) OldStatus(ctx context.Context) (v examassesment.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIsReady is only allowed on UpdateOne operations")
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIsReady requires an ID field in the mutation")
+		return v, errors.New("OldStatus requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsReady: %w", err)
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
 	}
-	return oldValue.IsReady, nil
+	return oldValue.Status, nil
 }
 
-// ResetIsReady resets all changes to the "is_ready" field.
-func (m *ExamAssesmentMutation) ResetIsReady() {
-	m.is_ready = nil
+// ResetStatus resets all changes to the "status" field.
+func (m *ExamAssesmentMutation) ResetStatus() {
+	m.status = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -1898,8 +1898,8 @@ func (m *ExamAssesmentMutation) Fields() []string {
 	if m.raw_assesment_data != nil {
 		fields = append(fields, examassesment.FieldRawAssesmentData)
 	}
-	if m.is_ready != nil {
-		fields = append(fields, examassesment.FieldIsReady)
+	if m.status != nil {
+		fields = append(fields, examassesment.FieldStatus)
 	}
 	if m.created_at != nil {
 		fields = append(fields, examassesment.FieldCreatedAt)
@@ -1919,8 +1919,8 @@ func (m *ExamAssesmentMutation) Field(name string) (ent.Value, bool) {
 		return m.CompletedSeconds()
 	case examassesment.FieldRawAssesmentData:
 		return m.RawAssesmentData()
-	case examassesment.FieldIsReady:
-		return m.IsReady()
+	case examassesment.FieldStatus:
+		return m.Status()
 	case examassesment.FieldCreatedAt:
 		return m.CreatedAt()
 	case examassesment.FieldUpdatedAt:
@@ -1938,8 +1938,8 @@ func (m *ExamAssesmentMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldCompletedSeconds(ctx)
 	case examassesment.FieldRawAssesmentData:
 		return m.OldRawAssesmentData(ctx)
-	case examassesment.FieldIsReady:
-		return m.OldIsReady(ctx)
+	case examassesment.FieldStatus:
+		return m.OldStatus(ctx)
 	case examassesment.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case examassesment.FieldUpdatedAt:
@@ -1967,12 +1967,12 @@ func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRawAssesmentData(v)
 		return nil
-	case examassesment.FieldIsReady:
-		v, ok := value.(bool)
+	case examassesment.FieldStatus:
+		v, ok := value.(examassesment.Status)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIsReady(v)
+		m.SetStatus(v)
 		return nil
 	case examassesment.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -2067,8 +2067,8 @@ func (m *ExamAssesmentMutation) ResetField(name string) error {
 	case examassesment.FieldRawAssesmentData:
 		m.ResetRawAssesmentData()
 		return nil
-	case examassesment.FieldIsReady:
-		m.ResetIsReady()
+	case examassesment.FieldStatus:
+		m.ResetStatus()
 		return nil
 	case examassesment.FieldCreatedAt:
 		m.ResetCreatedAt()

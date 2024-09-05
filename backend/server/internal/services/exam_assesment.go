@@ -6,7 +6,6 @@ import (
 	commonRepositories "common/repositories"
 	"context"
 	"encoding/json"
-	"fmt"
 	"server/pkg/models"
 
 	"github.com/redis/go-redis/v9"
@@ -41,6 +40,7 @@ func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *E
 func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest) (*ent.ExamAssesment, error) {
 	assesmentModel := commonRepositories.AssesmentModel{
 		CompletedSeconds: request.CompletedSeconds,
+		Status:           constants.ASSESSMENT_PENDING,
 	}
 
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId)
@@ -59,22 +59,22 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 		return nil, err
 	}
 
-	prompt := fmt.Sprintf(`Can you evaluate %s on topic: %s
-					Points to check for:
-					- Grammar
-					- Punctuation
-					- Relevance to the topic
-					- Maximum word count: 250. Make sure you count the number of WORDS and not punctuation marks or numbers or anyting
-					Provide a rating out of 25 marks based on these criteria.
+	// prompt := fmt.Sprintf(`Can you evaluate %s on topic: %s
+	// 				Points to check for:
+	// 				- Grammar
+	// 				- Punctuation
+	// 				- Relevance to the topic
+	// 				- Maximum word count: 250. Make sure you count the number of WORDS and not punctuation marks or numbers or anyting
+	// 				Provide a rating out of 25 marks based on these criteria.
 
-					Output Requirements:
-					- A JSON with keys "rating" with string value, "strengths" with array of string, "weakness"  with array of string, "corrected_version"  with string value
-					- Make sure the output is one line string with no formatting such that it shiould be JSON parsed
+	// 				Output Requirements:
+	// 				- A JSON with keys "rating" with string value, "strengths" with array of string, "weakness"  with array of string, "corrected_version"  with string value
+	// 				- Make sure the output is one line string with no formatting such that it shiould be JSON parsed
 
-					Content to evaluate:
-					%s`, descriptiveExam.Type, descriptiveExam.Topic, request.Content)
+	// 				Content to evaluate:
+	// 				%s`, descriptiveExam.Type, descriptiveExam.Topic, request.Content)
 
-	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.FLASH_15)
+	// response, err := e.promptService.GetPromptResult(ctx, prompt, constants.FLASH_15)
 
 	return e.examAssesmentRepository.Create(ctx, attempt.ID, assesmentModel)
 }
