@@ -7,6 +7,8 @@ type Props = {
   isAttemped?: boolean;
   handleAttemptClick?: () => void;
   duration?: number;
+  attempts: number;
+  isNew: number;
 };
 
 const DescriptiveQuestionCard = ({
@@ -16,6 +18,8 @@ const DescriptiveQuestionCard = ({
   isAttemped,
   handleAttemptClick,
   duration,
+  attempts,
+  isNew,
 }: Props) => {
   return (
     <article className="rounded-xl border-2 border-gray-100 bg-white">
@@ -23,7 +27,7 @@ const DescriptiveQuestionCard = ({
         {srNumber !== null && <div>{srNumber}.</div>}
 
         <div className="space-y-2">
-          <h3 className="font-medium sm:text-lg">{topic}</h3>
+          <h3 className="font-medium ">{topic}</h3>
 
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center rounded-full bg-orange-100 px-2.5 py-0.5 text-orange-700">
@@ -34,10 +38,26 @@ const DescriptiveQuestionCard = ({
               <i className="fa-regular fa-circle-check text-sm mr-2"></i>
               <p className="whitespace-nowrap text-sm capitalize">{type}</p>
             </span>
+            <span className="inline-flex items-center justify-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-yellow-700">
+              <i className="fa-solid fa-rotate-right text-sm mr-2"></i>
+              <p className="whitespace-nowrap text-sm capitalize">
+                {attempts} attempt left
+              </p>
+            </span>
           </div>
         </div>
       </div>
       <div className="flex justify-end">
+        {!!isNew && (
+          <Button
+            onClick={handleAttemptClick}
+            variant={"secondary"}
+            className="px-3 py-1 mr-4 h-auto rounded-full"
+          >
+            <i className="fa-regular fa-paper-plane text-sm mr-2"></i>
+            View Submissions
+          </Button>
+        )}
         {isAttemped ? (
           <strong className="-mb-[2px] -me-[2px] inline-flex items-center gap-1 rounded-ee-xl rounded-ss-xl bg-green-600 px-3 py-1.5 text-white">
             <span className="text-[10px] font-medium sm:text-xs">

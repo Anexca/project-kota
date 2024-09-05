@@ -3,6 +3,7 @@
 package examassesment
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -18,8 +19,10 @@ const (
 	FieldCompletedSeconds = "completed_seconds"
 	// FieldRawAssesmentData holds the string denoting the raw_assesment_data field in the database.
 	FieldRawAssesmentData = "raw_assesment_data"
-	// FieldIsReady holds the string denoting the is_ready field in the database.
-	FieldIsReady = "is_ready"
+	// FieldRawUserSubmission holds the string denoting the raw_user_submission field in the database.
+	FieldRawUserSubmission = "raw_user_submission"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -42,7 +45,8 @@ var Columns = []string{
 	FieldID,
 	FieldCompletedSeconds,
 	FieldRawAssesmentData,
-	FieldIsReady,
+	FieldRawUserSubmission,
+	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -69,8 +73,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultIsReady holds the default value on creation for the "is_ready" field.
-	DefaultIsReady bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -78,6 +80,30 @@ var (
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
+
+// Status defines the type for the "status" enum field.
+type Status string
+
+// Status values.
+const (
+	StatusCOMPLETED Status = "COMPLETED"
+	StatusREJECTED  Status = "REJECTED"
+	StatusPENDING   Status = "PENDING"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusCOMPLETED, StatusREJECTED, StatusPENDING:
+		return nil
+	default:
+		return fmt.Errorf("examassesment: invalid enum value for status field: %q", s)
+	}
+}
 
 // OrderOption defines the ordering options for the ExamAssesment queries.
 type OrderOption func(*sql.Selector)
@@ -92,9 +118,9 @@ func ByCompletedSeconds(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCompletedSeconds, opts...).ToFunc()
 }
 
-// ByIsReady orders the results by the is_ready field.
-func ByIsReady(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsReady, opts...).ToFunc()
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

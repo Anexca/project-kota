@@ -9,7 +9,7 @@ export interface IQuestion {
   raw_exam_data: RawExamData;
   user_attempts: number;
   max_attempts: number;
-  duration_minutes: number;
+  duration_seconds: number;
   number_of_questions: number;
   created_at: string;
   updated_at: string;
