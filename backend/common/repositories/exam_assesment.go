@@ -16,8 +16,9 @@ type ExamAssesmentRepository struct {
 }
 
 type AssesmentModel struct {
-	CompletedSeconds int
-	Status           constants.AssessmentStatus
+	CompletedSeconds  int
+	Status            constants.AssessmentStatus
+	RawAssessmentData map[string]interface{}
 }
 
 func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
@@ -27,11 +28,29 @@ func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
 }
 
 func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, model AssesmentModel) (*ent.ExamAssesment, error) {
-	return e.dbClient.ExamAssesment.Create().
+	query := e.dbClient.ExamAssesment.Create().
 		SetAttemptID(attemptId).
 		SetCompletedSeconds(model.CompletedSeconds).
-		SetStatus(examassesment.Status(model.Status)).
-		Save(ctx)
+		SetStatus(examassesment.Status(model.Status))
+
+	if model.RawAssessmentData != nil {
+		query.SetRawAssesmentData(model.RawAssessmentData)
+	}
+
+	return query.Save(ctx)
+}
+
+func (e *ExamAssesmentRepository) Update(ctx context.Context, assessmentId int, model AssesmentModel) error {
+	query := e.dbClient.ExamAssesment.Update().
+		Where(examassesment.ID(assessmentId)).
+		SetStatus(examassesment.Status(model.Status))
+
+	if model.RawAssessmentData != nil {
+		query.SetRawAssesmentData(model.RawAssessmentData)
+	}
+
+	_, err := query.Save(ctx)
+	return err
 }
 
 func (e *ExamAssesmentRepository) GetById(ctx context.Context, assesmentId int, userId string) (*ent.ExamAssesment, error) {
