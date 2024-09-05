@@ -23,6 +23,10 @@ func (ExamAssesment) Fields() []ent.Field {
 			SchemaType(map[string]string{
 				dialect.Postgres: "jsonb",
 			}),
+		field.JSON("raw_user_submission", map[string]interface{}{}).
+			SchemaType(map[string]string{
+				dialect.Postgres: "jsonb",
+			}),
 		field.Enum("status").Values("COMPLETED", "REJECTED", "PENDING").
 			SchemaType(map[string]string{
 				dialect.Postgres: "status",

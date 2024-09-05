@@ -23,6 +23,8 @@ type ExamAssesment struct {
 	CompletedSeconds int `json:"completed_seconds,omitempty"`
 	// RawAssesmentData holds the value of the "raw_assesment_data" field.
 	RawAssesmentData map[string]interface{} `json:"raw_assesment_data,omitempty"`
+	// RawUserSubmission holds the value of the "raw_user_submission" field.
+	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
 	// Status holds the value of the "status" field.
 	Status examassesment.Status `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -61,7 +63,7 @@ func (*ExamAssesment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case examassesment.FieldRawAssesmentData:
+		case examassesment.FieldRawAssesmentData, examassesment.FieldRawUserSubmission:
 			values[i] = new([]byte)
 		case examassesment.FieldID, examassesment.FieldCompletedSeconds:
 			values[i] = new(sql.NullInt64)
@@ -104,6 +106,14 @@ func (ea *ExamAssesment) assignValues(columns []string, values []any) error {
 			} else if value != nil && len(*value) > 0 {
 				if err := json.Unmarshal(*value, &ea.RawAssesmentData); err != nil {
 					return fmt.Errorf("unmarshal field raw_assesment_data: %w", err)
+				}
+			}
+		case examassesment.FieldRawUserSubmission:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field raw_user_submission", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &ea.RawUserSubmission); err != nil {
+					return fmt.Errorf("unmarshal field raw_user_submission: %w", err)
 				}
 			}
 		case examassesment.FieldStatus:
@@ -177,6 +187,9 @@ func (ea *ExamAssesment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("raw_assesment_data=")
 	builder.WriteString(fmt.Sprintf("%v", ea.RawAssesmentData))
+	builder.WriteString(", ")
+	builder.WriteString("raw_user_submission=")
+	builder.WriteString(fmt.Sprintf("%v", ea.RawUserSubmission))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", ea.Status))

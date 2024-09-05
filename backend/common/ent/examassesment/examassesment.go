@@ -19,6 +19,8 @@ const (
 	FieldCompletedSeconds = "completed_seconds"
 	// FieldRawAssesmentData holds the string denoting the raw_assesment_data field in the database.
 	FieldRawAssesmentData = "raw_assesment_data"
+	// FieldRawUserSubmission holds the string denoting the raw_user_submission field in the database.
+	FieldRawUserSubmission = "raw_user_submission"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -43,6 +45,7 @@ var Columns = []string{
 	FieldID,
 	FieldCompletedSeconds,
 	FieldRawAssesmentData,
+	FieldRawUserSubmission,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,

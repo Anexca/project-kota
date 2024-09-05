@@ -39,10 +39,15 @@ func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *E
 	}
 }
 
-func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest) (*ent.ExamAssesment, error) {
+func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest) (*models.AssessmentDetails, error) {
+	userSubmission := map[string]interface{}{
+		"content": request.Content,
+	}
+
 	assesmentModel := commonRepositories.AssesmentModel{
-		CompletedSeconds: request.CompletedSeconds,
-		Status:           constants.ASSESSMENT_PENDING,
+		CompletedSeconds:  request.CompletedSeconds,
+		Status:            constants.ASSESSMENT_PENDING,
+		RawUserSubmission: userSubmission,
 	}
 
 	assessment, err := e.examAssesmentRepository.Create(ctx, attempt.ID, assesmentModel)
@@ -54,8 +59,16 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 		bgCtx := context.Background()
 		e.AssessDescriptiveExam(bgCtx, generatedExamId, assessment.ID, request.Content)
 	}()
+	assessmentModel := &models.AssessmentDetails{
+		Id:                assessment.ID,
+		CompletedSeconds:  assessment.CompletedSeconds,
+		Status:            assessment.Status.String(),
+		RawUserSubmission: assessment.RawUserSubmission,
+		CreatedAt:         assessment.CreatedAt,
+		UpdatedAt:         assessment.UpdatedAt,
+	}
 
-	return assessment, nil
+	return assessmentModel, nil
 }
 
 func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) {
@@ -65,9 +78,12 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 	}
 
 	assessmentModel := &models.AssessmentDetails{
-		Id:               assessment.ID,
-		CompletedSeconds: assessment.CompletedSeconds,
-		Status:           assessment.Status.String(),
+		Id:                assessment.ID,
+		CompletedSeconds:  assessment.CompletedSeconds,
+		Status:            assessment.Status.String(),
+		RawUserSubmission: assessment.RawUserSubmission,
+		CreatedAt:         assessment.CreatedAt,
+		UpdatedAt:         assessment.UpdatedAt,
 	}
 
 	if assessment.RawAssesmentData == nil {

@@ -33,6 +33,12 @@ func (eac *ExamAssesmentCreate) SetRawAssesmentData(m map[string]interface{}) *E
 	return eac
 }
 
+// SetRawUserSubmission sets the "raw_user_submission" field.
+func (eac *ExamAssesmentCreate) SetRawUserSubmission(m map[string]interface{}) *ExamAssesmentCreate {
+	eac.mutation.SetRawUserSubmission(m)
+	return eac
+}
+
 // SetStatus sets the "status" field.
 func (eac *ExamAssesmentCreate) SetStatus(e examassesment.Status) *ExamAssesmentCreate {
 	eac.mutation.SetStatus(e)
@@ -136,6 +142,9 @@ func (eac *ExamAssesmentCreate) check() error {
 	if _, ok := eac.mutation.CompletedSeconds(); !ok {
 		return &ValidationError{Name: "completed_seconds", err: errors.New(`ent: missing required field "ExamAssesment.completed_seconds"`)}
 	}
+	if _, ok := eac.mutation.RawUserSubmission(); !ok {
+		return &ValidationError{Name: "raw_user_submission", err: errors.New(`ent: missing required field "ExamAssesment.raw_user_submission"`)}
+	}
 	if _, ok := eac.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ExamAssesment.status"`)}
 	}
@@ -183,6 +192,10 @@ func (eac *ExamAssesmentCreate) createSpec() (*ExamAssesment, *sqlgraph.CreateSp
 	if value, ok := eac.mutation.RawAssesmentData(); ok {
 		_spec.SetField(examassesment.FieldRawAssesmentData, field.TypeJSON, value)
 		_node.RawAssesmentData = value
+	}
+	if value, ok := eac.mutation.RawUserSubmission(); ok {
+		_spec.SetField(examassesment.FieldRawUserSubmission, field.TypeJSON, value)
+		_node.RawUserSubmission = value
 	}
 	if value, ok := eac.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)

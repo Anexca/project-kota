@@ -62,6 +62,12 @@ func (eau *ExamAssesmentUpdate) ClearRawAssesmentData() *ExamAssesmentUpdate {
 	return eau
 }
 
+// SetRawUserSubmission sets the "raw_user_submission" field.
+func (eau *ExamAssesmentUpdate) SetRawUserSubmission(m map[string]interface{}) *ExamAssesmentUpdate {
+	eau.mutation.SetRawUserSubmission(m)
+	return eau
+}
+
 // SetStatus sets the "status" field.
 func (eau *ExamAssesmentUpdate) SetStatus(e examassesment.Status) *ExamAssesmentUpdate {
 	eau.mutation.SetStatus(e)
@@ -182,6 +188,9 @@ func (eau *ExamAssesmentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if eau.mutation.RawAssesmentDataCleared() {
 		_spec.ClearField(examassesment.FieldRawAssesmentData, field.TypeJSON)
 	}
+	if value, ok := eau.mutation.RawUserSubmission(); ok {
+		_spec.SetField(examassesment.FieldRawUserSubmission, field.TypeJSON, value)
+	}
 	if value, ok := eau.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 	}
@@ -267,6 +276,12 @@ func (eauo *ExamAssesmentUpdateOne) SetRawAssesmentData(m map[string]interface{}
 // ClearRawAssesmentData clears the value of the "raw_assesment_data" field.
 func (eauo *ExamAssesmentUpdateOne) ClearRawAssesmentData() *ExamAssesmentUpdateOne {
 	eauo.mutation.ClearRawAssesmentData()
+	return eauo
+}
+
+// SetRawUserSubmission sets the "raw_user_submission" field.
+func (eauo *ExamAssesmentUpdateOne) SetRawUserSubmission(m map[string]interface{}) *ExamAssesmentUpdateOne {
+	eauo.mutation.SetRawUserSubmission(m)
 	return eauo
 }
 
@@ -419,6 +434,9 @@ func (eauo *ExamAssesmentUpdateOne) sqlSave(ctx context.Context) (_node *ExamAss
 	}
 	if eauo.mutation.RawAssesmentDataCleared() {
 		_spec.ClearField(examassesment.FieldRawAssesmentData, field.TypeJSON)
+	}
+	if value, ok := eauo.mutation.RawUserSubmission(); ok {
+		_spec.SetField(examassesment.FieldRawUserSubmission, field.TypeJSON, value)
 	}
 	if value, ok := eauo.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)

@@ -1496,6 +1496,7 @@ type ExamAssesmentMutation struct {
 	completed_seconds    *int
 	addcompleted_seconds *int
 	raw_assesment_data   *map[string]interface{}
+	raw_user_submission  *map[string]interface{}
 	status               *examassesment.Status
 	created_at           *time.Time
 	updated_at           *time.Time
@@ -1710,6 +1711,42 @@ func (m *ExamAssesmentMutation) ResetRawAssesmentData() {
 	delete(m.clearedFields, examassesment.FieldRawAssesmentData)
 }
 
+// SetRawUserSubmission sets the "raw_user_submission" field.
+func (m *ExamAssesmentMutation) SetRawUserSubmission(value map[string]interface{}) {
+	m.raw_user_submission = &value
+}
+
+// RawUserSubmission returns the value of the "raw_user_submission" field in the mutation.
+func (m *ExamAssesmentMutation) RawUserSubmission() (r map[string]interface{}, exists bool) {
+	v := m.raw_user_submission
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRawUserSubmission returns the old "raw_user_submission" field's value of the ExamAssesment entity.
+// If the ExamAssesment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamAssesmentMutation) OldRawUserSubmission(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRawUserSubmission is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRawUserSubmission requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRawUserSubmission: %w", err)
+	}
+	return oldValue.RawUserSubmission, nil
+}
+
+// ResetRawUserSubmission resets all changes to the "raw_user_submission" field.
+func (m *ExamAssesmentMutation) ResetRawUserSubmission() {
+	m.raw_user_submission = nil
+}
+
 // SetStatus sets the "status" field.
 func (m *ExamAssesmentMutation) SetStatus(e examassesment.Status) {
 	m.status = &e
@@ -1891,12 +1928,15 @@ func (m *ExamAssesmentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamAssesmentMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.completed_seconds != nil {
 		fields = append(fields, examassesment.FieldCompletedSeconds)
 	}
 	if m.raw_assesment_data != nil {
 		fields = append(fields, examassesment.FieldRawAssesmentData)
+	}
+	if m.raw_user_submission != nil {
+		fields = append(fields, examassesment.FieldRawUserSubmission)
 	}
 	if m.status != nil {
 		fields = append(fields, examassesment.FieldStatus)
@@ -1919,6 +1959,8 @@ func (m *ExamAssesmentMutation) Field(name string) (ent.Value, bool) {
 		return m.CompletedSeconds()
 	case examassesment.FieldRawAssesmentData:
 		return m.RawAssesmentData()
+	case examassesment.FieldRawUserSubmission:
+		return m.RawUserSubmission()
 	case examassesment.FieldStatus:
 		return m.Status()
 	case examassesment.FieldCreatedAt:
@@ -1938,6 +1980,8 @@ func (m *ExamAssesmentMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldCompletedSeconds(ctx)
 	case examassesment.FieldRawAssesmentData:
 		return m.OldRawAssesmentData(ctx)
+	case examassesment.FieldRawUserSubmission:
+		return m.OldRawUserSubmission(ctx)
 	case examassesment.FieldStatus:
 		return m.OldStatus(ctx)
 	case examassesment.FieldCreatedAt:
@@ -1966,6 +2010,13 @@ func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRawAssesmentData(v)
+		return nil
+	case examassesment.FieldRawUserSubmission:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRawUserSubmission(v)
 		return nil
 	case examassesment.FieldStatus:
 		v, ok := value.(examassesment.Status)
@@ -2066,6 +2117,9 @@ func (m *ExamAssesmentMutation) ResetField(name string) error {
 		return nil
 	case examassesment.FieldRawAssesmentData:
 		m.ResetRawAssesmentData()
+		return nil
+	case examassesment.FieldRawUserSubmission:
+		m.ResetRawUserSubmission()
 		return nil
 	case examassesment.FieldStatus:
 		m.ResetStatus()

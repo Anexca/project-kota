@@ -19,6 +19,7 @@ type AssesmentModel struct {
 	CompletedSeconds  int
 	Status            constants.AssessmentStatus
 	RawAssessmentData map[string]interface{}
+	RawUserSubmission map[string]interface{}
 }
 
 func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
@@ -31,7 +32,8 @@ func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, mod
 	query := e.dbClient.ExamAssesment.Create().
 		SetAttemptID(attemptId).
 		SetCompletedSeconds(model.CompletedSeconds).
-		SetStatus(examassesment.Status(model.Status))
+		SetStatus(examassesment.Status(model.Status)).
+		SetRawUserSubmission(model.RawUserSubmission)
 
 	if model.RawAssessmentData != nil {
 		query.SetRawAssesmentData(model.RawAssessmentData)
