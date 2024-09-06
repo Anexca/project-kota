@@ -1,6 +1,7 @@
 package services
 
 import (
+	commonConstants "common/constants"
 	"common/ent"
 	commonRepositories "common/repositories"
 	commonService "common/services"
@@ -41,7 +42,6 @@ func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClie
 	}
 }
 
-const GEN_AI_MODEL = "gemini-1.5-flash"
 const DEFAULT_CACHE_EXPIRY = 24 * time.Hour
 
 func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
@@ -74,7 +74,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 						return
 					}
 
-					response, err := q.genAIService.GetContentStream(ctx, examSetting.AiPrompt, GEN_AI_MODEL)
+					response, err := q.genAIService.GetContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
 					if err != nil {
 						log.Printf("Error generating content for exam %s: %v", exam.Name, err)
 						return

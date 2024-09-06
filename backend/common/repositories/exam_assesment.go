@@ -5,6 +5,7 @@ import (
 	"common/ent"
 	"common/ent/examassesment"
 	"common/ent/examattempt"
+	"common/ent/generatedexam"
 	"common/ent/user"
 	"context"
 
@@ -68,4 +69,17 @@ func (e *ExamAssesmentRepository) GetById(ctx context.Context, assesmentId int, 
 		).
 		WithAttempt().
 		Only(ctx)
+}
+
+func (e *ExamAssesmentRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return e.dbClient.ExamAssesment.Query().
+		Where(examassesment.HasAttemptWith(
+			examattempt.HasUserWith(user.ID(userUid)),
+			examattempt.HasGeneratedexamWith(generatedexam.ID(generatedExamId)),
+		)).All(ctx)
 }
