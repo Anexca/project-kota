@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getQuestions } from "../../services/exam.service";
 
 import { useNavigate } from "react-router-dom";
@@ -11,12 +11,12 @@ import { supabase } from "../../supabase/client";
 
 const QuestionPaper = () => {
   const [questions, setQuestions] = useState<IQuestion[]>([]);
+  const [showUnattempted, setShowUnattempted] = useState(false);
   const navigate = useNavigate();
   const getQuestionsList = async () => {
     try {
       await supabase.auth.getSession();
       const data = await getQuestions();
-      console.log(data);
       setQuestions(data.data);
     } catch (error) {
       console.log(error);
@@ -33,6 +33,10 @@ const QuestionPaper = () => {
       },
     });
   };
+  const unattemptedQuestion = useMemo(() => {
+    return questions.filter((i) => !i.user_attempts);
+  }, [questions]);
+  const questionList = showUnattempted ? unattemptedQuestion : questions;
   return (
     <div className="w-full">
       <Header />
@@ -46,10 +50,13 @@ const QuestionPaper = () => {
 
           <div className=" flex items-center gap-2  text-sm">
             <span>Show unattempted only</span>
-            <Checkbox variant={"info"} />
+            <Checkbox
+              variant={"info"}
+              onCheckedChange={(s: boolean) => setShowUnattempted(s)}
+            />
           </div>
         </div>
-        {questions.map((item, index) => {
+        {questionList.map((item, index) => {
           const attempts = item.max_attempts - item.user_attempts;
           return (
             <DescriptiveQuestionCard

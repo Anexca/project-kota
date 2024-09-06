@@ -41,11 +41,12 @@ const useSessionStore = create<SessionStore>((set) => ({
     };
   },
   logout: async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
+    try {
+      await supabase.auth.signOut();
+      localStorage.clear();
       set({ session: null }); // Clear session on successful logout
-    } else {
-      console.error("Logout error:", error.message);
+    } catch (error) {
+      set({ session: null }); // Clear session on successful logout
     }
   },
 }));

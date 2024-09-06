@@ -42,8 +42,8 @@ export function Login() {
       return;
     }
     if (data) {
-      const session = await loadSession();
-      session && navigate(`/${paths.HOMEPAGE}`);
+      loadSession();
+      navigate(`/${paths.HOMEPAGE}`);
     }
   };
   const loginWithGoogle = async () => {
