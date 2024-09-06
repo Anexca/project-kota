@@ -11,4 +11,5 @@ export enum paths {
   QUESTION_PAPER = "question-paper",
   PREVIOUS_SOLUTIONS = "pevious-solutions",
   PROFILE = "profile",
+  MY_SUMBISSIONS = "my-submissions",
 }

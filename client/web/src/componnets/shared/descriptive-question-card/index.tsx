@@ -27,9 +27,9 @@ const DescriptiveQuestionCard = ({
         {srNumber !== null && <div>{srNumber}.</div>}
 
         <div className="space-y-2">
-          <h3 className="font-medium ">{topic}</h3>
+          <h3 className="font-medium text-sm sm:text-md">{topic}</h3>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center justify-center rounded-full bg-orange-100 px-2.5 py-0.5 text-orange-700">
               <i className="fa-regular fa-clock text-sm mr-2"></i>
               <p className="whitespace-nowrap text-sm">{duration} min</p>
@@ -50,16 +50,15 @@ const DescriptiveQuestionCard = ({
       <div className="flex justify-end">
         {!!isNew && (
           <Button
-            onClick={handleAttemptClick}
             variant={"secondary"}
-            className="px-3 py-1 mr-4 h-auto rounded-full"
+            className="px-3 py-1 mr-auto  h-auto text-sm rounded-none rounded-es-xl rounded-se-xl"
           >
             <i className="fa-regular fa-paper-plane text-sm mr-2"></i>
-            View Submissions
+            Attempted
           </Button>
         )}
         {isAttemped ? (
-          <strong className="-mb-[2px] -me-[2px] inline-flex items-center gap-1 rounded-ee-xl rounded-ss-xl bg-green-600 px-3 py-1.5 text-white">
+          <strong className="-mb-[2px] -me-[2px] inline-flex items-center gap-1  rounded-ee-xl rounded-ss-xl bg-green-600 px-3 py-1.5 text-white">
             <span className="text-[10px] font-medium sm:text-xs">
               🎉 Solved!
             </span>

@@ -1,7 +1,9 @@
 import clsx from "clsx";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { paths } from "../../../routes/route.constant";
 import useSessionStore from "../../../store/auth-store";
+import { Button } from "../../base/button/button";
 
 const loggedOutLinks = [
   {
@@ -19,14 +21,19 @@ const loggedOutLinks = [
 ];
 const loggedInLinks = [
   {
-    to: "/submissions",
+    to: `/${paths.MY_SUMBISSIONS}`,
     label: "My Submissions",
   },
 ];
 const Header = () => {
+  const navigation = useNavigate();
   const [mobileViewHeader, setMobileViewHeader] = useState(false);
-  const { session } = useSessionStore();
+  const { session, logout } = useSessionStore();
   const links = session ? loggedInLinks : loggedOutLinks;
+  const logoutHandler = async () => {
+    await logout();
+    navigation(`/${paths.HOMEPAGE}`);
+  };
   return (
     <header className="sticky top-0 z-10 ">
       <nav className="z-10 w-full border-b border-black/5 dark:border-white/5  bg-white/30 backdrop-blur-md">
@@ -43,7 +50,7 @@ const Header = () => {
                   <div className="h-6 w-2 bg-primary"></div>
                 </div>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Revaluate
+                  PseudoTest
                 </span>
               </Link>
 
@@ -77,7 +84,7 @@ const Header = () => {
               id="navLayer"
               aria-hidden="true"
               className={clsx(
-                "fixed inset-0 z-10 h-screen w-screen origin-bottom scale-y-0 bg-white/70 backdrop-blur-2xl transition duration-500 dark:bg-gray-900/70 lg:hidden",
+                "fixed inset-0 z-10 h-screen  origin-bottom scale-y-0 bg-white/70 backdrop-blur-2xl transition duration-500 dark:bg-gray-900/70 lg:hidden",
                 mobileViewHeader && "origin-top scale-y-100"
               )}
             ></div>
@@ -119,16 +126,26 @@ const Header = () => {
                 </ul>
               </div>
 
-              <div className="mt-12 lg:mt-0">
+              <div className="mt-12 lg:mt-0 flex flex-col sm:flex-row gap-2">
                 {session ? (
-                  <Link
-                    to="/profile"
-                    className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max"
-                  >
-                    <span className="capitalize relative text-sm font-semibold text-white">
-                      {session?.user?.email?.[0]}{" "}
-                    </span>
-                  </Link>
+                  <>
+                    <Link
+                      to="/profile"
+                      className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max"
+                    >
+                      <span className="capitalize relative text-sm font-semibold text-white">
+                        {session?.user?.email?.[0]}{" "}
+                      </span>
+                    </Link>
+                    <Button
+                      onClick={logoutHandler}
+                      className="relative flex h-9 items-center justify-center px-4 rounded-full"
+                    >
+                      <span className="capitalize relative text-sm font-semibold text-white">
+                        Logout
+                      </span>
+                    </Button>
+                  </>
                 ) : (
                   <Link
                     to="/register"

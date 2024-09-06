@@ -15,7 +15,6 @@ const AnswerOptions = ({ options, selected, onChange, name }: Props) => {
     <RadioGroup
       name={name}
       onValueChange={(a) => {
-        console.log(a);
         onChange(a);
       }}
     >

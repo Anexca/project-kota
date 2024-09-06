@@ -8,7 +8,7 @@ const Container = ({ className, children }: PropsWithChildren<Props>) => {
   return (
     <div
       className={clsx(
-        "w-full md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl mx-auto",
+        "w-full md:max-w-lg lg:max-w-xl xl:max-w-xl 2xl:max-w-2xl mx-auto",
         className
       )}
     >

@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router-dom";
+import { Navigate, RouteObject } from "react-router-dom";
 import { paths } from "./route.constant";
 import { Login } from "../pages/login/login";
 import { RegisterPage } from "../pages/register/register";
@@ -12,6 +12,10 @@ import PreviousSolutions from "../pages/previous-solutions/previous-solutions";
 import UserProfile from "../pages/user-profle";
 
 const routes: RouteObject[] = [
+  {
+    path: "/",
+    element: <Navigate to={paths.HOMEPAGE} />,
+  },
   {
     path: paths.HOMEPAGE,
     element: (
@@ -76,6 +80,14 @@ const routes: RouteObject[] = [
         ),
       },
     ],
+  },
+  {
+    path: paths.MY_SUMBISSIONS,
+    element: (
+      <ProtectedRoute>
+        <div>Feature comming soon</div>
+      </ProtectedRoute>
+    ),
   },
 ];
 

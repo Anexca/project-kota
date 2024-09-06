@@ -18,13 +18,14 @@ const SignedInRoute = ({ children }: PropsWithChildren) => {
       setIsloading(false);
       return;
     }
+    setIsloading(false);
     navigate(`/${paths.QUESTION_PAPER}`);
   };
   useEffect(() => {
     if (session && !isLoading) {
       navigate(`/${paths.QUESTION_PAPER}`);
     }
-  }, [session]);
+  }, [session, isLoading]);
   useEffect(() => {
     checkSessionToken();
     return subscribeToAuthChanges();

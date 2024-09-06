@@ -15,13 +15,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import ControlledInput from "../../componnets/base/controlled-input";
 import { useToast } from "../../hooks/use-toast";
-import useSessionStore from "../../store/auth-store";
 import { LoginSchema, LoginType } from "../../validation-schema/auth";
 import { supabase } from "../../supabase/client";
 import GoogleIcon from "../../assets/svg/google-icon";
 
 export function RegisterPage() {
-  const { setSession } = useSessionStore();
   const { toast } = useToast();
   const { handleSubmit, control } = useForm({
     defaultValues: {
@@ -41,8 +39,9 @@ export function RegisterPage() {
       return;
     }
     if (data) {
-      toast({ title: "Successfully logged in." });
-      setSession(data.session);
+      toast({
+        title: "Succesfully created account. Please confirm mail to login.",
+      });
     }
   };
   return (
