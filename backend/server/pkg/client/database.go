@@ -17,7 +17,7 @@ func NewDbClient(ctx context.Context) (*ent.Client, error) {
 	}
 
 	client, err := ent.Open("postgres", fmt.Sprintf(
-		"host=%s port=%s user=%s dbname=%s password=%s binary_parameters=yes",
+		"host=%s port=%s user=%s dbname=%s password=%s",
 		environment.DatabaseHost, environment.DatabasePort, environment.DatabaseUser, environment.DatabaseName, environment.DatabasePassword,
 	))
 

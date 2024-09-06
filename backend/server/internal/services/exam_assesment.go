@@ -119,15 +119,21 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 }
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string) {
+	assesmentModel := &commonRepositories.AssesmentModel{}
+
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId)
 	if err != nil {
 		log.Println("error getting exam", err)
+		assesmentModel.Status = constants.ASSESSMENT_REJECTED
+		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
 		return
 	}
 
 	jsonData, err := json.Marshal(generatedExam.RawExamData)
 	if err != nil {
 		log.Println("error processing exam data", err)
+		assesmentModel.Status = constants.ASSESSMENT_REJECTED
+		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
 		return
 	}
 
@@ -135,11 +141,9 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal(jsonData, &descriptiveExam)
 	if err != nil {
 		log.Println("error processing exam data", err)
+		assesmentModel.Status = constants.ASSESSMENT_REJECTED
+		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
 		return
-	}
-
-	assesmentModel := commonRepositories.AssesmentModel{
-		Status: constants.ASSESSMENT_PENDING,
 	}
 
 	prompt := fmt.Sprintf(`Can you evaluate %s on topic: %s
@@ -159,6 +163,8 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 
 	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.FLASH_15)
 	if err != nil {
+		assesmentModel.Status = constants.ASSESSMENT_REJECTED
+		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
 		log.Printf("Error getting prompt result: %v", err)
 		return
 	}
@@ -168,7 +174,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	if err != nil {
 		log.Println("error response from AI service", err)
 		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
+		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
 		return
 	}
 
@@ -177,10 +183,12 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	if err != nil {
 		log.Println("response from AI service does not match criteria", err)
 		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
+		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		return
 	}
 
 	assesmentModel.Status = constants.ASSESSMENT_COMPLETED
 	assesmentModel.RawAssessmentData = rawJsonData
-	e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
+	e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+	log.Println("Processed Assessment", assessmentId)
 }
