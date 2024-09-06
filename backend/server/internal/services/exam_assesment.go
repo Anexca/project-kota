@@ -71,13 +71,13 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 	return assessmentModel, nil
 }
 
-func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) {
+func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (models.AssessmentDetails, error) {
 	assessment, err := e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
 	if err != nil {
-		return nil, err
+		return models.AssessmentDetails{}, err
 	}
 
-	assessmentModel := &models.AssessmentDetails{
+	assessmentModel := models.AssessmentDetails{
 		Id:                assessment.ID,
 		CompletedSeconds:  assessment.CompletedSeconds,
 		Status:            assessment.Status.String(),
@@ -93,6 +93,29 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 	assessmentModel.RawAssesmentData = assessment.RawAssesmentData
 
 	return assessmentModel, nil
+}
+
+func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generatedExamId int, userId string) ([]models.AssessmentDetails, error) {
+	assessments, err := e.examAssesmentRepository.GetByExam(ctx, generatedExamId, userId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	assessmentsList := make([]models.AssessmentDetails, 0, len(assessments))
+
+	for _, assessment := range assessments {
+		assessmentModel := models.AssessmentDetails{
+			Id:               assessment.ID,
+			CompletedSeconds: assessment.CompletedSeconds,
+			Status:           assessment.Status.String(),
+			CreatedAt:        assessment.CreatedAt,
+			UpdatedAt:        assessment.UpdatedAt,
+		}
+
+		assessmentsList = append(assessmentsList, assessmentModel)
+	}
+	return assessmentsList, nil
 }
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string) {

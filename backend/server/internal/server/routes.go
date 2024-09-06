@@ -45,6 +45,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			})
 
 			r.Get("/{id}", s.GetGeneratedExamById)
+			r.Get("/{id}/assessments", s.GetExamAssessments)
 		})
 	})
 
