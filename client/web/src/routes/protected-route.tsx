@@ -6,6 +6,7 @@ import { paths } from "./route.constant";
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
   const { session, loadSession, subscribeToAuthChanges } = useSessionStore();
+
   const [isLoading, setIsloading] = useState(true);
   const checkSessionToken = async () => {
     setIsloading(true);
@@ -24,7 +25,7 @@ const ProtectedRoute = ({ children }: PropsWithChildren) => {
     if (!session && !isLoading) {
       navigate(`/${paths.LOGIN}`);
     }
-  }, [session]);
+  }, [session, isLoading]);
   useEffect(() => {
     checkSessionToken();
     return subscribeToAuthChanges();

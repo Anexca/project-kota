@@ -26,7 +26,7 @@ const TestHeader = ({ currentTime, active }: Props) => {
                   <div className="h-6 w-2 bg-primary"></div>
                 </div>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Revaluate
+                  PseudoTest
                 </span>
               </Link>
 

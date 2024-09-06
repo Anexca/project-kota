@@ -8,7 +8,6 @@ import useSessionStore from "../../store/auth-store";
 export default function SupabaseAuth() {
   const { loadSession, subscribeToAuthChanges, session, logout } =
     useSessionStore();
-  console.log(session?.access_token);
 
   useEffect(() => {
     loadSession();

@@ -20,7 +20,7 @@ export const sendAnswerForAssesment = async ({
 }) => {
   const response = await axiosInstance.post(
     `/exams/banking/descriptive/${questionId}/evaluate`,
-    { completed_minutes: completedTime, answer }
+    { completed_seconds: completedTime, content: answer }
   );
   return response.data;
 };
