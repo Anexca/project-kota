@@ -39,7 +39,6 @@ func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId i
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.ID(generatedExamId)).
 		WithExam().
-		WithAttempts().
 		Only(ctx)
 }
 

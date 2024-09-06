@@ -29,12 +29,17 @@ func NewExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
 }
 
 func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedExamId int, userId string) (*ent.ExamAttempt, error) {
+	userExamAttempts, err := e.examAtemptRepository.GetByExam(ctx, generatedExamId, userId)
+	if err != nil {
+		return nil, err
+	}
+
 	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
 	if err != nil {
 		return nil, err
 	}
 
-	currAttempts := len(generatedExam.Edges.Attempts)
+	currAttempts := len(userExamAttempts)
 
 	examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam.ID)
 	if err != nil {
