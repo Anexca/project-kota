@@ -4,6 +4,7 @@ import (
 	"common/ent"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
+	"common/ent/user"
 	"context"
 
 	"github.com/google/uuid"
@@ -19,9 +20,14 @@ func NewExamAttemptRepository(dbClient *ent.Client) *ExamAttemptRepository {
 	}
 }
 
-func (e *ExamAttemptRepository) GetByExam(ctx context.Context, generatedExamId int) ([]*ent.ExamAttempt, error) {
+func (e *ExamAttemptRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
 	return e.dbClient.ExamAttempt.Query().
-		Where(examattempt.HasGeneratedexamWith(generatedexam.ID(generatedExamId))).
+		Where(examattempt.HasGeneratedexamWith(generatedexam.ID(generatedExamId)), examattempt.HasUserWith(user.ID(userUid))).
 		WithGeneratedexam().
 		All(ctx)
 }

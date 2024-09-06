@@ -19,7 +19,12 @@ const EXAM_CATEGORY_TYPE = commonConstants.Banking
 func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
 	const EXAM_TYPE = commonConstants.Descriptive
 
-	cachedQuestions, err := s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE)
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+	}
+
+	cachedQuestions, err := s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
 	if err != nil {
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
@@ -70,7 +75,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request)
+	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

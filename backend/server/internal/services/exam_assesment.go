@@ -39,7 +39,7 @@ func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *E
 	}
 }
 
-func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest) (*models.AssessmentDetails, error) {
+func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest, userId string) (*models.AssessmentDetails, error) {
 	userSubmission := map[string]interface{}{
 		"content": request.Content,
 	}
@@ -57,7 +57,7 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 
 	go func() {
 		bgCtx := context.Background()
-		e.AssessDescriptiveExam(bgCtx, generatedExamId, assessment.ID, request.Content)
+		e.AssessDescriptiveExam(bgCtx, generatedExamId, assessment.ID, request.Content, userId)
 	}()
 
 	assessmentModel := &models.AssessmentDetails{
@@ -118,10 +118,10 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 	return assessmentsList, nil
 }
 
-func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string) {
+func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string, userId string) {
 	assesmentModel := &commonRepositories.AssesmentModel{}
 
-	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId)
+	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId)
 	if err != nil {
 		log.Println("error getting exam", err)
 		assesmentModel.Status = constants.ASSESSMENT_REJECTED
