@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"server/pkg/models"
+	"sort"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -65,22 +66,29 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 }
 
 func (e *ExamGenerationService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (string, error) {
-
 	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to retrieve cached metadata for exam '%s': %w", exam.Name, err)
 	}
 
 	if len(cachedMetaData) == 0 {
 		return "", fmt.Errorf("no cached metadata found for exam: %s", exam.Name)
 	}
 
-	cachedData, err := e.redisService.Get(ctx, cachedMetaData[0].CacheUID)
+	sort.Slice(cachedMetaData, func(i, j int) bool {
+		return cachedMetaData[i].UpdatedAt.After(cachedMetaData[j].UpdatedAt)
+	})
+
+	latestCachedMeta := cachedMetaData[0]
+
+	cachedData, err := e.redisService.Get(ctx, latestCachedMeta.CacheUID)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to fetch cached data from Redis: %w", err)
 	}
 
-	e.cachedExamRepository.MarkAsUsed(ctx, cachedMetaData[0].ID)
+	if err := e.cachedExamRepository.MarkAsUsed(ctx, latestCachedMeta.ID); err != nil {
+		return "", fmt.Errorf("failed to mark cached metadata as used: %w", err)
+	}
 
 	return cachedData, nil
 }
@@ -122,29 +130,12 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(exam.Edges.Generatedexams))
+	sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
 
-	for _, generatedExam := range exam.Edges.Generatedexams {
-		userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get exam by name: %w", err)
-		}
+	limit := min(26, len(sortedExams))
+	latestExams := sortedExams[:limit]
 
-		generatedExamOverview := models.GeneratedExamOverview{
-			Id:                generatedExam.ID,
-			RawExamData:       generatedExam.RawExamData,
-			CreatedAt:         generatedExam.CreatedAt,
-			UpdatedAt:         generatedExam.UpdatedAt,
-			UserAttempts:      len(userAttempts),
-			MaxAttempts:       exam.Edges.Setting.MaxAttempts,
-			DurationSeconds:   exam.Edges.Setting.DurationSeconds,
-			NumberOfQuestions: exam.Edges.Setting.NumberOfQuestions,
-		}
-
-		generatedExamOverviewList = append(generatedExamOverviewList, generatedExamOverview)
-	}
-
-	return generatedExamOverviewList, nil
+	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam)
 }
 
 func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int) (models.GeneratedExamOverview, error) {
@@ -158,7 +149,36 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get exam settings: %w", err)
 	}
 
-	generatedExamOverview := models.GeneratedExamOverview{
+	return e.buildGeneratedExamOverview(generatedExam, examSettings), nil
+}
+
+func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam) []*ent.GeneratedExam {
+	sort.Slice(exams, func(i, j int) bool {
+		return exams[i].UpdatedAt.After(exams[j].UpdatedAt)
+	})
+	return exams
+}
+
+func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, exam *ent.Exam) ([]models.GeneratedExamOverview, error) {
+	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(latestExams))
+
+	for _, generatedExam := range latestExams {
+		userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get user attempts: %w", err)
+		}
+
+		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting)
+		overview.UserAttempts = len(userAttempts)
+
+		generatedExamOverviewList = append(generatedExamOverviewList, overview)
+	}
+
+	return generatedExamOverviewList, nil
+}
+
+func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.GeneratedExam, examSettings *ent.ExamSetting) models.GeneratedExamOverview {
+	return models.GeneratedExamOverview{
 		Id:                generatedExam.ID,
 		RawExamData:       generatedExam.RawExamData,
 		CreatedAt:         generatedExam.CreatedAt,
@@ -168,6 +188,11 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		DurationSeconds:   examSettings.DurationSeconds,
 		NumberOfQuestions: examSettings.NumberOfQuestions,
 	}
+}
 
-	return generatedExamOverview, nil
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
