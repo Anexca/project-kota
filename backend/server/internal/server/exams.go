@@ -18,7 +18,12 @@ func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId)
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+	}
+
+	generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

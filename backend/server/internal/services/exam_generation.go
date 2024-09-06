@@ -122,7 +122,7 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType) ([]models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]models.GeneratedExamOverview, error) {
 	examName := commonConstants.EXAMS[examType]
 
 	exam, err := e.examRepository.GetByName(ctx, examName)
@@ -135,13 +135,18 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 	limit := min(26, len(sortedExams))
 	latestExams := sortedExams[:limit]
 
-	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam)
+	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
 }
 
-func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int) (models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string) (models.GeneratedExamOverview, error) {
 	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
 	if err != nil {
 		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get generated exam: %w", err)
+	}
+
+	userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
+	if err != nil {
+		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get user attempts: %w", err)
 	}
 
 	examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam.ID)
@@ -149,7 +154,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get exam settings: %w", err)
 	}
 
-	return e.buildGeneratedExamOverview(generatedExam, examSettings), nil
+	return e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts), nil
 }
 
 func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam) []*ent.GeneratedExam {
@@ -159,16 +164,16 @@ func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam)
 	return exams
 }
 
-func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, exam *ent.Exam) ([]models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, exam *ent.Exam, userId string) ([]models.GeneratedExamOverview, error) {
 	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(latestExams))
 
 	for _, generatedExam := range latestExams {
-		userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID)
+		userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get user attempts: %w", err)
 		}
 
-		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting)
+		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting, userAttempts)
 		overview.UserAttempts = len(userAttempts)
 
 		generatedExamOverviewList = append(generatedExamOverviewList, overview)
@@ -177,13 +182,13 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 	return generatedExamOverviewList, nil
 }
 
-func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.GeneratedExam, examSettings *ent.ExamSetting) models.GeneratedExamOverview {
+func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.GeneratedExam, examSettings *ent.ExamSetting, examAttempts []*ent.ExamAttempt) models.GeneratedExamOverview {
 	return models.GeneratedExamOverview{
 		Id:                generatedExam.ID,
 		RawExamData:       generatedExam.RawExamData,
 		CreatedAt:         generatedExam.CreatedAt,
 		UpdatedAt:         generatedExam.UpdatedAt,
-		UserAttempts:      len(generatedExam.Edges.Attempts),
+		UserAttempts:      len(examAttempts),
 		MaxAttempts:       examSettings.MaxAttempts,
 		DurationSeconds:   examSettings.DurationSeconds,
 		NumberOfQuestions: examSettings.NumberOfQuestions,
