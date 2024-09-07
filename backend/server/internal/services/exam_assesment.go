@@ -146,7 +146,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		return
 	}
 
-	prompt := fmt.Sprintf(`Can you evaluate %s on topic: %s
+	prompt := fmt.Sprintf(`Can you evaluate "%s" on topic: "%s"
 					Points to check for:
 					- Grammar
 					- Punctuation
@@ -159,7 +159,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 					- Make sure the output is one line string with no formatting such that it should be JSON parsed
 	
 					Content to evaluate:
-					%s`, descriptiveExam.Type, descriptiveExam.Topic, content)
+					"%s"`, descriptiveExam.Type, descriptiveExam.Topic, content)
 
 	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.FLASH_15)
 	if err != nil {
