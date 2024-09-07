@@ -2,8 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"server/internal/middlewares"
+	"server/pkg/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -11,14 +13,27 @@ import (
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
+	env, err := config.LoadEnvironment()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RedirectSlashes)
 
+	var allowedOrigins []string
+	if env.IsProduction {
+		allowedOrigins = []string{env.CorsAllowedOrigin}
+	} else {
+		allowedOrigins = []string{"*"}
+	}
+
+	log.Println(allowedOrigins)
+
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},

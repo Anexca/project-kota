@@ -7,6 +7,7 @@ import (
 )
 
 type Environment struct {
+	IsProduction             bool
 	ServerPort               string
 	DatabaseHost             string
 	DatabasePort             string
@@ -43,6 +44,7 @@ func LoadEnvironment() (*Environment, error) {
 		GoogleCloudProjectId:     os.Getenv("GCLOUD_PROJECT_ID"),
 		GoogleCloudProjectRegion: os.Getenv("GCLOUD_PROJECT_REGION"),
 		ServerAccessKey:          os.Getenv("SERVER_ACCESS_KEY"),
+		IsProduction:             os.Getenv("ENV") == "production",
 	}
 
 	if env.ServerPort == "" {

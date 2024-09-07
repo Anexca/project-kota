@@ -7,6 +7,8 @@ import (
 )
 
 type Environment struct {
+	IsProduction       bool
+	CorsAllowedOrigin  string
 	ServerPort         string
 	DatabaseHost       string
 	DatabasePort       string
@@ -45,10 +47,12 @@ func LoadEnvironment() (*Environment, error) {
 		SupabaseKey:        os.Getenv("SUPABASE_KEY"),
 		AIServiceAccessKey: os.Getenv("AI_SERVICE_ACCESS_KEY"),
 		AIServiceUrl:       os.Getenv("AI_SERVICE_URL"),
+		IsProduction:       os.Getenv("ENV") == "production",
+		CorsAllowedOrigin:  os.Getenv("CORS_ALLOWED_ORIGIN"),
 	}
 
-	if env.ServerPort == "" {
-		return nil, errors.New("missing SERVER_PORT environment variable")
+	if env.ServerPort == "" || env.CorsAllowedOrigin == "" {
+		return nil, errors.New("missing SERVER_PORT or Allowed CORS environment variable")
 	}
 
 	if env.RedisPort == "" || env.RedisAddress == "" || env.RedisPassword == "" {
