@@ -1,4 +1,6 @@
 import { Button } from "../../base/button/button";
+import Chip from "../../base/chip";
+import Icon from "../../base/icon";
 
 type Props = {
   srNumber?: number | null;
@@ -6,9 +8,9 @@ type Props = {
   type: string;
   isAttemped?: boolean;
   handleAttemptClick?: () => void;
+  showSubmission?: () => void;
   duration?: number;
   attempts: number;
-  isNew: number;
 };
 
 const DescriptiveQuestionCard = ({
@@ -17,65 +19,48 @@ const DescriptiveQuestionCard = ({
   type,
   isAttemped,
   handleAttemptClick,
+  showSubmission,
   duration,
   attempts,
-  isNew,
 }: Props) => {
   return (
-    <article className="rounded-xl border-2 border-gray-100 bg-white">
-      <div className="flex items-start gap-2 !pb-1 p-2 sm:p-4 lg:p-6">
-        {srNumber !== null && <div>{srNumber}.</div>}
-
-        <div className="space-y-2">
-          <h3 className="font-medium text-sm sm:text-md">{topic}</h3>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center justify-center rounded-full bg-orange-100 px-2.5 py-0.5 text-orange-700">
-              <i className="fa-regular fa-clock text-sm mr-2"></i>
-              <p className="whitespace-nowrap text-sm">{duration} min</p>
-            </span>
-            <span className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-emerald-700">
-              <i className="fa-regular fa-circle-check text-sm mr-2"></i>
-              <p className="whitespace-nowrap text-sm capitalize">{type}</p>
-            </span>
-            <span className="inline-flex items-center justify-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-yellow-700">
-              <i className="fa-solid fa-rotate-right text-sm mr-2"></i>
-              <p className="whitespace-nowrap text-sm capitalize">
-                {attempts} attempt left
-              </p>
-            </span>
-          </div>
+    <article className="rounded-md shadow-sm bg-white flex flex-col md:flex-row gap-4 p-3 px-4 md:p3 text-sm">
+      <div className="flex-1">
+        <p className="font-medium text-balance md:text-pretty text-black mb-2">
+          #{srNumber} - {topic}
+        </p>
+        <div className="flex gap-2 flex-wrap">
+          <Chip icon="clock" variant={"danger"}>
+            {duration} min
+          </Chip>
+          <Chip icon="clock" variant={"success"}>
+            {type}
+          </Chip>
+          <Chip icon="clock" variant={"warning"}>
+            {attempts} Attempt
+          </Chip>
         </div>
       </div>
-      <div className="flex justify-end">
-        {!!isNew && (
+      <div className="flex flex-col items-stretch gap-2 md:justify-center md:w-32">
+        {attempts >= 1 && (
           <Button
-            variant={"secondary"}
-            className="px-3 py-1 mr-auto  h-auto text-sm rounded-none rounded-es-xl rounded-se-xl"
+            onClick={handleAttemptClick}
+            size={"sm"}
+            className="px-3 py-1"
+            variant={"info"}
           >
-            <i className="fa-regular fa-paper-plane text-sm mr-2"></i>
-            Attempted
+            <Icon icon="play_circle" className="mr-2" /> Attempt
           </Button>
         )}
-        {isAttemped ? (
-          <strong className="-mb-[2px] -me-[2px] inline-flex items-center gap-1  rounded-ee-xl rounded-ss-xl bg-green-600 px-3 py-1.5 text-white">
-            <span className="text-[10px] font-medium sm:text-xs">
-              🎉 Solved!
-            </span>
-          </strong>
-        ) : (
-          <>
-            {handleAttemptClick ? (
-              <Button
-                onClick={handleAttemptClick}
-                variant={"info"}
-                className="px-2 py-1 rounded-none h-auto rounded-ee-xl rounded-ss-xl"
-              >
-                <i className="fa-regular fa-play-circle text-sm mr-2"></i>
-                Take Test
-              </Button>
-            ) : null}
-          </>
+        {isAttemped && (
+          <Button
+            onClick={showSubmission}
+            size={"sm"}
+            className="px-3 py-1"
+            variant={"secondary"}
+          >
+            <Icon icon="send" className="mr-2" /> View Submission
+          </Button>
         )}
       </div>
     </article>

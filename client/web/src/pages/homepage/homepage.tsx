@@ -58,8 +58,8 @@ const HomePage = () => {
           <div className="blur-[106px] h-32 bg-gradient-to-r from-cyan-400 to-sky-300 dark:to-indigo-600"></div>
         </div>
         <div className="max-w-7xl mx-auto px-6 md:px-12 xl:px-6">
-          <div className="relative pt-36 ml-auto">
-            <div className="lg:w-2/3 text-center mx-auto">
+          <div className="relative ml-auto pt-20">
+            <div className="lg:w-2/3 text-center mx-auto ">
               <h1 className="text-balance text-gray-900 dark:text-white font-bold text-5xl md:text-6xl xl:text-7xl">
                 Ace Your Exams with{" "}
                 <span className="text-purple-500 dark:text-white">
@@ -70,8 +70,8 @@ const HomePage = () => {
               <p className="mt-8 text-gray-700 dark:text-gray-300">
                 Experience the next generation of mock tests designed to give
                 you an edge in your exam preparation. Our platform offers
-                in-depth practice for IBPS and NEET with an exclusive feature:
-                AI-evaluated descriptive answers.
+                in-depth practice for various goverment and entrance exam with
+                an exclusive feature of AI-evaluated descriptive answers.
               </p>
               <div className="mt-16 flex flex-wrap justify-center gap-y-4 gap-x-6">
                 <Link

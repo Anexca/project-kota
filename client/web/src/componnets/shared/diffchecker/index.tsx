@@ -1,5 +1,6 @@
 import { Change, diffWords } from "diff";
 import { useEffect, useState } from "react";
+import Icon from "../../base/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../base/tabs";
 
 const DiffChecker = ({
@@ -28,10 +29,10 @@ const DiffChecker = ({
   }, []);
 
   return (
-    <div className="mt-4 border rounded p-2 md:p-4">
+    <div className="mt-4 shadow-sm rounded p-2 md:p-4 bg-white text-sm">
       <h2 className="mb-4">
-        AI Assesed rating{" "}
-        <span className="inline-flex items-center justify-center rounded-full bg-green-100 px-2.5 py-0.5 text-green-700">
+        AI Assessment rating{" "}
+        <span className="ml-2 inline-flex items-center justify-center rounded-full bg-green-100 px-2.5 py-0.5 text-green-700">
           <i className="fa-regular fa-star text-sm mr-2"></i>
           <p className="whitespace-nowrap text-sm"> {rating}</p>
         </span>
@@ -63,19 +64,37 @@ const Insights = ({
 }) => {
   return (
     <div className="flex flex-col gap-2 text-sm">
-      <div className="bg-green-100 text-green-700 rounded p-2">
-        <label className="font-medium">Strengths :</label>
-        <ul className="list-disc ml-4">
+      <div className=" rounded p-2 shadow-sm">
+        <label className="font-medium underline">
+          <Icon icon="dumbbell" className="text-green-700 text-base mr-2" />
+          Strengths
+        </label>
+        <ul className="pl-1 mt-2 space-y-2">
           {strength.map((item) => (
-            <li>{item}</li>
+            <li className="flex items-start">
+              <Icon icon="caret_up" className="text-green-700 text-base mr-2" />
+              <span>{item}</span>
+            </li>
           ))}
         </ul>
       </div>
-      <div className="bg-orange-100 text-orange-700 rounded p-2">
-        <label className="font-medium">Weakness :</label>
-        <ul className="list-disc ml-4">
+      <div className="rounded p-2 shadow-sm">
+        <label className="font-medium underline">
+          <Icon
+            icon="exclaimation"
+            className="text-orange-700 text-base mr-2"
+          />
+          Weakness
+        </label>
+        <ul className="pl-1 mt-2 space-y-2">
           {weaknesses.map((item) => (
-            <li>{item}</li>
+            <li className="flex items-start">
+              <Icon
+                icon="caret_down"
+                className="text-orange-700 text-base mr-2"
+              />
+              <span>{item}</span>
+            </li>
           ))}
         </ul>
       </div>
@@ -87,7 +106,7 @@ const DiffResult = ({ diffResult }: { diffResult: Change[] }) => {
   return (
     <p
       style={{ whiteSpace: "pre-wrap" }}
-      className="text-sm rounded p-2  bg-neutral-100/50"
+      className="text-sm rounded p-2 px-3  bg-neutral-100/25 shadow-sm"
     >
       {diffResult.map((part, index) =>
         part.removed || part.added ? (

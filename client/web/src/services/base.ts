@@ -10,15 +10,6 @@ const axiosBase = axios.create({
   },
 });
 
-// const axiosInstance = async () => {
-//   const { data } = await supabase.auth.getSession();
-//   axiosBase.defaults.headers[
-//     "Authorization"
-//   ] = `Bearer ${data.session?.access_token}`;
-//   return axiosBase;
-// };
-// Optionally, add request/response interceptors for additional processing
-
 // Request interceptor
 axiosBase.interceptors.request.use(
   async (config) => {
