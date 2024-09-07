@@ -27,6 +27,12 @@ import {
   DiscriptiveExamSchema,
   DiscriptiveExamSchemaType,
 } from "../../validation-schema/discriptive-exam";
+import {
+  EvaluationPending,
+  EvaluationCompleted,
+} from "../../interface/evaluation";
+import Icon from "../../componnets/base/icon";
+import { useToast } from "../../hooks/use-toast";
 
 const ConformationDialog = ({ timerStart, time }: any) => {
   const [open, setOpen] = useState(true);
@@ -159,30 +165,6 @@ const Hints = ({ hints }: { hints: string[] }) => {
   );
 };
 
-type EvaluationPending = {
-  id: number;
-  completed_seconds: number;
-  status: "PENDING";
-  created_at: string;
-  updated_at: string;
-};
-type EvaluationCompleted = {
-  id: number;
-  completed_seconds: number;
-  raw_assesment_data: {
-    corrected_version: string;
-    rating: string;
-    strengths: string[];
-    weakness: string[];
-  };
-  raw_user_submission: {
-    content: string;
-  };
-  status: "COMPLETED";
-  created_at: string;
-  updated_at: string;
-};
-
 type Evalution = EvaluationPending | EvaluationCompleted;
 
 const DiscriptiveExam = () => {
@@ -201,14 +183,22 @@ const DiscriptiveExam = () => {
     defaultValues: { answer: "" },
     resolver: yupResolver(DiscriptiveExamSchema),
   });
-
+  const { toast } = useToast();
   const answer = useWatch({ control, name: "answer" });
   const fetchQuestionById = async () => {
     if (!param?.questionId) return;
-    const response = await getQuestionById(param?.questionId);
+    try {
+      const response = await getQuestionById(param?.questionId);
 
-    setExamTime(response.data.duration_seconds);
-    setQuestion(response.data);
+      setExamTime(response.data.duration_seconds);
+      setQuestion(response.data);
+    } catch (error) {
+      toast({
+        title: "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
+    }
   };
   const getResultByExamId = (examId: number) => {
     return async () => {
@@ -229,7 +219,17 @@ const DiscriptiveExam = () => {
         completedTime: timeTaken,
       });
       fetchResultRef.current = getResultByExamId(response.data.id);
+      toast({
+        title: "Successfully subitted the exam.",
+        variant: "success",
+        description: "Please wait while we evaluate your answer.",
+      });
     } catch (error) {
+      toast({
+        title: "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
 
@@ -256,7 +256,7 @@ const DiscriptiveExam = () => {
 
   const exitExam = () => {
     interval.stop();
-    navigate(`/${paths.QUESTION_PAPER}`);
+    navigate(`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`);
   };
 
   useEffect(() => {
@@ -287,10 +287,10 @@ const DiscriptiveExam = () => {
         <div className="mb-4">
           {evaluationResult && (
             <Link
-              to={`/${paths.QUESTION_PAPER}`}
+              to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
               className="text-info pb-2 inline-block"
             >
-              <i className="fa-solid fa-arrow-left text-sm mr-1"></i> Exit Exam
+              <Icon icon="arrow_back" className="text-sm mr-1" /> Exit Exam
             </Link>
           )}
           <div className="text-sm font-medium">

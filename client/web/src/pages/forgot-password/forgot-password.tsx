@@ -41,7 +41,11 @@ export function ForgotPassword() {
 
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) {
-      toast({ title: error.message || "Something went wrong." });
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
     if (data) {

@@ -35,12 +35,18 @@ export function RegisterPage() {
       password,
     });
     if (error) {
-      toast({ title: error.message || "Something went wrong." });
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
     if (data) {
       toast({
-        title: "Succesfully created account. Please confirm mail to login.",
+        title: "Succesfully created account. ",
+        variant: "success",
+        description: "Please confirm mail to login.",
       });
     }
   };

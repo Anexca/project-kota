@@ -119,6 +119,9 @@ export default {
           "100%": {
             transform: "translateY(-50%)",
           },
+        }, fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
       },
       animation: {
@@ -129,6 +132,7 @@ export default {
         third: "moveInCircle 40s linear infinite",
         fourth: "moveHorizontal 40s ease infinite",
         fifth: "moveInCircle 20s ease infinite",
+        fadeIn: 'fadeIn 0.25s ease',
       },
     },
   },

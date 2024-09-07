@@ -38,7 +38,11 @@ export function Login() {
       password,
     });
     if (error) {
-      toast({ title: error.message || "Something went wrong." });
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
     if (data) {
@@ -52,7 +56,11 @@ export function Login() {
     });
 
     if (error) {
-      toast({ title: error.message || "Something went wrong." });
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
     if (data) {

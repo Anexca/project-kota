@@ -1,15 +1,17 @@
 import { Navigate, RouteObject } from "react-router-dom";
-import { paths } from "./route.constant";
+import { ForgotPassword } from "../pages/forgot-password/forgot-password";
+import HomePage from "../pages/homepage/homepage";
 import { Login } from "../pages/login/login";
 import { RegisterPage } from "../pages/register/register";
-import HomePage from "../pages/homepage/homepage";
 import ProtectedRoute from "./protected-route";
-import { ForgotPassword } from "../pages/forgot-password/forgot-password";
-import QuestionPaper from "../pages/question-paper/question-paper";
+import { paths } from "./route.constant";
+
+import GeneralLayout from "../layouts/general-layout";
+import DescriptiveQuestion from "../pages/descriptive-questions";
+import DescriptiveSubmission from "../pages/descriptive-submission";
 import DiscriptiveExam from "../pages/discriptive-exam/discriptive-exam";
-import SignedInRoute from "./signedin-route";
-import PreviousSolutions from "../pages/previous-solutions/previous-solutions";
 import UserProfile from "../pages/user-profle";
+import SignedInRoute from "./signedin-route";
 
 const routes: RouteObject[] = [
   {
@@ -44,14 +46,7 @@ const routes: RouteObject[] = [
     path: paths.FORGOT_PASSWORD,
     element: <ForgotPassword />,
   },
-  {
-    path: paths.QUESTION_PAPER,
-    element: (
-      <ProtectedRoute>
-        <QuestionPaper />
-      </ProtectedRoute>
-    ),
-  },
+
   {
     path: paths.PROFILE,
     element: (
@@ -62,30 +57,35 @@ const routes: RouteObject[] = [
   },
   {
     path: paths.EXAMS,
+    element: (
+      <ProtectedRoute>
+        <GeneralLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        path: `${paths.DISCRIPTIVE}/:questionId`,
-        element: (
-          <ProtectedRoute>
-            <DiscriptiveExam />
-          </ProtectedRoute>
-        ),
+        path: `banking/${paths.DISCRIPTIVE}`,
+        element: <DescriptiveQuestion />,
       },
       {
-        path: `${paths.PREVIOUS_SOLUTIONS}/:questionId`,
+        path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+        element: <DescriptiveSubmission />,
+      },
+      {
+        path: `${paths.MY_SUMBISSIONS}/:examId`,
         element: (
           <ProtectedRoute>
-            <PreviousSolutions />
+            <div>Comming soon</div>
           </ProtectedRoute>
         ),
       },
     ],
   },
   {
-    path: paths.MY_SUMBISSIONS,
+    path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
     element: (
       <ProtectedRoute>
-        <div>Feature comming soon</div>
+        <DiscriptiveExam />
       </ProtectedRoute>
     ),
   },
