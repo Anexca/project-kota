@@ -7,6 +7,7 @@ import (
 	commonService "common/services"
 	commonUtil "common/util"
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -80,8 +81,23 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 						return
 					}
 
+					validationPrompt := fmt.Sprintf(`Ensure that the following string is a valid JSON string.
+													Requirements:
+
+													•	The string must be a valid JSON format.
+													•	When parsed as JSON, no errors should occur.
+													•	The output should be a single-line string without extra spaces, newlines, or formatting.
+													"%s"
+													`, response)
+
+					validationResponse, err := q.genAIService.GetContentStream(ctx, validationPrompt, commonConstants.PRO_15)
+					if err != nil {
+						log.Printf("Error generating content for exam %s: %v", exam.Name, err)
+						return
+					}
+
 					uid := commonUtil.GenerateUUID()
-					q.redisService.Store(ctx, uid, response, DEFAULT_CACHE_EXPIRY)
+					q.redisService.Store(ctx, uid, validationResponse, DEFAULT_CACHE_EXPIRY)
 					cacheMetaData, err := q.cachedQuestionMetaDataRepository.Create(ctx, uid, DEFAULT_CACHE_EXPIRY, exam)
 					if err != nil {
 						log.Printf("Error saving cached meta data for exam %s: %v", exam.Name, err)
