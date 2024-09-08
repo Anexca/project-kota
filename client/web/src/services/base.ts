@@ -3,8 +3,8 @@ import { supabase } from "../supabase/client";
 
 // Create an axios instance
 const axiosBase = axios.create({
-  baseURL: "https://server-hgkzytv7nq-el.a.run.app", // Replace with your API's base URL
-  timeout: 10000, // Set a timeout (in milliseconds)
+  baseURL: import.meta.env.VITE_SERVER_URL, // Replace with your API's base URL
+  timeout: 120000, // Set a timeout (in milliseconds)
   headers: {
     Authorization: `Bearer`, // Optional: add authorization if required
   },
