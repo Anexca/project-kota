@@ -30,8 +30,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		allowedOrigins = []string{"*"}
 	}
 
-	log.Println(allowedOrigins)
-
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
