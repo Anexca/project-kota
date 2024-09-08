@@ -56,7 +56,7 @@ export function RegisterPage() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: import.meta.env.VITE_SITE_URL,
+        redirectTo: import.meta.env.VITE_OAUTH_GOOGLE_REDIRECT_URL,
         queryParams: {
           access_type: "offline",
         },
