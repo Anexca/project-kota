@@ -53,7 +53,15 @@ export function Login() {
   const loginWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: import.meta.env.VITE_SITE_URL,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
     });
+    console.log(data);
 
     if (error) {
       toast({
@@ -122,6 +130,7 @@ export function Login() {
                 Login
               </Button>
               <Button
+                type="button"
                 onClick={loginWithGoogle}
                 variant="outline"
                 className="w-full"
