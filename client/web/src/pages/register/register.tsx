@@ -18,8 +18,10 @@ import { useToast } from "../../hooks/use-toast";
 import { LoginSchema, LoginType } from "../../validation-schema/auth";
 import { supabase } from "../../supabase/client";
 import GoogleIcon from "../../assets/svg/google-icon";
+import useSessionStore from "../../store/auth-store";
 
 export function RegisterPage() {
+  const { loadSession } = useSessionStore();
   const { toast } = useToast();
   const { handleSubmit, control } = useForm({
     defaultValues: {
@@ -35,13 +37,42 @@ export function RegisterPage() {
       password,
     });
     if (error) {
-      toast({ title: error.message || "Something went wrong." });
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
     if (data) {
       toast({
-        title: "Succesfully created account. Please confirm mail to login.",
+        title: "Succesfully created account. ",
+        variant: "success",
+        description: "Please confirm mail to login.",
       });
+    }
+  };
+  const loginWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: import.meta.env.VITE_OAUTH_GOOGLE_REDIRECT_URL,
+        queryParams: {
+          access_type: "offline",
+        },
+      },
+    });
+
+    if (error) {
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
+      return;
+    }
+    if (data) {
+      await loadSession();
     }
   };
   return (
@@ -90,7 +121,12 @@ export function RegisterPage() {
               <Button type="submit" className="w-full">
                 Register
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button
+                onClick={loginWithGoogle}
+                type="button"
+                variant="outline"
+                className="w-full"
+              >
                 <GoogleIcon className="mr-2" /> Login with Google
               </Button>
             </form>

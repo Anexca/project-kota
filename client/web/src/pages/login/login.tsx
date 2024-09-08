@@ -38,7 +38,11 @@ export function Login() {
       password,
     });
     if (error) {
-      toast({ title: error.message || "Something went wrong." });
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
     if (data) {
@@ -49,10 +53,21 @@ export function Login() {
   const loginWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: import.meta.env.VITE_OAUTH_GOOGLE_REDIRECT_URL,
+        queryParams: {
+          access_type: "offline",
+        },
+      },
     });
+    console.log(data);
 
     if (error) {
-      toast({ title: error.message || "Something went wrong." });
+      toast({
+        title: error.message || "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in proccessing your request.",
+      });
       return;
     }
     if (data) {
@@ -114,6 +129,7 @@ export function Login() {
                 Login
               </Button>
               <Button
+                type="button"
                 onClick={loginWithGoogle}
                 variant="outline"
                 className="w-full"

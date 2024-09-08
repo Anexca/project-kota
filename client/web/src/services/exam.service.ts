@@ -28,3 +28,7 @@ export const getAssesmetsResult = async (assesmetId: number) => {
   const response = await axiosInstance.get(`/exams/assesments/${assesmetId}`);
   return response.data;
 };
+export const getPastSubmission = async (examId: number) => {
+  const response = await axiosInstance.get(`/exams/${examId}/assessments`);
+  return response.data;
+};

@@ -19,11 +19,11 @@ const SignedInRoute = ({ children }: PropsWithChildren) => {
       return;
     }
     setIsloading(false);
-    navigate(`/${paths.QUESTION_PAPER}`);
+    navigate(`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`);
   };
   useEffect(() => {
     if (session && !isLoading) {
-      navigate(`/${paths.QUESTION_PAPER}`);
+      navigate(`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`);
     }
   }, [session, isLoading]);
   useEffect(() => {
