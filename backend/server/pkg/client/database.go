@@ -3,11 +3,16 @@ package client
 import (
 	"common/ent"
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"server/pkg/config"
 
-	_ "github.com/lib/pq"
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
+	_ "github.com/jackc/pgconn"
+	_ "github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func NewDbClient(ctx context.Context) (*ent.Client, error) {
@@ -16,16 +21,15 @@ func NewDbClient(ctx context.Context) (*ent.Client, error) {
 		return nil, err
 	}
 
-	client, err := ent.Open("postgres", fmt.Sprintf(
-		"host=%s port=%s user=%s dbname=%s password=%s",
-		environment.DatabaseHost, environment.DatabasePort, environment.DatabaseUser, environment.DatabaseName, environment.DatabasePassword,
-	))
+	databaseUrl := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", environment.DatabaseUser, environment.DatabasePassword, environment.DatabaseHost, environment.DatabasePort, environment.DatabaseName)
 
+	db, err := sql.Open("pgx", databaseUrl)
 	if err != nil {
 		return nil, err
 	}
+	drv := entsql.OpenDB(dialect.Postgres, db)
+	client := ent.NewClient(ent.Driver(drv))
 
-	err = client.Schema.Create(ctx)
 	log.Println("connected to database server", environment.DatabaseHost)
-	return client, err
+	return client, nil
 }
