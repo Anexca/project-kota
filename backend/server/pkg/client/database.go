@@ -3,16 +3,15 @@ package client
 import (
 	"common/ent"
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"server/pkg/config"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-	_ "github.com/jackc/pgconn"
-	_ "github.com/jackc/pgx/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 )
 
 func NewDbClient(ctx context.Context) (*ent.Client, error) {
@@ -23,10 +22,18 @@ func NewDbClient(ctx context.Context) (*ent.Client, error) {
 
 	databaseUrl := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", environment.DatabaseUser, environment.DatabasePassword, environment.DatabaseHost, environment.DatabasePort, environment.DatabaseName)
 
-	db, err := sql.Open("pgx", databaseUrl)
+	poolConfig, err := pgxpool.ParseConfig(databaseUrl)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
+	poolConfig.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeCacheDescribe
+
+	pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db := stdlib.OpenDBFromPool(pool)
 	drv := entsql.OpenDB(dialect.Postgres, db)
 	client := ent.NewClient(ent.Driver(drv))
 
