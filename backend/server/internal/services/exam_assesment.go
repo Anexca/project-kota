@@ -124,16 +124,14 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId)
 	if err != nil {
 		log.Println("error getting exam", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
 	jsonData, err := json.Marshal(generatedExam.RawExamData)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
@@ -141,8 +139,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal(jsonData, &descriptiveExam)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
@@ -171,10 +168,10 @@ Content to evaluate:
 	•	“%s”
 `, descriptiveExam.Type, descriptiveExam.Topic, descriptiveExam.MaxNumberOfWordsAllowed, descriptiveExam.TotalMarks, content)
 
-	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.FLASH_15)
+	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.PRO_15)
 	if err != nil {
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
+
 		log.Printf("Error getting prompt result: %v", err)
 		return
 	}
@@ -183,8 +180,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &rawJsonData)
 	if err != nil {
 		log.Println("error response from AI service", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
@@ -192,8 +188,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &assessmentResult)
 	if err != nil {
 		log.Println("response from AI service does not match criteria", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
@@ -201,4 +196,15 @@ Content to evaluate:
 	assesmentModel.RawAssessmentData = rawJsonData
 	e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
 	log.Println("Processed Assessment", assessmentId)
+}
+
+func (e *ExamAssesmentService) rejectAssessment(ctx context.Context, assessmentId int) {
+	assesmentModel := &commonRepositories.AssesmentModel{
+		Status: constants.ASSESSMENT_REJECTED,
+	}
+
+	update_err := e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+	if update_err != nil {
+		log.Printf("Error updating status %v", update_err)
+	}
 }
