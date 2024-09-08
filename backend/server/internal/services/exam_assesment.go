@@ -10,6 +10,7 @@ import (
 	"log"
 	"server/pkg/models"
 
+	goaway "github.com/TwiN/go-away"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -124,14 +125,14 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId)
 	if err != nil {
 		log.Println("error getting exam", err)
-		e.rejectAssessment(ctx, assessmentId)
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
 		return
 	}
 
 	jsonData, err := json.Marshal(generatedExam.RawExamData)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		e.rejectAssessment(ctx, assessmentId)
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
 		return
 	}
 
@@ -139,7 +140,16 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal(jsonData, &descriptiveExam)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		e.rejectAssessment(ctx, assessmentId)
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		return
+	}
+
+	if goaway.IsProfane(content) {
+		log.Println("content is profane")
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
+			"profanity_check": "detected",
+			"profane_content": goaway.ExtractProfanity(content),
+		}})
 		return
 	}
 
@@ -170,8 +180,7 @@ Content to evaluate:
 
 	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.PRO_15)
 	if err != nil {
-		e.rejectAssessment(ctx, assessmentId)
-
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
 		log.Printf("Error getting prompt result: %v", err)
 		return
 	}
@@ -180,7 +189,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &rawJsonData)
 	if err != nil {
 		log.Println("error response from AI service", err)
-		e.rejectAssessment(ctx, assessmentId)
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
 		return
 	}
 
@@ -188,7 +197,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &assessmentResult)
 	if err != nil {
 		log.Println("response from AI service does not match criteria", err)
-		e.rejectAssessment(ctx, assessmentId)
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
 		return
 	}
 
@@ -198,12 +207,9 @@ Content to evaluate:
 	log.Println("Processed Assessment", assessmentId)
 }
 
-func (e *ExamAssesmentService) rejectAssessment(ctx context.Context, assessmentId int) {
-	assesmentModel := &commonRepositories.AssesmentModel{
-		Status: constants.ASSESSMENT_REJECTED,
-	}
+func (e *ExamAssesmentService) updateAssessment(ctx context.Context, assessmentId int, assesmentModel commonRepositories.AssesmentModel) {
 
-	update_err := e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+	update_err := e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
 	if update_err != nil {
 		log.Printf("Error updating status %v", update_err)
 	}
