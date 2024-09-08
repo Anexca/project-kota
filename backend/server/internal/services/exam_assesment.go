@@ -124,16 +124,14 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId)
 	if err != nil {
 		log.Println("error getting exam", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
 	jsonData, err := json.Marshal(generatedExam.RawExamData)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
@@ -141,30 +139,39 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal(jsonData, &descriptiveExam)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
-	prompt := fmt.Sprintf(`Can you evaluate "%s" on topic: "%s"
-					Points to check for:
-					- Grammar
-					- Punctuation
-					- Relevance to the topic
-					- Maximum word count: 250. Make sure you count the number of WORDS and not punctuation marks or numbers or anything
-					Provide a rating out of 25 marks based on these criteria.
-	
-					Output Requirements:
-					- A JSON with keys "rating" with string value, "strengths" with array of string, "weakness"  with array of string, "corrected_version"  with string value
-					- Make sure the output is one line string with no formatting such that it should be JSON parsed
-	
-					Content to evaluate:
-					"%s"`, descriptiveExam.Type, descriptiveExam.Topic, content)
+	prompt := fmt.Sprintf(`
+Evaluate the following %s based on the topic: “%s”.
+Criteria to consider:
 
-	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.FLASH_15)
+	•	Grammar accuracy.
+	•	Proper use of punctuation.
+	•	Relevance to the given topic.
+	•	Word count should not exceed %s words (only count words, exclude special characters).
+
+Scoring: Provide a rating out of %s marks based on the above criteria.
+
+Output Requirements:
+
+	•	Return a valid JSON object with the following keys:
+	•	"rating": A string representing the rating.
+	•	"strengths": An array of strings highlighting the content’s strengths.
+	•	"weaknesses": An array of strings pointing out the content’s weaknesses.
+	•	"corrected_version": A string with the corrected version of the content.
+	•	The entire output should be a single-line string with no extra spaces, newlines, or formatting, ensuring it can be parsed as valid JSON.
+
+Content to evaluate:
+
+	•	“%s”
+`, descriptiveExam.Type, descriptiveExam.Topic, descriptiveExam.MaxNumberOfWordsAllowed, descriptiveExam.TotalMarks, content)
+
+	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.PRO_15)
 	if err != nil {
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
+
 		log.Printf("Error getting prompt result: %v", err)
 		return
 	}
@@ -173,8 +180,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal([]byte(response), &rawJsonData)
 	if err != nil {
 		log.Println("error response from AI service", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
@@ -182,8 +188,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal([]byte(response), &assessmentResult)
 	if err != nil {
 		log.Println("response from AI service does not match criteria", err)
-		assesmentModel.Status = constants.ASSESSMENT_REJECTED
-		e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+		e.rejectAssessment(ctx, assessmentId)
 		return
 	}
 
@@ -191,4 +196,15 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	assesmentModel.RawAssessmentData = rawJsonData
 	e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
 	log.Println("Processed Assessment", assessmentId)
+}
+
+func (e *ExamAssesmentService) rejectAssessment(ctx context.Context, assessmentId int) {
+	assesmentModel := &commonRepositories.AssesmentModel{
+		Status: constants.ASSESSMENT_REJECTED,
+	}
+
+	update_err := e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+	if update_err != nil {
+		log.Printf("Error updating status %v", update_err)
+	}
 }
