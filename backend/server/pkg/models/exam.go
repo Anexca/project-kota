@@ -10,9 +10,11 @@ const (
 )
 
 type DescriptiveExam struct {
-	Type  string   `json:"type"`
-	Topic string   `json:"topic"`
-	Hints []string `json:"hints"`
+	Type                    string   `json:"type" validate:"required,oneof=formal_letter essay"`
+	Topic                   string   `json:"topic" validate:"required"`
+	Hints                   []string `json:"hints" validate:"required"`
+	MaxNumberOfWordsAllowed string   `json:"max_number_of_words" validate:"required"`
+	TotalMarks              string   `json:"total_marks" validate:"required"`
 }
 
 type GeneratedExamOverview struct {
