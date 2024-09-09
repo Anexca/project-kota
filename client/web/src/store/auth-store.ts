@@ -13,7 +13,7 @@ interface SessionStore {
 }
 
 // Create the Zustand store
-const useSessionStore = create<SessionStore>((set) => ({
+export const sessionStore = create<SessionStore>((set) => ({
   session: null,
 
   setSession: (session) => set({ session }),
@@ -42,13 +42,13 @@ const useSessionStore = create<SessionStore>((set) => ({
   },
   logout: async () => {
     try {
-      await supabase.auth.signOut();
       localStorage.clear();
+      await supabase.auth.signOut();
       set({ session: null }); // Clear session on successful logout
     } catch (error) {
       set({ session: null }); // Clear session on successful logout
     }
   },
 }));
-
+const useSessionStore = sessionStore;
 export default useSessionStore;
