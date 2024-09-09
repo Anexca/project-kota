@@ -27,12 +27,13 @@ import {
   DiscriptiveExamSchema,
   DiscriptiveExamSchemaType,
 } from "../../validation-schema/discriptive-exam";
-import {
-  EvaluationPending,
-  EvaluationCompleted,
-} from "../../interface/evaluation";
+
 import Icon from "../../componnets/base/icon";
 import { useToast } from "../../hooks/use-toast";
+import Chip from "../../componnets/base/chip";
+import ProfanityError from "../../componnets/shared/profanity_error/profanity-error";
+import { Evalution } from "../../interface/evaluation";
+import { questionType } from "../../constants/shared";
 
 const ConformationDialog = ({ timerStart, time }: any) => {
   const [open, setOpen] = useState(true);
@@ -165,8 +166,6 @@ const Hints = ({ hints }: { hints: string[] }) => {
   );
 };
 
-type Evalution = EvaluationPending | EvaluationCompleted;
-
 const DiscriptiveExam = () => {
   const param = useParams();
   const navigate = useNavigate();
@@ -176,10 +175,11 @@ const DiscriptiveExam = () => {
   const interval = useInterval(() => setExamTime((s) => s - 1), 1000);
   const fetchResultRef = useRef<any>(null);
   const fetcherTimeOut = useRef<NodeJS.Timeout>();
-  const [evaluationResult, setEvaluationResult] =
-    useState<EvaluationCompleted | null>(null);
+  const [evaluationResult, setEvaluationResult] = useState<Evalution | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, formState, setValue } = useForm({
     defaultValues: { answer: "" },
     resolver: yupResolver(DiscriptiveExamSchema),
   });
@@ -189,7 +189,7 @@ const DiscriptiveExam = () => {
     if (!param?.questionId) return;
     try {
       const response = await getQuestionById(param?.questionId);
-
+      setValue("maxWords", response.data.raw_exam_data.max_number_of_words);
       setExamTime(response.data.duration_seconds);
       setQuestion(response.data);
     } catch (error) {
@@ -246,8 +246,17 @@ const DiscriptiveExam = () => {
         if (data.status === "COMPLETED") {
           setEvaluationResult(data);
         }
+        if (data.status === "REJECTED") {
+          setEvaluationResult(data);
+        }
       } catch (error) {
         clearTimeout(fetcherTimeOut?.current);
+        toast({
+          title: "Something went wrong.",
+          variant: "destructive",
+          description:
+            "Sorry there is some problem in proccessing your request.",
+        });
       }
       setLoading(false);
     };
@@ -296,15 +305,21 @@ const DiscriptiveExam = () => {
           <div className="text-sm font-medium">
             Que - {question?.raw_exam_data.topic}
           </div>
-          <span className="inline-flex items-center justify-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-emerald-700">
-            <i className="fa-regular fa-circle-check text-sm mr-2"></i>
-            <p className="whitespace-nowrap text-sm capitalize">
-              {question?.raw_exam_data.type}
-            </p>
-          </span>
-          {!evaluationResult && question?.raw_exam_data?.hints && (
-            <Hints hints={question?.raw_exam_data?.hints || []} />
-          )}
+          <div>
+            <Chip icon="clock" variant={"success"}>
+              {question?.raw_exam_data.type
+                ? questionType[question?.raw_exam_data.type] || "--"
+                : "--"}
+            </Chip>
+            <Chip icon="target" className="ml-2">
+              Marks {question?.raw_exam_data.total_marks}
+            </Chip>
+          </div>
+          {!evaluationResult &&
+            question?.raw_exam_data?.hints &&
+            !!question?.raw_exam_data?.hints.length && (
+              <Hints hints={question?.raw_exam_data?.hints || []} />
+            )}
         </div>
         {!evaluationResult && (
           <>
@@ -320,7 +335,11 @@ const DiscriptiveExam = () => {
                     control={control}
                     render={({ field }) => {
                       return (
-                        <Textarea {...field} className="text-sm" rows={10} />
+                        <Textarea
+                          {...field}
+                          className="text-sm min-h-[50vh]"
+                          rows={10}
+                        />
                       );
                     }}
                   />
@@ -334,7 +353,8 @@ const DiscriptiveExam = () => {
                   <div className="flex justify-end mb-2">
                     {" "}
                     <div className="text-xs">
-                      {answer?.match(/\b\w+(?:[.,!;?])?\b/g)?.length || 0}/250
+                      {answer?.match(/\b\w+(?:[.,!;?])?\b/g)?.length || 0}/
+                      {question?.raw_exam_data.max_number_of_words}
                       words
                     </div>
                   </div>
@@ -375,14 +395,17 @@ const DiscriptiveExam = () => {
           </>
         )}
 
-        {evaluationResult ? (
+        {evaluationResult?.status === "COMPLETED" ? (
           <DiffChecker
             rating={evaluationResult.raw_assesment_data.rating}
-            weaknesses={evaluationResult.raw_assesment_data.weakness}
+            weaknesses={evaluationResult.raw_assesment_data.weaknesses}
             strength={evaluationResult.raw_assesment_data.strengths}
             modifiedText={evaluationResult.raw_assesment_data.corrected_version}
             originalText={evaluationResult.raw_user_submission.content}
           />
+        ) : null}
+        {evaluationResult?.status === "REJECTED" ? (
+          <ProfanityError data={evaluationResult} />
         ) : null}
       </Container>
     </div>

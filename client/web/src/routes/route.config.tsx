@@ -72,7 +72,7 @@ const routes: RouteObject[] = [
         element: <DescriptiveSubmission />,
       },
       {
-        path: `${paths.MY_SUMBISSIONS}/:examId`,
+        path: `${paths.MY_SUMBISSIONS}`,
         element: (
           <ProtectedRoute>
             <div>Comming soon</div>

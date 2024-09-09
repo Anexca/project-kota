@@ -64,7 +64,7 @@ const Insights = ({
 }) => {
   return (
     <div className="flex flex-col gap-2 text-sm">
-      <div className=" rounded p-2 shadow-sm">
+      <div className=" rounded p-2 shadow">
         <label className="font-medium underline">
           <Icon icon="dumbbell" className="text-green-700 text-base mr-2" />
           Strengths

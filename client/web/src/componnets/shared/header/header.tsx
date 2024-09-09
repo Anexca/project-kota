@@ -21,7 +21,7 @@ const loggedOutLinks = [
 ];
 const loggedInLinks = [
   {
-    to: `/${paths.MY_SUMBISSIONS}`,
+    to: `/${paths.EXAMS}/${paths.MY_SUMBISSIONS}`,
     label: "My Submissions",
   },
 ];
@@ -100,12 +100,12 @@ const Header = () => {
                 <ul className="flex flex-col gap-6 tracking-wide lg:flex-row lg:gap-0 lg:text-sm">
                   {links.map((link) => (
                     <li>
-                      <a
-                        href={link.to}
+                      <Link
+                        to={link.to}
                         className="hover:text-primary block transition dark:hover:text-white md:px-4"
                       >
                         <span>{link.label}</span>
-                      </a>
+                      </Link>
                     </li>
                   ))}
                   {!session && (
