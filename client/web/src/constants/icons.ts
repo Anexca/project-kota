@@ -12,6 +12,10 @@ export const ICONS = {
   exclaimation: "fa-solid fa-exclamation-triangle",
   dumbbell: "fa-solid fa-dumbbell",
   arrow_back: "fa-solid fa-arrow-left",
+  target: "fa-solid fa-bullseye",
+  exclaimation_circle: "fa-solid fa-exclamation-circle",
+  xmark_circle: "fa-solid fa-xmark-circle",
+  file: "fa-solid fa-file",
 };
 type IconType = keyof typeof ICONS;
 export type { IconType };

@@ -2,6 +2,8 @@ interface RawExamData {
   hints: string[];
   topic: string;
   type: string;
+  max_number_of_words: string;
+  total_marks: string;
 }
 
 export interface IQuestion {

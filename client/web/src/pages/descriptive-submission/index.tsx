@@ -5,20 +5,20 @@ import Icon from "../../componnets/base/icon";
 import Container from "../../componnets/shared/container";
 import DiffChecker from "../../componnets/shared/diffchecker";
 import { useToast } from "../../hooks/use-toast";
-import { EvaluationCompleted } from "../../interface/evaluation";
+import { Evalution } from "../../interface/evaluation";
 import { IQuestion } from "../../interface/question";
 import { paths } from "../../routes/route.constant";
 import {
   getAssesmetsResult,
   getQuestionById,
 } from "../../services/exam.service";
+import ProfanityError from "../../componnets/shared/profanity_error/profanity-error";
+import { questionType } from "../../constants/shared";
 
 const DescriptiveSubmission = () => {
   const [question, setQuestion] = useState<IQuestion | null>(null);
 
-  const [assessment, setAssessment] = useState<EvaluationCompleted | null>(
-    null
-  );
+  const [assessment, setAssessment] = useState<Evalution | null>(null);
   const [loading, setLoading] = useState(false);
 
   const params = useParams();
@@ -59,8 +59,10 @@ const DescriptiveSubmission = () => {
           {question?.raw_exam_data.topic}
         </div>
 
-        <Chip className="capitalize" icon="check">
-          {question?.raw_exam_data.type}
+        <Chip variant={"success"} className="capitalize" icon="file">
+          {question?.raw_exam_data.type
+            ? questionType[question?.raw_exam_data.type] || "--"
+            : "--"}
         </Chip>
       </div>
       {loading ? (
@@ -69,15 +71,20 @@ const DescriptiveSubmission = () => {
           Getting Your Submission
         </div>
       ) : (
-        assessment && (
-          <DiffChecker
-            modifiedText={assessment?.raw_assesment_data.corrected_version}
-            originalText={assessment?.raw_user_submission.content}
-            rating={assessment?.raw_assesment_data.rating}
-            weaknesses={assessment?.raw_assesment_data.weakness}
-            strength={assessment?.raw_assesment_data.strengths}
-          />
-        )
+        <>
+          {assessment?.status === "COMPLETED" ? (
+            <DiffChecker
+              modifiedText={assessment?.raw_assesment_data.corrected_version}
+              originalText={assessment?.raw_user_submission.content}
+              rating={assessment?.raw_assesment_data.rating}
+              weaknesses={assessment?.raw_assesment_data.weaknesses}
+              strength={assessment?.raw_assesment_data.strengths}
+            />
+          ) : null}
+          {assessment?.status === "REJECTED" ? (
+            <ProfanityError data={assessment} />
+          ) : null}
+        </>
       )}
     </Container>
   );
