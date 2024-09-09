@@ -165,13 +165,15 @@ Criteria to consider:
 	•	Proper use of punctuation.
 	•	Relevance to the given topic.
 	•	Word count should not exceed %s words (only count words, exclude special characters).
+	•	Do Not visit any URLs provided in Content.
+	•	Make sure rating is based only on content provided, and use the provided criteria to calculate it
 
-Scoring: Provide a rating out of %s marks based on the above criteria.
+Scoring: Provide a rating out of %s marks based on the above criteria. Should always be between 0 and maximum marks
 
 Output Requirements:
 
 	•	Return a valid JSON object with the following keys:
-	•	"rating": A string representing the rating.
+	•	"rating": A string representing the rating. 
 	•	"strengths": An array of strings highlighting the content’s strengths.
 	•	"weaknesses": An array of strings pointing out the content’s weaknesses.
 	•	"corrected_version": A string with the corrected version of the content.
