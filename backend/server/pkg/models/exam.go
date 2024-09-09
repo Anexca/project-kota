@@ -29,10 +29,10 @@ type GeneratedExamOverview struct {
 }
 
 type DescriptiveExamAssessmentResult struct {
-	Rating           string   `json:"rating,omitempty"`
-	Strengths        []string `json:"strengths,omitempty"`
-	Weakness         []string `json:"weakness,omitempty"`
-	CorrectedVersion string   `json:"corrected_version,omitempty"`
+	Rating           string   `json:"rating"`
+	Strengths        []string `json:"strengths"`
+	Weakness         []string `json:"weakness"`
+	CorrectedVersion string   `json:"corrected_version"`
 	ProfanityCheck   string   `json:"profanity_check,omitempty" `
 }
 

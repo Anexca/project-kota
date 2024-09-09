@@ -36,6 +36,6 @@ func main() {
 	log.Println("Starting server on address", server.Addr)
 	err = server.ListenAndServe()
 	if err != nil {
-		log.Fatalln("cannot start server: %s", err)
+		log.Fatalf("cannot start server: %s", err)
 	}
 }

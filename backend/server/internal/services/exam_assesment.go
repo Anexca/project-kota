@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"server/pkg/models"
+	"strings"
 
 	goaway "github.com/TwiN/go-away"
 	"github.com/redis/go-redis/v9"
@@ -145,7 +146,6 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	}
 
 	if goaway.IsProfane(content) {
-		log.Println("content is profane")
 		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
 			"profanity_check": "detected",
 			"profane_content": goaway.ExtractProfanity(content),
@@ -182,6 +182,14 @@ Content to evaluate:
 	if err != nil {
 		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
 		log.Printf("Error getting prompt result: %v", err)
+		return
+	}
+
+	if strings.Contains(response, "FinishReasonSafety") {
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
+			"profanity_check": "detected",
+		}})
+
 		return
 	}
 
