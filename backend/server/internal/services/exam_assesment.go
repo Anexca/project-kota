@@ -4,6 +4,7 @@ import (
 	"common/constants"
 	"common/ent"
 	commonRepositories "common/repositories"
+	commonServices "common/services"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -18,6 +19,7 @@ import (
 type ExamAssesmentService struct {
 	promptService           *PromptService
 	examGenerationService   *ExamGenerationService
+	profanityService        *commonServices.ProfanityService
 	examAttemptRepository   *commonRepositories.ExamAttemptRepository
 	examAssesmentRepository *commonRepositories.ExamAssesmentRepository
 }
@@ -29,12 +31,14 @@ type DescriptiveExamAssesmentRequest struct {
 
 func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *ExamAssesmentService {
 	promptService := NewPromptService()
+	profanityService := commonServices.NewProfanityService()
 	examGenerationService := NewExamGenerationService(redisClient, dbClient)
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examAssesmentRepository := commonRepositories.NewExamAssesmentRepository(dbClient)
 
 	return &ExamAssesmentService{
 		promptService:           promptService,
+		profanityService:        profanityService,
 		examGenerationService:   examGenerationService,
 		examAttemptRepository:   examAttemptRepository,
 		examAssesmentRepository: examAssesmentRepository,
@@ -145,7 +149,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		return
 	}
 
-	if goaway.IsProfane(content) {
+	if e.profanityService.IsProfane(content) {
 		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
 			"profanity_check": "detected",
 			"profane_content": goaway.ExtractProfanity(content),
