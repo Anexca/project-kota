@@ -2,12 +2,16 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 // https://vitejs.dev/config/
 export default defineConfig({
-    // resolve: {
-    //   alias: {
-    //     '@': path.resolve(__dirname, './src'),
-    //     '@assets': path.resolve(__dirname, './src/assets'),
-    //     '@componnets': path.resolve(__dirname, './src/componnets'),
-    //   },
-    // },
+    build: {
+        // Ensure assets are hashed
+        assetsDir: "assets", // Directory to store static assets
+        rollupOptions: {
+            output: {
+                assetFileNames: `assets/[name].[hash][extname]`, // Hash in asset filenames
+                chunkFileNames: `assets/[name].[hash].js`, // Hash in chunk filenames
+                entryFileNames: `assets/[name].[hash].js`, // Hash in entry filenames
+            },
+        },
+    },
     plugins: [react()],
 });

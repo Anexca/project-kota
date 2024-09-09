@@ -2,7 +2,7 @@ export enum paths {
   HOMEPAGE = "home",
   STREAM_SELECT = "streams",
   EXAMS = "exams",
-  DISCRIPTIVE = "discriptive",
+  DISCRIPTIVE = "descriptive",
   MCQ = "mcq",
   LOGIN = "login",
   REGISTER = "register",

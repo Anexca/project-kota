@@ -1,3 +1,4 @@
+import { questionType } from "../../../constants/shared";
 import { Button } from "../../base/button/button";
 import Chip from "../../base/chip";
 import Icon from "../../base/icon";
@@ -33,10 +34,10 @@ const DescriptiveQuestionCard = ({
           <Chip icon="clock" variant={"danger"}>
             {duration} min
           </Chip>
-          <Chip icon="clock" variant={"success"}>
-            {type}
+          <Chip icon="file" variant={"success"}>
+            {questionType[type] || "--"}
           </Chip>
-          <Chip icon="clock" variant={"warning"}>
+          <Chip icon="rotate_right" variant={"warning"}>
             {attempts} Attempt
           </Chip>
         </div>

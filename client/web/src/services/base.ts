@@ -1,5 +1,6 @@
 import axios from "axios";
 import { supabase } from "../supabase/client";
+import useSessionStore from "../store/auth-store";
 
 // Create an axios instance
 const axiosBase = axios.create({
@@ -30,8 +31,13 @@ axiosBase.interceptors.response.use(
     // Handle response data
     return response;
   },
-  (error) => {
+  async (error) => {
     // Handle the response error
+    if (error.response && error.response.status === 401) {
+      await useSessionStore.getState().logout();
+      return;
+    }
+
     return Promise.reject(error);
   }
 );

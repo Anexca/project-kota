@@ -121,7 +121,6 @@ const DescriptiveQuestion = () => {
                 duration={item.duration_seconds / 60}
                 attempts={attempts}
                 showSubmission={() => setSelectedQuestions(item)}
-                // showSubmission={() => showSubmission(item.id)}
               />
             );
           })}
