@@ -33,6 +33,7 @@ type DescriptiveExamAssessmentResult struct {
 	Strengths        []string `json:"strengths,omitempty"`
 	Weakness         []string `json:"weakness,omitempty"`
 	CorrectedVersion string   `json:"corrected_version,omitempty"`
+	ProfanityCheck   string   `json:"profanity_check,omitempty" `
 }
 
 type AssessmentDetails struct {
