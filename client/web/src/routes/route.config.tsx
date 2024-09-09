@@ -12,6 +12,7 @@ import DescriptiveSubmission from "../pages/descriptive-submission";
 import DiscriptiveExam from "../pages/discriptive-exam/discriptive-exam";
 import UserProfile from "../pages/user-profle";
 import SignedInRoute from "./signedin-route";
+import NotFound from "../pages/not-found";
 
 const routes: RouteObject[] = [
   {
@@ -89,6 +90,7 @@ const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
   },
+  { path: "*", element: <NotFound /> },
 ];
 
 export default routes;
