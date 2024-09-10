@@ -7,7 +7,7 @@ const ContactUs = () => {
     <div className="bg-slate-50 min-h-screen">
       <Header />
       <Container>
-        <div className="mt-8">
+        <div className="mt-8 p-4">
           <div className="bg-white shadow rounded-lg p-8 text-center">
             <h1 className="text-2xl font-bold text-center mb-8">Contact Us</h1>
 
