@@ -13,6 +13,10 @@ import DiscriptiveExam from "../pages/discriptive-exam/discriptive-exam";
 import UserProfile from "../pages/user-profle";
 import SignedInRoute from "./signedin-route";
 import NotFound from "../pages/not-found";
+import PricingPlan from "../pages/pricing-plan";
+import TermsOfService from "../pages/terms-of-service";
+import PrivacyPolicy from "../pages/privacy-policy";
+import ContactUs from "../pages/contact-us";
 
 const routes: RouteObject[] = [
   {
@@ -90,6 +94,10 @@ const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
   },
+  { path: "/pricing-plan", element: <PricingPlan /> },
+  { path: "/terms-of-service", element: <TermsOfService /> },
+  { path: "/privacy-policy", element: <PrivacyPolicy /> },
+  { path: "/contact-us", element: <ContactUs /> },
   { path: "*", element: <NotFound /> },
 ];
 

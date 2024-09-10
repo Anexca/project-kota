@@ -13,4 +13,7 @@ export enum paths {
   PROFILE = "profile",
   MY_SUMBISSIONS = "my-submissions",
   SUBMISSION = "submissions",
+  PRIVACY_POLICY = "privacy-policy",
+  TERMS_OF_SERVICE = "terms-of-service",
+  CONTACT_US = "contact-us",
 }
