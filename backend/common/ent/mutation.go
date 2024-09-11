@@ -8344,26 +8344,26 @@ func (m *UserMutation) ResetEdge(name string) error {
 // UserSubscriptionMutation represents an operation that mutates the UserSubscription nodes in the graph.
 type UserSubscriptionMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	start_date          *time.Time
-	end_date            *time.Time
-	is_active           *bool
-	provider_order_id   *string
-	created_at          *time.Time
-	updated_at          *time.Time
-	clearedFields       map[string]struct{}
-	user                *uuid.UUID
-	cleareduser         bool
-	subscription        *int
-	clearedsubscription bool
-	payments            map[int]struct{}
-	removedpayments     map[int]struct{}
-	clearedpayments     bool
-	done                bool
-	oldValue            func(context.Context) (*UserSubscription, error)
-	predicates          []predicate.UserSubscription
+	op                       Op
+	typ                      string
+	id                       *int
+	is_active                *bool
+	start_date               *time.Time
+	end_date                 *time.Time
+	provider_subscription_id *string
+	created_at               *time.Time
+	updated_at               *time.Time
+	clearedFields            map[string]struct{}
+	user                     *uuid.UUID
+	cleareduser              bool
+	subscription             *int
+	clearedsubscription      bool
+	payments                 map[int]struct{}
+	removedpayments          map[int]struct{}
+	clearedpayments          bool
+	done                     bool
+	oldValue                 func(context.Context) (*UserSubscription, error)
+	predicates               []predicate.UserSubscription
 }
 
 var _ ent.Mutation = (*UserSubscriptionMutation)(nil)
@@ -8464,78 +8464,6 @@ func (m *UserSubscriptionMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetStartDate sets the "start_date" field.
-func (m *UserSubscriptionMutation) SetStartDate(t time.Time) {
-	m.start_date = &t
-}
-
-// StartDate returns the value of the "start_date" field in the mutation.
-func (m *UserSubscriptionMutation) StartDate() (r time.Time, exists bool) {
-	v := m.start_date
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStartDate returns the old "start_date" field's value of the UserSubscription entity.
-// If the UserSubscription object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserSubscriptionMutation) OldStartDate(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStartDate is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStartDate requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStartDate: %w", err)
-	}
-	return oldValue.StartDate, nil
-}
-
-// ResetStartDate resets all changes to the "start_date" field.
-func (m *UserSubscriptionMutation) ResetStartDate() {
-	m.start_date = nil
-}
-
-// SetEndDate sets the "end_date" field.
-func (m *UserSubscriptionMutation) SetEndDate(t time.Time) {
-	m.end_date = &t
-}
-
-// EndDate returns the value of the "end_date" field in the mutation.
-func (m *UserSubscriptionMutation) EndDate() (r time.Time, exists bool) {
-	v := m.end_date
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEndDate returns the old "end_date" field's value of the UserSubscription entity.
-// If the UserSubscription object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserSubscriptionMutation) OldEndDate(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEndDate is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEndDate requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEndDate: %w", err)
-	}
-	return oldValue.EndDate, nil
-}
-
-// ResetEndDate resets all changes to the "end_date" field.
-func (m *UserSubscriptionMutation) ResetEndDate() {
-	m.end_date = nil
-}
-
 // SetIsActive sets the "is_active" field.
 func (m *UserSubscriptionMutation) SetIsActive(b bool) {
 	m.is_active = &b
@@ -8572,40 +8500,138 @@ func (m *UserSubscriptionMutation) ResetIsActive() {
 	m.is_active = nil
 }
 
-// SetProviderOrderID sets the "provider_order_id" field.
-func (m *UserSubscriptionMutation) SetProviderOrderID(s string) {
-	m.provider_order_id = &s
+// SetStartDate sets the "start_date" field.
+func (m *UserSubscriptionMutation) SetStartDate(t time.Time) {
+	m.start_date = &t
 }
 
-// ProviderOrderID returns the value of the "provider_order_id" field in the mutation.
-func (m *UserSubscriptionMutation) ProviderOrderID() (r string, exists bool) {
-	v := m.provider_order_id
+// StartDate returns the value of the "start_date" field in the mutation.
+func (m *UserSubscriptionMutation) StartDate() (r time.Time, exists bool) {
+	v := m.start_date
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldProviderOrderID returns the old "provider_order_id" field's value of the UserSubscription entity.
+// OldStartDate returns the old "start_date" field's value of the UserSubscription entity.
 // If the UserSubscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserSubscriptionMutation) OldProviderOrderID(ctx context.Context) (v string, err error) {
+func (m *UserSubscriptionMutation) OldStartDate(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProviderOrderID is only allowed on UpdateOne operations")
+		return v, errors.New("OldStartDate is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProviderOrderID requires an ID field in the mutation")
+		return v, errors.New("OldStartDate requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProviderOrderID: %w", err)
+		return v, fmt.Errorf("querying old value for OldStartDate: %w", err)
 	}
-	return oldValue.ProviderOrderID, nil
+	return oldValue.StartDate, nil
 }
 
-// ResetProviderOrderID resets all changes to the "provider_order_id" field.
-func (m *UserSubscriptionMutation) ResetProviderOrderID() {
-	m.provider_order_id = nil
+// ClearStartDate clears the value of the "start_date" field.
+func (m *UserSubscriptionMutation) ClearStartDate() {
+	m.start_date = nil
+	m.clearedFields[usersubscription.FieldStartDate] = struct{}{}
+}
+
+// StartDateCleared returns if the "start_date" field was cleared in this mutation.
+func (m *UserSubscriptionMutation) StartDateCleared() bool {
+	_, ok := m.clearedFields[usersubscription.FieldStartDate]
+	return ok
+}
+
+// ResetStartDate resets all changes to the "start_date" field.
+func (m *UserSubscriptionMutation) ResetStartDate() {
+	m.start_date = nil
+	delete(m.clearedFields, usersubscription.FieldStartDate)
+}
+
+// SetEndDate sets the "end_date" field.
+func (m *UserSubscriptionMutation) SetEndDate(t time.Time) {
+	m.end_date = &t
+}
+
+// EndDate returns the value of the "end_date" field in the mutation.
+func (m *UserSubscriptionMutation) EndDate() (r time.Time, exists bool) {
+	v := m.end_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndDate returns the old "end_date" field's value of the UserSubscription entity.
+// If the UserSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserSubscriptionMutation) OldEndDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndDate: %w", err)
+	}
+	return oldValue.EndDate, nil
+}
+
+// ClearEndDate clears the value of the "end_date" field.
+func (m *UserSubscriptionMutation) ClearEndDate() {
+	m.end_date = nil
+	m.clearedFields[usersubscription.FieldEndDate] = struct{}{}
+}
+
+// EndDateCleared returns if the "end_date" field was cleared in this mutation.
+func (m *UserSubscriptionMutation) EndDateCleared() bool {
+	_, ok := m.clearedFields[usersubscription.FieldEndDate]
+	return ok
+}
+
+// ResetEndDate resets all changes to the "end_date" field.
+func (m *UserSubscriptionMutation) ResetEndDate() {
+	m.end_date = nil
+	delete(m.clearedFields, usersubscription.FieldEndDate)
+}
+
+// SetProviderSubscriptionID sets the "provider_subscription_id" field.
+func (m *UserSubscriptionMutation) SetProviderSubscriptionID(s string) {
+	m.provider_subscription_id = &s
+}
+
+// ProviderSubscriptionID returns the value of the "provider_subscription_id" field in the mutation.
+func (m *UserSubscriptionMutation) ProviderSubscriptionID() (r string, exists bool) {
+	v := m.provider_subscription_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProviderSubscriptionID returns the old "provider_subscription_id" field's value of the UserSubscription entity.
+// If the UserSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserSubscriptionMutation) OldProviderSubscriptionID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProviderSubscriptionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProviderSubscriptionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProviderSubscriptionID: %w", err)
+	}
+	return oldValue.ProviderSubscriptionID, nil
+}
+
+// ResetProviderSubscriptionID resets all changes to the "provider_subscription_id" field.
+func (m *UserSubscriptionMutation) ResetProviderSubscriptionID() {
+	m.provider_subscription_id = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -8847,17 +8873,17 @@ func (m *UserSubscriptionMutation) Type() string {
 // AddedFields().
 func (m *UserSubscriptionMutation) Fields() []string {
 	fields := make([]string, 0, 6)
+	if m.is_active != nil {
+		fields = append(fields, usersubscription.FieldIsActive)
+	}
 	if m.start_date != nil {
 		fields = append(fields, usersubscription.FieldStartDate)
 	}
 	if m.end_date != nil {
 		fields = append(fields, usersubscription.FieldEndDate)
 	}
-	if m.is_active != nil {
-		fields = append(fields, usersubscription.FieldIsActive)
-	}
-	if m.provider_order_id != nil {
-		fields = append(fields, usersubscription.FieldProviderOrderID)
+	if m.provider_subscription_id != nil {
+		fields = append(fields, usersubscription.FieldProviderSubscriptionID)
 	}
 	if m.created_at != nil {
 		fields = append(fields, usersubscription.FieldCreatedAt)
@@ -8873,14 +8899,14 @@ func (m *UserSubscriptionMutation) Fields() []string {
 // schema.
 func (m *UserSubscriptionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case usersubscription.FieldIsActive:
+		return m.IsActive()
 	case usersubscription.FieldStartDate:
 		return m.StartDate()
 	case usersubscription.FieldEndDate:
 		return m.EndDate()
-	case usersubscription.FieldIsActive:
-		return m.IsActive()
-	case usersubscription.FieldProviderOrderID:
-		return m.ProviderOrderID()
+	case usersubscription.FieldProviderSubscriptionID:
+		return m.ProviderSubscriptionID()
 	case usersubscription.FieldCreatedAt:
 		return m.CreatedAt()
 	case usersubscription.FieldUpdatedAt:
@@ -8894,14 +8920,14 @@ func (m *UserSubscriptionMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *UserSubscriptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case usersubscription.FieldIsActive:
+		return m.OldIsActive(ctx)
 	case usersubscription.FieldStartDate:
 		return m.OldStartDate(ctx)
 	case usersubscription.FieldEndDate:
 		return m.OldEndDate(ctx)
-	case usersubscription.FieldIsActive:
-		return m.OldIsActive(ctx)
-	case usersubscription.FieldProviderOrderID:
-		return m.OldProviderOrderID(ctx)
+	case usersubscription.FieldProviderSubscriptionID:
+		return m.OldProviderSubscriptionID(ctx)
 	case usersubscription.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case usersubscription.FieldUpdatedAt:
@@ -8915,6 +8941,13 @@ func (m *UserSubscriptionMutation) OldField(ctx context.Context, name string) (e
 // type.
 func (m *UserSubscriptionMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case usersubscription.FieldIsActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsActive(v)
+		return nil
 	case usersubscription.FieldStartDate:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -8929,19 +8962,12 @@ func (m *UserSubscriptionMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetEndDate(v)
 		return nil
-	case usersubscription.FieldIsActive:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsActive(v)
-		return nil
-	case usersubscription.FieldProviderOrderID:
+	case usersubscription.FieldProviderSubscriptionID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetProviderOrderID(v)
+		m.SetProviderSubscriptionID(v)
 		return nil
 	case usersubscription.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -8986,7 +9012,14 @@ func (m *UserSubscriptionMutation) AddField(name string, value ent.Value) error 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserSubscriptionMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(usersubscription.FieldStartDate) {
+		fields = append(fields, usersubscription.FieldStartDate)
+	}
+	if m.FieldCleared(usersubscription.FieldEndDate) {
+		fields = append(fields, usersubscription.FieldEndDate)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -8999,6 +9032,14 @@ func (m *UserSubscriptionMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserSubscriptionMutation) ClearField(name string) error {
+	switch name {
+	case usersubscription.FieldStartDate:
+		m.ClearStartDate()
+		return nil
+	case usersubscription.FieldEndDate:
+		m.ClearEndDate()
+		return nil
+	}
 	return fmt.Errorf("unknown UserSubscription nullable field %s", name)
 }
 
@@ -9006,17 +9047,17 @@ func (m *UserSubscriptionMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *UserSubscriptionMutation) ResetField(name string) error {
 	switch name {
+	case usersubscription.FieldIsActive:
+		m.ResetIsActive()
+		return nil
 	case usersubscription.FieldStartDate:
 		m.ResetStartDate()
 		return nil
 	case usersubscription.FieldEndDate:
 		m.ResetEndDate()
 		return nil
-	case usersubscription.FieldIsActive:
-		m.ResetIsActive()
-		return nil
-	case usersubscription.FieldProviderOrderID:
-		m.ResetProviderOrderID()
+	case usersubscription.FieldProviderSubscriptionID:
+		m.ResetProviderSubscriptionID()
 		return nil
 	case usersubscription.FieldCreatedAt:
 		m.ResetCreatedAt()

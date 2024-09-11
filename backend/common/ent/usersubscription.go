@@ -20,14 +20,14 @@ type UserSubscription struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// IsActive holds the value of the "is_active" field.
+	IsActive bool `json:"is_active,omitempty"`
 	// StartDate holds the value of the "start_date" field.
 	StartDate time.Time `json:"start_date,omitempty"`
 	// EndDate holds the value of the "end_date" field.
 	EndDate time.Time `json:"end_date,omitempty"`
-	// IsActive holds the value of the "is_active" field.
-	IsActive bool `json:"is_active,omitempty"`
-	// ProviderOrderID holds the value of the "provider_order_id" field.
-	ProviderOrderID string `json:"provider_order_id,omitempty"`
+	// ProviderSubscriptionID holds the value of the "provider_subscription_id" field.
+	ProviderSubscriptionID string `json:"provider_subscription_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -93,7 +93,7 @@ func (*UserSubscription) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case usersubscription.FieldID:
 			values[i] = new(sql.NullInt64)
-		case usersubscription.FieldProviderOrderID:
+		case usersubscription.FieldProviderSubscriptionID:
 			values[i] = new(sql.NullString)
 		case usersubscription.FieldStartDate, usersubscription.FieldEndDate, usersubscription.FieldCreatedAt, usersubscription.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -122,6 +122,12 @@ func (us *UserSubscription) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			us.ID = int(value.Int64)
+		case usersubscription.FieldIsActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_active", values[i])
+			} else if value.Valid {
+				us.IsActive = value.Bool
+			}
 		case usersubscription.FieldStartDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field start_date", values[i])
@@ -134,17 +140,11 @@ func (us *UserSubscription) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				us.EndDate = value.Time
 			}
-		case usersubscription.FieldIsActive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_active", values[i])
-			} else if value.Valid {
-				us.IsActive = value.Bool
-			}
-		case usersubscription.FieldProviderOrderID:
+		case usersubscription.FieldProviderSubscriptionID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field provider_order_id", values[i])
+				return fmt.Errorf("unexpected type %T for field provider_subscription_id", values[i])
 			} else if value.Valid {
-				us.ProviderOrderID = value.String
+				us.ProviderSubscriptionID = value.String
 			}
 		case usersubscription.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -223,17 +223,17 @@ func (us *UserSubscription) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserSubscription(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", us.ID))
+	builder.WriteString("is_active=")
+	builder.WriteString(fmt.Sprintf("%v", us.IsActive))
+	builder.WriteString(", ")
 	builder.WriteString("start_date=")
 	builder.WriteString(us.StartDate.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("end_date=")
 	builder.WriteString(us.EndDate.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("is_active=")
-	builder.WriteString(fmt.Sprintf("%v", us.IsActive))
-	builder.WriteString(", ")
-	builder.WriteString("provider_order_id=")
-	builder.WriteString(us.ProviderOrderID)
+	builder.WriteString("provider_subscription_id=")
+	builder.WriteString(us.ProviderSubscriptionID)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(us.CreatedAt.Format(time.ANSIC))

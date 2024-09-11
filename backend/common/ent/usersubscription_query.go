@@ -373,12 +373,12 @@ func (usq *UserSubscriptionQuery) WithPayments(opts ...func(*PaymentQuery)) *Use
 // Example:
 //
 //	var v []struct {
-//		StartDate time.Time `json:"start_date,omitempty"`
+//		IsActive bool `json:"is_active,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.UserSubscription.Query().
-//		GroupBy(usersubscription.FieldStartDate).
+//		GroupBy(usersubscription.FieldIsActive).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (usq *UserSubscriptionQuery) GroupBy(field string, fields ...string) *UserSubscriptionGroupBy {
@@ -396,11 +396,11 @@ func (usq *UserSubscriptionQuery) GroupBy(field string, fields ...string) *UserS
 // Example:
 //
 //	var v []struct {
-//		StartDate time.Time `json:"start_date,omitempty"`
+//		IsActive bool `json:"is_active,omitempty"`
 //	}
 //
 //	client.UserSubscription.Query().
-//		Select(usersubscription.FieldStartDate).
+//		Select(usersubscription.FieldIsActive).
 //		Scan(ctx, &v)
 func (usq *UserSubscriptionQuery) Select(fields ...string) *UserSubscriptionSelect {
 	usq.ctx.Fields = append(usq.ctx.Fields, fields...)

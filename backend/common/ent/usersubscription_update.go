@@ -32,6 +32,20 @@ func (usu *UserSubscriptionUpdate) Where(ps ...predicate.UserSubscription) *User
 	return usu
 }
 
+// SetIsActive sets the "is_active" field.
+func (usu *UserSubscriptionUpdate) SetIsActive(b bool) *UserSubscriptionUpdate {
+	usu.mutation.SetIsActive(b)
+	return usu
+}
+
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (usu *UserSubscriptionUpdate) SetNillableIsActive(b *bool) *UserSubscriptionUpdate {
+	if b != nil {
+		usu.SetIsActive(*b)
+	}
+	return usu
+}
+
 // SetStartDate sets the "start_date" field.
 func (usu *UserSubscriptionUpdate) SetStartDate(t time.Time) *UserSubscriptionUpdate {
 	usu.mutation.SetStartDate(t)
@@ -43,6 +57,12 @@ func (usu *UserSubscriptionUpdate) SetNillableStartDate(t *time.Time) *UserSubsc
 	if t != nil {
 		usu.SetStartDate(*t)
 	}
+	return usu
+}
+
+// ClearStartDate clears the value of the "start_date" field.
+func (usu *UserSubscriptionUpdate) ClearStartDate() *UserSubscriptionUpdate {
+	usu.mutation.ClearStartDate()
 	return usu
 }
 
@@ -60,30 +80,22 @@ func (usu *UserSubscriptionUpdate) SetNillableEndDate(t *time.Time) *UserSubscri
 	return usu
 }
 
-// SetIsActive sets the "is_active" field.
-func (usu *UserSubscriptionUpdate) SetIsActive(b bool) *UserSubscriptionUpdate {
-	usu.mutation.SetIsActive(b)
+// ClearEndDate clears the value of the "end_date" field.
+func (usu *UserSubscriptionUpdate) ClearEndDate() *UserSubscriptionUpdate {
+	usu.mutation.ClearEndDate()
 	return usu
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (usu *UserSubscriptionUpdate) SetNillableIsActive(b *bool) *UserSubscriptionUpdate {
-	if b != nil {
-		usu.SetIsActive(*b)
-	}
+// SetProviderSubscriptionID sets the "provider_subscription_id" field.
+func (usu *UserSubscriptionUpdate) SetProviderSubscriptionID(s string) *UserSubscriptionUpdate {
+	usu.mutation.SetProviderSubscriptionID(s)
 	return usu
 }
 
-// SetProviderOrderID sets the "provider_order_id" field.
-func (usu *UserSubscriptionUpdate) SetProviderOrderID(s string) *UserSubscriptionUpdate {
-	usu.mutation.SetProviderOrderID(s)
-	return usu
-}
-
-// SetNillableProviderOrderID sets the "provider_order_id" field if the given value is not nil.
-func (usu *UserSubscriptionUpdate) SetNillableProviderOrderID(s *string) *UserSubscriptionUpdate {
+// SetNillableProviderSubscriptionID sets the "provider_subscription_id" field if the given value is not nil.
+func (usu *UserSubscriptionUpdate) SetNillableProviderSubscriptionID(s *string) *UserSubscriptionUpdate {
 	if s != nil {
-		usu.SetProviderOrderID(*s)
+		usu.SetProviderSubscriptionID(*s)
 	}
 	return usu
 }
@@ -230,17 +242,23 @@ func (usu *UserSubscriptionUpdate) sqlSave(ctx context.Context) (n int, err erro
 			}
 		}
 	}
+	if value, ok := usu.mutation.IsActive(); ok {
+		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
+	}
 	if value, ok := usu.mutation.StartDate(); ok {
 		_spec.SetField(usersubscription.FieldStartDate, field.TypeTime, value)
+	}
+	if usu.mutation.StartDateCleared() {
+		_spec.ClearField(usersubscription.FieldStartDate, field.TypeTime)
 	}
 	if value, ok := usu.mutation.EndDate(); ok {
 		_spec.SetField(usersubscription.FieldEndDate, field.TypeTime, value)
 	}
-	if value, ok := usu.mutation.IsActive(); ok {
-		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
+	if usu.mutation.EndDateCleared() {
+		_spec.ClearField(usersubscription.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := usu.mutation.ProviderOrderID(); ok {
-		_spec.SetField(usersubscription.FieldProviderOrderID, field.TypeString, value)
+	if value, ok := usu.mutation.ProviderSubscriptionID(); ok {
+		_spec.SetField(usersubscription.FieldProviderSubscriptionID, field.TypeString, value)
 	}
 	if value, ok := usu.mutation.UpdatedAt(); ok {
 		_spec.SetField(usersubscription.FieldUpdatedAt, field.TypeTime, value)
@@ -368,6 +386,20 @@ type UserSubscriptionUpdateOne struct {
 	mutation *UserSubscriptionMutation
 }
 
+// SetIsActive sets the "is_active" field.
+func (usuo *UserSubscriptionUpdateOne) SetIsActive(b bool) *UserSubscriptionUpdateOne {
+	usuo.mutation.SetIsActive(b)
+	return usuo
+}
+
+// SetNillableIsActive sets the "is_active" field if the given value is not nil.
+func (usuo *UserSubscriptionUpdateOne) SetNillableIsActive(b *bool) *UserSubscriptionUpdateOne {
+	if b != nil {
+		usuo.SetIsActive(*b)
+	}
+	return usuo
+}
+
 // SetStartDate sets the "start_date" field.
 func (usuo *UserSubscriptionUpdateOne) SetStartDate(t time.Time) *UserSubscriptionUpdateOne {
 	usuo.mutation.SetStartDate(t)
@@ -379,6 +411,12 @@ func (usuo *UserSubscriptionUpdateOne) SetNillableStartDate(t *time.Time) *UserS
 	if t != nil {
 		usuo.SetStartDate(*t)
 	}
+	return usuo
+}
+
+// ClearStartDate clears the value of the "start_date" field.
+func (usuo *UserSubscriptionUpdateOne) ClearStartDate() *UserSubscriptionUpdateOne {
+	usuo.mutation.ClearStartDate()
 	return usuo
 }
 
@@ -396,30 +434,22 @@ func (usuo *UserSubscriptionUpdateOne) SetNillableEndDate(t *time.Time) *UserSub
 	return usuo
 }
 
-// SetIsActive sets the "is_active" field.
-func (usuo *UserSubscriptionUpdateOne) SetIsActive(b bool) *UserSubscriptionUpdateOne {
-	usuo.mutation.SetIsActive(b)
+// ClearEndDate clears the value of the "end_date" field.
+func (usuo *UserSubscriptionUpdateOne) ClearEndDate() *UserSubscriptionUpdateOne {
+	usuo.mutation.ClearEndDate()
 	return usuo
 }
 
-// SetNillableIsActive sets the "is_active" field if the given value is not nil.
-func (usuo *UserSubscriptionUpdateOne) SetNillableIsActive(b *bool) *UserSubscriptionUpdateOne {
-	if b != nil {
-		usuo.SetIsActive(*b)
-	}
+// SetProviderSubscriptionID sets the "provider_subscription_id" field.
+func (usuo *UserSubscriptionUpdateOne) SetProviderSubscriptionID(s string) *UserSubscriptionUpdateOne {
+	usuo.mutation.SetProviderSubscriptionID(s)
 	return usuo
 }
 
-// SetProviderOrderID sets the "provider_order_id" field.
-func (usuo *UserSubscriptionUpdateOne) SetProviderOrderID(s string) *UserSubscriptionUpdateOne {
-	usuo.mutation.SetProviderOrderID(s)
-	return usuo
-}
-
-// SetNillableProviderOrderID sets the "provider_order_id" field if the given value is not nil.
-func (usuo *UserSubscriptionUpdateOne) SetNillableProviderOrderID(s *string) *UserSubscriptionUpdateOne {
+// SetNillableProviderSubscriptionID sets the "provider_subscription_id" field if the given value is not nil.
+func (usuo *UserSubscriptionUpdateOne) SetNillableProviderSubscriptionID(s *string) *UserSubscriptionUpdateOne {
 	if s != nil {
-		usuo.SetProviderOrderID(*s)
+		usuo.SetProviderSubscriptionID(*s)
 	}
 	return usuo
 }
@@ -596,17 +626,23 @@ func (usuo *UserSubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *User
 			}
 		}
 	}
+	if value, ok := usuo.mutation.IsActive(); ok {
+		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
+	}
 	if value, ok := usuo.mutation.StartDate(); ok {
 		_spec.SetField(usersubscription.FieldStartDate, field.TypeTime, value)
+	}
+	if usuo.mutation.StartDateCleared() {
+		_spec.ClearField(usersubscription.FieldStartDate, field.TypeTime)
 	}
 	if value, ok := usuo.mutation.EndDate(); ok {
 		_spec.SetField(usersubscription.FieldEndDate, field.TypeTime, value)
 	}
-	if value, ok := usuo.mutation.IsActive(); ok {
-		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
+	if usuo.mutation.EndDateCleared() {
+		_spec.ClearField(usersubscription.FieldEndDate, field.TypeTime)
 	}
-	if value, ok := usuo.mutation.ProviderOrderID(); ok {
-		_spec.SetField(usersubscription.FieldProviderOrderID, field.TypeString, value)
+	if value, ok := usuo.mutation.ProviderSubscriptionID(); ok {
+		_spec.SetField(usersubscription.FieldProviderSubscriptionID, field.TypeString, value)
 	}
 	if value, ok := usuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(usersubscription.FieldUpdatedAt, field.TypeTime, value)

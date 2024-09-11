@@ -6,23 +6,23 @@ type PaymentService struct {
 	paymentClient *razorpay.Client
 }
 
+type CreateSubscriptionModel struct {
+	ProviderPlanId     string
+	TotalBillingCycles int
+}
+
 func NewPaymentService(paymentClient *razorpay.Client) *PaymentService {
 	return &PaymentService{
 		paymentClient: paymentClient,
 	}
 }
 
-func (p *PaymentService) CreateOrder() (map[string]interface{}, error) {
+func (p *PaymentService) CreateSubscription(model CreateSubscriptionModel) (map[string]interface{}, error) {
 	data := map[string]interface{}{
-		"amount":          50000,
-		"currency":        "INR",
-		"receipt":         "some_receipt_id",
-		"partial_payment": false,
-		"notes": map[string]interface{}{
-			"key1": "value1",
-			"key2": "value2",
-		},
+		"plan_id":         model.ProviderPlanId,
+		"total_count":     model.TotalBillingCycles,
+		"customer_notify": 1,
 	}
 
-	return p.paymentClient.Order.Create(data, nil)
+	return p.paymentClient.Subscription.Create(data, nil)
 }

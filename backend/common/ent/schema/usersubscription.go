@@ -16,10 +16,10 @@ type UserSubscription struct {
 // Fields of the UserSubscription.
 func (UserSubscription) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("start_date"),
-		field.Time("end_date"),
 		field.Bool("is_active"),
-		field.String("provider_order_id").Unique(),
+		field.Time("start_date").Optional(),
+		field.Time("end_date").Optional(),
+		field.String("provider_subscription_id").Unique(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

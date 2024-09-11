@@ -24,9 +24,23 @@ type UserSubscriptionCreate struct {
 	hooks    []Hook
 }
 
+// SetIsActive sets the "is_active" field.
+func (usc *UserSubscriptionCreate) SetIsActive(b bool) *UserSubscriptionCreate {
+	usc.mutation.SetIsActive(b)
+	return usc
+}
+
 // SetStartDate sets the "start_date" field.
 func (usc *UserSubscriptionCreate) SetStartDate(t time.Time) *UserSubscriptionCreate {
 	usc.mutation.SetStartDate(t)
+	return usc
+}
+
+// SetNillableStartDate sets the "start_date" field if the given value is not nil.
+func (usc *UserSubscriptionCreate) SetNillableStartDate(t *time.Time) *UserSubscriptionCreate {
+	if t != nil {
+		usc.SetStartDate(*t)
+	}
 	return usc
 }
 
@@ -36,15 +50,17 @@ func (usc *UserSubscriptionCreate) SetEndDate(t time.Time) *UserSubscriptionCrea
 	return usc
 }
 
-// SetIsActive sets the "is_active" field.
-func (usc *UserSubscriptionCreate) SetIsActive(b bool) *UserSubscriptionCreate {
-	usc.mutation.SetIsActive(b)
+// SetNillableEndDate sets the "end_date" field if the given value is not nil.
+func (usc *UserSubscriptionCreate) SetNillableEndDate(t *time.Time) *UserSubscriptionCreate {
+	if t != nil {
+		usc.SetEndDate(*t)
+	}
 	return usc
 }
 
-// SetProviderOrderID sets the "provider_order_id" field.
-func (usc *UserSubscriptionCreate) SetProviderOrderID(s string) *UserSubscriptionCreate {
-	usc.mutation.SetProviderOrderID(s)
+// SetProviderSubscriptionID sets the "provider_subscription_id" field.
+func (usc *UserSubscriptionCreate) SetProviderSubscriptionID(s string) *UserSubscriptionCreate {
+	usc.mutation.SetProviderSubscriptionID(s)
 	return usc
 }
 
@@ -176,17 +192,11 @@ func (usc *UserSubscriptionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (usc *UserSubscriptionCreate) check() error {
-	if _, ok := usc.mutation.StartDate(); !ok {
-		return &ValidationError{Name: "start_date", err: errors.New(`ent: missing required field "UserSubscription.start_date"`)}
-	}
-	if _, ok := usc.mutation.EndDate(); !ok {
-		return &ValidationError{Name: "end_date", err: errors.New(`ent: missing required field "UserSubscription.end_date"`)}
-	}
 	if _, ok := usc.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "UserSubscription.is_active"`)}
 	}
-	if _, ok := usc.mutation.ProviderOrderID(); !ok {
-		return &ValidationError{Name: "provider_order_id", err: errors.New(`ent: missing required field "UserSubscription.provider_order_id"`)}
+	if _, ok := usc.mutation.ProviderSubscriptionID(); !ok {
+		return &ValidationError{Name: "provider_subscription_id", err: errors.New(`ent: missing required field "UserSubscription.provider_subscription_id"`)}
 	}
 	if _, ok := usc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "UserSubscription.created_at"`)}
@@ -220,6 +230,10 @@ func (usc *UserSubscriptionCreate) createSpec() (*UserSubscription, *sqlgraph.Cr
 		_node = &UserSubscription{config: usc.config}
 		_spec = sqlgraph.NewCreateSpec(usersubscription.Table, sqlgraph.NewFieldSpec(usersubscription.FieldID, field.TypeInt))
 	)
+	if value, ok := usc.mutation.IsActive(); ok {
+		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
+		_node.IsActive = value
+	}
 	if value, ok := usc.mutation.StartDate(); ok {
 		_spec.SetField(usersubscription.FieldStartDate, field.TypeTime, value)
 		_node.StartDate = value
@@ -228,13 +242,9 @@ func (usc *UserSubscriptionCreate) createSpec() (*UserSubscription, *sqlgraph.Cr
 		_spec.SetField(usersubscription.FieldEndDate, field.TypeTime, value)
 		_node.EndDate = value
 	}
-	if value, ok := usc.mutation.IsActive(); ok {
-		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
-		_node.IsActive = value
-	}
-	if value, ok := usc.mutation.ProviderOrderID(); ok {
-		_spec.SetField(usersubscription.FieldProviderOrderID, field.TypeString, value)
-		_node.ProviderOrderID = value
+	if value, ok := usc.mutation.ProviderSubscriptionID(); ok {
+		_spec.SetField(usersubscription.FieldProviderSubscriptionID, field.TypeString, value)
+		_node.ProviderSubscriptionID = value
 	}
 	if value, ok := usc.mutation.CreatedAt(); ok {
 		_spec.SetField(usersubscription.FieldCreatedAt, field.TypeTime, value)

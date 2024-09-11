@@ -14,14 +14,14 @@ const (
 	Label = "user_subscription"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldIsActive holds the string denoting the is_active field in the database.
+	FieldIsActive = "is_active"
 	// FieldStartDate holds the string denoting the start_date field in the database.
 	FieldStartDate = "start_date"
 	// FieldEndDate holds the string denoting the end_date field in the database.
 	FieldEndDate = "end_date"
-	// FieldIsActive holds the string denoting the is_active field in the database.
-	FieldIsActive = "is_active"
-	// FieldProviderOrderID holds the string denoting the provider_order_id field in the database.
-	FieldProviderOrderID = "provider_order_id"
+	// FieldProviderSubscriptionID holds the string denoting the provider_subscription_id field in the database.
+	FieldProviderSubscriptionID = "provider_subscription_id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -60,10 +60,10 @@ const (
 // Columns holds all SQL columns for usersubscription fields.
 var Columns = []string{
 	FieldID,
+	FieldIsActive,
 	FieldStartDate,
 	FieldEndDate,
-	FieldIsActive,
-	FieldProviderOrderID,
+	FieldProviderSubscriptionID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -107,6 +107,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByIsActive orders the results by the is_active field.
+func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
+}
+
 // ByStartDate orders the results by the start_date field.
 func ByStartDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStartDate, opts...).ToFunc()
@@ -117,14 +122,9 @@ func ByEndDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndDate, opts...).ToFunc()
 }
 
-// ByIsActive orders the results by the is_active field.
-func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
-}
-
-// ByProviderOrderID orders the results by the provider_order_id field.
-func ByProviderOrderID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldProviderOrderID, opts...).ToFunc()
+// ByProviderSubscriptionID orders the results by the provider_subscription_id field.
+func ByProviderSubscriptionID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProviderSubscriptionID, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
