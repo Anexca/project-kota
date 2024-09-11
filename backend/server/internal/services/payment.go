@@ -11,6 +11,7 @@ type PaymentService struct {
 type CreateSubscriptionModel struct {
 	ProviderPlanId     string
 	TotalBillingCycles int
+	CustomerId         string
 }
 
 type UpsertPaymentProviderCustomerModel struct {
@@ -51,6 +52,7 @@ func (p *PaymentService) CreateSubscription(model CreateSubscriptionModel) (map[
 		"plan_id":         model.ProviderPlanId,
 		"total_count":     model.TotalBillingCycles,
 		"customer_notify": 1,
+		"customer_id":     model.CustomerId,
 	}
 
 	return p.paymentClient.Subscription.Create(data, nil)

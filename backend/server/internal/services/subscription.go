@@ -11,17 +11,20 @@ import (
 
 type SubscriptionService struct {
 	paymentService             *PaymentService
+	userService                *UserService
 	subscriptionRepository     *commonRepositories.SubscriptionRepository
 	userSubscriptionRepository *commonRepositories.UserSubscriptioRepository
 }
 
 func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client) *SubscriptionService {
 	paymentService := NewPaymentService(paymentClient)
+	userService := NewUserService(dbClient, paymentClient)
 	subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
 	userSubscriptionRepository := commonRepositories.NewUserSubscriptioRepository(dbClient)
 
 	return &SubscriptionService{
 		paymentService:             paymentService,
+		userService:                userService,
 		subscriptionRepository:     subscriptionRepository,
 		userSubscriptionRepository: userSubscriptionRepository,
 	}
@@ -32,6 +35,15 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]*ent.Subscription, 
 }
 
 func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*ent.UserSubscription, error) {
+	user, err := s.userService.GetUser(ctx, userId)
+	if user.PaymentProviderCustomerID == "" {
+		return nil, fmt.Errorf("user %s profile does not have enough data to start subscription", user.Email)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
 	subscription, err := s.subscriptionRepository.GetById(ctx, subscriptionId)
 	if err != nil {
 		return nil, err
@@ -40,6 +52,7 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 	model := CreateSubscriptionModel{
 		ProviderPlanId:     subscription.ProviderPlanID,
 		TotalBillingCycles: 3,
+		CustomerId:         user.PaymentProviderCustomerID,
 	}
 
 	createdSubscription, err := s.paymentService.CreateSubscription(model)
