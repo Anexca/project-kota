@@ -10,7 +10,11 @@ import (
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
+	"common/ent/payment"
+	"common/ent/subscription"
+	"common/ent/subscriptionexam"
 	"common/ent/user"
+	"common/ent/usersubscription"
 	"context"
 	"errors"
 	"fmt"
@@ -80,14 +84,18 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			cachedexam.Table:    cachedexam.ValidColumn,
-			exam.Table:          exam.ValidColumn,
-			examassesment.Table: examassesment.ValidColumn,
-			examattempt.Table:   examattempt.ValidColumn,
-			examcategory.Table:  examcategory.ValidColumn,
-			examsetting.Table:   examsetting.ValidColumn,
-			generatedexam.Table: generatedexam.ValidColumn,
-			user.Table:          user.ValidColumn,
+			cachedexam.Table:       cachedexam.ValidColumn,
+			exam.Table:             exam.ValidColumn,
+			examassesment.Table:    examassesment.ValidColumn,
+			examattempt.Table:      examattempt.ValidColumn,
+			examcategory.Table:     examcategory.ValidColumn,
+			examsetting.Table:      examsetting.ValidColumn,
+			generatedexam.Table:    generatedexam.ValidColumn,
+			payment.Table:          payment.ValidColumn,
+			subscription.Table:     subscription.ValidColumn,
+			subscriptionexam.Table: subscriptionexam.ValidColumn,
+			user.Table:             user.ValidColumn,
+			usersubscription.Table: usersubscription.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

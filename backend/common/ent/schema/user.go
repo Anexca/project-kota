@@ -22,12 +22,16 @@ func (User) Fields() []ent.Field {
 			NotEmpty(),
 		field.String("first_name").Optional(),
 		field.String("last_name").Optional(),
+		field.String("phone_number").Optional(),
+		field.String("payment_provider_customer_id").Optional().Unique(),
 	}
 }
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("attempts", ExamAttempt.Type), // One User can have Many Attempts
+		edge.To("attempts", ExamAttempt.Type),           // One User can have Many Attempts
+		edge.To("subscriptions", UserSubscription.Type), // One User can have many UserSubscriptions
+		edge.To("payments", Payment.Type),               // One User can have many Payments
 	}
 }

@@ -4,7 +4,9 @@ package ent
 
 import (
 	"common/ent/examattempt"
+	"common/ent/payment"
 	"common/ent/user"
+	"common/ent/usersubscription"
 	"context"
 	"errors"
 	"fmt"
@@ -55,6 +57,34 @@ func (uc *UserCreate) SetNillableLastName(s *string) *UserCreate {
 	return uc
 }
 
+// SetPhoneNumber sets the "phone_number" field.
+func (uc *UserCreate) SetPhoneNumber(s string) *UserCreate {
+	uc.mutation.SetPhoneNumber(s)
+	return uc
+}
+
+// SetNillablePhoneNumber sets the "phone_number" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePhoneNumber(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPhoneNumber(*s)
+	}
+	return uc
+}
+
+// SetPaymentProviderCustomerID sets the "payment_provider_customer_id" field.
+func (uc *UserCreate) SetPaymentProviderCustomerID(s string) *UserCreate {
+	uc.mutation.SetPaymentProviderCustomerID(s)
+	return uc
+}
+
+// SetNillablePaymentProviderCustomerID sets the "payment_provider_customer_id" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePaymentProviderCustomerID(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPaymentProviderCustomerID(*s)
+	}
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(u uuid.UUID) *UserCreate {
 	uc.mutation.SetID(u)
@@ -74,6 +104,36 @@ func (uc *UserCreate) AddAttempts(e ...*ExamAttempt) *UserCreate {
 		ids[i] = e[i].ID
 	}
 	return uc.AddAttemptIDs(ids...)
+}
+
+// AddSubscriptionIDs adds the "subscriptions" edge to the UserSubscription entity by IDs.
+func (uc *UserCreate) AddSubscriptionIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSubscriptionIDs(ids...)
+	return uc
+}
+
+// AddSubscriptions adds the "subscriptions" edges to the UserSubscription entity.
+func (uc *UserCreate) AddSubscriptions(u ...*UserSubscription) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddSubscriptionIDs(ids...)
+}
+
+// AddPaymentIDs adds the "payments" edge to the Payment entity by IDs.
+func (uc *UserCreate) AddPaymentIDs(ids ...int) *UserCreate {
+	uc.mutation.AddPaymentIDs(ids...)
+	return uc
+}
+
+// AddPayments adds the "payments" edges to the Payment entity.
+func (uc *UserCreate) AddPayments(p ...*Payment) *UserCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uc.AddPaymentIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -165,6 +225,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldLastName, field.TypeString, value)
 		_node.LastName = value
 	}
+	if value, ok := uc.mutation.PhoneNumber(); ok {
+		_spec.SetField(user.FieldPhoneNumber, field.TypeString, value)
+		_node.PhoneNumber = value
+	}
+	if value, ok := uc.mutation.PaymentProviderCustomerID(); ok {
+		_spec.SetField(user.FieldPaymentProviderCustomerID, field.TypeString, value)
+		_node.PaymentProviderCustomerID = value
+	}
 	if nodes := uc.mutation.AttemptsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -174,6 +242,38 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examattempt.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.SubscriptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SubscriptionsTable,
+			Columns: []string{user.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usersubscription.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.PaymentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.PaymentsTable,
+			Columns: []string{user.PaymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(payment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

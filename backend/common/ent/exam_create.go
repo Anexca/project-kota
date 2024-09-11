@@ -8,6 +8,7 @@ import (
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
+	"common/ent/subscriptionexam"
 	"context"
 	"errors"
 	"fmt"
@@ -95,6 +96,21 @@ func (ec *ExamCreate) SetNillableCategoryID(id *int) *ExamCreate {
 // SetCategory sets the "category" edge to the ExamCategory entity.
 func (ec *ExamCreate) SetCategory(e *ExamCategory) *ExamCreate {
 	return ec.SetCategoryID(e.ID)
+}
+
+// AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by IDs.
+func (ec *ExamCreate) AddSubscriptionIDs(ids ...int) *ExamCreate {
+	ec.mutation.AddSubscriptionIDs(ids...)
+	return ec
+}
+
+// AddSubscriptions adds the "subscriptions" edges to the SubscriptionExam entity.
+func (ec *ExamCreate) AddSubscriptions(s ...*SubscriptionExam) *ExamCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ec.AddSubscriptionIDs(ids...)
 }
 
 // SetSettingID sets the "setting" edge to the ExamSetting entity by ID.
@@ -273,6 +289,22 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.exam_category_exams = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.SubscriptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.SubscriptionsTable,
+			Columns: []string{exam.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subscriptionexam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.SettingIDs(); len(nodes) > 0 {

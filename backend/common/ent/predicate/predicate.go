@@ -27,5 +27,17 @@ type ExamSetting func(*sql.Selector)
 // GeneratedExam is the predicate function for generatedexam builders.
 type GeneratedExam func(*sql.Selector)
 
+// Payment is the predicate function for payment builders.
+type Payment func(*sql.Selector)
+
+// Subscription is the predicate function for subscription builders.
+type Subscription func(*sql.Selector)
+
+// SubscriptionExam is the predicate function for subscriptionexam builders.
+type SubscriptionExam func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserSubscription is the predicate function for usersubscription builders.
+type UserSubscription func(*sql.Selector)
