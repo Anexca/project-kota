@@ -22,6 +22,7 @@ type Server struct {
 	port int
 
 	authService           *services.AuthService
+	userService           *services.UserService
 	redisService          *commonService.RedisService
 	paymentService        *services.PaymentService
 	subscriptionService   *services.SubscriptionService
@@ -34,6 +35,7 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 	logger := commonConfig.SetupLogger()
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 
+	userService := services.NewUserService(dbClient)
 	authService := services.NewAuthService(supabaseClient)
 	redisService := commonService.NewRedisService(redisClient)
 	paymentService := services.NewPaymentService(paymentClient)
@@ -44,6 +46,7 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 
 	NewServer := &Server{
 		port:                  port,
+		userService:           userService,
 		authService:           authService,
 		redisService:          redisService,
 		paymentService:        paymentService,

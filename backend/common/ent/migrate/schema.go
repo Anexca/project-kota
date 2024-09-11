@@ -262,6 +262,8 @@ var (
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "first_name", Type: field.TypeString, Nullable: true},
 		{Name: "last_name", Type: field.TypeString, Nullable: true},
+		{Name: "phone_number", Type: field.TypeString, Nullable: true},
+		{Name: "payment_provider_customer_id", Type: field.TypeString, Unique: true, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

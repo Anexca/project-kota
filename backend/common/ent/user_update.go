@@ -84,6 +84,46 @@ func (uu *UserUpdate) ClearLastName() *UserUpdate {
 	return uu
 }
 
+// SetPhoneNumber sets the "phone_number" field.
+func (uu *UserUpdate) SetPhoneNumber(s string) *UserUpdate {
+	uu.mutation.SetPhoneNumber(s)
+	return uu
+}
+
+// SetNillablePhoneNumber sets the "phone_number" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePhoneNumber(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPhoneNumber(*s)
+	}
+	return uu
+}
+
+// ClearPhoneNumber clears the value of the "phone_number" field.
+func (uu *UserUpdate) ClearPhoneNumber() *UserUpdate {
+	uu.mutation.ClearPhoneNumber()
+	return uu
+}
+
+// SetPaymentProviderCustomerID sets the "payment_provider_customer_id" field.
+func (uu *UserUpdate) SetPaymentProviderCustomerID(s string) *UserUpdate {
+	uu.mutation.SetPaymentProviderCustomerID(s)
+	return uu
+}
+
+// SetNillablePaymentProviderCustomerID sets the "payment_provider_customer_id" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePaymentProviderCustomerID(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPaymentProviderCustomerID(*s)
+	}
+	return uu
+}
+
+// ClearPaymentProviderCustomerID clears the value of the "payment_provider_customer_id" field.
+func (uu *UserUpdate) ClearPaymentProviderCustomerID() *UserUpdate {
+	uu.mutation.ClearPaymentProviderCustomerID()
+	return uu
+}
+
 // AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
 func (uu *UserUpdate) AddAttemptIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddAttemptIDs(ids...)
@@ -260,6 +300,18 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.LastNameCleared() {
 		_spec.ClearField(user.FieldLastName, field.TypeString)
+	}
+	if value, ok := uu.mutation.PhoneNumber(); ok {
+		_spec.SetField(user.FieldPhoneNumber, field.TypeString, value)
+	}
+	if uu.mutation.PhoneNumberCleared() {
+		_spec.ClearField(user.FieldPhoneNumber, field.TypeString)
+	}
+	if value, ok := uu.mutation.PaymentProviderCustomerID(); ok {
+		_spec.SetField(user.FieldPaymentProviderCustomerID, field.TypeString, value)
+	}
+	if uu.mutation.PaymentProviderCustomerIDCleared() {
+		_spec.ClearField(user.FieldPaymentProviderCustomerID, field.TypeString)
 	}
 	if uu.mutation.AttemptsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -470,6 +522,46 @@ func (uuo *UserUpdateOne) ClearLastName() *UserUpdateOne {
 	return uuo
 }
 
+// SetPhoneNumber sets the "phone_number" field.
+func (uuo *UserUpdateOne) SetPhoneNumber(s string) *UserUpdateOne {
+	uuo.mutation.SetPhoneNumber(s)
+	return uuo
+}
+
+// SetNillablePhoneNumber sets the "phone_number" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePhoneNumber(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPhoneNumber(*s)
+	}
+	return uuo
+}
+
+// ClearPhoneNumber clears the value of the "phone_number" field.
+func (uuo *UserUpdateOne) ClearPhoneNumber() *UserUpdateOne {
+	uuo.mutation.ClearPhoneNumber()
+	return uuo
+}
+
+// SetPaymentProviderCustomerID sets the "payment_provider_customer_id" field.
+func (uuo *UserUpdateOne) SetPaymentProviderCustomerID(s string) *UserUpdateOne {
+	uuo.mutation.SetPaymentProviderCustomerID(s)
+	return uuo
+}
+
+// SetNillablePaymentProviderCustomerID sets the "payment_provider_customer_id" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePaymentProviderCustomerID(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPaymentProviderCustomerID(*s)
+	}
+	return uuo
+}
+
+// ClearPaymentProviderCustomerID clears the value of the "payment_provider_customer_id" field.
+func (uuo *UserUpdateOne) ClearPaymentProviderCustomerID() *UserUpdateOne {
+	uuo.mutation.ClearPaymentProviderCustomerID()
+	return uuo
+}
+
 // AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by IDs.
 func (uuo *UserUpdateOne) AddAttemptIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddAttemptIDs(ids...)
@@ -676,6 +768,18 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.LastNameCleared() {
 		_spec.ClearField(user.FieldLastName, field.TypeString)
+	}
+	if value, ok := uuo.mutation.PhoneNumber(); ok {
+		_spec.SetField(user.FieldPhoneNumber, field.TypeString, value)
+	}
+	if uuo.mutation.PhoneNumberCleared() {
+		_spec.ClearField(user.FieldPhoneNumber, field.TypeString)
+	}
+	if value, ok := uuo.mutation.PaymentProviderCustomerID(); ok {
+		_spec.SetField(user.FieldPaymentProviderCustomerID, field.TypeString, value)
+	}
+	if uuo.mutation.PaymentProviderCustomerIDCleared() {
+		_spec.ClearField(user.FieldPaymentProviderCustomerID, field.TypeString)
 	}
 	if uuo.mutation.AttemptsCleared() {
 		edge := &sqlgraph.EdgeSpec{

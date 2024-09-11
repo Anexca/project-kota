@@ -18,6 +18,10 @@ const (
 	FieldFirstName = "first_name"
 	// FieldLastName holds the string denoting the last_name field in the database.
 	FieldLastName = "last_name"
+	// FieldPhoneNumber holds the string denoting the phone_number field in the database.
+	FieldPhoneNumber = "phone_number"
+	// FieldPaymentProviderCustomerID holds the string denoting the payment_provider_customer_id field in the database.
+	FieldPaymentProviderCustomerID = "payment_provider_customer_id"
 	// EdgeAttempts holds the string denoting the attempts edge name in mutations.
 	EdgeAttempts = "attempts"
 	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
@@ -55,6 +59,8 @@ var Columns = []string{
 	FieldEmail,
 	FieldFirstName,
 	FieldLastName,
+	FieldPhoneNumber,
+	FieldPaymentProviderCustomerID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -93,6 +99,16 @@ func ByFirstName(opts ...sql.OrderTermOption) OrderOption {
 // ByLastName orders the results by the last_name field.
 func ByLastName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastName, opts...).ToFunc()
+}
+
+// ByPhoneNumber orders the results by the phone_number field.
+func ByPhoneNumber(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhoneNumber, opts...).ToFunc()
+}
+
+// ByPaymentProviderCustomerID orders the results by the payment_provider_customer_id field.
+func ByPaymentProviderCustomerID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPaymentProviderCustomerID, opts...).ToFunc()
 }
 
 // ByAttemptsCount orders the results by attempts count.

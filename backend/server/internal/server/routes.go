@@ -47,6 +47,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuthMiddleware(s.authService))
 
+		r.Route("/user", func(r chi.Router) {
+			r.Get("/", s.GetUserProfile)
+			r.Put("/", s.UpdateUser)
+		})
+
 		r.Route("/exams", func(r chi.Router) {
 			r.Route("/banking", func(r chi.Router) {
 				r.Get("/descriptive", s.GetBankingDescriptiveQuestions)

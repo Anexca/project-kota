@@ -57,6 +57,34 @@ func (uc *UserCreate) SetNillableLastName(s *string) *UserCreate {
 	return uc
 }
 
+// SetPhoneNumber sets the "phone_number" field.
+func (uc *UserCreate) SetPhoneNumber(s string) *UserCreate {
+	uc.mutation.SetPhoneNumber(s)
+	return uc
+}
+
+// SetNillablePhoneNumber sets the "phone_number" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePhoneNumber(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPhoneNumber(*s)
+	}
+	return uc
+}
+
+// SetPaymentProviderCustomerID sets the "payment_provider_customer_id" field.
+func (uc *UserCreate) SetPaymentProviderCustomerID(s string) *UserCreate {
+	uc.mutation.SetPaymentProviderCustomerID(s)
+	return uc
+}
+
+// SetNillablePaymentProviderCustomerID sets the "payment_provider_customer_id" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePaymentProviderCustomerID(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPaymentProviderCustomerID(*s)
+	}
+	return uc
+}
+
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(u uuid.UUID) *UserCreate {
 	uc.mutation.SetID(u)
@@ -196,6 +224,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.LastName(); ok {
 		_spec.SetField(user.FieldLastName, field.TypeString, value)
 		_node.LastName = value
+	}
+	if value, ok := uc.mutation.PhoneNumber(); ok {
+		_spec.SetField(user.FieldPhoneNumber, field.TypeString, value)
+		_node.PhoneNumber = value
+	}
+	if value, ok := uc.mutation.PaymentProviderCustomerID(); ok {
+		_spec.SetField(user.FieldPaymentProviderCustomerID, field.TypeString, value)
+		_node.PaymentProviderCustomerID = value
 	}
 	if nodes := uc.mutation.AttemptsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

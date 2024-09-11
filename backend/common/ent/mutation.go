@@ -7604,25 +7604,27 @@ func (m *SubscriptionExamMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *uuid.UUID
-	email                *string
-	first_name           *string
-	last_name            *string
-	clearedFields        map[string]struct{}
-	attempts             map[int]struct{}
-	removedattempts      map[int]struct{}
-	clearedattempts      bool
-	subscriptions        map[int]struct{}
-	removedsubscriptions map[int]struct{}
-	clearedsubscriptions bool
-	payments             map[int]struct{}
-	removedpayments      map[int]struct{}
-	clearedpayments      bool
-	done                 bool
-	oldValue             func(context.Context) (*User, error)
-	predicates           []predicate.User
+	op                           Op
+	typ                          string
+	id                           *uuid.UUID
+	email                        *string
+	first_name                   *string
+	last_name                    *string
+	phone_number                 *string
+	payment_provider_customer_id *string
+	clearedFields                map[string]struct{}
+	attempts                     map[int]struct{}
+	removedattempts              map[int]struct{}
+	clearedattempts              bool
+	subscriptions                map[int]struct{}
+	removedsubscriptions         map[int]struct{}
+	clearedsubscriptions         bool
+	payments                     map[int]struct{}
+	removedpayments              map[int]struct{}
+	clearedpayments              bool
+	done                         bool
+	oldValue                     func(context.Context) (*User, error)
+	predicates                   []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -7863,6 +7865,104 @@ func (m *UserMutation) ResetLastName() {
 	delete(m.clearedFields, user.FieldLastName)
 }
 
+// SetPhoneNumber sets the "phone_number" field.
+func (m *UserMutation) SetPhoneNumber(s string) {
+	m.phone_number = &s
+}
+
+// PhoneNumber returns the value of the "phone_number" field in the mutation.
+func (m *UserMutation) PhoneNumber() (r string, exists bool) {
+	v := m.phone_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhoneNumber returns the old "phone_number" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPhoneNumber(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPhoneNumber is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPhoneNumber requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhoneNumber: %w", err)
+	}
+	return oldValue.PhoneNumber, nil
+}
+
+// ClearPhoneNumber clears the value of the "phone_number" field.
+func (m *UserMutation) ClearPhoneNumber() {
+	m.phone_number = nil
+	m.clearedFields[user.FieldPhoneNumber] = struct{}{}
+}
+
+// PhoneNumberCleared returns if the "phone_number" field was cleared in this mutation.
+func (m *UserMutation) PhoneNumberCleared() bool {
+	_, ok := m.clearedFields[user.FieldPhoneNumber]
+	return ok
+}
+
+// ResetPhoneNumber resets all changes to the "phone_number" field.
+func (m *UserMutation) ResetPhoneNumber() {
+	m.phone_number = nil
+	delete(m.clearedFields, user.FieldPhoneNumber)
+}
+
+// SetPaymentProviderCustomerID sets the "payment_provider_customer_id" field.
+func (m *UserMutation) SetPaymentProviderCustomerID(s string) {
+	m.payment_provider_customer_id = &s
+}
+
+// PaymentProviderCustomerID returns the value of the "payment_provider_customer_id" field in the mutation.
+func (m *UserMutation) PaymentProviderCustomerID() (r string, exists bool) {
+	v := m.payment_provider_customer_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPaymentProviderCustomerID returns the old "payment_provider_customer_id" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPaymentProviderCustomerID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPaymentProviderCustomerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPaymentProviderCustomerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPaymentProviderCustomerID: %w", err)
+	}
+	return oldValue.PaymentProviderCustomerID, nil
+}
+
+// ClearPaymentProviderCustomerID clears the value of the "payment_provider_customer_id" field.
+func (m *UserMutation) ClearPaymentProviderCustomerID() {
+	m.payment_provider_customer_id = nil
+	m.clearedFields[user.FieldPaymentProviderCustomerID] = struct{}{}
+}
+
+// PaymentProviderCustomerIDCleared returns if the "payment_provider_customer_id" field was cleared in this mutation.
+func (m *UserMutation) PaymentProviderCustomerIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldPaymentProviderCustomerID]
+	return ok
+}
+
+// ResetPaymentProviderCustomerID resets all changes to the "payment_provider_customer_id" field.
+func (m *UserMutation) ResetPaymentProviderCustomerID() {
+	m.payment_provider_customer_id = nil
+	delete(m.clearedFields, user.FieldPaymentProviderCustomerID)
+}
+
 // AddAttemptIDs adds the "attempts" edge to the ExamAttempt entity by ids.
 func (m *UserMutation) AddAttemptIDs(ids ...int) {
 	if m.attempts == nil {
@@ -8059,7 +8159,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
 	}
@@ -8068,6 +8168,12 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.last_name != nil {
 		fields = append(fields, user.FieldLastName)
+	}
+	if m.phone_number != nil {
+		fields = append(fields, user.FieldPhoneNumber)
+	}
+	if m.payment_provider_customer_id != nil {
+		fields = append(fields, user.FieldPaymentProviderCustomerID)
 	}
 	return fields
 }
@@ -8083,6 +8189,10 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.FirstName()
 	case user.FieldLastName:
 		return m.LastName()
+	case user.FieldPhoneNumber:
+		return m.PhoneNumber()
+	case user.FieldPaymentProviderCustomerID:
+		return m.PaymentProviderCustomerID()
 	}
 	return nil, false
 }
@@ -8098,6 +8208,10 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldFirstName(ctx)
 	case user.FieldLastName:
 		return m.OldLastName(ctx)
+	case user.FieldPhoneNumber:
+		return m.OldPhoneNumber(ctx)
+	case user.FieldPaymentProviderCustomerID:
+		return m.OldPaymentProviderCustomerID(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -8127,6 +8241,20 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLastName(v)
+		return nil
+	case user.FieldPhoneNumber:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhoneNumber(v)
+		return nil
+	case user.FieldPaymentProviderCustomerID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPaymentProviderCustomerID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -8164,6 +8292,12 @@ func (m *UserMutation) ClearedFields() []string {
 	if m.FieldCleared(user.FieldLastName) {
 		fields = append(fields, user.FieldLastName)
 	}
+	if m.FieldCleared(user.FieldPhoneNumber) {
+		fields = append(fields, user.FieldPhoneNumber)
+	}
+	if m.FieldCleared(user.FieldPaymentProviderCustomerID) {
+		fields = append(fields, user.FieldPaymentProviderCustomerID)
+	}
 	return fields
 }
 
@@ -8184,6 +8318,12 @@ func (m *UserMutation) ClearField(name string) error {
 	case user.FieldLastName:
 		m.ClearLastName()
 		return nil
+	case user.FieldPhoneNumber:
+		m.ClearPhoneNumber()
+		return nil
+	case user.FieldPaymentProviderCustomerID:
+		m.ClearPaymentProviderCustomerID()
+		return nil
 	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
@@ -8200,6 +8340,12 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldLastName:
 		m.ResetLastName()
+		return nil
+	case user.FieldPhoneNumber:
+		m.ResetPhoneNumber()
+		return nil
+	case user.FieldPaymentProviderCustomerID:
+		m.ResetPaymentProviderCustomerID()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

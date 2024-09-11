@@ -22,6 +22,8 @@ func (User) Fields() []ent.Field {
 			NotEmpty(),
 		field.String("first_name").Optional(),
 		field.String("last_name").Optional(),
+		field.String("phone_number").Optional(),
+		field.String("payment_provider_customer_id").Optional().Unique(),
 	}
 }
 
