@@ -94,16 +94,28 @@ func (su *SubscriptionUpdate) SetNillableIsActive(b *bool) *SubscriptionUpdate {
 }
 
 // SetName sets the "name" field.
-func (su *SubscriptionUpdate) SetName(b bool) *SubscriptionUpdate {
-	su.mutation.SetName(b)
+func (su *SubscriptionUpdate) SetName(s string) *SubscriptionUpdate {
+	su.mutation.SetName(s)
 	return su
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableName(b *bool) *SubscriptionUpdate {
-	if b != nil {
-		su.SetName(*b)
+func (su *SubscriptionUpdate) SetNillableName(s *string) *SubscriptionUpdate {
+	if s != nil {
+		su.SetName(*s)
 	}
+	return su
+}
+
+// SetRawSubscriptionData sets the "raw_subscription_data" field.
+func (su *SubscriptionUpdate) SetRawSubscriptionData(m map[string]interface{}) *SubscriptionUpdate {
+	su.mutation.SetRawSubscriptionData(m)
+	return su
+}
+
+// ClearRawSubscriptionData clears the value of the "raw_subscription_data" field.
+func (su *SubscriptionUpdate) ClearRawSubscriptionData() *SubscriptionUpdate {
+	su.mutation.ClearRawSubscriptionData()
 	return su
 }
 
@@ -251,7 +263,13 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(subscription.FieldIsActive, field.TypeBool, value)
 	}
 	if value, ok := su.mutation.Name(); ok {
-		_spec.SetField(subscription.FieldName, field.TypeBool, value)
+		_spec.SetField(subscription.FieldName, field.TypeString, value)
+	}
+	if value, ok := su.mutation.RawSubscriptionData(); ok {
+		_spec.SetField(subscription.FieldRawSubscriptionData, field.TypeJSON, value)
+	}
+	if su.mutation.RawSubscriptionDataCleared() {
+		_spec.ClearField(subscription.FieldRawSubscriptionData, field.TypeJSON)
 	}
 	if value, ok := su.mutation.UpdatedAt(); ok {
 		_spec.SetField(subscription.FieldUpdatedAt, field.TypeTime, value)
@@ -430,16 +448,28 @@ func (suo *SubscriptionUpdateOne) SetNillableIsActive(b *bool) *SubscriptionUpda
 }
 
 // SetName sets the "name" field.
-func (suo *SubscriptionUpdateOne) SetName(b bool) *SubscriptionUpdateOne {
-	suo.mutation.SetName(b)
+func (suo *SubscriptionUpdateOne) SetName(s string) *SubscriptionUpdateOne {
+	suo.mutation.SetName(s)
 	return suo
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableName(b *bool) *SubscriptionUpdateOne {
-	if b != nil {
-		suo.SetName(*b)
+func (suo *SubscriptionUpdateOne) SetNillableName(s *string) *SubscriptionUpdateOne {
+	if s != nil {
+		suo.SetName(*s)
 	}
+	return suo
+}
+
+// SetRawSubscriptionData sets the "raw_subscription_data" field.
+func (suo *SubscriptionUpdateOne) SetRawSubscriptionData(m map[string]interface{}) *SubscriptionUpdateOne {
+	suo.mutation.SetRawSubscriptionData(m)
+	return suo
+}
+
+// ClearRawSubscriptionData clears the value of the "raw_subscription_data" field.
+func (suo *SubscriptionUpdateOne) ClearRawSubscriptionData() *SubscriptionUpdateOne {
+	suo.mutation.ClearRawSubscriptionData()
 	return suo
 }
 
@@ -617,7 +647,13 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		_spec.SetField(subscription.FieldIsActive, field.TypeBool, value)
 	}
 	if value, ok := suo.mutation.Name(); ok {
-		_spec.SetField(subscription.FieldName, field.TypeBool, value)
+		_spec.SetField(subscription.FieldName, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.RawSubscriptionData(); ok {
+		_spec.SetField(subscription.FieldRawSubscriptionData, field.TypeJSON, value)
+	}
+	if suo.mutation.RawSubscriptionDataCleared() {
+		_spec.ClearField(subscription.FieldRawSubscriptionData, field.TypeJSON)
 	}
 	if value, ok := suo.mutation.UpdatedAt(); ok {
 		_spec.SetField(subscription.FieldUpdatedAt, field.TypeTime, value)

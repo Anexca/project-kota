@@ -47,8 +47,14 @@ func (sc *SubscriptionCreate) SetIsActive(b bool) *SubscriptionCreate {
 }
 
 // SetName sets the "name" field.
-func (sc *SubscriptionCreate) SetName(b bool) *SubscriptionCreate {
-	sc.mutation.SetName(b)
+func (sc *SubscriptionCreate) SetName(s string) *SubscriptionCreate {
+	sc.mutation.SetName(s)
+	return sc
+}
+
+// SetRawSubscriptionData sets the "raw_subscription_data" field.
+func (sc *SubscriptionCreate) SetRawSubscriptionData(m map[string]interface{}) *SubscriptionCreate {
+	sc.mutation.SetRawSubscriptionData(m)
 	return sc
 }
 
@@ -221,8 +227,12 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_node.IsActive = value
 	}
 	if value, ok := sc.mutation.Name(); ok {
-		_spec.SetField(subscription.FieldName, field.TypeBool, value)
+		_spec.SetField(subscription.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := sc.mutation.RawSubscriptionData(); ok {
+		_spec.SetField(subscription.FieldRawSubscriptionData, field.TypeJSON, value)
+		_node.RawSubscriptionData = value
 	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.SetField(subscription.FieldCreatedAt, field.TypeTime, value)

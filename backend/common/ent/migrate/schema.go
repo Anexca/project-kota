@@ -216,7 +216,8 @@ var (
 		{Name: "price", Type: field.TypeInt},
 		{Name: "duration_in_months", Type: field.TypeString},
 		{Name: "is_active", Type: field.TypeBool},
-		{Name: "name", Type: field.TypeBool},
+		{Name: "name", Type: field.TypeString},
+		{Name: "raw_subscription_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

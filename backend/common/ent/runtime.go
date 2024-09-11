@@ -142,11 +142,11 @@ func init() {
 	subscriptionFields := schema.Subscription{}.Fields()
 	_ = subscriptionFields
 	// subscriptionDescCreatedAt is the schema descriptor for created_at field.
-	subscriptionDescCreatedAt := subscriptionFields[5].Descriptor()
+	subscriptionDescCreatedAt := subscriptionFields[6].Descriptor()
 	// subscription.DefaultCreatedAt holds the default value on creation for the created_at field.
 	subscription.DefaultCreatedAt = subscriptionDescCreatedAt.Default.(func() time.Time)
 	// subscriptionDescUpdatedAt is the schema descriptor for updated_at field.
-	subscriptionDescUpdatedAt := subscriptionFields[6].Descriptor()
+	subscriptionDescUpdatedAt := subscriptionFields[7].Descriptor()
 	// subscription.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	subscription.DefaultUpdatedAt = subscriptionDescUpdatedAt.Default.(func() time.Time)
 	// subscription.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

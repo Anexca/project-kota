@@ -4,6 +4,7 @@ package ent
 
 import (
 	"common/ent/subscription"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -26,7 +27,9 @@ type Subscription struct {
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
 	// Name holds the value of the "name" field.
-	Name bool `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
+	// RawSubscriptionData holds the value of the "raw_subscription_data" field.
+	RawSubscriptionData map[string]interface{} `json:"raw_subscription_data,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -71,11 +74,13 @@ func (*Subscription) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case subscription.FieldIsActive, subscription.FieldName:
+		case subscription.FieldRawSubscriptionData:
+			values[i] = new([]byte)
+		case subscription.FieldIsActive:
 			values[i] = new(sql.NullBool)
 		case subscription.FieldID, subscription.FieldPrice:
 			values[i] = new(sql.NullInt64)
-		case subscription.FieldProviderSubscriptionID, subscription.FieldDurationInMonths:
+		case subscription.FieldProviderSubscriptionID, subscription.FieldDurationInMonths, subscription.FieldName:
 			values[i] = new(sql.NullString)
 		case subscription.FieldCreatedAt, subscription.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -125,10 +130,18 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 				s.IsActive = value.Bool
 			}
 		case subscription.FieldName:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				s.Name = value.Bool
+				s.Name = value.String
+			}
+		case subscription.FieldRawSubscriptionData:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field raw_subscription_data", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.RawSubscriptionData); err != nil {
+					return fmt.Errorf("unmarshal field raw_subscription_data: %w", err)
+				}
 			}
 		case subscription.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -201,7 +214,10 @@ func (s *Subscription) String() string {
 	builder.WriteString(fmt.Sprintf("%v", s.IsActive))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(fmt.Sprintf("%v", s.Name))
+	builder.WriteString(s.Name)
+	builder.WriteString(", ")
+	builder.WriteString("raw_subscription_data=")
+	builder.WriteString(fmt.Sprintf("%v", s.RawSubscriptionData))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(s.CreatedAt.Format(time.ANSIC))

@@ -6114,7 +6114,8 @@ type SubscriptionMutation struct {
 	addprice                  *int
 	duration_in_months        *string
 	is_active                 *bool
-	name                      *bool
+	name                      *string
+	raw_subscription_data     *map[string]interface{}
 	created_at                *time.Time
 	updated_at                *time.Time
 	clearedFields             map[string]struct{}
@@ -6392,12 +6393,12 @@ func (m *SubscriptionMutation) ResetIsActive() {
 }
 
 // SetName sets the "name" field.
-func (m *SubscriptionMutation) SetName(b bool) {
-	m.name = &b
+func (m *SubscriptionMutation) SetName(s string) {
+	m.name = &s
 }
 
 // Name returns the value of the "name" field in the mutation.
-func (m *SubscriptionMutation) Name() (r bool, exists bool) {
+func (m *SubscriptionMutation) Name() (r string, exists bool) {
 	v := m.name
 	if v == nil {
 		return
@@ -6408,7 +6409,7 @@ func (m *SubscriptionMutation) Name() (r bool, exists bool) {
 // OldName returns the old "name" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldName(ctx context.Context) (v bool, err error) {
+func (m *SubscriptionMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
@@ -6425,6 +6426,55 @@ func (m *SubscriptionMutation) OldName(ctx context.Context) (v bool, err error) 
 // ResetName resets all changes to the "name" field.
 func (m *SubscriptionMutation) ResetName() {
 	m.name = nil
+}
+
+// SetRawSubscriptionData sets the "raw_subscription_data" field.
+func (m *SubscriptionMutation) SetRawSubscriptionData(value map[string]interface{}) {
+	m.raw_subscription_data = &value
+}
+
+// RawSubscriptionData returns the value of the "raw_subscription_data" field in the mutation.
+func (m *SubscriptionMutation) RawSubscriptionData() (r map[string]interface{}, exists bool) {
+	v := m.raw_subscription_data
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRawSubscriptionData returns the old "raw_subscription_data" field's value of the Subscription entity.
+// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubscriptionMutation) OldRawSubscriptionData(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRawSubscriptionData is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRawSubscriptionData requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRawSubscriptionData: %w", err)
+	}
+	return oldValue.RawSubscriptionData, nil
+}
+
+// ClearRawSubscriptionData clears the value of the "raw_subscription_data" field.
+func (m *SubscriptionMutation) ClearRawSubscriptionData() {
+	m.raw_subscription_data = nil
+	m.clearedFields[subscription.FieldRawSubscriptionData] = struct{}{}
+}
+
+// RawSubscriptionDataCleared returns if the "raw_subscription_data" field was cleared in this mutation.
+func (m *SubscriptionMutation) RawSubscriptionDataCleared() bool {
+	_, ok := m.clearedFields[subscription.FieldRawSubscriptionData]
+	return ok
+}
+
+// ResetRawSubscriptionData resets all changes to the "raw_subscription_data" field.
+func (m *SubscriptionMutation) ResetRawSubscriptionData() {
+	m.raw_subscription_data = nil
+	delete(m.clearedFields, subscription.FieldRawSubscriptionData)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -6641,7 +6691,7 @@ func (m *SubscriptionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubscriptionMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.provider_subscription_id != nil {
 		fields = append(fields, subscription.FieldProviderSubscriptionID)
 	}
@@ -6656,6 +6706,9 @@ func (m *SubscriptionMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, subscription.FieldName)
+	}
+	if m.raw_subscription_data != nil {
+		fields = append(fields, subscription.FieldRawSubscriptionData)
 	}
 	if m.created_at != nil {
 		fields = append(fields, subscription.FieldCreatedAt)
@@ -6681,6 +6734,8 @@ func (m *SubscriptionMutation) Field(name string) (ent.Value, bool) {
 		return m.IsActive()
 	case subscription.FieldName:
 		return m.Name()
+	case subscription.FieldRawSubscriptionData:
+		return m.RawSubscriptionData()
 	case subscription.FieldCreatedAt:
 		return m.CreatedAt()
 	case subscription.FieldUpdatedAt:
@@ -6704,6 +6759,8 @@ func (m *SubscriptionMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldIsActive(ctx)
 	case subscription.FieldName:
 		return m.OldName(ctx)
+	case subscription.FieldRawSubscriptionData:
+		return m.OldRawSubscriptionData(ctx)
 	case subscription.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case subscription.FieldUpdatedAt:
@@ -6746,11 +6803,18 @@ func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 		m.SetIsActive(v)
 		return nil
 	case subscription.FieldName:
-		v, ok := value.(bool)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case subscription.FieldRawSubscriptionData:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRawSubscriptionData(v)
 		return nil
 	case subscription.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -6810,7 +6874,11 @@ func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SubscriptionMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(subscription.FieldRawSubscriptionData) {
+		fields = append(fields, subscription.FieldRawSubscriptionData)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -6823,6 +6891,11 @@ func (m *SubscriptionMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SubscriptionMutation) ClearField(name string) error {
+	switch name {
+	case subscription.FieldRawSubscriptionData:
+		m.ClearRawSubscriptionData()
+		return nil
+	}
 	return fmt.Errorf("unknown Subscription nullable field %s", name)
 }
 
@@ -6844,6 +6917,9 @@ func (m *SubscriptionMutation) ResetField(name string) error {
 		return nil
 	case subscription.FieldName:
 		m.ResetName()
+		return nil
+	case subscription.FieldRawSubscriptionData:
+		m.ResetRawSubscriptionData()
 		return nil
 	case subscription.FieldCreatedAt:
 		m.ResetCreatedAt()

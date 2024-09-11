@@ -24,6 +24,8 @@ const (
 	FieldIsActive = "is_active"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldRawSubscriptionData holds the string denoting the raw_subscription_data field in the database.
+	FieldRawSubscriptionData = "raw_subscription_data"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldDurationInMonths,
 	FieldIsActive,
 	FieldName,
+	FieldRawSubscriptionData,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }

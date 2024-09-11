@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -20,7 +21,11 @@ func (Subscription) Fields() []ent.Field {
 		field.Int("price"),
 		field.String("duration_in_months"),
 		field.Bool("is_active"),
-		field.Bool("name"),
+		field.String("name"),
+		field.JSON("raw_subscription_data", map[string]interface{}{}).
+			SchemaType(map[string]string{
+				dialect.Postgres: "jsonb",
+			}).Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
