@@ -169,7 +169,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-            <div className="text-center my-4 font-bold text-2xl underline">
+            <div className="text-center my-4 font-bold text-2xl underline mt-14">
               Service We Offers
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
