@@ -9,6 +9,7 @@ import (
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
+	"common/ent/subscriptionexam"
 	"context"
 	"errors"
 	"fmt"
@@ -99,6 +100,21 @@ func (eu *ExamUpdate) SetCategory(e *ExamCategory) *ExamUpdate {
 	return eu.SetCategoryID(e.ID)
 }
 
+// AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by IDs.
+func (eu *ExamUpdate) AddSubscriptionIDs(ids ...int) *ExamUpdate {
+	eu.mutation.AddSubscriptionIDs(ids...)
+	return eu
+}
+
+// AddSubscriptions adds the "subscriptions" edges to the SubscriptionExam entity.
+func (eu *ExamUpdate) AddSubscriptions(s ...*SubscriptionExam) *ExamUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return eu.AddSubscriptionIDs(ids...)
+}
+
 // SetSettingID sets the "setting" edge to the ExamSetting entity by ID.
 func (eu *ExamUpdate) SetSettingID(id int) *ExamUpdate {
 	eu.mutation.SetSettingID(id)
@@ -157,6 +173,27 @@ func (eu *ExamUpdate) Mutation() *ExamMutation {
 func (eu *ExamUpdate) ClearCategory() *ExamUpdate {
 	eu.mutation.ClearCategory()
 	return eu
+}
+
+// ClearSubscriptions clears all "subscriptions" edges to the SubscriptionExam entity.
+func (eu *ExamUpdate) ClearSubscriptions() *ExamUpdate {
+	eu.mutation.ClearSubscriptions()
+	return eu
+}
+
+// RemoveSubscriptionIDs removes the "subscriptions" edge to SubscriptionExam entities by IDs.
+func (eu *ExamUpdate) RemoveSubscriptionIDs(ids ...int) *ExamUpdate {
+	eu.mutation.RemoveSubscriptionIDs(ids...)
+	return eu
+}
+
+// RemoveSubscriptions removes "subscriptions" edges to SubscriptionExam entities.
+func (eu *ExamUpdate) RemoveSubscriptions(s ...*SubscriptionExam) *ExamUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return eu.RemoveSubscriptionIDs(ids...)
 }
 
 // ClearSetting clears the "setting" edge to the ExamSetting entity.
@@ -286,6 +323,51 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.SubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.SubscriptionsTable,
+			Columns: []string{exam.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subscriptionexam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !eu.mutation.SubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.SubscriptionsTable,
+			Columns: []string{exam.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subscriptionexam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.SubscriptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.SubscriptionsTable,
+			Columns: []string{exam.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subscriptionexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -499,6 +581,21 @@ func (euo *ExamUpdateOne) SetCategory(e *ExamCategory) *ExamUpdateOne {
 	return euo.SetCategoryID(e.ID)
 }
 
+// AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by IDs.
+func (euo *ExamUpdateOne) AddSubscriptionIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.AddSubscriptionIDs(ids...)
+	return euo
+}
+
+// AddSubscriptions adds the "subscriptions" edges to the SubscriptionExam entity.
+func (euo *ExamUpdateOne) AddSubscriptions(s ...*SubscriptionExam) *ExamUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return euo.AddSubscriptionIDs(ids...)
+}
+
 // SetSettingID sets the "setting" edge to the ExamSetting entity by ID.
 func (euo *ExamUpdateOne) SetSettingID(id int) *ExamUpdateOne {
 	euo.mutation.SetSettingID(id)
@@ -557,6 +654,27 @@ func (euo *ExamUpdateOne) Mutation() *ExamMutation {
 func (euo *ExamUpdateOne) ClearCategory() *ExamUpdateOne {
 	euo.mutation.ClearCategory()
 	return euo
+}
+
+// ClearSubscriptions clears all "subscriptions" edges to the SubscriptionExam entity.
+func (euo *ExamUpdateOne) ClearSubscriptions() *ExamUpdateOne {
+	euo.mutation.ClearSubscriptions()
+	return euo
+}
+
+// RemoveSubscriptionIDs removes the "subscriptions" edge to SubscriptionExam entities by IDs.
+func (euo *ExamUpdateOne) RemoveSubscriptionIDs(ids ...int) *ExamUpdateOne {
+	euo.mutation.RemoveSubscriptionIDs(ids...)
+	return euo
+}
+
+// RemoveSubscriptions removes "subscriptions" edges to SubscriptionExam entities.
+func (euo *ExamUpdateOne) RemoveSubscriptions(s ...*SubscriptionExam) *ExamUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return euo.RemoveSubscriptionIDs(ids...)
 }
 
 // ClearSetting clears the "setting" edge to the ExamSetting entity.
@@ -716,6 +834,51 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.SubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.SubscriptionsTable,
+			Columns: []string{exam.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subscriptionexam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedSubscriptionsIDs(); len(nodes) > 0 && !euo.mutation.SubscriptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.SubscriptionsTable,
+			Columns: []string{exam.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subscriptionexam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.SubscriptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exam.SubscriptionsTable,
+			Columns: []string{exam.SubscriptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subscriptionexam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

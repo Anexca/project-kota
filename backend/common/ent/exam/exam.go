@@ -26,6 +26,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
+	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
+	EdgeSubscriptions = "subscriptions"
 	// EdgeSetting holds the string denoting the setting edge name in mutations.
 	EdgeSetting = "setting"
 	// EdgeCachedExam holds the string denoting the cached_exam edge name in mutations.
@@ -41,6 +43,13 @@ const (
 	CategoryInverseTable = "exam_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "exam_category_exams"
+	// SubscriptionsTable is the table that holds the subscriptions relation/edge.
+	SubscriptionsTable = "subscription_exams"
+	// SubscriptionsInverseTable is the table name for the SubscriptionExam entity.
+	// It exists in this package in order to avoid circular dependency with the "subscriptionexam" package.
+	SubscriptionsInverseTable = "subscription_exams"
+	// SubscriptionsColumn is the table column denoting the subscriptions relation/edge.
+	SubscriptionsColumn = "exam_subscriptions"
 	// SettingTable is the table that holds the setting relation/edge.
 	SettingTable = "exam_settings"
 	// SettingInverseTable is the table name for the ExamSetting entity.
@@ -146,6 +155,20 @@ func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// BySubscriptionsCount orders the results by subscriptions count.
+func BySubscriptionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubscriptionsStep(), opts...)
+	}
+}
+
+// BySubscriptions orders the results by subscriptions terms.
+func BySubscriptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubscriptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // BySettingField orders the results by setting field.
 func BySettingField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -185,6 +208,13 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+	)
+}
+func newSubscriptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubscriptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubscriptionsTable, SubscriptionsColumn),
 	)
 }
 func newSettingStep() *sqlgraph.Step {

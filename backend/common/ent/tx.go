@@ -26,8 +26,16 @@ type Tx struct {
 	ExamSetting *ExamSettingClient
 	// GeneratedExam is the client for interacting with the GeneratedExam builders.
 	GeneratedExam *GeneratedExamClient
+	// Payment is the client for interacting with the Payment builders.
+	Payment *PaymentClient
+	// Subscription is the client for interacting with the Subscription builders.
+	Subscription *SubscriptionClient
+	// SubscriptionExam is the client for interacting with the SubscriptionExam builders.
+	SubscriptionExam *SubscriptionExamClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserSubscription is the client for interacting with the UserSubscription builders.
+	UserSubscription *UserSubscriptionClient
 
 	// lazily loaded.
 	client     *Client
@@ -166,7 +174,11 @@ func (tx *Tx) init() {
 	tx.ExamCategory = NewExamCategoryClient(tx.config)
 	tx.ExamSetting = NewExamSettingClient(tx.config)
 	tx.GeneratedExam = NewGeneratedExamClient(tx.config)
+	tx.Payment = NewPaymentClient(tx.config)
+	tx.Subscription = NewSubscriptionClient(tx.config)
+	tx.SubscriptionExam = NewSubscriptionExamClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserSubscription = NewUserSubscriptionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

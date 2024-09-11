@@ -33,9 +33,13 @@ type User struct {
 type UserEdges struct {
 	// Attempts holds the value of the attempts edge.
 	Attempts []*ExamAttempt `json:"attempts,omitempty"`
+	// Subscriptions holds the value of the subscriptions edge.
+	Subscriptions []*UserSubscription `json:"subscriptions,omitempty"`
+	// Payments holds the value of the payments edge.
+	Payments []*Payment `json:"payments,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // AttemptsOrErr returns the Attempts value or an error if the edge
@@ -45,6 +49,24 @@ func (e UserEdges) AttemptsOrErr() ([]*ExamAttempt, error) {
 		return e.Attempts, nil
 	}
 	return nil, &NotLoadedError{edge: "attempts"}
+}
+
+// SubscriptionsOrErr returns the Subscriptions value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) SubscriptionsOrErr() ([]*UserSubscription, error) {
+	if e.loadedTypes[1] {
+		return e.Subscriptions, nil
+	}
+	return nil, &NotLoadedError{edge: "subscriptions"}
+}
+
+// PaymentsOrErr returns the Payments value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) PaymentsOrErr() ([]*Payment, error) {
+	if e.loadedTypes[2] {
+		return e.Payments, nil
+	}
+	return nil, &NotLoadedError{edge: "payments"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -111,6 +133,16 @@ func (u *User) Value(name string) (ent.Value, error) {
 // QueryAttempts queries the "attempts" edge of the User entity.
 func (u *User) QueryAttempts() *ExamAttemptQuery {
 	return NewUserClient(u.config).QueryAttempts(u)
+}
+
+// QuerySubscriptions queries the "subscriptions" edge of the User entity.
+func (u *User) QuerySubscriptions() *UserSubscriptionQuery {
+	return NewUserClient(u.config).QuerySubscriptions(u)
+}
+
+// QueryPayments queries the "payments" edge of the User entity.
+func (u *User) QueryPayments() *PaymentQuery {
+	return NewUserClient(u.config).QueryPayments(u)
 }
 
 // Update returns a builder for updating this User.

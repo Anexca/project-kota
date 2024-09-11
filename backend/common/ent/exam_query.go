@@ -9,6 +9,7 @@ import (
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
+	"common/ent/subscriptionexam"
 	"context"
 	"database/sql/driver"
 	"fmt"
@@ -28,6 +29,7 @@ type ExamQuery struct {
 	inters             []Interceptor
 	predicates         []predicate.Exam
 	withCategory       *ExamCategoryQuery
+	withSubscriptions  *SubscriptionExamQuery
 	withSetting        *ExamSettingQuery
 	withCachedExam     *CachedExamQuery
 	withGeneratedexams *GeneratedExamQuery
@@ -83,6 +85,28 @@ func (eq *ExamQuery) QueryCategory() *ExamCategoryQuery {
 			sqlgraph.From(exam.Table, exam.FieldID, selector),
 			sqlgraph.To(examcategory.Table, examcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, exam.CategoryTable, exam.CategoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubscriptions chains the current query on the "subscriptions" edge.
+func (eq *ExamQuery) QuerySubscriptions() *SubscriptionExamQuery {
+	query := (&SubscriptionExamClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, selector),
+			sqlgraph.To(subscriptionexam.Table, subscriptionexam.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, exam.SubscriptionsTable, exam.SubscriptionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -349,6 +373,7 @@ func (eq *ExamQuery) Clone() *ExamQuery {
 		inters:             append([]Interceptor{}, eq.inters...),
 		predicates:         append([]predicate.Exam{}, eq.predicates...),
 		withCategory:       eq.withCategory.Clone(),
+		withSubscriptions:  eq.withSubscriptions.Clone(),
 		withSetting:        eq.withSetting.Clone(),
 		withCachedExam:     eq.withCachedExam.Clone(),
 		withGeneratedexams: eq.withGeneratedexams.Clone(),
@@ -366,6 +391,17 @@ func (eq *ExamQuery) WithCategory(opts ...func(*ExamCategoryQuery)) *ExamQuery {
 		opt(query)
 	}
 	eq.withCategory = query
+	return eq
+}
+
+// WithSubscriptions tells the query-builder to eager-load the nodes that are connected to
+// the "subscriptions" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *ExamQuery) WithSubscriptions(opts ...func(*SubscriptionExamQuery)) *ExamQuery {
+	query := (&SubscriptionExamClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withSubscriptions = query
 	return eq
 }
 
@@ -481,8 +517,9 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 		nodes       = []*Exam{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			eq.withCategory != nil,
+			eq.withSubscriptions != nil,
 			eq.withSetting != nil,
 			eq.withCachedExam != nil,
 			eq.withGeneratedexams != nil,
@@ -515,6 +552,13 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 	if query := eq.withCategory; query != nil {
 		if err := eq.loadCategory(ctx, query, nodes, nil,
 			func(n *Exam, e *ExamCategory) { n.Edges.Category = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withSubscriptions; query != nil {
+		if err := eq.loadSubscriptions(ctx, query, nodes,
+			func(n *Exam) { n.Edges.Subscriptions = []*SubscriptionExam{} },
+			func(n *Exam, e *SubscriptionExam) { n.Edges.Subscriptions = append(n.Edges.Subscriptions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -570,6 +614,37 @@ func (eq *ExamQuery) loadCategory(ctx context.Context, query *ExamCategoryQuery,
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (eq *ExamQuery) loadSubscriptions(ctx context.Context, query *SubscriptionExamQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *SubscriptionExam)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Exam)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.SubscriptionExam(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(exam.SubscriptionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.exam_subscriptions
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "exam_subscriptions" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "exam_subscriptions" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

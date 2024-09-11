@@ -18,7 +18,11 @@ import (
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
+	"common/ent/payment"
+	"common/ent/subscription"
+	"common/ent/subscriptionexam"
 	"common/ent/user"
+	"common/ent/usersubscription"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -46,8 +50,16 @@ type Client struct {
 	ExamSetting *ExamSettingClient
 	// GeneratedExam is the client for interacting with the GeneratedExam builders.
 	GeneratedExam *GeneratedExamClient
+	// Payment is the client for interacting with the Payment builders.
+	Payment *PaymentClient
+	// Subscription is the client for interacting with the Subscription builders.
+	Subscription *SubscriptionClient
+	// SubscriptionExam is the client for interacting with the SubscriptionExam builders.
+	SubscriptionExam *SubscriptionExamClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserSubscription is the client for interacting with the UserSubscription builders.
+	UserSubscription *UserSubscriptionClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -66,7 +78,11 @@ func (c *Client) init() {
 	c.ExamCategory = NewExamCategoryClient(c.config)
 	c.ExamSetting = NewExamSettingClient(c.config)
 	c.GeneratedExam = NewGeneratedExamClient(c.config)
+	c.Payment = NewPaymentClient(c.config)
+	c.Subscription = NewSubscriptionClient(c.config)
+	c.SubscriptionExam = NewSubscriptionExamClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserSubscription = NewUserSubscriptionClient(c.config)
 }
 
 type (
@@ -157,16 +173,20 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		CachedExam:    NewCachedExamClient(cfg),
-		Exam:          NewExamClient(cfg),
-		ExamAssesment: NewExamAssesmentClient(cfg),
-		ExamAttempt:   NewExamAttemptClient(cfg),
-		ExamCategory:  NewExamCategoryClient(cfg),
-		ExamSetting:   NewExamSettingClient(cfg),
-		GeneratedExam: NewGeneratedExamClient(cfg),
-		User:          NewUserClient(cfg),
+		ctx:              ctx,
+		config:           cfg,
+		CachedExam:       NewCachedExamClient(cfg),
+		Exam:             NewExamClient(cfg),
+		ExamAssesment:    NewExamAssesmentClient(cfg),
+		ExamAttempt:      NewExamAttemptClient(cfg),
+		ExamCategory:     NewExamCategoryClient(cfg),
+		ExamSetting:      NewExamSettingClient(cfg),
+		GeneratedExam:    NewGeneratedExamClient(cfg),
+		Payment:          NewPaymentClient(cfg),
+		Subscription:     NewSubscriptionClient(cfg),
+		SubscriptionExam: NewSubscriptionExamClient(cfg),
+		User:             NewUserClient(cfg),
+		UserSubscription: NewUserSubscriptionClient(cfg),
 	}, nil
 }
 
@@ -184,16 +204,20 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		CachedExam:    NewCachedExamClient(cfg),
-		Exam:          NewExamClient(cfg),
-		ExamAssesment: NewExamAssesmentClient(cfg),
-		ExamAttempt:   NewExamAttemptClient(cfg),
-		ExamCategory:  NewExamCategoryClient(cfg),
-		ExamSetting:   NewExamSettingClient(cfg),
-		GeneratedExam: NewGeneratedExamClient(cfg),
-		User:          NewUserClient(cfg),
+		ctx:              ctx,
+		config:           cfg,
+		CachedExam:       NewCachedExamClient(cfg),
+		Exam:             NewExamClient(cfg),
+		ExamAssesment:    NewExamAssesmentClient(cfg),
+		ExamAttempt:      NewExamAttemptClient(cfg),
+		ExamCategory:     NewExamCategoryClient(cfg),
+		ExamSetting:      NewExamSettingClient(cfg),
+		GeneratedExam:    NewGeneratedExamClient(cfg),
+		Payment:          NewPaymentClient(cfg),
+		Subscription:     NewSubscriptionClient(cfg),
+		SubscriptionExam: NewSubscriptionExamClient(cfg),
+		User:             NewUserClient(cfg),
+		UserSubscription: NewUserSubscriptionClient(cfg),
 	}, nil
 }
 
@@ -224,7 +248,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.CachedExam, c.Exam, c.ExamAssesment, c.ExamAttempt, c.ExamCategory,
-		c.ExamSetting, c.GeneratedExam, c.User,
+		c.ExamSetting, c.GeneratedExam, c.Payment, c.Subscription, c.SubscriptionExam,
+		c.User, c.UserSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -235,7 +260,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.CachedExam, c.Exam, c.ExamAssesment, c.ExamAttempt, c.ExamCategory,
-		c.ExamSetting, c.GeneratedExam, c.User,
+		c.ExamSetting, c.GeneratedExam, c.Payment, c.Subscription, c.SubscriptionExam,
+		c.User, c.UserSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -258,8 +284,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ExamSetting.mutate(ctx, m)
 	case *GeneratedExamMutation:
 		return c.GeneratedExam.mutate(ctx, m)
+	case *PaymentMutation:
+		return c.Payment.mutate(ctx, m)
+	case *SubscriptionMutation:
+		return c.Subscription.mutate(ctx, m)
+	case *SubscriptionExamMutation:
+		return c.SubscriptionExam.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserSubscriptionMutation:
+		return c.UserSubscription.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -531,6 +565,22 @@ func (c *ExamClient) QueryCategory(e *Exam) *ExamCategoryQuery {
 			sqlgraph.From(exam.Table, exam.FieldID, id),
 			sqlgraph.To(examcategory.Table, examcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, exam.CategoryTable, exam.CategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubscriptions queries the subscriptions edge of a Exam.
+func (c *ExamClient) QuerySubscriptions(e *Exam) *SubscriptionExamQuery {
+	query := (&SubscriptionExamClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, id),
+			sqlgraph.To(subscriptionexam.Table, subscriptionexam.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, exam.SubscriptionsTable, exam.SubscriptionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1404,6 +1454,501 @@ func (c *GeneratedExamClient) mutate(ctx context.Context, m *GeneratedExamMutati
 	}
 }
 
+// PaymentClient is a client for the Payment schema.
+type PaymentClient struct {
+	config
+}
+
+// NewPaymentClient returns a client for the Payment from the given config.
+func NewPaymentClient(c config) *PaymentClient {
+	return &PaymentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `payment.Hooks(f(g(h())))`.
+func (c *PaymentClient) Use(hooks ...Hook) {
+	c.hooks.Payment = append(c.hooks.Payment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `payment.Intercept(f(g(h())))`.
+func (c *PaymentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Payment = append(c.inters.Payment, interceptors...)
+}
+
+// Create returns a builder for creating a Payment entity.
+func (c *PaymentClient) Create() *PaymentCreate {
+	mutation := newPaymentMutation(c.config, OpCreate)
+	return &PaymentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Payment entities.
+func (c *PaymentClient) CreateBulk(builders ...*PaymentCreate) *PaymentCreateBulk {
+	return &PaymentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PaymentClient) MapCreateBulk(slice any, setFunc func(*PaymentCreate, int)) *PaymentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PaymentCreateBulk{err: fmt.Errorf("calling to PaymentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PaymentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PaymentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Payment.
+func (c *PaymentClient) Update() *PaymentUpdate {
+	mutation := newPaymentMutation(c.config, OpUpdate)
+	return &PaymentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PaymentClient) UpdateOne(pa *Payment) *PaymentUpdateOne {
+	mutation := newPaymentMutation(c.config, OpUpdateOne, withPayment(pa))
+	return &PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PaymentClient) UpdateOneID(id int) *PaymentUpdateOne {
+	mutation := newPaymentMutation(c.config, OpUpdateOne, withPaymentID(id))
+	return &PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Payment.
+func (c *PaymentClient) Delete() *PaymentDelete {
+	mutation := newPaymentMutation(c.config, OpDelete)
+	return &PaymentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PaymentClient) DeleteOne(pa *Payment) *PaymentDeleteOne {
+	return c.DeleteOneID(pa.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PaymentClient) DeleteOneID(id int) *PaymentDeleteOne {
+	builder := c.Delete().Where(payment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PaymentDeleteOne{builder}
+}
+
+// Query returns a query builder for Payment.
+func (c *PaymentClient) Query() *PaymentQuery {
+	return &PaymentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePayment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Payment entity by its id.
+func (c *PaymentClient) Get(ctx context.Context, id int) (*Payment, error) {
+	return c.Query().Where(payment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PaymentClient) GetX(ctx context.Context, id int) *Payment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a Payment.
+func (c *PaymentClient) QueryUser(pa *Payment) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(payment.Table, payment.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, payment.UserTable, payment.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubscription queries the subscription edge of a Payment.
+func (c *PaymentClient) QuerySubscription(pa *Payment) *UserSubscriptionQuery {
+	query := (&UserSubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(payment.Table, payment.FieldID, id),
+			sqlgraph.To(usersubscription.Table, usersubscription.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, payment.SubscriptionTable, payment.SubscriptionColumn),
+		)
+		fromV = sqlgraph.Neighbors(pa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PaymentClient) Hooks() []Hook {
+	return c.hooks.Payment
+}
+
+// Interceptors returns the client interceptors.
+func (c *PaymentClient) Interceptors() []Interceptor {
+	return c.inters.Payment
+}
+
+func (c *PaymentClient) mutate(ctx context.Context, m *PaymentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PaymentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PaymentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PaymentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Payment mutation op: %q", m.Op())
+	}
+}
+
+// SubscriptionClient is a client for the Subscription schema.
+type SubscriptionClient struct {
+	config
+}
+
+// NewSubscriptionClient returns a client for the Subscription from the given config.
+func NewSubscriptionClient(c config) *SubscriptionClient {
+	return &SubscriptionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `subscription.Hooks(f(g(h())))`.
+func (c *SubscriptionClient) Use(hooks ...Hook) {
+	c.hooks.Subscription = append(c.hooks.Subscription, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `subscription.Intercept(f(g(h())))`.
+func (c *SubscriptionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Subscription = append(c.inters.Subscription, interceptors...)
+}
+
+// Create returns a builder for creating a Subscription entity.
+func (c *SubscriptionClient) Create() *SubscriptionCreate {
+	mutation := newSubscriptionMutation(c.config, OpCreate)
+	return &SubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Subscription entities.
+func (c *SubscriptionClient) CreateBulk(builders ...*SubscriptionCreate) *SubscriptionCreateBulk {
+	return &SubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SubscriptionClient) MapCreateBulk(slice any, setFunc func(*SubscriptionCreate, int)) *SubscriptionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SubscriptionCreateBulk{err: fmt.Errorf("calling to SubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SubscriptionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Subscription.
+func (c *SubscriptionClient) Update() *SubscriptionUpdate {
+	mutation := newSubscriptionMutation(c.config, OpUpdate)
+	return &SubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubscriptionClient) UpdateOne(s *Subscription) *SubscriptionUpdateOne {
+	mutation := newSubscriptionMutation(c.config, OpUpdateOne, withSubscription(s))
+	return &SubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubscriptionClient) UpdateOneID(id int) *SubscriptionUpdateOne {
+	mutation := newSubscriptionMutation(c.config, OpUpdateOne, withSubscriptionID(id))
+	return &SubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Subscription.
+func (c *SubscriptionClient) Delete() *SubscriptionDelete {
+	mutation := newSubscriptionMutation(c.config, OpDelete)
+	return &SubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubscriptionClient) DeleteOne(s *Subscription) *SubscriptionDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubscriptionClient) DeleteOneID(id int) *SubscriptionDeleteOne {
+	builder := c.Delete().Where(subscription.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubscriptionDeleteOne{builder}
+}
+
+// Query returns a query builder for Subscription.
+func (c *SubscriptionClient) Query() *SubscriptionQuery {
+	return &SubscriptionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubscription},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Subscription entity by its id.
+func (c *SubscriptionClient) Get(ctx context.Context, id int) (*Subscription, error) {
+	return c.Query().Where(subscription.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubscriptionClient) GetX(ctx context.Context, id int) *Subscription {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryExams queries the exams edge of a Subscription.
+func (c *SubscriptionClient) QueryExams(s *Subscription) *SubscriptionExamQuery {
+	query := (&SubscriptionExamClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subscription.Table, subscription.FieldID, id),
+			sqlgraph.To(subscriptionexam.Table, subscriptionexam.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, subscription.ExamsTable, subscription.ExamsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUserSubscriptions queries the user_subscriptions edge of a Subscription.
+func (c *SubscriptionClient) QueryUserSubscriptions(s *Subscription) *UserSubscriptionQuery {
+	query := (&UserSubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subscription.Table, subscription.FieldID, id),
+			sqlgraph.To(usersubscription.Table, usersubscription.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, subscription.UserSubscriptionsTable, subscription.UserSubscriptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SubscriptionClient) Hooks() []Hook {
+	return c.hooks.Subscription
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubscriptionClient) Interceptors() []Interceptor {
+	return c.inters.Subscription
+}
+
+func (c *SubscriptionClient) mutate(ctx context.Context, m *SubscriptionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Subscription mutation op: %q", m.Op())
+	}
+}
+
+// SubscriptionExamClient is a client for the SubscriptionExam schema.
+type SubscriptionExamClient struct {
+	config
+}
+
+// NewSubscriptionExamClient returns a client for the SubscriptionExam from the given config.
+func NewSubscriptionExamClient(c config) *SubscriptionExamClient {
+	return &SubscriptionExamClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `subscriptionexam.Hooks(f(g(h())))`.
+func (c *SubscriptionExamClient) Use(hooks ...Hook) {
+	c.hooks.SubscriptionExam = append(c.hooks.SubscriptionExam, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `subscriptionexam.Intercept(f(g(h())))`.
+func (c *SubscriptionExamClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SubscriptionExam = append(c.inters.SubscriptionExam, interceptors...)
+}
+
+// Create returns a builder for creating a SubscriptionExam entity.
+func (c *SubscriptionExamClient) Create() *SubscriptionExamCreate {
+	mutation := newSubscriptionExamMutation(c.config, OpCreate)
+	return &SubscriptionExamCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SubscriptionExam entities.
+func (c *SubscriptionExamClient) CreateBulk(builders ...*SubscriptionExamCreate) *SubscriptionExamCreateBulk {
+	return &SubscriptionExamCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SubscriptionExamClient) MapCreateBulk(slice any, setFunc func(*SubscriptionExamCreate, int)) *SubscriptionExamCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SubscriptionExamCreateBulk{err: fmt.Errorf("calling to SubscriptionExamClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SubscriptionExamCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SubscriptionExamCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SubscriptionExam.
+func (c *SubscriptionExamClient) Update() *SubscriptionExamUpdate {
+	mutation := newSubscriptionExamMutation(c.config, OpUpdate)
+	return &SubscriptionExamUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubscriptionExamClient) UpdateOne(se *SubscriptionExam) *SubscriptionExamUpdateOne {
+	mutation := newSubscriptionExamMutation(c.config, OpUpdateOne, withSubscriptionExam(se))
+	return &SubscriptionExamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubscriptionExamClient) UpdateOneID(id int) *SubscriptionExamUpdateOne {
+	mutation := newSubscriptionExamMutation(c.config, OpUpdateOne, withSubscriptionExamID(id))
+	return &SubscriptionExamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SubscriptionExam.
+func (c *SubscriptionExamClient) Delete() *SubscriptionExamDelete {
+	mutation := newSubscriptionExamMutation(c.config, OpDelete)
+	return &SubscriptionExamDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubscriptionExamClient) DeleteOne(se *SubscriptionExam) *SubscriptionExamDeleteOne {
+	return c.DeleteOneID(se.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubscriptionExamClient) DeleteOneID(id int) *SubscriptionExamDeleteOne {
+	builder := c.Delete().Where(subscriptionexam.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubscriptionExamDeleteOne{builder}
+}
+
+// Query returns a query builder for SubscriptionExam.
+func (c *SubscriptionExamClient) Query() *SubscriptionExamQuery {
+	return &SubscriptionExamQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubscriptionExam},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SubscriptionExam entity by its id.
+func (c *SubscriptionExamClient) Get(ctx context.Context, id int) (*SubscriptionExam, error) {
+	return c.Query().Where(subscriptionexam.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubscriptionExamClient) GetX(ctx context.Context, id int) *SubscriptionExam {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySubscription queries the subscription edge of a SubscriptionExam.
+func (c *SubscriptionExamClient) QuerySubscription(se *SubscriptionExam) *SubscriptionQuery {
+	query := (&SubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := se.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subscriptionexam.Table, subscriptionexam.FieldID, id),
+			sqlgraph.To(subscription.Table, subscription.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, subscriptionexam.SubscriptionTable, subscriptionexam.SubscriptionColumn),
+		)
+		fromV = sqlgraph.Neighbors(se.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryExam queries the exam edge of a SubscriptionExam.
+func (c *SubscriptionExamClient) QueryExam(se *SubscriptionExam) *ExamQuery {
+	query := (&ExamClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := se.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subscriptionexam.Table, subscriptionexam.FieldID, id),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, subscriptionexam.ExamTable, subscriptionexam.ExamColumn),
+		)
+		fromV = sqlgraph.Neighbors(se.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SubscriptionExamClient) Hooks() []Hook {
+	return c.hooks.SubscriptionExam
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubscriptionExamClient) Interceptors() []Interceptor {
+	return c.inters.SubscriptionExam
+}
+
+func (c *SubscriptionExamClient) mutate(ctx context.Context, m *SubscriptionExamMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubscriptionExamCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubscriptionExamUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubscriptionExamUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubscriptionExamDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SubscriptionExam mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -1528,6 +2073,38 @@ func (c *UserClient) QueryAttempts(u *User) *ExamAttemptQuery {
 	return query
 }
 
+// QuerySubscriptions queries the subscriptions edge of a User.
+func (c *UserClient) QuerySubscriptions(u *User) *UserSubscriptionQuery {
+	query := (&UserSubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(usersubscription.Table, usersubscription.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SubscriptionsTable, user.SubscriptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPayments queries the payments edge of a User.
+func (c *UserClient) QueryPayments(u *User) *PaymentQuery {
+	query := (&PaymentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(payment.Table, payment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.PaymentsTable, user.PaymentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -1553,14 +2130,197 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserSubscriptionClient is a client for the UserSubscription schema.
+type UserSubscriptionClient struct {
+	config
+}
+
+// NewUserSubscriptionClient returns a client for the UserSubscription from the given config.
+func NewUserSubscriptionClient(c config) *UserSubscriptionClient {
+	return &UserSubscriptionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `usersubscription.Hooks(f(g(h())))`.
+func (c *UserSubscriptionClient) Use(hooks ...Hook) {
+	c.hooks.UserSubscription = append(c.hooks.UserSubscription, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usersubscription.Intercept(f(g(h())))`.
+func (c *UserSubscriptionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserSubscription = append(c.inters.UserSubscription, interceptors...)
+}
+
+// Create returns a builder for creating a UserSubscription entity.
+func (c *UserSubscriptionClient) Create() *UserSubscriptionCreate {
+	mutation := newUserSubscriptionMutation(c.config, OpCreate)
+	return &UserSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserSubscription entities.
+func (c *UserSubscriptionClient) CreateBulk(builders ...*UserSubscriptionCreate) *UserSubscriptionCreateBulk {
+	return &UserSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserSubscriptionClient) MapCreateBulk(slice any, setFunc func(*UserSubscriptionCreate, int)) *UserSubscriptionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserSubscriptionCreateBulk{err: fmt.Errorf("calling to UserSubscriptionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserSubscriptionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserSubscriptionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserSubscription.
+func (c *UserSubscriptionClient) Update() *UserSubscriptionUpdate {
+	mutation := newUserSubscriptionMutation(c.config, OpUpdate)
+	return &UserSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserSubscriptionClient) UpdateOne(us *UserSubscription) *UserSubscriptionUpdateOne {
+	mutation := newUserSubscriptionMutation(c.config, OpUpdateOne, withUserSubscription(us))
+	return &UserSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserSubscriptionClient) UpdateOneID(id int) *UserSubscriptionUpdateOne {
+	mutation := newUserSubscriptionMutation(c.config, OpUpdateOne, withUserSubscriptionID(id))
+	return &UserSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserSubscription.
+func (c *UserSubscriptionClient) Delete() *UserSubscriptionDelete {
+	mutation := newUserSubscriptionMutation(c.config, OpDelete)
+	return &UserSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserSubscriptionClient) DeleteOne(us *UserSubscription) *UserSubscriptionDeleteOne {
+	return c.DeleteOneID(us.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserSubscriptionClient) DeleteOneID(id int) *UserSubscriptionDeleteOne {
+	builder := c.Delete().Where(usersubscription.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserSubscriptionDeleteOne{builder}
+}
+
+// Query returns a query builder for UserSubscription.
+func (c *UserSubscriptionClient) Query() *UserSubscriptionQuery {
+	return &UserSubscriptionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserSubscription},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserSubscription entity by its id.
+func (c *UserSubscriptionClient) Get(ctx context.Context, id int) (*UserSubscription, error) {
+	return c.Query().Where(usersubscription.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserSubscriptionClient) GetX(ctx context.Context, id int) *UserSubscription {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a UserSubscription.
+func (c *UserSubscriptionClient) QueryUser(us *UserSubscription) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := us.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usersubscription.Table, usersubscription.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, usersubscription.UserTable, usersubscription.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(us.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubscription queries the subscription edge of a UserSubscription.
+func (c *UserSubscriptionClient) QuerySubscription(us *UserSubscription) *SubscriptionQuery {
+	query := (&SubscriptionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := us.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usersubscription.Table, usersubscription.FieldID, id),
+			sqlgraph.To(subscription.Table, subscription.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, usersubscription.SubscriptionTable, usersubscription.SubscriptionColumn),
+		)
+		fromV = sqlgraph.Neighbors(us.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPayments queries the payments edge of a UserSubscription.
+func (c *UserSubscriptionClient) QueryPayments(us *UserSubscription) *PaymentQuery {
+	query := (&PaymentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := us.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usersubscription.Table, usersubscription.FieldID, id),
+			sqlgraph.To(payment.Table, payment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, usersubscription.PaymentsTable, usersubscription.PaymentsColumn),
+		)
+		fromV = sqlgraph.Neighbors(us.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserSubscriptionClient) Hooks() []Hook {
+	return c.hooks.UserSubscription
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserSubscriptionClient) Interceptors() []Interceptor {
+	return c.inters.UserSubscription
+}
+
+func (c *UserSubscriptionClient) mutate(ctx context.Context, m *UserSubscriptionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserSubscriptionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserSubscriptionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserSubscriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserSubscriptionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserSubscription mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
 		CachedExam, Exam, ExamAssesment, ExamAttempt, ExamCategory, ExamSetting,
-		GeneratedExam, User []ent.Hook
+		GeneratedExam, Payment, Subscription, SubscriptionExam, User,
+		UserSubscription []ent.Hook
 	}
 	inters struct {
 		CachedExam, Exam, ExamAssesment, ExamAttempt, ExamCategory, ExamSetting,
-		GeneratedExam, User []ent.Interceptor
+		GeneratedExam, Payment, Subscription, SubscriptionExam, User,
+		UserSubscription []ent.Interceptor
 	}
 )
