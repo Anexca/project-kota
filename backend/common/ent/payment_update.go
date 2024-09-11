@@ -108,6 +108,20 @@ func (pu *PaymentUpdate) SetNillablePaymentPaymentID(s *string) *PaymentUpdate {
 	return pu
 }
 
+// SetReceiptID sets the "receipt_id" field.
+func (pu *PaymentUpdate) SetReceiptID(s string) *PaymentUpdate {
+	pu.mutation.SetReceiptID(s)
+	return pu
+}
+
+// SetNillableReceiptID sets the "receipt_id" field if the given value is not nil.
+func (pu *PaymentUpdate) SetNillableReceiptID(s *string) *PaymentUpdate {
+	if s != nil {
+		pu.SetReceiptID(*s)
+	}
+	return pu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (pu *PaymentUpdate) SetUpdatedAt(t time.Time) *PaymentUpdate {
 	pu.mutation.SetUpdatedAt(t)
@@ -244,6 +258,9 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.PaymentPaymentID(); ok {
 		_spec.SetField(payment.FieldPaymentPaymentID, field.TypeString, value)
+	}
+	if value, ok := pu.mutation.ReceiptID(); ok {
+		_spec.SetField(payment.FieldReceiptID, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.UpdatedAt(); ok {
 		_spec.SetField(payment.FieldUpdatedAt, field.TypeTime, value)
@@ -399,6 +416,20 @@ func (puo *PaymentUpdateOne) SetPaymentPaymentID(s string) *PaymentUpdateOne {
 func (puo *PaymentUpdateOne) SetNillablePaymentPaymentID(s *string) *PaymentUpdateOne {
 	if s != nil {
 		puo.SetPaymentPaymentID(*s)
+	}
+	return puo
+}
+
+// SetReceiptID sets the "receipt_id" field.
+func (puo *PaymentUpdateOne) SetReceiptID(s string) *PaymentUpdateOne {
+	puo.mutation.SetReceiptID(s)
+	return puo
+}
+
+// SetNillableReceiptID sets the "receipt_id" field if the given value is not nil.
+func (puo *PaymentUpdateOne) SetNillableReceiptID(s *string) *PaymentUpdateOne {
+	if s != nil {
+		puo.SetReceiptID(*s)
 	}
 	return puo
 }
@@ -569,6 +600,9 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 	}
 	if value, ok := puo.mutation.PaymentPaymentID(); ok {
 		_spec.SetField(payment.FieldPaymentPaymentID, field.TypeString, value)
+	}
+	if value, ok := puo.mutation.ReceiptID(); ok {
+		_spec.SetField(payment.FieldReceiptID, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.UpdatedAt(); ok {
 		_spec.SetField(payment.FieldUpdatedAt, field.TypeTime, value)

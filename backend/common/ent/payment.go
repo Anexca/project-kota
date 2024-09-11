@@ -30,6 +30,8 @@ type Payment struct {
 	PaymentMethod string `json:"payment_method,omitempty"`
 	// PaymentPaymentID holds the value of the "payment_payment_id" field.
 	PaymentPaymentID string `json:"payment_payment_id,omitempty"`
+	// ReceiptID holds the value of the "receipt_id" field.
+	ReceiptID string `json:"receipt_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -82,7 +84,7 @@ func (*Payment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case payment.FieldID, payment.FieldAmount:
 			values[i] = new(sql.NullInt64)
-		case payment.FieldPaymentStatus, payment.FieldPaymentMethod, payment.FieldPaymentPaymentID:
+		case payment.FieldPaymentStatus, payment.FieldPaymentMethod, payment.FieldPaymentPaymentID, payment.FieldReceiptID:
 			values[i] = new(sql.NullString)
 		case payment.FieldPaymentDate, payment.FieldCreatedAt, payment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -140,6 +142,12 @@ func (pa *Payment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field payment_payment_id", values[i])
 			} else if value.Valid {
 				pa.PaymentPaymentID = value.String
+			}
+		case payment.FieldReceiptID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field receipt_id", values[i])
+			} else if value.Valid {
+				pa.ReceiptID = value.String
 			}
 		case payment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -227,6 +235,9 @@ func (pa *Payment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("payment_payment_id=")
 	builder.WriteString(pa.PaymentPaymentID)
+	builder.WriteString(", ")
+	builder.WriteString("receipt_id=")
+	builder.WriteString(pa.ReceiptID)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(pa.CreatedAt.Format(time.ANSIC))

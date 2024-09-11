@@ -30,16 +30,16 @@ func (su *SubscriptionUpdate) Where(ps ...predicate.Subscription) *SubscriptionU
 	return su
 }
 
-// SetProviderSubscriptionID sets the "provider_subscription_id" field.
-func (su *SubscriptionUpdate) SetProviderSubscriptionID(s string) *SubscriptionUpdate {
-	su.mutation.SetProviderSubscriptionID(s)
+// SetProviderPlanID sets the "provider_plan_id" field.
+func (su *SubscriptionUpdate) SetProviderPlanID(s string) *SubscriptionUpdate {
+	su.mutation.SetProviderPlanID(s)
 	return su
 }
 
-// SetNillableProviderSubscriptionID sets the "provider_subscription_id" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableProviderSubscriptionID(s *string) *SubscriptionUpdate {
+// SetNillableProviderPlanID sets the "provider_plan_id" field if the given value is not nil.
+func (su *SubscriptionUpdate) SetNillableProviderPlanID(s *string) *SubscriptionUpdate {
 	if s != nil {
-		su.SetProviderSubscriptionID(*s)
+		su.SetProviderPlanID(*s)
 	}
 	return su
 }
@@ -247,8 +247,8 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := su.mutation.ProviderSubscriptionID(); ok {
-		_spec.SetField(subscription.FieldProviderSubscriptionID, field.TypeString, value)
+	if value, ok := su.mutation.ProviderPlanID(); ok {
+		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
 	}
 	if value, ok := su.mutation.Price(); ok {
 		_spec.SetField(subscription.FieldPrice, field.TypeInt, value)
@@ -384,16 +384,16 @@ type SubscriptionUpdateOne struct {
 	mutation *SubscriptionMutation
 }
 
-// SetProviderSubscriptionID sets the "provider_subscription_id" field.
-func (suo *SubscriptionUpdateOne) SetProviderSubscriptionID(s string) *SubscriptionUpdateOne {
-	suo.mutation.SetProviderSubscriptionID(s)
+// SetProviderPlanID sets the "provider_plan_id" field.
+func (suo *SubscriptionUpdateOne) SetProviderPlanID(s string) *SubscriptionUpdateOne {
+	suo.mutation.SetProviderPlanID(s)
 	return suo
 }
 
-// SetNillableProviderSubscriptionID sets the "provider_subscription_id" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableProviderSubscriptionID(s *string) *SubscriptionUpdateOne {
+// SetNillableProviderPlanID sets the "provider_plan_id" field if the given value is not nil.
+func (suo *SubscriptionUpdateOne) SetNillableProviderPlanID(s *string) *SubscriptionUpdateOne {
 	if s != nil {
-		suo.SetProviderSubscriptionID(*s)
+		suo.SetProviderPlanID(*s)
 	}
 	return suo
 }
@@ -631,8 +631,8 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 			}
 		}
 	}
-	if value, ok := suo.mutation.ProviderSubscriptionID(); ok {
-		_spec.SetField(subscription.FieldProviderSubscriptionID, field.TypeString, value)
+	if value, ok := suo.mutation.ProviderPlanID(); ok {
+		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.Price(); ok {
 		_spec.SetField(subscription.FieldPrice, field.TypeInt, value)

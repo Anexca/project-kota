@@ -130,11 +130,11 @@ func init() {
 	paymentFields := schema.Payment{}.Fields()
 	_ = paymentFields
 	// paymentDescCreatedAt is the schema descriptor for created_at field.
-	paymentDescCreatedAt := paymentFields[5].Descriptor()
+	paymentDescCreatedAt := paymentFields[6].Descriptor()
 	// payment.DefaultCreatedAt holds the default value on creation for the created_at field.
 	payment.DefaultCreatedAt = paymentDescCreatedAt.Default.(func() time.Time)
 	// paymentDescUpdatedAt is the schema descriptor for updated_at field.
-	paymentDescUpdatedAt := paymentFields[6].Descriptor()
+	paymentDescUpdatedAt := paymentFields[7].Descriptor()
 	// payment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	payment.DefaultUpdatedAt = paymentDescUpdatedAt.Default.(func() time.Time)
 	// payment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

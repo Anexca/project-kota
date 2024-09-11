@@ -184,6 +184,7 @@ var (
 		{Name: "payment_status", Type: field.TypeEnum, Enums: []string{"CREATED", "AUTHORIZED", "CAPTURED", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED", "PENDING", "PROCESSING", "CANCELLED", "DISPUTED"}},
 		{Name: "payment_method", Type: field.TypeString},
 		{Name: "payment_payment_id", Type: field.TypeString, Unique: true},
+		{Name: "receipt_id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "user_payments", Type: field.TypeUUID, Nullable: true},
@@ -197,13 +198,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "payments_users_payments",
-				Columns:    []*schema.Column{PaymentsColumns[8]},
+				Columns:    []*schema.Column{PaymentsColumns[9]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "payments_user_subscriptions_payments",
-				Columns:    []*schema.Column{PaymentsColumns[9]},
+				Columns:    []*schema.Column{PaymentsColumns[10]},
 				RefColumns: []*schema.Column{UserSubscriptionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -212,7 +213,7 @@ var (
 	// SubscriptionsColumns holds the columns for the "subscriptions" table.
 	SubscriptionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "provider_subscription_id", Type: field.TypeString},
+		{Name: "provider_plan_id", Type: field.TypeString},
 		{Name: "price", Type: field.TypeInt},
 		{Name: "duration_in_months", Type: field.TypeString},
 		{Name: "is_active", Type: field.TypeBool},

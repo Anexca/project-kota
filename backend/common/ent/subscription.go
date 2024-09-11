@@ -18,8 +18,8 @@ type Subscription struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// ProviderSubscriptionID holds the value of the "provider_subscription_id" field.
-	ProviderSubscriptionID string `json:"provider_subscription_id,omitempty"`
+	// ProviderPlanID holds the value of the "provider_plan_id" field.
+	ProviderPlanID string `json:"provider_plan_id,omitempty"`
 	// Price holds the value of the "price" field.
 	Price int `json:"price,omitempty"`
 	// DurationInMonths holds the value of the "duration_in_months" field.
@@ -80,7 +80,7 @@ func (*Subscription) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case subscription.FieldID, subscription.FieldPrice:
 			values[i] = new(sql.NullInt64)
-		case subscription.FieldProviderSubscriptionID, subscription.FieldDurationInMonths, subscription.FieldName:
+		case subscription.FieldProviderPlanID, subscription.FieldDurationInMonths, subscription.FieldName:
 			values[i] = new(sql.NullString)
 		case subscription.FieldCreatedAt, subscription.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -105,11 +105,11 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			s.ID = int(value.Int64)
-		case subscription.FieldProviderSubscriptionID:
+		case subscription.FieldProviderPlanID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field provider_subscription_id", values[i])
+				return fmt.Errorf("unexpected type %T for field provider_plan_id", values[i])
 			} else if value.Valid {
-				s.ProviderSubscriptionID = value.String
+				s.ProviderPlanID = value.String
 			}
 		case subscription.FieldPrice:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -201,8 +201,8 @@ func (s *Subscription) String() string {
 	var builder strings.Builder
 	builder.WriteString("Subscription(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
-	builder.WriteString("provider_subscription_id=")
-	builder.WriteString(s.ProviderSubscriptionID)
+	builder.WriteString("provider_plan_id=")
+	builder.WriteString(s.ProviderPlanID)
 	builder.WriteString(", ")
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", s.Price))

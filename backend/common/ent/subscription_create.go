@@ -22,9 +22,9 @@ type SubscriptionCreate struct {
 	hooks    []Hook
 }
 
-// SetProviderSubscriptionID sets the "provider_subscription_id" field.
-func (sc *SubscriptionCreate) SetProviderSubscriptionID(s string) *SubscriptionCreate {
-	sc.mutation.SetProviderSubscriptionID(s)
+// SetProviderPlanID sets the "provider_plan_id" field.
+func (sc *SubscriptionCreate) SetProviderPlanID(s string) *SubscriptionCreate {
+	sc.mutation.SetProviderPlanID(s)
 	return sc
 }
 
@@ -163,8 +163,8 @@ func (sc *SubscriptionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *SubscriptionCreate) check() error {
-	if _, ok := sc.mutation.ProviderSubscriptionID(); !ok {
-		return &ValidationError{Name: "provider_subscription_id", err: errors.New(`ent: missing required field "Subscription.provider_subscription_id"`)}
+	if _, ok := sc.mutation.ProviderPlanID(); !ok {
+		return &ValidationError{Name: "provider_plan_id", err: errors.New(`ent: missing required field "Subscription.provider_plan_id"`)}
 	}
 	if _, ok := sc.mutation.Price(); !ok {
 		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Subscription.price"`)}
@@ -210,9 +210,9 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_node = &Subscription{config: sc.config}
 		_spec = sqlgraph.NewCreateSpec(subscription.Table, sqlgraph.NewFieldSpec(subscription.FieldID, field.TypeInt))
 	)
-	if value, ok := sc.mutation.ProviderSubscriptionID(); ok {
-		_spec.SetField(subscription.FieldProviderSubscriptionID, field.TypeString, value)
-		_node.ProviderSubscriptionID = value
+	if value, ok := sc.mutation.ProviderPlanID(); ok {
+		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
+		_node.ProviderPlanID = value
 	}
 	if value, ok := sc.mutation.Price(); ok {
 		_spec.SetField(subscription.FieldPrice, field.TypeInt, value)

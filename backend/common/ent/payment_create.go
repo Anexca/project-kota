@@ -53,6 +53,12 @@ func (pc *PaymentCreate) SetPaymentPaymentID(s string) *PaymentCreate {
 	return pc
 }
 
+// SetReceiptID sets the "receipt_id" field.
+func (pc *PaymentCreate) SetReceiptID(s string) *PaymentCreate {
+	pc.mutation.SetReceiptID(s)
+	return pc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (pc *PaymentCreate) SetCreatedAt(t time.Time) *PaymentCreate {
 	pc.mutation.SetCreatedAt(t)
@@ -186,6 +192,9 @@ func (pc *PaymentCreate) check() error {
 	if _, ok := pc.mutation.PaymentPaymentID(); !ok {
 		return &ValidationError{Name: "payment_payment_id", err: errors.New(`ent: missing required field "Payment.payment_payment_id"`)}
 	}
+	if _, ok := pc.mutation.ReceiptID(); !ok {
+		return &ValidationError{Name: "receipt_id", err: errors.New(`ent: missing required field "Payment.receipt_id"`)}
+	}
 	if _, ok := pc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Payment.created_at"`)}
 	}
@@ -237,6 +246,10 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.PaymentPaymentID(); ok {
 		_spec.SetField(payment.FieldPaymentPaymentID, field.TypeString, value)
 		_node.PaymentPaymentID = value
+	}
+	if value, ok := pc.mutation.ReceiptID(); ok {
+		_spec.SetField(payment.FieldReceiptID, field.TypeString, value)
+		_node.ReceiptID = value
 	}
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.SetField(payment.FieldCreatedAt, field.TypeTime, value)

@@ -5303,6 +5303,7 @@ type PaymentMutation struct {
 	payment_status      *payment.PaymentStatus
 	payment_method      *string
 	payment_payment_id  *string
+	receipt_id          *string
 	created_at          *time.Time
 	updated_at          *time.Time
 	clearedFields       map[string]struct{}
@@ -5613,6 +5614,42 @@ func (m *PaymentMutation) ResetPaymentPaymentID() {
 	m.payment_payment_id = nil
 }
 
+// SetReceiptID sets the "receipt_id" field.
+func (m *PaymentMutation) SetReceiptID(s string) {
+	m.receipt_id = &s
+}
+
+// ReceiptID returns the value of the "receipt_id" field in the mutation.
+func (m *PaymentMutation) ReceiptID() (r string, exists bool) {
+	v := m.receipt_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReceiptID returns the old "receipt_id" field's value of the Payment entity.
+// If the Payment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PaymentMutation) OldReceiptID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReceiptID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReceiptID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReceiptID: %w", err)
+	}
+	return oldValue.ReceiptID, nil
+}
+
+// ResetReceiptID resets all changes to the "receipt_id" field.
+func (m *PaymentMutation) ResetReceiptID() {
+	m.receipt_id = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *PaymentMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -5797,7 +5834,7 @@ func (m *PaymentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PaymentMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.amount != nil {
 		fields = append(fields, payment.FieldAmount)
 	}
@@ -5812,6 +5849,9 @@ func (m *PaymentMutation) Fields() []string {
 	}
 	if m.payment_payment_id != nil {
 		fields = append(fields, payment.FieldPaymentPaymentID)
+	}
+	if m.receipt_id != nil {
+		fields = append(fields, payment.FieldReceiptID)
 	}
 	if m.created_at != nil {
 		fields = append(fields, payment.FieldCreatedAt)
@@ -5837,6 +5877,8 @@ func (m *PaymentMutation) Field(name string) (ent.Value, bool) {
 		return m.PaymentMethod()
 	case payment.FieldPaymentPaymentID:
 		return m.PaymentPaymentID()
+	case payment.FieldReceiptID:
+		return m.ReceiptID()
 	case payment.FieldCreatedAt:
 		return m.CreatedAt()
 	case payment.FieldUpdatedAt:
@@ -5860,6 +5902,8 @@ func (m *PaymentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldPaymentMethod(ctx)
 	case payment.FieldPaymentPaymentID:
 		return m.OldPaymentPaymentID(ctx)
+	case payment.FieldReceiptID:
+		return m.OldReceiptID(ctx)
 	case payment.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case payment.FieldUpdatedAt:
@@ -5907,6 +5951,13 @@ func (m *PaymentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPaymentPaymentID(v)
+		return nil
+	case payment.FieldReceiptID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReceiptID(v)
 		return nil
 	case payment.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -6000,6 +6051,9 @@ func (m *PaymentMutation) ResetField(name string) error {
 		return nil
 	case payment.FieldPaymentPaymentID:
 		m.ResetPaymentPaymentID()
+		return nil
+	case payment.FieldReceiptID:
+		m.ResetReceiptID()
 		return nil
 	case payment.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -6109,7 +6163,7 @@ type SubscriptionMutation struct {
 	op                        Op
 	typ                       string
 	id                        *int
-	provider_subscription_id  *string
+	provider_plan_id          *string
 	price                     *int
 	addprice                  *int
 	duration_in_months        *string
@@ -6228,40 +6282,40 @@ func (m *SubscriptionMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetProviderSubscriptionID sets the "provider_subscription_id" field.
-func (m *SubscriptionMutation) SetProviderSubscriptionID(s string) {
-	m.provider_subscription_id = &s
+// SetProviderPlanID sets the "provider_plan_id" field.
+func (m *SubscriptionMutation) SetProviderPlanID(s string) {
+	m.provider_plan_id = &s
 }
 
-// ProviderSubscriptionID returns the value of the "provider_subscription_id" field in the mutation.
-func (m *SubscriptionMutation) ProviderSubscriptionID() (r string, exists bool) {
-	v := m.provider_subscription_id
+// ProviderPlanID returns the value of the "provider_plan_id" field in the mutation.
+func (m *SubscriptionMutation) ProviderPlanID() (r string, exists bool) {
+	v := m.provider_plan_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldProviderSubscriptionID returns the old "provider_subscription_id" field's value of the Subscription entity.
+// OldProviderPlanID returns the old "provider_plan_id" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldProviderSubscriptionID(ctx context.Context) (v string, err error) {
+func (m *SubscriptionMutation) OldProviderPlanID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProviderSubscriptionID is only allowed on UpdateOne operations")
+		return v, errors.New("OldProviderPlanID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProviderSubscriptionID requires an ID field in the mutation")
+		return v, errors.New("OldProviderPlanID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProviderSubscriptionID: %w", err)
+		return v, fmt.Errorf("querying old value for OldProviderPlanID: %w", err)
 	}
-	return oldValue.ProviderSubscriptionID, nil
+	return oldValue.ProviderPlanID, nil
 }
 
-// ResetProviderSubscriptionID resets all changes to the "provider_subscription_id" field.
-func (m *SubscriptionMutation) ResetProviderSubscriptionID() {
-	m.provider_subscription_id = nil
+// ResetProviderPlanID resets all changes to the "provider_plan_id" field.
+func (m *SubscriptionMutation) ResetProviderPlanID() {
+	m.provider_plan_id = nil
 }
 
 // SetPrice sets the "price" field.
@@ -6692,8 +6746,8 @@ func (m *SubscriptionMutation) Type() string {
 // AddedFields().
 func (m *SubscriptionMutation) Fields() []string {
 	fields := make([]string, 0, 8)
-	if m.provider_subscription_id != nil {
-		fields = append(fields, subscription.FieldProviderSubscriptionID)
+	if m.provider_plan_id != nil {
+		fields = append(fields, subscription.FieldProviderPlanID)
 	}
 	if m.price != nil {
 		fields = append(fields, subscription.FieldPrice)
@@ -6724,8 +6778,8 @@ func (m *SubscriptionMutation) Fields() []string {
 // schema.
 func (m *SubscriptionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case subscription.FieldProviderSubscriptionID:
-		return m.ProviderSubscriptionID()
+	case subscription.FieldProviderPlanID:
+		return m.ProviderPlanID()
 	case subscription.FieldPrice:
 		return m.Price()
 	case subscription.FieldDurationInMonths:
@@ -6749,8 +6803,8 @@ func (m *SubscriptionMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *SubscriptionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case subscription.FieldProviderSubscriptionID:
-		return m.OldProviderSubscriptionID(ctx)
+	case subscription.FieldProviderPlanID:
+		return m.OldProviderPlanID(ctx)
 	case subscription.FieldPrice:
 		return m.OldPrice(ctx)
 	case subscription.FieldDurationInMonths:
@@ -6774,12 +6828,12 @@ func (m *SubscriptionMutation) OldField(ctx context.Context, name string) (ent.V
 // type.
 func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case subscription.FieldProviderSubscriptionID:
+	case subscription.FieldProviderPlanID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetProviderSubscriptionID(v)
+		m.SetProviderPlanID(v)
 		return nil
 	case subscription.FieldPrice:
 		v, ok := value.(int)
@@ -6903,8 +6957,8 @@ func (m *SubscriptionMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *SubscriptionMutation) ResetField(name string) error {
 	switch name {
-	case subscription.FieldProviderSubscriptionID:
-		m.ResetProviderSubscriptionID()
+	case subscription.FieldProviderPlanID:
+		m.ResetProviderPlanID()
 		return nil
 	case subscription.FieldPrice:
 		m.ResetPrice()

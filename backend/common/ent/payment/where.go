@@ -75,6 +75,11 @@ func PaymentPaymentID(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldPaymentPaymentID, v))
 }
 
+// ReceiptID applies equality check predicate on the "receipt_id" field. It's identical to ReceiptIDEQ.
+func ReceiptID(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldReceiptID, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldCreatedAt, v))
@@ -313,6 +318,71 @@ func PaymentPaymentIDEqualFold(v string) predicate.Payment {
 // PaymentPaymentIDContainsFold applies the ContainsFold predicate on the "payment_payment_id" field.
 func PaymentPaymentIDContainsFold(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldContainsFold(FieldPaymentPaymentID, v))
+}
+
+// ReceiptIDEQ applies the EQ predicate on the "receipt_id" field.
+func ReceiptIDEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldReceiptID, v))
+}
+
+// ReceiptIDNEQ applies the NEQ predicate on the "receipt_id" field.
+func ReceiptIDNEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldReceiptID, v))
+}
+
+// ReceiptIDIn applies the In predicate on the "receipt_id" field.
+func ReceiptIDIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldReceiptID, vs...))
+}
+
+// ReceiptIDNotIn applies the NotIn predicate on the "receipt_id" field.
+func ReceiptIDNotIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldReceiptID, vs...))
+}
+
+// ReceiptIDGT applies the GT predicate on the "receipt_id" field.
+func ReceiptIDGT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldReceiptID, v))
+}
+
+// ReceiptIDGTE applies the GTE predicate on the "receipt_id" field.
+func ReceiptIDGTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldReceiptID, v))
+}
+
+// ReceiptIDLT applies the LT predicate on the "receipt_id" field.
+func ReceiptIDLT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldReceiptID, v))
+}
+
+// ReceiptIDLTE applies the LTE predicate on the "receipt_id" field.
+func ReceiptIDLTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldReceiptID, v))
+}
+
+// ReceiptIDContains applies the Contains predicate on the "receipt_id" field.
+func ReceiptIDContains(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContains(FieldReceiptID, v))
+}
+
+// ReceiptIDHasPrefix applies the HasPrefix predicate on the "receipt_id" field.
+func ReceiptIDHasPrefix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasPrefix(FieldReceiptID, v))
+}
+
+// ReceiptIDHasSuffix applies the HasSuffix predicate on the "receipt_id" field.
+func ReceiptIDHasSuffix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasSuffix(FieldReceiptID, v))
+}
+
+// ReceiptIDEqualFold applies the EqualFold predicate on the "receipt_id" field.
+func ReceiptIDEqualFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEqualFold(FieldReceiptID, v))
+}
+
+// ReceiptIDContainsFold applies the ContainsFold predicate on the "receipt_id" field.
+func ReceiptIDContainsFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContainsFold(FieldReceiptID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

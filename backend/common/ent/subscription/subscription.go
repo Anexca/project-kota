@@ -14,8 +14,8 @@ const (
 	Label = "subscription"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldProviderSubscriptionID holds the string denoting the provider_subscription_id field in the database.
-	FieldProviderSubscriptionID = "provider_subscription_id"
+	// FieldProviderPlanID holds the string denoting the provider_plan_id field in the database.
+	FieldProviderPlanID = "provider_plan_id"
 	// FieldPrice holds the string denoting the price field in the database.
 	FieldPrice = "price"
 	// FieldDurationInMonths holds the string denoting the duration_in_months field in the database.
@@ -55,7 +55,7 @@ const (
 // Columns holds all SQL columns for subscription fields.
 var Columns = []string{
 	FieldID,
-	FieldProviderSubscriptionID,
+	FieldProviderPlanID,
 	FieldPrice,
 	FieldDurationInMonths,
 	FieldIsActive,
@@ -92,9 +92,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByProviderSubscriptionID orders the results by the provider_subscription_id field.
-func ByProviderSubscriptionID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldProviderSubscriptionID, opts...).ToFunc()
+// ByProviderPlanID orders the results by the provider_plan_id field.
+func ByProviderPlanID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProviderPlanID, opts...).ToFunc()
 }
 
 // ByPrice orders the results by the price field.

@@ -17,7 +17,7 @@ type Subscription struct {
 // Fields of the Subscription.
 func (Subscription) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("provider_subscription_id"),
+		field.String("provider_plan_id"),
 		field.Int("price"),
 		field.String("duration_in_months"),
 		field.Bool("is_active"),
