@@ -60,10 +60,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Get("/{id}", s.GetGeneratedExamById)
 			r.Get("/{id}/assessments", s.GetExamAssessments)
 		})
+
+		r.Route("/payments", func(r chi.Router) {
+			r.Post("/create", s.CreateOrder)
+		})
+
 	})
 
-	r.Route("/payments", func(r chi.Router) {
-		r.Post("/create", s.CreateOrder)
+	r.Route("/subscriptions", func(r chi.Router) {
+		r.Get("/", s.GetAllSubscriptions)
 	})
 
 	return r

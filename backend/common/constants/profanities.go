@@ -675,7 +675,6 @@ var DefaultProfanities = []string{
 	"poop",
 	"porn",
 	"prick",
-	"prostitut",
 	"pube",
 	"pussie",
 	"pussy",
