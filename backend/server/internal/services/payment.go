@@ -1,6 +1,8 @@
 package services
 
-import "github.com/razorpay/razorpay-go"
+import (
+	"github.com/razorpay/razorpay-go"
+)
 
 type PaymentService struct {
 	paymentClient *razorpay.Client
@@ -11,7 +13,7 @@ type CreateSubscriptionModel struct {
 	TotalBillingCycles int
 }
 
-type CreatePaymentProviderCustomerModel struct {
+type UpsertPaymentProviderCustomerModel struct {
 	Name  string
 	Email string
 	Phone string
@@ -23,7 +25,7 @@ func NewPaymentService(paymentClient *razorpay.Client) *PaymentService {
 	}
 }
 
-func (p *PaymentService) CreateCustomer(model CreatePaymentProviderCustomerModel) (map[string]interface{}, error) {
+func (p *PaymentService) CreateCustomer(model UpsertPaymentProviderCustomerModel) (map[string]interface{}, error) {
 	data := map[string]interface{}{
 		"name":          model.Name,
 		"contact":       model.Phone,
@@ -32,6 +34,16 @@ func (p *PaymentService) CreateCustomer(model CreatePaymentProviderCustomerModel
 	}
 
 	return p.paymentClient.Customer.Create(data, nil)
+}
+
+func (p *PaymentService) UpdateCustomer(customerID string, model UpsertPaymentProviderCustomerModel) (map[string]interface{}, error) {
+	data := map[string]interface{}{
+		"name":    model.Name,
+		"contact": model.Phone,
+		"email":   model.Email,
+	}
+
+	return p.paymentClient.Customer.Edit(customerID, data, nil)
 }
 
 func (p *PaymentService) CreateSubscription(model CreateSubscriptionModel) (map[string]interface{}, error) {

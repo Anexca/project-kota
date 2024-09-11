@@ -35,7 +35,7 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 	logger := commonConfig.SetupLogger()
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 
-	userService := services.NewUserService(dbClient)
+	userService := services.NewUserService(dbClient, paymentClient)
 	authService := services.NewAuthService(supabaseClient)
 	redisService := commonService.NewRedisService(redisClient)
 	paymentService := services.NewPaymentService(paymentClient)
