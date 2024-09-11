@@ -62,6 +62,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 	})
 
+	r.Route("/payments", func(r chi.Router) {
+		r.Post("/create", s.CreateOrder)
+	})
+
 	return r
 }
 
