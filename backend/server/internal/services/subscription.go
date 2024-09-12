@@ -36,12 +36,12 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]*ent.Subscription, 
 
 func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*ent.UserSubscription, error) {
 	user, err := s.userService.GetUser(ctx, userId)
-	if user.PaymentProviderCustomerID == "" {
-		return nil, fmt.Errorf("user %s profile does not have enough data to start subscription", user.Email)
-	}
-
 	if err != nil {
 		return nil, err
+	}
+
+	if user.PaymentProviderCustomerID == "" {
+		return nil, fmt.Errorf("user %s profile does not have enough data to start subscription", user.Email)
 	}
 
 	subscription, err := s.subscriptionRepository.GetById(ctx, subscriptionId)
@@ -74,6 +74,20 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 	userSubscription, err := s.userSubscriptionRepository.Create(ctx, userSubscriptionModel)
 	if err != nil {
 		return nil, err
+	}
+
+	return userSubscription, nil
+}
+
+func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
+	userSubscription, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.paymentService.CancelUserSubscription(userSubscription.ProviderSubscriptionID)
+	if err != nil {
+		return nil, fmt.Errorf("error canceling subscription with payment provider: %v", err)
 	}
 
 	return userSubscription, nil
