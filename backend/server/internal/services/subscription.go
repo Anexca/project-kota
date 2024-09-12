@@ -64,7 +64,7 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 
 	createdSubscriptionId, ok := createdSubscription["id"].(string)
 	if !ok {
-		return nil, fmt.Errorf("cound not get id from object %v", createdSubscription)
+		return nil, fmt.Errorf("could not get id from object %v", createdSubscription)
 	}
 
 	userSubscriptionModel := commonRepositories.UserSubscriptionModel{
