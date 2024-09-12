@@ -181,7 +181,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "amount", Type: field.TypeInt},
 		{Name: "payment_date", Type: field.TypeTime},
-		{Name: "payment_status", Type: field.TypeEnum, Enums: []string{"CREATED", "AUTHORIZED", "CAPTURED", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED", "PENDING", "PROCESSING", "CANCELLED", "DISPUTED"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"CREATED", "AUTHORIZED", "CAPTURED", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED", "PENDING", "PROCESSING", "CANCELLED", "DISPUTED"}},
 		{Name: "payment_method", Type: field.TypeString},
 		{Name: "payment_payment_id", Type: field.TypeString, Unique: true},
 		{Name: "receipt_id", Type: field.TypeString, Unique: true},
@@ -275,6 +275,7 @@ var (
 	UserSubscriptionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "is_active", Type: field.TypeBool},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ACTIVE", "CANCELED", "EXPIRED", "PENDING", "PAUSED"}, Default: "PENDING"},
 		{Name: "start_date", Type: field.TypeTime, Nullable: true},
 		{Name: "end_date", Type: field.TypeTime, Nullable: true},
 		{Name: "provider_subscription_id", Type: field.TypeString, Unique: true},
@@ -291,13 +292,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "user_subscriptions_subscriptions_user_subscriptions",
-				Columns:    []*schema.Column{UserSubscriptionsColumns[7]},
+				Columns:    []*schema.Column{UserSubscriptionsColumns[8]},
 				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "user_subscriptions_users_subscriptions",
-				Columns:    []*schema.Column{UserSubscriptionsColumns[8]},
+				Columns:    []*schema.Column{UserSubscriptionsColumns[9]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

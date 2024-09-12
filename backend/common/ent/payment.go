@@ -24,8 +24,8 @@ type Payment struct {
 	Amount int `json:"amount,omitempty"`
 	// PaymentDate holds the value of the "payment_date" field.
 	PaymentDate time.Time `json:"payment_date,omitempty"`
-	// PaymentStatus holds the value of the "payment_status" field.
-	PaymentStatus payment.PaymentStatus `json:"payment_status,omitempty"`
+	// Status holds the value of the "status" field.
+	Status payment.Status `json:"status,omitempty"`
 	// PaymentMethod holds the value of the "payment_method" field.
 	PaymentMethod string `json:"payment_method,omitempty"`
 	// PaymentPaymentID holds the value of the "payment_payment_id" field.
@@ -84,7 +84,7 @@ func (*Payment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case payment.FieldID, payment.FieldAmount:
 			values[i] = new(sql.NullInt64)
-		case payment.FieldPaymentStatus, payment.FieldPaymentMethod, payment.FieldPaymentPaymentID, payment.FieldReceiptID:
+		case payment.FieldStatus, payment.FieldPaymentMethod, payment.FieldPaymentPaymentID, payment.FieldReceiptID:
 			values[i] = new(sql.NullString)
 		case payment.FieldPaymentDate, payment.FieldCreatedAt, payment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -125,11 +125,11 @@ func (pa *Payment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pa.PaymentDate = value.Time
 			}
-		case payment.FieldPaymentStatus:
+		case payment.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field payment_status", values[i])
+				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				pa.PaymentStatus = payment.PaymentStatus(value.String)
+				pa.Status = payment.Status(value.String)
 			}
 		case payment.FieldPaymentMethod:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -227,8 +227,8 @@ func (pa *Payment) String() string {
 	builder.WriteString("payment_date=")
 	builder.WriteString(pa.PaymentDate.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("payment_status=")
-	builder.WriteString(fmt.Sprintf("%v", pa.PaymentStatus))
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", pa.Status))
 	builder.WriteString(", ")
 	builder.WriteString("payment_method=")
 	builder.WriteString(pa.PaymentMethod)

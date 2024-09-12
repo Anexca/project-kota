@@ -2,8 +2,10 @@ package services
 
 import (
 	"common/ent"
+	"common/ent/usersubscription"
 	commonRepositories "common/repositories"
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/razorpay/razorpay-go"
@@ -80,15 +82,26 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 }
 
 func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
-	userSubscription, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
+	userSubscriptionToCancel, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = s.paymentService.CancelUserSubscription(userSubscription.ProviderSubscriptionID)
+	if userSubscriptionToCancel.Status == usersubscription.StatusCANCELED {
+		return nil, errors.New("user subscrption is already cancelled")
+	}
+
+	_, err = s.paymentService.CancelUserSubscription(userSubscriptionToCancel.ProviderSubscriptionID)
 	if err != nil {
 		return nil, fmt.Errorf("error canceling subscription with payment provider: %v", err)
 	}
 
-	return userSubscription, nil
+	userSubscriptionToCancel.Status = usersubscription.StatusCANCELED
+
+	err = s.userSubscriptionRepository.Update(ctx, userSubscriptionToCancel)
+	if err != nil {
+		return nil, err
+	}
+
+	return userSubscriptionToCancel, nil
 }

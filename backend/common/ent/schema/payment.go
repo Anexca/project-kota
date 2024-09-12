@@ -34,7 +34,7 @@ func (Payment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("amount"),
 		field.Time("payment_date"),
-		field.Enum("payment_status").
+		field.Enum("status").
 			Values(
 				string(PaymentStatusCreated),
 				string(PaymentStatusAuthorized),

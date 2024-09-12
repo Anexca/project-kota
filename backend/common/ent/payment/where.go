@@ -170,24 +170,24 @@ func PaymentDateLTE(v time.Time) predicate.Payment {
 	return predicate.Payment(sql.FieldLTE(FieldPaymentDate, v))
 }
 
-// PaymentStatusEQ applies the EQ predicate on the "payment_status" field.
-func PaymentStatusEQ(v PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldEQ(FieldPaymentStatus, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldStatus, v))
 }
 
-// PaymentStatusNEQ applies the NEQ predicate on the "payment_status" field.
-func PaymentStatusNEQ(v PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldNEQ(FieldPaymentStatus, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldStatus, v))
 }
 
-// PaymentStatusIn applies the In predicate on the "payment_status" field.
-func PaymentStatusIn(vs ...PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldIn(FieldPaymentStatus, vs...))
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldStatus, vs...))
 }
 
-// PaymentStatusNotIn applies the NotIn predicate on the "payment_status" field.
-func PaymentStatusNotIn(vs ...PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldNotIn(FieldPaymentStatus, vs...))
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // PaymentMethodEQ applies the EQ predicate on the "payment_method" field.

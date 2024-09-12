@@ -13,10 +13,28 @@ type UserSubscription struct {
 	ent.Schema
 }
 
+type UserSubscriptionStatus string
+
+const (
+	UserSubscriptionStatusActive   UserSubscriptionStatus = "ACTIVE"
+	UserSubscriptionStatusCanceled UserSubscriptionStatus = "CANCELED"
+	UserSubscriptionStatusExpired  UserSubscriptionStatus = "EXPIRED"
+	UserSubscriptionStatusPending  UserSubscriptionStatus = "PENDING"
+	UserSubscriptionStatusPaused   UserSubscriptionStatus = "PAUSED"
+)
+
 // Fields of the UserSubscription.
 func (UserSubscription) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("is_active"),
+		field.Enum("status"). // Define the status field as an enum
+					Values(
+				string(UserSubscriptionStatusActive),
+				string(UserSubscriptionStatusCanceled),
+				string(UserSubscriptionStatusExpired),
+				string(UserSubscriptionStatusPending),
+				string(UserSubscriptionStatusPaused),
+			).Default(string(UserSubscriptionStatusPending)),
 		field.Time("start_date").Optional(),
 		field.Time("end_date").Optional(),
 		field.String("provider_subscription_id").Unique(),

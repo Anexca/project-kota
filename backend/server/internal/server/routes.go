@@ -70,6 +70,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Post("/{subscriptionId}/buy", s.StartSubscription)
 		})
 
+		r.Route("/user-subscriptions", func(r chi.Router) {
+			r.Post("/{userSubscriptionId}/cancel", s.CancelUserSubscription)
+		})
 	})
 
 	r.Get("/subscriptions", s.GetAllSubscriptions)

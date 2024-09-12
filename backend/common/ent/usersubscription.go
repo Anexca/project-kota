@@ -22,6 +22,8 @@ type UserSubscription struct {
 	ID int `json:"id,omitempty"`
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
+	// Status holds the value of the "status" field.
+	Status usersubscription.Status `json:"status,omitempty"`
 	// StartDate holds the value of the "start_date" field.
 	StartDate time.Time `json:"start_date,omitempty"`
 	// EndDate holds the value of the "end_date" field.
@@ -93,7 +95,7 @@ func (*UserSubscription) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case usersubscription.FieldID:
 			values[i] = new(sql.NullInt64)
-		case usersubscription.FieldProviderSubscriptionID:
+		case usersubscription.FieldStatus, usersubscription.FieldProviderSubscriptionID:
 			values[i] = new(sql.NullString)
 		case usersubscription.FieldStartDate, usersubscription.FieldEndDate, usersubscription.FieldCreatedAt, usersubscription.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -127,6 +129,12 @@ func (us *UserSubscription) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field is_active", values[i])
 			} else if value.Valid {
 				us.IsActive = value.Bool
+			}
+		case usersubscription.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				us.Status = usersubscription.Status(value.String)
 			}
 		case usersubscription.FieldStartDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -225,6 +233,9 @@ func (us *UserSubscription) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", us.ID))
 	builder.WriteString("is_active=")
 	builder.WriteString(fmt.Sprintf("%v", us.IsActive))
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", us.Status))
 	builder.WriteString(", ")
 	builder.WriteString("start_date=")
 	builder.WriteString(us.StartDate.Format(time.ANSIC))

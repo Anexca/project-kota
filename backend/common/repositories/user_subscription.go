@@ -46,6 +46,7 @@ func (u *UserSubscriptioRepository) Update(ctx context.Context, updatedUserSubsc
 		SetIsActive(updatedUserSubscription.IsActive).
 		SetStartDate(updatedUserSubscription.StartDate).
 		SetEndDate(updatedUserSubscription.EndDate).
+		SetStatus(updatedUserSubscription.Status).
 		Exec(ctx)
 }
 
