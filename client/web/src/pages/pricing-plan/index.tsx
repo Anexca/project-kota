@@ -1,8 +1,24 @@
+import { useEffect, useState } from "react";
 import { Button } from "../../componnets/base/button/button";
 import Icon from "../../componnets/base/icon";
 import Header from "../../componnets/shared/header/header";
+import RazorpayButton from "../../componnets/shared/razorpay-button";
+import { getPlans } from "../../services/payment.service";
+import { getUserProfile } from "../../services/profile.service";
 
 export default function PricingPlan() {
+  const [plans, setPlans] = useState<any>([]);
+  const [profile, setProfile] = useState<any>({});
+  const getPricingPlan = async () => {
+    const res = await getPlans();
+    const user = await getUserProfile();
+    setPlans(res.data);
+    setProfile(user.data);
+  };
+
+  useEffect(() => {
+    getPricingPlan();
+  }, []);
   return (
     <>
       <div className=" bg-neutral-50">
@@ -65,9 +81,23 @@ export default function PricingPlan() {
                     <span>{data.duration}</span>
                   </div>
                   <div className="flex align-bottom">
-                    <Button disabled={data.isDisables} className="w-full">
-                      {data.buttonText}
-                    </Button>
+                    {index ? (
+                      <Button disabled={data.isDisables} className="w-full">
+                        {data.buttonText}
+                      </Button>
+                    ) : (
+                      <RazorpayButton
+                        prefill={{
+                          name: profile.first_name,
+                          email: profile.email,
+                          contact: profile.phone_number,
+                        }}
+                        subscriptionId={plans[0]?.provider_plan_id}
+                        id={plans[0]?.id}
+                      >
+                        {data.buttonText}
+                      </RazorpayButton>
+                    )}
                   </div>
                 </div>
               </div>
@@ -107,3 +137,34 @@ const staticValue = [
     buttonText: "Comming soon",
   },
 ];
+
+{
+  /* <button id = "rzp-button1">Pay</button>
+		<script>
+			var options = {
+				"key": "key_id",
+				"subscription_id": "sub_00000000000001",
+				"name": "Acme Corp.",
+				"description": "Monthly Test Plan",
+				"image": "/your_logo.jpg",
+				"callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+				"prefill": {
+					"name": "Gaurav Kumar",
+					"email": "gaurav.kumar@example.com",
+					"contact": "+919876543210"
+				},
+				"notes": {
+					"note_key_1": "Tea. Earl Grey. Hot",
+					"note_key_2": "Make it so."
+				},
+				"theme": {
+					"color": "#F37254"
+				}
+			};
+			var rzp1 = new Razorpay(options);
+			document.getElementById('rzp-button1').onclick = function(e) {
+				rzp1.open();
+				e.preventDefault();
+			}
+			</script> */
+}
