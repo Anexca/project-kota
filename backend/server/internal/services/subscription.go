@@ -5,11 +5,9 @@ import (
 	"common/ent/usersubscription"
 	commonRepositories "common/repositories"
 	"context"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
+	"log"
 	"server/pkg/config"
 	"time"
 
@@ -103,13 +101,19 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 		return nil, err
 	}
 
-	generatedSignature := s.generateSignature(
-		request.PaymentId,
-		userSubscriptionToUpdate.ProviderSubscriptionID,
-		s.environment.RazorpaySecret,
-	)
+	existingPayment, err := s.paymentrepository.GetByProviderPaymentId(ctx, request.PaymentId)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if !errors.As(err, &notFoundError) {
+			return nil, err
+		}
+	}
 
-	if !s.verifySignature(generatedSignature, request.Signature) {
+	if existingPayment != nil {
+		return nil, fmt.Errorf("record of payment with %s id already exists", request.PaymentId)
+	}
+
+	if !s.paymentService.IsSubscriptionPaymentSignatureValid(request.PaymentId, userSubscriptionToUpdate.ProviderSubscriptionID, request.Signature) {
 		return nil, errors.New("payment verification failed")
 	}
 
@@ -119,8 +123,19 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 
 	go func() {
 		bgCtx := context.Background()
-		s.StorePaymentForSubscription(bgCtx, request.PaymentId, userSubscriptionId, userId)
+		payment, err := s.StorePaymentForSubscription(bgCtx, request.PaymentId, userSubscriptionId, userId)
+		if err != nil {
+			log.Printf("could not store payment %v", err)
+			return
+		}
+
+		log.Println("payment info stored successfully with id", payment.ID)
 	}()
+
+	err = s.userSubscriptionRepository.Update(ctx, userSubscriptionToUpdate)
+	if err != nil {
+		return nil, err
+	}
 
 	return userSubscriptionToUpdate, nil
 }
@@ -131,12 +146,12 @@ func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, p
 		return nil, err
 	}
 
-	amount, ok := paymentInfo["amount"].(int)
+	amount, ok := paymentInfo["amount"].(float64)
 	if !ok {
 		return nil, fmt.Errorf("could not get amount from object %v", paymentInfo)
 	}
 
-	createdAt, ok := paymentInfo["created_at"].(time.Time)
+	createdAt, ok := paymentInfo["created_at"].(float64)
 	if !ok {
 		return nil, fmt.Errorf("could not get created_at from object %v", paymentInfo)
 	}
@@ -151,13 +166,19 @@ func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, p
 		return nil, fmt.Errorf("could not get status from object %v", paymentInfo)
 	}
 
+	invoiceId, ok := paymentInfo["invoice_id"].(string)
+	if !ok {
+		return nil, fmt.Errorf("could not get invoice_id from object %v", paymentInfo)
+	}
+
 	paymentModel := commonRepositories.CreatePaymentModel{
 		Status:             status,
 		PaymentMethod:      method,
-		PaymentDate:        createdAt,
-		Amount:             amount,
+		PaymentDate:        time.Unix(int64(createdAt), 0),
+		Amount:             int(amount),
 		UserSubscriptionId: userSubscriptionId,
 		ProviderPaymentId:  providerPaymentId,
+		ProviderInvoiceId:  invoiceId,
 	}
 
 	return s.paymentrepository.Create(ctx, paymentModel, userId)
@@ -186,18 +207,4 @@ func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSu
 	}
 
 	return userSubscriptionToCancel, nil
-}
-
-func (s *SubscriptionService) generateSignature(razorpayPaymentID, subscriptionID, secret string) string {
-	data := razorpayPaymentID + "|" + subscriptionID
-
-	h := hmac.New(sha256.New, []byte(secret))
-
-	h.Write([]byte(data))
-
-	return hex.EncodeToString(h.Sum(nil))
-}
-
-func (s *SubscriptionService) verifySignature(generatedSignature, razorpaySignature string) bool {
-	return generatedSignature == razorpaySignature
 }

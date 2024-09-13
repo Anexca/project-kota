@@ -1,11 +1,15 @@
 package services
 
 import (
+	"server/pkg/config"
+
 	"github.com/razorpay/razorpay-go"
+	utils "github.com/razorpay/razorpay-go/utils"
 )
 
 type PaymentService struct {
 	paymentClient *razorpay.Client
+	environment   *config.Environment
 }
 
 type CreateSubscriptionModel struct {
@@ -21,7 +25,10 @@ type UpsertPaymentProviderCustomerModel struct {
 }
 
 func NewPaymentService(paymentClient *razorpay.Client) *PaymentService {
+	environment, _ := config.LoadEnvironment()
+
 	return &PaymentService{
+		environment:   environment,
 		paymentClient: paymentClient,
 	}
 }
@@ -64,4 +71,15 @@ func (p *PaymentService) CancelUserSubscription(subscriptionId string) (map[stri
 
 func (p *PaymentService) GetPayment(paymentId string) (map[string]interface{}, error) {
 	return p.paymentClient.Payment.Fetch(paymentId, nil, nil)
+}
+
+func (p *PaymentService) IsSubscriptionPaymentSignatureValid(paymentId, subscriptionId, signatureToVerify string) bool {
+	params := map[string]interface{}{
+		"razorpay_subscription_id": subscriptionId,
+		"razorpay_payment_id":      paymentId,
+	}
+
+	signature := signatureToVerify
+	secret := p.environment.RazorpaySecret
+	return utils.VerifySubscriptionSignature(params, signature, secret)
 }

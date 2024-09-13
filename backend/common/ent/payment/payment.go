@@ -25,8 +25,8 @@ const (
 	FieldPaymentMethod = "payment_method"
 	// FieldProviderPaymentID holds the string denoting the provider_payment_id field in the database.
 	FieldProviderPaymentID = "provider_payment_id"
-	// FieldReceiptID holds the string denoting the receipt_id field in the database.
-	FieldReceiptID = "receipt_id"
+	// FieldProviderInvoiceID holds the string denoting the provider_invoice_id field in the database.
+	FieldProviderInvoiceID = "provider_invoice_id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -61,7 +61,7 @@ var Columns = []string{
 	FieldStatus,
 	FieldPaymentMethod,
 	FieldProviderPaymentID,
-	FieldReceiptID,
+	FieldProviderInvoiceID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -161,9 +161,9 @@ func ByProviderPaymentID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProviderPaymentID, opts...).ToFunc()
 }
 
-// ByReceiptID orders the results by the receipt_id field.
-func ByReceiptID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldReceiptID, opts...).ToFunc()
+// ByProviderInvoiceID orders the results by the provider_invoice_id field.
+func ByProviderInvoiceID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProviderInvoiceID, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
