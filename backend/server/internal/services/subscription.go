@@ -5,26 +5,38 @@ import (
 	"common/ent/usersubscription"
 	commonRepositories "common/repositories"
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"server/pkg/config"
 
 	"github.com/razorpay/razorpay-go"
 )
 
 type SubscriptionService struct {
+	environment                *config.Environment
 	paymentService             *PaymentService
 	userService                *UserService
 	subscriptionRepository     *commonRepositories.SubscriptionRepository
 	userSubscriptionRepository *commonRepositories.UserSubscriptioRepository
 }
 
+type ActivateUserSubscriptionRequest struct {
+	PaymentId string `json:"payment_id" validate:"required"`
+	Signature string `json:"signature" validate:"required"`
+}
+
 func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client) *SubscriptionService {
+	environment, _ := config.LoadEnvironment()
 	paymentService := NewPaymentService(paymentClient)
 	userService := NewUserService(dbClient, paymentClient)
 	subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
 	userSubscriptionRepository := commonRepositories.NewUserSubscriptioRepository(dbClient)
 
 	return &SubscriptionService{
+		environment:                environment,
 		paymentService:             paymentService,
 		userService:                userService,
 		subscriptionRepository:     subscriptionRepository,
@@ -81,6 +93,25 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 	return userSubscription, nil
 }
 
+func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, request ActivateUserSubscriptionRequest, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
+	userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	generatedSignature := s.generateSignature(
+		request.PaymentId,
+		userSubscriptionToUpdate.ProviderSubscriptionID,
+		s.environment.RazorpaySecret,
+	)
+
+	if !s.verifySignature(generatedSignature, request.Signature) {
+		return nil, errors.New("payment verification failed")
+	}
+
+	return userSubscriptionToUpdate, nil
+}
+
 func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
 	userSubscriptionToCancel, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
 	if err != nil {
@@ -104,4 +135,24 @@ func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSu
 	}
 
 	return userSubscriptionToCancel, nil
+}
+
+// Generate HMAC-SHA256 signature
+func (s *SubscriptionService) generateSignature(razorpayPaymentID, subscriptionID, secret string) string {
+	// Create the data string to sign
+	data := razorpayPaymentID + "|" + subscriptionID
+
+	// Create a new HMAC by defining the hash type and the key (secret)
+	h := hmac.New(sha256.New, []byte(secret))
+
+	// Write the data to be signed
+	h.Write([]byte(data))
+
+	// Compute the HMAC and return the hexadecimal representation
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// Verify the signature
+func (s *SubscriptionService) verifySignature(generatedSignature, razorpaySignature string) bool {
+	return generatedSignature == razorpaySignature
 }
