@@ -48,7 +48,7 @@ func (Payment) Fields() []ent.Field {
 				string(PaymentStatusDisputed),
 			),
 		field.String("payment_method"),
-		field.String("payment_payment_id").Unique(),
+		field.String("provider_payment_id").Unique(),
 		field.String("receipt_id").Unique(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),

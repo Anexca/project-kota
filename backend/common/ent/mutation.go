@@ -5302,7 +5302,7 @@ type PaymentMutation struct {
 	payment_date        *time.Time
 	status              *payment.Status
 	payment_method      *string
-	payment_payment_id  *string
+	provider_payment_id *string
 	receipt_id          *string
 	created_at          *time.Time
 	updated_at          *time.Time
@@ -5578,40 +5578,40 @@ func (m *PaymentMutation) ResetPaymentMethod() {
 	m.payment_method = nil
 }
 
-// SetPaymentPaymentID sets the "payment_payment_id" field.
-func (m *PaymentMutation) SetPaymentPaymentID(s string) {
-	m.payment_payment_id = &s
+// SetProviderPaymentID sets the "provider_payment_id" field.
+func (m *PaymentMutation) SetProviderPaymentID(s string) {
+	m.provider_payment_id = &s
 }
 
-// PaymentPaymentID returns the value of the "payment_payment_id" field in the mutation.
-func (m *PaymentMutation) PaymentPaymentID() (r string, exists bool) {
-	v := m.payment_payment_id
+// ProviderPaymentID returns the value of the "provider_payment_id" field in the mutation.
+func (m *PaymentMutation) ProviderPaymentID() (r string, exists bool) {
+	v := m.provider_payment_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPaymentPaymentID returns the old "payment_payment_id" field's value of the Payment entity.
+// OldProviderPaymentID returns the old "provider_payment_id" field's value of the Payment entity.
 // If the Payment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PaymentMutation) OldPaymentPaymentID(ctx context.Context) (v string, err error) {
+func (m *PaymentMutation) OldProviderPaymentID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPaymentPaymentID is only allowed on UpdateOne operations")
+		return v, errors.New("OldProviderPaymentID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPaymentPaymentID requires an ID field in the mutation")
+		return v, errors.New("OldProviderPaymentID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPaymentPaymentID: %w", err)
+		return v, fmt.Errorf("querying old value for OldProviderPaymentID: %w", err)
 	}
-	return oldValue.PaymentPaymentID, nil
+	return oldValue.ProviderPaymentID, nil
 }
 
-// ResetPaymentPaymentID resets all changes to the "payment_payment_id" field.
-func (m *PaymentMutation) ResetPaymentPaymentID() {
-	m.payment_payment_id = nil
+// ResetProviderPaymentID resets all changes to the "provider_payment_id" field.
+func (m *PaymentMutation) ResetProviderPaymentID() {
+	m.provider_payment_id = nil
 }
 
 // SetReceiptID sets the "receipt_id" field.
@@ -5847,8 +5847,8 @@ func (m *PaymentMutation) Fields() []string {
 	if m.payment_method != nil {
 		fields = append(fields, payment.FieldPaymentMethod)
 	}
-	if m.payment_payment_id != nil {
-		fields = append(fields, payment.FieldPaymentPaymentID)
+	if m.provider_payment_id != nil {
+		fields = append(fields, payment.FieldProviderPaymentID)
 	}
 	if m.receipt_id != nil {
 		fields = append(fields, payment.FieldReceiptID)
@@ -5875,8 +5875,8 @@ func (m *PaymentMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case payment.FieldPaymentMethod:
 		return m.PaymentMethod()
-	case payment.FieldPaymentPaymentID:
-		return m.PaymentPaymentID()
+	case payment.FieldProviderPaymentID:
+		return m.ProviderPaymentID()
 	case payment.FieldReceiptID:
 		return m.ReceiptID()
 	case payment.FieldCreatedAt:
@@ -5900,8 +5900,8 @@ func (m *PaymentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldStatus(ctx)
 	case payment.FieldPaymentMethod:
 		return m.OldPaymentMethod(ctx)
-	case payment.FieldPaymentPaymentID:
-		return m.OldPaymentPaymentID(ctx)
+	case payment.FieldProviderPaymentID:
+		return m.OldProviderPaymentID(ctx)
 	case payment.FieldReceiptID:
 		return m.OldReceiptID(ctx)
 	case payment.FieldCreatedAt:
@@ -5945,12 +5945,12 @@ func (m *PaymentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPaymentMethod(v)
 		return nil
-	case payment.FieldPaymentPaymentID:
+	case payment.FieldProviderPaymentID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPaymentPaymentID(v)
+		m.SetProviderPaymentID(v)
 		return nil
 	case payment.FieldReceiptID:
 		v, ok := value.(string)
@@ -6049,8 +6049,8 @@ func (m *PaymentMutation) ResetField(name string) error {
 	case payment.FieldPaymentMethod:
 		m.ResetPaymentMethod()
 		return nil
-	case payment.FieldPaymentPaymentID:
-		m.ResetPaymentPaymentID()
+	case payment.FieldProviderPaymentID:
+		m.ResetProviderPaymentID()
 		return nil
 	case payment.FieldReceiptID:
 		m.ResetReceiptID()

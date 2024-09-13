@@ -28,8 +28,8 @@ type Payment struct {
 	Status payment.Status `json:"status,omitempty"`
 	// PaymentMethod holds the value of the "payment_method" field.
 	PaymentMethod string `json:"payment_method,omitempty"`
-	// PaymentPaymentID holds the value of the "payment_payment_id" field.
-	PaymentPaymentID string `json:"payment_payment_id,omitempty"`
+	// ProviderPaymentID holds the value of the "provider_payment_id" field.
+	ProviderPaymentID string `json:"provider_payment_id,omitempty"`
 	// ReceiptID holds the value of the "receipt_id" field.
 	ReceiptID string `json:"receipt_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -84,7 +84,7 @@ func (*Payment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case payment.FieldID, payment.FieldAmount:
 			values[i] = new(sql.NullInt64)
-		case payment.FieldStatus, payment.FieldPaymentMethod, payment.FieldPaymentPaymentID, payment.FieldReceiptID:
+		case payment.FieldStatus, payment.FieldPaymentMethod, payment.FieldProviderPaymentID, payment.FieldReceiptID:
 			values[i] = new(sql.NullString)
 		case payment.FieldPaymentDate, payment.FieldCreatedAt, payment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -137,11 +137,11 @@ func (pa *Payment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pa.PaymentMethod = value.String
 			}
-		case payment.FieldPaymentPaymentID:
+		case payment.FieldProviderPaymentID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field payment_payment_id", values[i])
+				return fmt.Errorf("unexpected type %T for field provider_payment_id", values[i])
 			} else if value.Valid {
-				pa.PaymentPaymentID = value.String
+				pa.ProviderPaymentID = value.String
 			}
 		case payment.FieldReceiptID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -233,8 +233,8 @@ func (pa *Payment) String() string {
 	builder.WriteString("payment_method=")
 	builder.WriteString(pa.PaymentMethod)
 	builder.WriteString(", ")
-	builder.WriteString("payment_payment_id=")
-	builder.WriteString(pa.PaymentPaymentID)
+	builder.WriteString("provider_payment_id=")
+	builder.WriteString(pa.ProviderPaymentID)
 	builder.WriteString(", ")
 	builder.WriteString("receipt_id=")
 	builder.WriteString(pa.ReceiptID)

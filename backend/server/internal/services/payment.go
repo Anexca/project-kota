@@ -61,3 +61,7 @@ func (p *PaymentService) CreateSubscription(model CreateSubscriptionModel) (map[
 func (p *PaymentService) CancelUserSubscription(subscriptionId string) (map[string]interface{}, error) {
 	return p.paymentClient.Subscription.Cancel(subscriptionId, nil, nil)
 }
+
+func (p *PaymentService) GetPayment(paymentId string) (map[string]interface{}, error) {
+	return p.paymentClient.Payment.Fetch(paymentId, nil, nil)
+}

@@ -94,16 +94,16 @@ func (pu *PaymentUpdate) SetNillablePaymentMethod(s *string) *PaymentUpdate {
 	return pu
 }
 
-// SetPaymentPaymentID sets the "payment_payment_id" field.
-func (pu *PaymentUpdate) SetPaymentPaymentID(s string) *PaymentUpdate {
-	pu.mutation.SetPaymentPaymentID(s)
+// SetProviderPaymentID sets the "provider_payment_id" field.
+func (pu *PaymentUpdate) SetProviderPaymentID(s string) *PaymentUpdate {
+	pu.mutation.SetProviderPaymentID(s)
 	return pu
 }
 
-// SetNillablePaymentPaymentID sets the "payment_payment_id" field if the given value is not nil.
-func (pu *PaymentUpdate) SetNillablePaymentPaymentID(s *string) *PaymentUpdate {
+// SetNillableProviderPaymentID sets the "provider_payment_id" field if the given value is not nil.
+func (pu *PaymentUpdate) SetNillableProviderPaymentID(s *string) *PaymentUpdate {
 	if s != nil {
-		pu.SetPaymentPaymentID(*s)
+		pu.SetProviderPaymentID(*s)
 	}
 	return pu
 }
@@ -256,8 +256,8 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.PaymentMethod(); ok {
 		_spec.SetField(payment.FieldPaymentMethod, field.TypeString, value)
 	}
-	if value, ok := pu.mutation.PaymentPaymentID(); ok {
-		_spec.SetField(payment.FieldPaymentPaymentID, field.TypeString, value)
+	if value, ok := pu.mutation.ProviderPaymentID(); ok {
+		_spec.SetField(payment.FieldProviderPaymentID, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.ReceiptID(); ok {
 		_spec.SetField(payment.FieldReceiptID, field.TypeString, value)
@@ -406,16 +406,16 @@ func (puo *PaymentUpdateOne) SetNillablePaymentMethod(s *string) *PaymentUpdateO
 	return puo
 }
 
-// SetPaymentPaymentID sets the "payment_payment_id" field.
-func (puo *PaymentUpdateOne) SetPaymentPaymentID(s string) *PaymentUpdateOne {
-	puo.mutation.SetPaymentPaymentID(s)
+// SetProviderPaymentID sets the "provider_payment_id" field.
+func (puo *PaymentUpdateOne) SetProviderPaymentID(s string) *PaymentUpdateOne {
+	puo.mutation.SetProviderPaymentID(s)
 	return puo
 }
 
-// SetNillablePaymentPaymentID sets the "payment_payment_id" field if the given value is not nil.
-func (puo *PaymentUpdateOne) SetNillablePaymentPaymentID(s *string) *PaymentUpdateOne {
+// SetNillableProviderPaymentID sets the "provider_payment_id" field if the given value is not nil.
+func (puo *PaymentUpdateOne) SetNillableProviderPaymentID(s *string) *PaymentUpdateOne {
 	if s != nil {
-		puo.SetPaymentPaymentID(*s)
+		puo.SetProviderPaymentID(*s)
 	}
 	return puo
 }
@@ -598,8 +598,8 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 	if value, ok := puo.mutation.PaymentMethod(); ok {
 		_spec.SetField(payment.FieldPaymentMethod, field.TypeString, value)
 	}
-	if value, ok := puo.mutation.PaymentPaymentID(); ok {
-		_spec.SetField(payment.FieldPaymentPaymentID, field.TypeString, value)
+	if value, ok := puo.mutation.ProviderPaymentID(); ok {
+		_spec.SetField(payment.FieldProviderPaymentID, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.ReceiptID(); ok {
 		_spec.SetField(payment.FieldReceiptID, field.TypeString, value)
