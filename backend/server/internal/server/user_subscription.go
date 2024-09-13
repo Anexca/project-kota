@@ -49,6 +49,11 @@ func (s *Server) ActivateUserSubscription(w http.ResponseWriter, r *http.Request
 			return
 		}
 
+		if strings.Contains(err.Error(), "already exists") {
+			s.ErrorJson(w, err)
+			return
+		}
+
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}
