@@ -65,6 +65,18 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, err
 	}
 
+	userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if !errors.As(err, &notFoundError) {
+			return nil, err
+		}
+	}
+
+	if userHasSubscription {
+		return nil, fmt.Errorf("user already has active subscription")
+	}
+
 	model := CreateSubscriptionModel{
 		ProviderPlanId:     subscription.ProviderPlanID,
 		TotalBillingCycles: 3,
@@ -119,6 +131,7 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 
 	userSubscriptionToUpdate.Status = usersubscription.StatusACTIVE
 	userSubscriptionToUpdate.StartDate = time.Now()
+	userSubscriptionToUpdate.IsActive = true
 	userSubscriptionToUpdate.EndDate = time.Now().AddDate(0, userSubscriptionToUpdate.Edges.Subscription.DurationInMonths, 0)
 
 	go func() {
@@ -207,4 +220,14 @@ func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSu
 	}
 
 	return userSubscriptionToCancel, nil
+}
+
+func (s *SubscriptionService) UserHasActiveSubscription(ctx context.Context, subscription *ent.Subscription, user *ent.User) (bool, error) {
+	userSubscription, err := s.userSubscriptionRepository.GetByUserId(ctx, subscription.ID, user.ID.String())
+	if err != nil {
+		return false, err
+	}
+
+	now := time.Now()
+	return userSubscription.StartDate.Before(now) && userSubscription.EndDate.After(now), nil
 }

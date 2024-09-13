@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"common/ent"
+	"common/ent/subscription"
 	"common/ent/user"
 	"common/ent/usersubscription"
 	"context"
@@ -62,4 +63,19 @@ func (u *UserSubscriptioRepository) GetById(ctx context.Context, userSubscriptio
 			usersubscription.HasUserWith(user.IDEQ(userUid))).
 		WithSubscription().
 		Only(ctx)
+}
+
+func (u *UserSubscriptioRepository) GetByUserId(ctx context.Context, subscriptionId int, userId string) (*ent.UserSubscription, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.dbClient.UserSubscription.Query().
+		Where(usersubscription.HasUserWith(user.IDEQ(userUid)),
+			usersubscription.IsActiveEQ(true),
+			usersubscription.StatusEQ(usersubscription.StatusACTIVE),
+			usersubscription.HasSubscriptionWith(subscription.IDEQ(subscriptionId)),
+		).
+		First(ctx)
 }
