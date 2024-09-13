@@ -66,16 +66,16 @@ func (pu *PaymentUpdate) SetNillablePaymentDate(t *time.Time) *PaymentUpdate {
 	return pu
 }
 
-// SetPaymentStatus sets the "payment_status" field.
-func (pu *PaymentUpdate) SetPaymentStatus(ps payment.PaymentStatus) *PaymentUpdate {
-	pu.mutation.SetPaymentStatus(ps)
+// SetStatus sets the "status" field.
+func (pu *PaymentUpdate) SetStatus(pa payment.Status) *PaymentUpdate {
+	pu.mutation.SetStatus(pa)
 	return pu
 }
 
-// SetNillablePaymentStatus sets the "payment_status" field if the given value is not nil.
-func (pu *PaymentUpdate) SetNillablePaymentStatus(ps *payment.PaymentStatus) *PaymentUpdate {
-	if ps != nil {
-		pu.SetPaymentStatus(*ps)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (pu *PaymentUpdate) SetNillableStatus(pa *payment.Status) *PaymentUpdate {
+	if pa != nil {
+		pu.SetStatus(*pa)
 	}
 	return pu
 }
@@ -94,16 +94,16 @@ func (pu *PaymentUpdate) SetNillablePaymentMethod(s *string) *PaymentUpdate {
 	return pu
 }
 
-// SetPaymentPaymentID sets the "payment_payment_id" field.
-func (pu *PaymentUpdate) SetPaymentPaymentID(s string) *PaymentUpdate {
-	pu.mutation.SetPaymentPaymentID(s)
+// SetProviderPaymentID sets the "provider_payment_id" field.
+func (pu *PaymentUpdate) SetProviderPaymentID(s string) *PaymentUpdate {
+	pu.mutation.SetProviderPaymentID(s)
 	return pu
 }
 
-// SetNillablePaymentPaymentID sets the "payment_payment_id" field if the given value is not nil.
-func (pu *PaymentUpdate) SetNillablePaymentPaymentID(s *string) *PaymentUpdate {
+// SetNillableProviderPaymentID sets the "provider_payment_id" field if the given value is not nil.
+func (pu *PaymentUpdate) SetNillableProviderPaymentID(s *string) *PaymentUpdate {
 	if s != nil {
-		pu.SetPaymentPaymentID(*s)
+		pu.SetProviderPaymentID(*s)
 	}
 	return pu
 }
@@ -221,9 +221,9 @@ func (pu *PaymentUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pu *PaymentUpdate) check() error {
-	if v, ok := pu.mutation.PaymentStatus(); ok {
-		if err := payment.PaymentStatusValidator(v); err != nil {
-			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
+	if v, ok := pu.mutation.Status(); ok {
+		if err := payment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Payment.status": %w`, err)}
 		}
 	}
 	return nil
@@ -250,14 +250,14 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.PaymentDate(); ok {
 		_spec.SetField(payment.FieldPaymentDate, field.TypeTime, value)
 	}
-	if value, ok := pu.mutation.PaymentStatus(); ok {
-		_spec.SetField(payment.FieldPaymentStatus, field.TypeEnum, value)
+	if value, ok := pu.mutation.Status(); ok {
+		_spec.SetField(payment.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := pu.mutation.PaymentMethod(); ok {
 		_spec.SetField(payment.FieldPaymentMethod, field.TypeString, value)
 	}
-	if value, ok := pu.mutation.PaymentPaymentID(); ok {
-		_spec.SetField(payment.FieldPaymentPaymentID, field.TypeString, value)
+	if value, ok := pu.mutation.ProviderPaymentID(); ok {
+		_spec.SetField(payment.FieldProviderPaymentID, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.ReceiptID(); ok {
 		_spec.SetField(payment.FieldReceiptID, field.TypeString, value)
@@ -378,16 +378,16 @@ func (puo *PaymentUpdateOne) SetNillablePaymentDate(t *time.Time) *PaymentUpdate
 	return puo
 }
 
-// SetPaymentStatus sets the "payment_status" field.
-func (puo *PaymentUpdateOne) SetPaymentStatus(ps payment.PaymentStatus) *PaymentUpdateOne {
-	puo.mutation.SetPaymentStatus(ps)
+// SetStatus sets the "status" field.
+func (puo *PaymentUpdateOne) SetStatus(pa payment.Status) *PaymentUpdateOne {
+	puo.mutation.SetStatus(pa)
 	return puo
 }
 
-// SetNillablePaymentStatus sets the "payment_status" field if the given value is not nil.
-func (puo *PaymentUpdateOne) SetNillablePaymentStatus(ps *payment.PaymentStatus) *PaymentUpdateOne {
-	if ps != nil {
-		puo.SetPaymentStatus(*ps)
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (puo *PaymentUpdateOne) SetNillableStatus(pa *payment.Status) *PaymentUpdateOne {
+	if pa != nil {
+		puo.SetStatus(*pa)
 	}
 	return puo
 }
@@ -406,16 +406,16 @@ func (puo *PaymentUpdateOne) SetNillablePaymentMethod(s *string) *PaymentUpdateO
 	return puo
 }
 
-// SetPaymentPaymentID sets the "payment_payment_id" field.
-func (puo *PaymentUpdateOne) SetPaymentPaymentID(s string) *PaymentUpdateOne {
-	puo.mutation.SetPaymentPaymentID(s)
+// SetProviderPaymentID sets the "provider_payment_id" field.
+func (puo *PaymentUpdateOne) SetProviderPaymentID(s string) *PaymentUpdateOne {
+	puo.mutation.SetProviderPaymentID(s)
 	return puo
 }
 
-// SetNillablePaymentPaymentID sets the "payment_payment_id" field if the given value is not nil.
-func (puo *PaymentUpdateOne) SetNillablePaymentPaymentID(s *string) *PaymentUpdateOne {
+// SetNillableProviderPaymentID sets the "provider_payment_id" field if the given value is not nil.
+func (puo *PaymentUpdateOne) SetNillableProviderPaymentID(s *string) *PaymentUpdateOne {
 	if s != nil {
-		puo.SetPaymentPaymentID(*s)
+		puo.SetProviderPaymentID(*s)
 	}
 	return puo
 }
@@ -546,9 +546,9 @@ func (puo *PaymentUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (puo *PaymentUpdateOne) check() error {
-	if v, ok := puo.mutation.PaymentStatus(); ok {
-		if err := payment.PaymentStatusValidator(v); err != nil {
-			return &ValidationError{Name: "payment_status", err: fmt.Errorf(`ent: validator failed for field "Payment.payment_status": %w`, err)}
+	if v, ok := puo.mutation.Status(); ok {
+		if err := payment.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Payment.status": %w`, err)}
 		}
 	}
 	return nil
@@ -592,14 +592,14 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 	if value, ok := puo.mutation.PaymentDate(); ok {
 		_spec.SetField(payment.FieldPaymentDate, field.TypeTime, value)
 	}
-	if value, ok := puo.mutation.PaymentStatus(); ok {
-		_spec.SetField(payment.FieldPaymentStatus, field.TypeEnum, value)
+	if value, ok := puo.mutation.Status(); ok {
+		_spec.SetField(payment.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := puo.mutation.PaymentMethod(); ok {
 		_spec.SetField(payment.FieldPaymentMethod, field.TypeString, value)
 	}
-	if value, ok := puo.mutation.PaymentPaymentID(); ok {
-		_spec.SetField(payment.FieldPaymentPaymentID, field.TypeString, value)
+	if value, ok := puo.mutation.ProviderPaymentID(); ok {
+		_spec.SetField(payment.FieldProviderPaymentID, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.ReceiptID(); ok {
 		_spec.SetField(payment.FieldReceiptID, field.TypeString, value)

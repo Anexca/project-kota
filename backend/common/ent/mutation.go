@@ -5300,9 +5300,9 @@ type PaymentMutation struct {
 	amount              *int
 	addamount           *int
 	payment_date        *time.Time
-	payment_status      *payment.PaymentStatus
+	status              *payment.Status
 	payment_method      *string
-	payment_payment_id  *string
+	provider_payment_id *string
 	receipt_id          *string
 	created_at          *time.Time
 	updated_at          *time.Time
@@ -5506,40 +5506,40 @@ func (m *PaymentMutation) ResetPaymentDate() {
 	m.payment_date = nil
 }
 
-// SetPaymentStatus sets the "payment_status" field.
-func (m *PaymentMutation) SetPaymentStatus(ps payment.PaymentStatus) {
-	m.payment_status = &ps
+// SetStatus sets the "status" field.
+func (m *PaymentMutation) SetStatus(pa payment.Status) {
+	m.status = &pa
 }
 
-// PaymentStatus returns the value of the "payment_status" field in the mutation.
-func (m *PaymentMutation) PaymentStatus() (r payment.PaymentStatus, exists bool) {
-	v := m.payment_status
+// Status returns the value of the "status" field in the mutation.
+func (m *PaymentMutation) Status() (r payment.Status, exists bool) {
+	v := m.status
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPaymentStatus returns the old "payment_status" field's value of the Payment entity.
+// OldStatus returns the old "status" field's value of the Payment entity.
 // If the Payment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PaymentMutation) OldPaymentStatus(ctx context.Context) (v payment.PaymentStatus, err error) {
+func (m *PaymentMutation) OldStatus(ctx context.Context) (v payment.Status, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPaymentStatus is only allowed on UpdateOne operations")
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPaymentStatus requires an ID field in the mutation")
+		return v, errors.New("OldStatus requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPaymentStatus: %w", err)
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
 	}
-	return oldValue.PaymentStatus, nil
+	return oldValue.Status, nil
 }
 
-// ResetPaymentStatus resets all changes to the "payment_status" field.
-func (m *PaymentMutation) ResetPaymentStatus() {
-	m.payment_status = nil
+// ResetStatus resets all changes to the "status" field.
+func (m *PaymentMutation) ResetStatus() {
+	m.status = nil
 }
 
 // SetPaymentMethod sets the "payment_method" field.
@@ -5578,40 +5578,40 @@ func (m *PaymentMutation) ResetPaymentMethod() {
 	m.payment_method = nil
 }
 
-// SetPaymentPaymentID sets the "payment_payment_id" field.
-func (m *PaymentMutation) SetPaymentPaymentID(s string) {
-	m.payment_payment_id = &s
+// SetProviderPaymentID sets the "provider_payment_id" field.
+func (m *PaymentMutation) SetProviderPaymentID(s string) {
+	m.provider_payment_id = &s
 }
 
-// PaymentPaymentID returns the value of the "payment_payment_id" field in the mutation.
-func (m *PaymentMutation) PaymentPaymentID() (r string, exists bool) {
-	v := m.payment_payment_id
+// ProviderPaymentID returns the value of the "provider_payment_id" field in the mutation.
+func (m *PaymentMutation) ProviderPaymentID() (r string, exists bool) {
+	v := m.provider_payment_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPaymentPaymentID returns the old "payment_payment_id" field's value of the Payment entity.
+// OldProviderPaymentID returns the old "provider_payment_id" field's value of the Payment entity.
 // If the Payment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PaymentMutation) OldPaymentPaymentID(ctx context.Context) (v string, err error) {
+func (m *PaymentMutation) OldProviderPaymentID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPaymentPaymentID is only allowed on UpdateOne operations")
+		return v, errors.New("OldProviderPaymentID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPaymentPaymentID requires an ID field in the mutation")
+		return v, errors.New("OldProviderPaymentID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPaymentPaymentID: %w", err)
+		return v, fmt.Errorf("querying old value for OldProviderPaymentID: %w", err)
 	}
-	return oldValue.PaymentPaymentID, nil
+	return oldValue.ProviderPaymentID, nil
 }
 
-// ResetPaymentPaymentID resets all changes to the "payment_payment_id" field.
-func (m *PaymentMutation) ResetPaymentPaymentID() {
-	m.payment_payment_id = nil
+// ResetProviderPaymentID resets all changes to the "provider_payment_id" field.
+func (m *PaymentMutation) ResetProviderPaymentID() {
+	m.provider_payment_id = nil
 }
 
 // SetReceiptID sets the "receipt_id" field.
@@ -5841,14 +5841,14 @@ func (m *PaymentMutation) Fields() []string {
 	if m.payment_date != nil {
 		fields = append(fields, payment.FieldPaymentDate)
 	}
-	if m.payment_status != nil {
-		fields = append(fields, payment.FieldPaymentStatus)
+	if m.status != nil {
+		fields = append(fields, payment.FieldStatus)
 	}
 	if m.payment_method != nil {
 		fields = append(fields, payment.FieldPaymentMethod)
 	}
-	if m.payment_payment_id != nil {
-		fields = append(fields, payment.FieldPaymentPaymentID)
+	if m.provider_payment_id != nil {
+		fields = append(fields, payment.FieldProviderPaymentID)
 	}
 	if m.receipt_id != nil {
 		fields = append(fields, payment.FieldReceiptID)
@@ -5871,12 +5871,12 @@ func (m *PaymentMutation) Field(name string) (ent.Value, bool) {
 		return m.Amount()
 	case payment.FieldPaymentDate:
 		return m.PaymentDate()
-	case payment.FieldPaymentStatus:
-		return m.PaymentStatus()
+	case payment.FieldStatus:
+		return m.Status()
 	case payment.FieldPaymentMethod:
 		return m.PaymentMethod()
-	case payment.FieldPaymentPaymentID:
-		return m.PaymentPaymentID()
+	case payment.FieldProviderPaymentID:
+		return m.ProviderPaymentID()
 	case payment.FieldReceiptID:
 		return m.ReceiptID()
 	case payment.FieldCreatedAt:
@@ -5896,12 +5896,12 @@ func (m *PaymentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldAmount(ctx)
 	case payment.FieldPaymentDate:
 		return m.OldPaymentDate(ctx)
-	case payment.FieldPaymentStatus:
-		return m.OldPaymentStatus(ctx)
+	case payment.FieldStatus:
+		return m.OldStatus(ctx)
 	case payment.FieldPaymentMethod:
 		return m.OldPaymentMethod(ctx)
-	case payment.FieldPaymentPaymentID:
-		return m.OldPaymentPaymentID(ctx)
+	case payment.FieldProviderPaymentID:
+		return m.OldProviderPaymentID(ctx)
 	case payment.FieldReceiptID:
 		return m.OldReceiptID(ctx)
 	case payment.FieldCreatedAt:
@@ -5931,12 +5931,12 @@ func (m *PaymentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPaymentDate(v)
 		return nil
-	case payment.FieldPaymentStatus:
-		v, ok := value.(payment.PaymentStatus)
+	case payment.FieldStatus:
+		v, ok := value.(payment.Status)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPaymentStatus(v)
+		m.SetStatus(v)
 		return nil
 	case payment.FieldPaymentMethod:
 		v, ok := value.(string)
@@ -5945,12 +5945,12 @@ func (m *PaymentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPaymentMethod(v)
 		return nil
-	case payment.FieldPaymentPaymentID:
+	case payment.FieldProviderPaymentID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPaymentPaymentID(v)
+		m.SetProviderPaymentID(v)
 		return nil
 	case payment.FieldReceiptID:
 		v, ok := value.(string)
@@ -6043,14 +6043,14 @@ func (m *PaymentMutation) ResetField(name string) error {
 	case payment.FieldPaymentDate:
 		m.ResetPaymentDate()
 		return nil
-	case payment.FieldPaymentStatus:
-		m.ResetPaymentStatus()
+	case payment.FieldStatus:
+		m.ResetStatus()
 		return nil
 	case payment.FieldPaymentMethod:
 		m.ResetPaymentMethod()
 		return nil
-	case payment.FieldPaymentPaymentID:
-		m.ResetPaymentPaymentID()
+	case payment.FieldProviderPaymentID:
+		m.ResetProviderPaymentID()
 		return nil
 	case payment.FieldReceiptID:
 		m.ResetReceiptID()
@@ -8494,6 +8494,7 @@ type UserSubscriptionMutation struct {
 	typ                      string
 	id                       *int
 	is_active                *bool
+	status                   *usersubscription.Status
 	start_date               *time.Time
 	end_date                 *time.Time
 	provider_subscription_id *string
@@ -8644,6 +8645,42 @@ func (m *UserSubscriptionMutation) OldIsActive(ctx context.Context) (v bool, err
 // ResetIsActive resets all changes to the "is_active" field.
 func (m *UserSubscriptionMutation) ResetIsActive() {
 	m.is_active = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *UserSubscriptionMutation) SetStatus(u usersubscription.Status) {
+	m.status = &u
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *UserSubscriptionMutation) Status() (r usersubscription.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the UserSubscription entity.
+// If the UserSubscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserSubscriptionMutation) OldStatus(ctx context.Context) (v usersubscription.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *UserSubscriptionMutation) ResetStatus() {
+	m.status = nil
 }
 
 // SetStartDate sets the "start_date" field.
@@ -9018,9 +9055,12 @@ func (m *UserSubscriptionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserSubscriptionMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.is_active != nil {
 		fields = append(fields, usersubscription.FieldIsActive)
+	}
+	if m.status != nil {
+		fields = append(fields, usersubscription.FieldStatus)
 	}
 	if m.start_date != nil {
 		fields = append(fields, usersubscription.FieldStartDate)
@@ -9047,6 +9087,8 @@ func (m *UserSubscriptionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case usersubscription.FieldIsActive:
 		return m.IsActive()
+	case usersubscription.FieldStatus:
+		return m.Status()
 	case usersubscription.FieldStartDate:
 		return m.StartDate()
 	case usersubscription.FieldEndDate:
@@ -9068,6 +9110,8 @@ func (m *UserSubscriptionMutation) OldField(ctx context.Context, name string) (e
 	switch name {
 	case usersubscription.FieldIsActive:
 		return m.OldIsActive(ctx)
+	case usersubscription.FieldStatus:
+		return m.OldStatus(ctx)
 	case usersubscription.FieldStartDate:
 		return m.OldStartDate(ctx)
 	case usersubscription.FieldEndDate:
@@ -9093,6 +9137,13 @@ func (m *UserSubscriptionMutation) SetField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIsActive(v)
+		return nil
+	case usersubscription.FieldStatus:
+		v, ok := value.(usersubscription.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
 		return nil
 	case usersubscription.FieldStartDate:
 		v, ok := value.(time.Time)
@@ -9195,6 +9246,9 @@ func (m *UserSubscriptionMutation) ResetField(name string) error {
 	switch name {
 	case usersubscription.FieldIsActive:
 		m.ResetIsActive()
+		return nil
+	case usersubscription.FieldStatus:
+		m.ResetStatus()
 		return nil
 	case usersubscription.FieldStartDate:
 		m.ResetStartDate()

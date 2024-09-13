@@ -46,6 +46,20 @@ func (usu *UserSubscriptionUpdate) SetNillableIsActive(b *bool) *UserSubscriptio
 	return usu
 }
 
+// SetStatus sets the "status" field.
+func (usu *UserSubscriptionUpdate) SetStatus(u usersubscription.Status) *UserSubscriptionUpdate {
+	usu.mutation.SetStatus(u)
+	return usu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (usu *UserSubscriptionUpdate) SetNillableStatus(u *usersubscription.Status) *UserSubscriptionUpdate {
+	if u != nil {
+		usu.SetStatus(*u)
+	}
+	return usu
+}
+
 // SetStartDate sets the "start_date" field.
 func (usu *UserSubscriptionUpdate) SetStartDate(t time.Time) *UserSubscriptionUpdate {
 	usu.mutation.SetStartDate(t)
@@ -233,7 +247,20 @@ func (usu *UserSubscriptionUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (usu *UserSubscriptionUpdate) check() error {
+	if v, ok := usu.mutation.Status(); ok {
+		if err := usersubscription.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "UserSubscription.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (usu *UserSubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := usu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(usersubscription.Table, usersubscription.Columns, sqlgraph.NewFieldSpec(usersubscription.FieldID, field.TypeInt))
 	if ps := usu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -244,6 +271,9 @@ func (usu *UserSubscriptionUpdate) sqlSave(ctx context.Context) (n int, err erro
 	}
 	if value, ok := usu.mutation.IsActive(); ok {
 		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := usu.mutation.Status(); ok {
+		_spec.SetField(usersubscription.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := usu.mutation.StartDate(); ok {
 		_spec.SetField(usersubscription.FieldStartDate, field.TypeTime, value)
@@ -396,6 +426,20 @@ func (usuo *UserSubscriptionUpdateOne) SetIsActive(b bool) *UserSubscriptionUpda
 func (usuo *UserSubscriptionUpdateOne) SetNillableIsActive(b *bool) *UserSubscriptionUpdateOne {
 	if b != nil {
 		usuo.SetIsActive(*b)
+	}
+	return usuo
+}
+
+// SetStatus sets the "status" field.
+func (usuo *UserSubscriptionUpdateOne) SetStatus(u usersubscription.Status) *UserSubscriptionUpdateOne {
+	usuo.mutation.SetStatus(u)
+	return usuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (usuo *UserSubscriptionUpdateOne) SetNillableStatus(u *usersubscription.Status) *UserSubscriptionUpdateOne {
+	if u != nil {
+		usuo.SetStatus(*u)
 	}
 	return usuo
 }
@@ -600,7 +644,20 @@ func (usuo *UserSubscriptionUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (usuo *UserSubscriptionUpdateOne) check() error {
+	if v, ok := usuo.mutation.Status(); ok {
+		if err := usersubscription.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "UserSubscription.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (usuo *UserSubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *UserSubscription, err error) {
+	if err := usuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(usersubscription.Table, usersubscription.Columns, sqlgraph.NewFieldSpec(usersubscription.FieldID, field.TypeInt))
 	id, ok := usuo.mutation.ID()
 	if !ok {
@@ -628,6 +685,9 @@ func (usuo *UserSubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *User
 	}
 	if value, ok := usuo.mutation.IsActive(); ok {
 		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := usuo.mutation.Status(); ok {
+		_spec.SetField(usersubscription.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := usuo.mutation.StartDate(); ok {
 		_spec.SetField(usersubscription.FieldStartDate, field.TypeTime, value)

@@ -3,6 +3,7 @@
 package usersubscription
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -16,6 +17,8 @@ const (
 	FieldID = "id"
 	// FieldIsActive holds the string denoting the is_active field in the database.
 	FieldIsActive = "is_active"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldStartDate holds the string denoting the start_date field in the database.
 	FieldStartDate = "start_date"
 	// FieldEndDate holds the string denoting the end_date field in the database.
@@ -61,6 +64,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldIsActive,
+	FieldStatus,
 	FieldStartDate,
 	FieldEndDate,
 	FieldProviderSubscriptionID,
@@ -99,6 +103,35 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusPENDING is the default value of the Status enum.
+const DefaultStatus = StatusPENDING
+
+// Status values.
+const (
+	StatusACTIVE   Status = "ACTIVE"
+	StatusCANCELED Status = "CANCELED"
+	StatusEXPIRED  Status = "EXPIRED"
+	StatusPENDING  Status = "PENDING"
+	StatusPAUSED   Status = "PAUSED"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusACTIVE, StatusCANCELED, StatusEXPIRED, StatusPENDING, StatusPAUSED:
+		return nil
+	default:
+		return fmt.Errorf("usersubscription: invalid enum value for status field: %q", s)
+	}
+}
+
 // OrderOption defines the ordering options for the UserSubscription queries.
 type OrderOption func(*sql.Selector)
 
@@ -110,6 +143,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByIsActive orders the results by the is_active field.
 func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByStartDate orders the results by the start_date field.

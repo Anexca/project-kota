@@ -70,9 +70,9 @@ func PaymentMethod(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldPaymentMethod, v))
 }
 
-// PaymentPaymentID applies equality check predicate on the "payment_payment_id" field. It's identical to PaymentPaymentIDEQ.
-func PaymentPaymentID(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldEQ(FieldPaymentPaymentID, v))
+// ProviderPaymentID applies equality check predicate on the "provider_payment_id" field. It's identical to ProviderPaymentIDEQ.
+func ProviderPaymentID(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldProviderPaymentID, v))
 }
 
 // ReceiptID applies equality check predicate on the "receipt_id" field. It's identical to ReceiptIDEQ.
@@ -170,24 +170,24 @@ func PaymentDateLTE(v time.Time) predicate.Payment {
 	return predicate.Payment(sql.FieldLTE(FieldPaymentDate, v))
 }
 
-// PaymentStatusEQ applies the EQ predicate on the "payment_status" field.
-func PaymentStatusEQ(v PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldEQ(FieldPaymentStatus, v))
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldStatus, v))
 }
 
-// PaymentStatusNEQ applies the NEQ predicate on the "payment_status" field.
-func PaymentStatusNEQ(v PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldNEQ(FieldPaymentStatus, v))
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldStatus, v))
 }
 
-// PaymentStatusIn applies the In predicate on the "payment_status" field.
-func PaymentStatusIn(vs ...PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldIn(FieldPaymentStatus, vs...))
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldStatus, vs...))
 }
 
-// PaymentStatusNotIn applies the NotIn predicate on the "payment_status" field.
-func PaymentStatusNotIn(vs ...PaymentStatus) predicate.Payment {
-	return predicate.Payment(sql.FieldNotIn(FieldPaymentStatus, vs...))
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // PaymentMethodEQ applies the EQ predicate on the "payment_method" field.
@@ -255,69 +255,69 @@ func PaymentMethodContainsFold(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldContainsFold(FieldPaymentMethod, v))
 }
 
-// PaymentPaymentIDEQ applies the EQ predicate on the "payment_payment_id" field.
-func PaymentPaymentIDEQ(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldEQ(FieldPaymentPaymentID, v))
+// ProviderPaymentIDEQ applies the EQ predicate on the "provider_payment_id" field.
+func ProviderPaymentIDEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEQ(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDNEQ applies the NEQ predicate on the "payment_payment_id" field.
-func PaymentPaymentIDNEQ(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldNEQ(FieldPaymentPaymentID, v))
+// ProviderPaymentIDNEQ applies the NEQ predicate on the "provider_payment_id" field.
+func ProviderPaymentIDNEQ(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldNEQ(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDIn applies the In predicate on the "payment_payment_id" field.
-func PaymentPaymentIDIn(vs ...string) predicate.Payment {
-	return predicate.Payment(sql.FieldIn(FieldPaymentPaymentID, vs...))
+// ProviderPaymentIDIn applies the In predicate on the "provider_payment_id" field.
+func ProviderPaymentIDIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldIn(FieldProviderPaymentID, vs...))
 }
 
-// PaymentPaymentIDNotIn applies the NotIn predicate on the "payment_payment_id" field.
-func PaymentPaymentIDNotIn(vs ...string) predicate.Payment {
-	return predicate.Payment(sql.FieldNotIn(FieldPaymentPaymentID, vs...))
+// ProviderPaymentIDNotIn applies the NotIn predicate on the "provider_payment_id" field.
+func ProviderPaymentIDNotIn(vs ...string) predicate.Payment {
+	return predicate.Payment(sql.FieldNotIn(FieldProviderPaymentID, vs...))
 }
 
-// PaymentPaymentIDGT applies the GT predicate on the "payment_payment_id" field.
-func PaymentPaymentIDGT(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldGT(FieldPaymentPaymentID, v))
+// ProviderPaymentIDGT applies the GT predicate on the "provider_payment_id" field.
+func ProviderPaymentIDGT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGT(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDGTE applies the GTE predicate on the "payment_payment_id" field.
-func PaymentPaymentIDGTE(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldGTE(FieldPaymentPaymentID, v))
+// ProviderPaymentIDGTE applies the GTE predicate on the "provider_payment_id" field.
+func ProviderPaymentIDGTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldGTE(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDLT applies the LT predicate on the "payment_payment_id" field.
-func PaymentPaymentIDLT(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldLT(FieldPaymentPaymentID, v))
+// ProviderPaymentIDLT applies the LT predicate on the "provider_payment_id" field.
+func ProviderPaymentIDLT(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLT(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDLTE applies the LTE predicate on the "payment_payment_id" field.
-func PaymentPaymentIDLTE(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldLTE(FieldPaymentPaymentID, v))
+// ProviderPaymentIDLTE applies the LTE predicate on the "provider_payment_id" field.
+func ProviderPaymentIDLTE(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldLTE(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDContains applies the Contains predicate on the "payment_payment_id" field.
-func PaymentPaymentIDContains(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldContains(FieldPaymentPaymentID, v))
+// ProviderPaymentIDContains applies the Contains predicate on the "provider_payment_id" field.
+func ProviderPaymentIDContains(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContains(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDHasPrefix applies the HasPrefix predicate on the "payment_payment_id" field.
-func PaymentPaymentIDHasPrefix(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldHasPrefix(FieldPaymentPaymentID, v))
+// ProviderPaymentIDHasPrefix applies the HasPrefix predicate on the "provider_payment_id" field.
+func ProviderPaymentIDHasPrefix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasPrefix(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDHasSuffix applies the HasSuffix predicate on the "payment_payment_id" field.
-func PaymentPaymentIDHasSuffix(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldHasSuffix(FieldPaymentPaymentID, v))
+// ProviderPaymentIDHasSuffix applies the HasSuffix predicate on the "provider_payment_id" field.
+func ProviderPaymentIDHasSuffix(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldHasSuffix(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDEqualFold applies the EqualFold predicate on the "payment_payment_id" field.
-func PaymentPaymentIDEqualFold(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldEqualFold(FieldPaymentPaymentID, v))
+// ProviderPaymentIDEqualFold applies the EqualFold predicate on the "provider_payment_id" field.
+func ProviderPaymentIDEqualFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldEqualFold(FieldProviderPaymentID, v))
 }
 
-// PaymentPaymentIDContainsFold applies the ContainsFold predicate on the "payment_payment_id" field.
-func PaymentPaymentIDContainsFold(v string) predicate.Payment {
-	return predicate.Payment(sql.FieldContainsFold(FieldPaymentPaymentID, v))
+// ProviderPaymentIDContainsFold applies the ContainsFold predicate on the "provider_payment_id" field.
+func ProviderPaymentIDContainsFold(v string) predicate.Payment {
+	return predicate.Payment(sql.FieldContainsFold(FieldProviderPaymentID, v))
 }
 
 // ReceiptIDEQ applies the EQ predicate on the "receipt_id" field.

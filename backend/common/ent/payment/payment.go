@@ -19,12 +19,12 @@ const (
 	FieldAmount = "amount"
 	// FieldPaymentDate holds the string denoting the payment_date field in the database.
 	FieldPaymentDate = "payment_date"
-	// FieldPaymentStatus holds the string denoting the payment_status field in the database.
-	FieldPaymentStatus = "payment_status"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
 	// FieldPaymentMethod holds the string denoting the payment_method field in the database.
 	FieldPaymentMethod = "payment_method"
-	// FieldPaymentPaymentID holds the string denoting the payment_payment_id field in the database.
-	FieldPaymentPaymentID = "payment_payment_id"
+	// FieldProviderPaymentID holds the string denoting the provider_payment_id field in the database.
+	FieldProviderPaymentID = "provider_payment_id"
 	// FieldReceiptID holds the string denoting the receipt_id field in the database.
 	FieldReceiptID = "receipt_id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -58,9 +58,9 @@ var Columns = []string{
 	FieldID,
 	FieldAmount,
 	FieldPaymentDate,
-	FieldPaymentStatus,
+	FieldStatus,
 	FieldPaymentMethod,
-	FieldPaymentPaymentID,
+	FieldProviderPaymentID,
 	FieldReceiptID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -97,34 +97,34 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
-// PaymentStatus defines the type for the "payment_status" enum field.
-type PaymentStatus string
+// Status defines the type for the "status" enum field.
+type Status string
 
-// PaymentStatus values.
+// Status values.
 const (
-	PaymentStatusCREATED            PaymentStatus = "CREATED"
-	PaymentStatusAUTHORIZED         PaymentStatus = "AUTHORIZED"
-	PaymentStatusCAPTURED           PaymentStatus = "CAPTURED"
-	PaymentStatusFAILED             PaymentStatus = "FAILED"
-	PaymentStatusREFUNDED           PaymentStatus = "REFUNDED"
-	PaymentStatusPARTIALLY_REFUNDED PaymentStatus = "PARTIALLY_REFUNDED"
-	PaymentStatusPENDING            PaymentStatus = "PENDING"
-	PaymentStatusPROCESSING         PaymentStatus = "PROCESSING"
-	PaymentStatusCANCELLED          PaymentStatus = "CANCELLED"
-	PaymentStatusDISPUTED           PaymentStatus = "DISPUTED"
+	StatusCREATED            Status = "CREATED"
+	StatusAUTHORIZED         Status = "AUTHORIZED"
+	StatusCAPTURED           Status = "CAPTURED"
+	StatusFAILED             Status = "FAILED"
+	StatusREFUNDED           Status = "REFUNDED"
+	StatusPARTIALLY_REFUNDED Status = "PARTIALLY_REFUNDED"
+	StatusPENDING            Status = "PENDING"
+	StatusPROCESSING         Status = "PROCESSING"
+	StatusCANCELLED          Status = "CANCELLED"
+	StatusDISPUTED           Status = "DISPUTED"
 )
 
-func (ps PaymentStatus) String() string {
-	return string(ps)
+func (s Status) String() string {
+	return string(s)
 }
 
-// PaymentStatusValidator is a validator for the "payment_status" field enum values. It is called by the builders before save.
-func PaymentStatusValidator(ps PaymentStatus) error {
-	switch ps {
-	case PaymentStatusCREATED, PaymentStatusAUTHORIZED, PaymentStatusCAPTURED, PaymentStatusFAILED, PaymentStatusREFUNDED, PaymentStatusPARTIALLY_REFUNDED, PaymentStatusPENDING, PaymentStatusPROCESSING, PaymentStatusCANCELLED, PaymentStatusDISPUTED:
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusCREATED, StatusAUTHORIZED, StatusCAPTURED, StatusFAILED, StatusREFUNDED, StatusPARTIALLY_REFUNDED, StatusPENDING, StatusPROCESSING, StatusCANCELLED, StatusDISPUTED:
 		return nil
 	default:
-		return fmt.Errorf("payment: invalid enum value for payment_status field: %q", ps)
+		return fmt.Errorf("payment: invalid enum value for status field: %q", s)
 	}
 }
 
@@ -146,9 +146,9 @@ func ByPaymentDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPaymentDate, opts...).ToFunc()
 }
 
-// ByPaymentStatus orders the results by the payment_status field.
-func ByPaymentStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPaymentStatus, opts...).ToFunc()
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
 // ByPaymentMethod orders the results by the payment_method field.
@@ -156,9 +156,9 @@ func ByPaymentMethod(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPaymentMethod, opts...).ToFunc()
 }
 
-// ByPaymentPaymentID orders the results by the payment_payment_id field.
-func ByPaymentPaymentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPaymentPaymentID, opts...).ToFunc()
+// ByProviderPaymentID orders the results by the provider_payment_id field.
+func ByProviderPaymentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProviderPaymentID, opts...).ToFunc()
 }
 
 // ByReceiptID orders the results by the receipt_id field.

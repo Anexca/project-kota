@@ -30,6 +30,20 @@ func (usc *UserSubscriptionCreate) SetIsActive(b bool) *UserSubscriptionCreate {
 	return usc
 }
 
+// SetStatus sets the "status" field.
+func (usc *UserSubscriptionCreate) SetStatus(u usersubscription.Status) *UserSubscriptionCreate {
+	usc.mutation.SetStatus(u)
+	return usc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (usc *UserSubscriptionCreate) SetNillableStatus(u *usersubscription.Status) *UserSubscriptionCreate {
+	if u != nil {
+		usc.SetStatus(*u)
+	}
+	return usc
+}
+
 // SetStartDate sets the "start_date" field.
 func (usc *UserSubscriptionCreate) SetStartDate(t time.Time) *UserSubscriptionCreate {
 	usc.mutation.SetStartDate(t)
@@ -180,6 +194,10 @@ func (usc *UserSubscriptionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (usc *UserSubscriptionCreate) defaults() {
+	if _, ok := usc.mutation.Status(); !ok {
+		v := usersubscription.DefaultStatus
+		usc.mutation.SetStatus(v)
+	}
 	if _, ok := usc.mutation.CreatedAt(); !ok {
 		v := usersubscription.DefaultCreatedAt()
 		usc.mutation.SetCreatedAt(v)
@@ -194,6 +212,14 @@ func (usc *UserSubscriptionCreate) defaults() {
 func (usc *UserSubscriptionCreate) check() error {
 	if _, ok := usc.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "UserSubscription.is_active"`)}
+	}
+	if _, ok := usc.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "UserSubscription.status"`)}
+	}
+	if v, ok := usc.mutation.Status(); ok {
+		if err := usersubscription.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "UserSubscription.status": %w`, err)}
+		}
 	}
 	if _, ok := usc.mutation.ProviderSubscriptionID(); !ok {
 		return &ValidationError{Name: "provider_subscription_id", err: errors.New(`ent: missing required field "UserSubscription.provider_subscription_id"`)}
@@ -233,6 +259,10 @@ func (usc *UserSubscriptionCreate) createSpec() (*UserSubscription, *sqlgraph.Cr
 	if value, ok := usc.mutation.IsActive(); ok {
 		_spec.SetField(usersubscription.FieldIsActive, field.TypeBool, value)
 		_node.IsActive = value
+	}
+	if value, ok := usc.mutation.Status(); ok {
+		_spec.SetField(usersubscription.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
 	}
 	if value, ok := usc.mutation.StartDate(); ok {
 		_spec.SetField(usersubscription.FieldStartDate, field.TypeTime, value)

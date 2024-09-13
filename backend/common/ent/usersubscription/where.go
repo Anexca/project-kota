@@ -95,6 +95,26 @@ func IsActiveNEQ(v bool) predicate.UserSubscription {
 	return predicate.UserSubscription(sql.FieldNEQ(FieldIsActive, v))
 }
 
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.UserSubscription {
+	return predicate.UserSubscription(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.UserSubscription {
+	return predicate.UserSubscription(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.UserSubscription {
+	return predicate.UserSubscription(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.UserSubscription {
+	return predicate.UserSubscription(sql.FieldNotIn(FieldStatus, vs...))
+}
+
 // StartDateEQ applies the EQ predicate on the "start_date" field.
 func StartDateEQ(v time.Time) predicate.UserSubscription {
 	return predicate.UserSubscription(sql.FieldEQ(FieldStartDate, v))
