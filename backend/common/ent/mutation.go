@@ -6166,7 +6166,8 @@ type SubscriptionMutation struct {
 	provider_plan_id          *string
 	price                     *int
 	addprice                  *int
-	duration_in_months        *string
+	duration_in_months        *int
+	addduration_in_months     *int
 	is_active                 *bool
 	name                      *string
 	raw_subscription_data     *map[string]interface{}
@@ -6375,12 +6376,13 @@ func (m *SubscriptionMutation) ResetPrice() {
 }
 
 // SetDurationInMonths sets the "duration_in_months" field.
-func (m *SubscriptionMutation) SetDurationInMonths(s string) {
-	m.duration_in_months = &s
+func (m *SubscriptionMutation) SetDurationInMonths(i int) {
+	m.duration_in_months = &i
+	m.addduration_in_months = nil
 }
 
 // DurationInMonths returns the value of the "duration_in_months" field in the mutation.
-func (m *SubscriptionMutation) DurationInMonths() (r string, exists bool) {
+func (m *SubscriptionMutation) DurationInMonths() (r int, exists bool) {
 	v := m.duration_in_months
 	if v == nil {
 		return
@@ -6391,7 +6393,7 @@ func (m *SubscriptionMutation) DurationInMonths() (r string, exists bool) {
 // OldDurationInMonths returns the old "duration_in_months" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldDurationInMonths(ctx context.Context) (v string, err error) {
+func (m *SubscriptionMutation) OldDurationInMonths(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDurationInMonths is only allowed on UpdateOne operations")
 	}
@@ -6405,9 +6407,28 @@ func (m *SubscriptionMutation) OldDurationInMonths(ctx context.Context) (v strin
 	return oldValue.DurationInMonths, nil
 }
 
+// AddDurationInMonths adds i to the "duration_in_months" field.
+func (m *SubscriptionMutation) AddDurationInMonths(i int) {
+	if m.addduration_in_months != nil {
+		*m.addduration_in_months += i
+	} else {
+		m.addduration_in_months = &i
+	}
+}
+
+// AddedDurationInMonths returns the value that was added to the "duration_in_months" field in this mutation.
+func (m *SubscriptionMutation) AddedDurationInMonths() (r int, exists bool) {
+	v := m.addduration_in_months
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetDurationInMonths resets all changes to the "duration_in_months" field.
 func (m *SubscriptionMutation) ResetDurationInMonths() {
 	m.duration_in_months = nil
+	m.addduration_in_months = nil
 }
 
 // SetIsActive sets the "is_active" field.
@@ -6843,7 +6864,7 @@ func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 		m.SetPrice(v)
 		return nil
 	case subscription.FieldDurationInMonths:
-		v, ok := value.(string)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6895,6 +6916,9 @@ func (m *SubscriptionMutation) AddedFields() []string {
 	if m.addprice != nil {
 		fields = append(fields, subscription.FieldPrice)
 	}
+	if m.addduration_in_months != nil {
+		fields = append(fields, subscription.FieldDurationInMonths)
+	}
 	return fields
 }
 
@@ -6905,6 +6929,8 @@ func (m *SubscriptionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case subscription.FieldPrice:
 		return m.AddedPrice()
+	case subscription.FieldDurationInMonths:
+		return m.AddedDurationInMonths()
 	}
 	return nil, false
 }
@@ -6920,6 +6946,13 @@ func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddPrice(v)
+		return nil
+	case subscription.FieldDurationInMonths:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDurationInMonths(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Subscription numeric field %s", name)

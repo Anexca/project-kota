@@ -35,8 +35,8 @@ func (sc *SubscriptionCreate) SetPrice(i int) *SubscriptionCreate {
 }
 
 // SetDurationInMonths sets the "duration_in_months" field.
-func (sc *SubscriptionCreate) SetDurationInMonths(s string) *SubscriptionCreate {
-	sc.mutation.SetDurationInMonths(s)
+func (sc *SubscriptionCreate) SetDurationInMonths(i int) *SubscriptionCreate {
+	sc.mutation.SetDurationInMonths(i)
 	return sc
 }
 
@@ -219,7 +219,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_node.Price = value
 	}
 	if value, ok := sc.mutation.DurationInMonths(); ok {
-		_spec.SetField(subscription.FieldDurationInMonths, field.TypeString, value)
+		_spec.SetField(subscription.FieldDurationInMonths, field.TypeInt, value)
 		_node.DurationInMonths = value
 	}
 	if value, ok := sc.mutation.IsActive(); ok {

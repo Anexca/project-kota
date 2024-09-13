@@ -215,7 +215,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "provider_plan_id", Type: field.TypeString},
 		{Name: "price", Type: field.TypeInt},
-		{Name: "duration_in_months", Type: field.TypeString},
+		{Name: "duration_in_months", Type: field.TypeInt},
 		{Name: "is_active", Type: field.TypeBool},
 		{Name: "name", Type: field.TypeString},
 		{Name: "raw_subscription_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
