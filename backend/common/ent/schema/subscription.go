@@ -19,7 +19,7 @@ func (Subscription) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("provider_plan_id"),
 		field.Int("price"),
-		field.String("duration_in_months"),
+		field.Int("duration_in_months"),
 		field.Bool("is_active"),
 		field.String("name"),
 		field.JSON("raw_subscription_data", map[string]interface{}{}).

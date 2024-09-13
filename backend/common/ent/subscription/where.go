@@ -66,7 +66,7 @@ func Price(v int) predicate.Subscription {
 }
 
 // DurationInMonths applies equality check predicate on the "duration_in_months" field. It's identical to DurationInMonthsEQ.
-func DurationInMonths(v string) predicate.Subscription {
+func DurationInMonths(v int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldEQ(FieldDurationInMonths, v))
 }
 
@@ -196,68 +196,43 @@ func PriceLTE(v int) predicate.Subscription {
 }
 
 // DurationInMonthsEQ applies the EQ predicate on the "duration_in_months" field.
-func DurationInMonthsEQ(v string) predicate.Subscription {
+func DurationInMonthsEQ(v int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldEQ(FieldDurationInMonths, v))
 }
 
 // DurationInMonthsNEQ applies the NEQ predicate on the "duration_in_months" field.
-func DurationInMonthsNEQ(v string) predicate.Subscription {
+func DurationInMonthsNEQ(v int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldNEQ(FieldDurationInMonths, v))
 }
 
 // DurationInMonthsIn applies the In predicate on the "duration_in_months" field.
-func DurationInMonthsIn(vs ...string) predicate.Subscription {
+func DurationInMonthsIn(vs ...int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldIn(FieldDurationInMonths, vs...))
 }
 
 // DurationInMonthsNotIn applies the NotIn predicate on the "duration_in_months" field.
-func DurationInMonthsNotIn(vs ...string) predicate.Subscription {
+func DurationInMonthsNotIn(vs ...int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldNotIn(FieldDurationInMonths, vs...))
 }
 
 // DurationInMonthsGT applies the GT predicate on the "duration_in_months" field.
-func DurationInMonthsGT(v string) predicate.Subscription {
+func DurationInMonthsGT(v int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldGT(FieldDurationInMonths, v))
 }
 
 // DurationInMonthsGTE applies the GTE predicate on the "duration_in_months" field.
-func DurationInMonthsGTE(v string) predicate.Subscription {
+func DurationInMonthsGTE(v int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldGTE(FieldDurationInMonths, v))
 }
 
 // DurationInMonthsLT applies the LT predicate on the "duration_in_months" field.
-func DurationInMonthsLT(v string) predicate.Subscription {
+func DurationInMonthsLT(v int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldLT(FieldDurationInMonths, v))
 }
 
 // DurationInMonthsLTE applies the LTE predicate on the "duration_in_months" field.
-func DurationInMonthsLTE(v string) predicate.Subscription {
+func DurationInMonthsLTE(v int) predicate.Subscription {
 	return predicate.Subscription(sql.FieldLTE(FieldDurationInMonths, v))
-}
-
-// DurationInMonthsContains applies the Contains predicate on the "duration_in_months" field.
-func DurationInMonthsContains(v string) predicate.Subscription {
-	return predicate.Subscription(sql.FieldContains(FieldDurationInMonths, v))
-}
-
-// DurationInMonthsHasPrefix applies the HasPrefix predicate on the "duration_in_months" field.
-func DurationInMonthsHasPrefix(v string) predicate.Subscription {
-	return predicate.Subscription(sql.FieldHasPrefix(FieldDurationInMonths, v))
-}
-
-// DurationInMonthsHasSuffix applies the HasSuffix predicate on the "duration_in_months" field.
-func DurationInMonthsHasSuffix(v string) predicate.Subscription {
-	return predicate.Subscription(sql.FieldHasSuffix(FieldDurationInMonths, v))
-}
-
-// DurationInMonthsEqualFold applies the EqualFold predicate on the "duration_in_months" field.
-func DurationInMonthsEqualFold(v string) predicate.Subscription {
-	return predicate.Subscription(sql.FieldEqualFold(FieldDurationInMonths, v))
-}
-
-// DurationInMonthsContainsFold applies the ContainsFold predicate on the "duration_in_months" field.
-func DurationInMonthsContainsFold(v string) predicate.Subscription {
-	return predicate.Subscription(sql.FieldContainsFold(FieldDurationInMonths, v))
 }
 
 // IsActiveEQ applies the EQ predicate on the "is_active" field.

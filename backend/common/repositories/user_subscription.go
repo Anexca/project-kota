@@ -59,6 +59,7 @@ func (u *UserSubscriptioRepository) GetById(ctx context.Context, userSubscriptio
 	return u.dbClient.UserSubscription.Query().
 		Where(
 			usersubscription.IDEQ(userSubscriptionId),
-			usersubscription.HasUserWith(user.IDEQ(userUid)),
-		).Only(ctx)
+			usersubscription.HasUserWith(user.IDEQ(userUid))).
+		WithSubscription().
+		Only(ctx)
 }

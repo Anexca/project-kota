@@ -66,16 +66,23 @@ func (su *SubscriptionUpdate) AddPrice(i int) *SubscriptionUpdate {
 }
 
 // SetDurationInMonths sets the "duration_in_months" field.
-func (su *SubscriptionUpdate) SetDurationInMonths(s string) *SubscriptionUpdate {
-	su.mutation.SetDurationInMonths(s)
+func (su *SubscriptionUpdate) SetDurationInMonths(i int) *SubscriptionUpdate {
+	su.mutation.ResetDurationInMonths()
+	su.mutation.SetDurationInMonths(i)
 	return su
 }
 
 // SetNillableDurationInMonths sets the "duration_in_months" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillableDurationInMonths(s *string) *SubscriptionUpdate {
-	if s != nil {
-		su.SetDurationInMonths(*s)
+func (su *SubscriptionUpdate) SetNillableDurationInMonths(i *int) *SubscriptionUpdate {
+	if i != nil {
+		su.SetDurationInMonths(*i)
 	}
+	return su
+}
+
+// AddDurationInMonths adds i to the "duration_in_months" field.
+func (su *SubscriptionUpdate) AddDurationInMonths(i int) *SubscriptionUpdate {
+	su.mutation.AddDurationInMonths(i)
 	return su
 }
 
@@ -257,7 +264,10 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(subscription.FieldPrice, field.TypeInt, value)
 	}
 	if value, ok := su.mutation.DurationInMonths(); ok {
-		_spec.SetField(subscription.FieldDurationInMonths, field.TypeString, value)
+		_spec.SetField(subscription.FieldDurationInMonths, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedDurationInMonths(); ok {
+		_spec.AddField(subscription.FieldDurationInMonths, field.TypeInt, value)
 	}
 	if value, ok := su.mutation.IsActive(); ok {
 		_spec.SetField(subscription.FieldIsActive, field.TypeBool, value)
@@ -420,16 +430,23 @@ func (suo *SubscriptionUpdateOne) AddPrice(i int) *SubscriptionUpdateOne {
 }
 
 // SetDurationInMonths sets the "duration_in_months" field.
-func (suo *SubscriptionUpdateOne) SetDurationInMonths(s string) *SubscriptionUpdateOne {
-	suo.mutation.SetDurationInMonths(s)
+func (suo *SubscriptionUpdateOne) SetDurationInMonths(i int) *SubscriptionUpdateOne {
+	suo.mutation.ResetDurationInMonths()
+	suo.mutation.SetDurationInMonths(i)
 	return suo
 }
 
 // SetNillableDurationInMonths sets the "duration_in_months" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillableDurationInMonths(s *string) *SubscriptionUpdateOne {
-	if s != nil {
-		suo.SetDurationInMonths(*s)
+func (suo *SubscriptionUpdateOne) SetNillableDurationInMonths(i *int) *SubscriptionUpdateOne {
+	if i != nil {
+		suo.SetDurationInMonths(*i)
 	}
+	return suo
+}
+
+// AddDurationInMonths adds i to the "duration_in_months" field.
+func (suo *SubscriptionUpdateOne) AddDurationInMonths(i int) *SubscriptionUpdateOne {
+	suo.mutation.AddDurationInMonths(i)
 	return suo
 }
 
@@ -641,7 +658,10 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		_spec.AddField(subscription.FieldPrice, field.TypeInt, value)
 	}
 	if value, ok := suo.mutation.DurationInMonths(); ok {
-		_spec.SetField(subscription.FieldDurationInMonths, field.TypeString, value)
+		_spec.SetField(subscription.FieldDurationInMonths, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedDurationInMonths(); ok {
+		_spec.AddField(subscription.FieldDurationInMonths, field.TypeInt, value)
 	}
 	if value, ok := suo.mutation.IsActive(); ok {
 		_spec.SetField(subscription.FieldIsActive, field.TypeBool, value)

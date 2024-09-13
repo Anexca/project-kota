@@ -114,6 +114,8 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 	}
 
 	userSubscriptionToUpdate.Status = usersubscription.StatusACTIVE
+	userSubscriptionToUpdate.StartDate = time.Now()
+	userSubscriptionToUpdate.EndDate = time.Now().AddDate(0, userSubscriptionToUpdate.Edges.Subscription.DurationInMonths, 0)
 
 	go func() {
 		bgCtx := context.Background()
