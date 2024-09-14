@@ -18,6 +18,7 @@ export const ICONS = {
   xmark_circle: "fa-solid fa-xmark-circle",
   file: "fa-solid fa-file",
   rupee: "fa-solid fa-indian-rupee-sign",
+  chevron_down: "fa-solid fa-chevron-down",
 };
 type IconType = keyof typeof ICONS;
 export type { IconType };

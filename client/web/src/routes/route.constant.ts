@@ -10,10 +10,11 @@ export enum paths {
   SUPABASE_AUTH = "supabase-auth",
   QUESTION_PAPER = "question-paper",
   PREVIOUS_SUBMISSIONS = "pevious-submissions",
-  PROFILE = "profile",
+  PROFILE = "user-profile",
   MY_SUMBISSIONS = "my-submissions",
   SUBMISSION = "submissions",
   PRIVACY_POLICY = "privacy-policy",
   TERMS_OF_SERVICE = "terms-of-service",
   CONTACT_US = "contact-us",
+  PRICING_PLAN = "pricing-plan",
 }

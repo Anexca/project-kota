@@ -1,4 +1,4 @@
-import { Navigate, RouteObject } from "react-router-dom";
+import { Navigate, Outlet, RouteObject } from "react-router-dom";
 import { ForgotPassword } from "../pages/forgot-password/forgot-password";
 import HomePage from "../pages/homepage/homepage";
 import { Login } from "../pages/login/login";
@@ -25,11 +25,7 @@ const routes: RouteObject[] = [
   },
   {
     path: paths.HOMEPAGE,
-    element: (
-      <SignedInRoute>
-        <HomePage />
-      </SignedInRoute>
-    ),
+    element: <HomePage />,
   },
   {
     path: paths.REGISTER,
@@ -53,48 +49,46 @@ const routes: RouteObject[] = [
   },
 
   {
-    path: paths.PROFILE,
+    path: "",
     element: (
       <ProtectedRoute>
-        <UserProfile />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: paths.EXAMS,
-    element: (
-      <ProtectedRoute>
-        <GeneralLayout />
+        <Outlet />
       </ProtectedRoute>
     ),
     children: [
       {
-        path: `banking/${paths.DISCRIPTIVE}`,
-        element: <DescriptiveQuestion />,
-      },
-      {
-        path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
-        element: <DescriptiveSubmission />,
-      },
-      {
-        path: `${paths.MY_SUMBISSIONS}`,
+        path: paths.PROFILE,
         element: (
-          <ProtectedRoute>
-            <div>Comming soon</div>
-          </ProtectedRoute>
+          <GeneralLayout>
+            <UserProfile />
+          </GeneralLayout>
         ),
+      },
+      {
+        path: paths.EXAMS,
+        element: <GeneralLayout />,
+        children: [
+          {
+            path: `banking/${paths.DISCRIPTIVE}`,
+            element: <DescriptiveQuestion />,
+          },
+          {
+            path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+            element: <DescriptiveSubmission />,
+          },
+          {
+            path: `${paths.MY_SUMBISSIONS}`,
+            element: <div>Comming soon</div>,
+          },
+        ],
+      },
+      {
+        path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
+        element: <DiscriptiveExam />,
       },
     ],
   },
-  {
-    path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
-    element: (
-      <ProtectedRoute>
-        <DiscriptiveExam />
-      </ProtectedRoute>
-    ),
-  },
-  { path: "/pricing-plan", element: <PricingPlan /> },
+  { path: paths.PRICING_PLAN, element: <PricingPlan /> },
   { path: "/terms-of-service", element: <TermsOfService /> },
   { path: "/privacy-policy", element: <PrivacyPolicy /> },
   { path: "/contact-us", element: <ContactUs /> },

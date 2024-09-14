@@ -27,5 +27,13 @@ const alertBackendForSubscription = async ({
   );
   return response.data;
 };
-
-export { getPlans, buySubscription, alertBackendForSubscription };
+const cancelSubscription = async (id: string) => {
+  const response = await axiosInstance.post(`/user-subscriptions/${id}/cancel`);
+  return response.data;
+};
+export {
+  getPlans,
+  buySubscription,
+  alertBackendForSubscription,
+  cancelSubscription,
+};
