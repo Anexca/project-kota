@@ -5,9 +5,11 @@ import (
 	commonRepositories "common/repositories"
 	"context"
 	"errors"
+	"fmt"
 )
 
 type ExamAttemptService struct {
+	accessService           *AccessService
 	examRepository          *commonRepositories.ExamRepository
 	examAtemptRepository    *commonRepositories.ExamAttemptRepository
 	examSettingRepository   *commonRepositories.ExamSettingRepository
@@ -15,12 +17,14 @@ type ExamAttemptService struct {
 }
 
 func NewExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
+	accessService := NewAccessService(dbClient)
 	examAtemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
 
 	return &ExamAttemptService{
+		accessService:           accessService,
 		examAtemptRepository:    examAtemptRepository,
 		examSettingRepository:   examSettingRepository,
 		examRepository:          examRepository,
@@ -37,6 +41,15 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
 	if err != nil {
 		return nil, err
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check access: %w", err)
+	}
+
+	if !hasAccess {
+		return nil, errors.New("forbidden")
 	}
 
 	currAttempts := len(userExamAttempts)

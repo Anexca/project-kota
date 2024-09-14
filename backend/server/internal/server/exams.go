@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"server/pkg/constants"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -28,6 +29,11 @@ func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
 			s.ErrorJson(w, errors.New("exam not found"))
+			return
+		}
+
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
 			return
 		}
 
@@ -63,6 +69,11 @@ func (s *Server) GetAssesmentById(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
+			return
+		}
+
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -92,6 +103,11 @@ func (s *Server) GetExamAssessments(w http.ResponseWriter, r *http.Request) {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
 			s.ErrorJson(w, errors.New("exam not found"))
+			return
+		}
+
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
 			return
 		}
 

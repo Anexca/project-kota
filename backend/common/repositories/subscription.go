@@ -21,5 +21,8 @@ func (s *SubscriptionRepository) GetAll(ctx context.Context) ([]*ent.Subscriptio
 }
 
 func (s *SubscriptionRepository) GetById(ctx context.Context, subscriptionId int) (*ent.Subscription, error) {
-	return s.dbClient.Subscription.Query().Where(subscription.IDEQ(subscriptionId)).Only(ctx)
+	return s.dbClient.Subscription.Query().
+		Where(subscription.IDEQ(subscriptionId)).
+		WithExams().
+		Only(ctx)
 }
