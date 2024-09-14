@@ -1,22 +1,16 @@
 import clsx from "clsx";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { paths } from "../../../routes/route.constant";
 import useSessionStore from "../../../store/auth-store";
-import { Button } from "../../base/button/button";
+import { NavigationHeaderMenu } from "../loggedin-header-menu";
+import { cn } from "../../../lib/utils";
+import useUserProfileStore from "../../../store/user-info-store";
 
 const loggedOutLinks = [
   {
-    to: "/#features",
-    label: "Features",
-  },
-  {
-    to: "/#mcq",
-    label: "MCQ",
-  },
-  {
-    to: "/#reviews",
-    label: "Reviews",
+    to: `/${paths.PRICING_PLAN}`,
+    label: "Pricing",
   },
 ];
 const loggedInLinks = [
@@ -26,14 +20,11 @@ const loggedInLinks = [
   },
 ];
 const Header = () => {
-  const navigation = useNavigate();
   const [mobileViewHeader, setMobileViewHeader] = useState(false);
-  const { session, logout } = useSessionStore();
+  const { session } = useSessionStore();
+  const { profile } = useUserProfileStore();
   const links = session ? loggedInLinks : loggedOutLinks;
-  const logoutHandler = async () => {
-    await logout();
-    navigation(`/${paths.HOMEPAGE}`);
-  };
+
   return (
     <header className="sticky top-0 z-10 ">
       <nav className="z-10 w-full border-b border-black/5 dark:border-white/5  bg-white/30 backdrop-blur-md">
@@ -100,55 +91,30 @@ const Header = () => {
                 <ul className="flex flex-col gap-6 tracking-wide lg:flex-row lg:gap-0 lg:text-sm">
                   {links.map((link) => (
                     <li>
-                      <Link
+                      <NavLink
                         to={link.to}
-                        className="hover:text-primary block transition dark:hover:text-white md:px-4"
+                        className={({ isActive }) =>
+                          cn(
+                            "hover:text-primary block transition dark:hover:text-white md:px-4 text-center",
+                            isActive && "bg-neutral-200/50 p-2 rounded-full"
+                          )
+                        }
                       >
                         <span>{link.label}</span>
-                      </Link>
+                      </NavLink>
                     </li>
                   ))}
-                  {!session && (
-                    <li>
-                      <a
-                        href="https://tailus.gumroad.com/l/astls-premium"
-                        target="_blank"
-                        className="flex gap-2 font-semibold text-gray-700 transition hover:text-primary dark:text-white dark:hover:text-white md:px-4"
-                      >
-                        <span>Premium</span>
-                        <span className="flex rounded-full bg-primary/20 px-1.5 py-0.5 text-xs tracking-wider text-purple-700 dark:bg-white/10 dark:text-orange-300">
-                          {" "}
-                          new
-                        </span>
-                      </a>
-                    </li>
-                  )}
                 </ul>
               </div>
 
               <div className="mt-12 lg:mt-0 flex flex-col sm:flex-row gap-2">
                 {session ? (
-                  <>
-                    <Link
-                      to="/profile"
-                      className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max"
-                    >
-                      <span className="capitalize relative text-sm font-semibold text-white">
-                        {session?.user?.email?.[0]}{" "}
-                      </span>
-                    </Link>
-                    <Button
-                      onClick={logoutHandler}
-                      className="relative flex h-9 items-center justify-center px-4 rounded-full"
-                    >
-                      <span className="capitalize relative text-sm font-semibold text-white">
-                        Logout
-                      </span>
-                    </Button>
-                  </>
+                  <NavigationHeaderMenu
+                    initial={profile.email?.[0]?.toUpperCase()}
+                  />
                 ) : (
                   <Link
-                    to="/register"
+                    to={`/${paths.REGISTER}`}
                     className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max"
                   >
                     <span className="relative text-sm font-semibold text-white">
