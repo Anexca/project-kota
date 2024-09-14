@@ -83,6 +83,27 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		All(ctx)
 }
 
+func (q *GeneratedExamRepository) GetOpenGeneratedExamsByExam(ctx context.Context, ex *ent.Exam, monthOffset int) ([]*ent.GeneratedExam, error) {
+	now := time.Now()
+
+	targetMonth := now.AddDate(0, -monthOffset, 0)
+	firstOfMonth := time.Date(targetMonth.Year(), targetMonth.Month(), 1, 0, 0, 0, 0, time.UTC)
+	lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+	return q.dbClient.GeneratedExam.Query().
+		Where(
+			generatedexam.HasExamWith(exam.ID(ex.ID)),
+			generatedexam.IsActive(false),
+			generatedexam.CreatedAtGTE(firstOfMonth),
+			generatedexam.CreatedAtLTE(lastOfMonth),
+		).
+		WithAttempts().
+		WithExam().
+		Order(ent.Asc(generatedexam.FieldCreatedAt)).
+		Limit(5).
+		All(ctx)
+}
+
 func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {

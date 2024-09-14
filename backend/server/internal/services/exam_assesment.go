@@ -194,7 +194,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		return
 	}
 
-	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId)
+	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId, false)
 	if err != nil {
 		log.Println("error getting exam", err)
 		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})

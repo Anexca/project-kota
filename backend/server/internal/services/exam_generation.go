@@ -181,7 +181,23 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
 }
 
-func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string) (*models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetOpenGeneratedExamsByExam(ctx, exam, 0)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	return e.buildGeneratedExamOverviewList(ctx, generatedExams, exam, userId)
+}
+
+func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) {
 	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
@@ -192,7 +208,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		return nil, fmt.Errorf("failed to check access: %w", err)
 	}
 
-	if !hasAccess {
+	if !hasAccess && !isOpen {
 		return nil, errors.New("forbidden")
 	}
 

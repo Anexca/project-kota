@@ -70,6 +70,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Get("/{id}/assessments", s.GetExamAssessments)
 		})
 
+		r.Route("/open-exams", func(r chi.Router) {
+			r.Route("/banking", func(r chi.Router) {
+				r.Get("/descriptive", s.GetOpenBankingDescriptiveQuestions)
+			})
+
+			r.Get("/{id}", s.GetGeneratedExamById)
+
+		})
+
 		r.Route("/subscriptions", func(r chi.Router) {
 			r.Post("/{subscriptionId}/buy", s.StartSubscription)
 		})
