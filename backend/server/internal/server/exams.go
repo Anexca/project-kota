@@ -197,7 +197,6 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Fetch exam attempts from the service
 	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to, examTypeId, categoryID)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
