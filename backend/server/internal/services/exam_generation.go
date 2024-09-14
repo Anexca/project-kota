@@ -69,6 +69,36 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 	return nil
 }
 
+func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examType commonConstants.ExamType) error {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return err
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	sort.SliceStable(generatedExams, func(i, j int) bool {
+		return generatedExams[i].UpdatedAt.After(generatedExams[j].UpdatedAt)
+	})
+
+	if len(generatedExams) > 30 {
+		for _, generatedExam := range generatedExams[30:] { // Skip the first 30 exams
+			generatedExam.IsActive = false
+		}
+
+		if err := e.generatedExamRepository.UpdateMany(ctx, generatedExams[30:]); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (e *ExamGenerationService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (string, error) {
 	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
 	if err != nil {

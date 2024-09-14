@@ -41,6 +41,32 @@ func (q *GeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *
 	return q.dbClient.GeneratedExam.CreateBulk(bulk...).Save(ctx)
 }
 
+func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error {
+	tx, err := q.dbClient.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, generatedExam := range generatedExams {
+		_, err := tx.GeneratedExam.UpdateOneID(generatedExam.ID).
+			SetIsActive(generatedExam.IsActive).
+			SetRawExamData(generatedExam.RawExamData).
+			Save(ctx)
+		if err != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				return rbErr
+			}
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.ID(generatedExamId)).
@@ -53,6 +79,7 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		Where(generatedexam.HasExamWith(exam.ID(ex.ID)), generatedexam.IsActive(true)).
 		WithAttempts().
 		WithExam().
+		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
 		All(ctx)
 }
 

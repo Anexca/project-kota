@@ -17,5 +17,10 @@ func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 		return err
 	}
 
+	err = w.examService.MarkExpiredExamsInactive(ctx, EXAM_TYPE)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
