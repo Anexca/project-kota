@@ -17,7 +17,7 @@ import (
 type SubscriptionService struct {
 	environment                *config.Environment
 	paymentService             *PaymentService
-	userService                *UserService
+	userRepository             *commonRepositories.UserRepository
 	subscriptionRepository     *commonRepositories.SubscriptionRepository
 	userSubscriptionRepository *commonRepositories.UserSubscriptioRepository
 	paymentrepository          *commonRepositories.PaymentRepository
@@ -31,7 +31,7 @@ type ActivateUserSubscriptionRequest struct {
 func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client) *SubscriptionService {
 	environment, _ := config.LoadEnvironment()
 	paymentService := NewPaymentService(paymentClient)
-	userService := NewUserService(dbClient, paymentClient)
+	userRepository := commonRepositories.NewUserRepository(dbClient)
 	subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
 	userSubscriptionRepository := commonRepositories.NewUserSubscriptioRepository(dbClient)
 	paymentrepository := commonRepositories.NewPaymentRepository(dbClient)
@@ -39,7 +39,7 @@ func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client
 	return &SubscriptionService{
 		environment:                environment,
 		paymentService:             paymentService,
-		userService:                userService,
+		userRepository:             userRepository,
 		subscriptionRepository:     subscriptionRepository,
 		userSubscriptionRepository: userSubscriptionRepository,
 		paymentrepository:          paymentrepository,
@@ -51,7 +51,7 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]*ent.Subscription, 
 }
 
 func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*ent.UserSubscription, error) {
-	user, err := s.userService.GetUser(ctx, userId)
+	user, err := s.userRepository.Get(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -223,11 +223,20 @@ func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSu
 }
 
 func (s *SubscriptionService) UserHasActiveSubscription(ctx context.Context, subscription *ent.Subscription, user *ent.User) (bool, error) {
-	userSubscription, err := s.userSubscriptionRepository.GetByUserId(ctx, subscription.ID, user.ID.String())
+	userSubscriptions, err := s.userSubscriptionRepository.GetByUserId(ctx, user.ID.String())
 	if err != nil {
 		return false, err
 	}
 
 	now := time.Now()
-	return userSubscription.StartDate.Before(now) && userSubscription.EndDate.After(now), nil
+
+	for _, userSubscription := range userSubscriptions {
+		if userSubscription.StartDate.Before(now) &&
+			userSubscription.EndDate.After(now) &&
+			userSubscription.Edges.Subscription.ID == subscription.ID {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
