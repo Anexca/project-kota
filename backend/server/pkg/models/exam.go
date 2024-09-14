@@ -46,4 +46,19 @@ type AssessmentDetails struct {
 	UpdatedAt         time.Time              `json:"updated_at"`
 }
 
-type UserAttempt struct{}
+type UserExamAttempt struct {
+	Id           int
+	IsActive     bool
+	ExamName     string
+	ExamCategory string
+	Topic        string
+	Type         string
+	Attempts     []Attempt
+}
+
+type Attempt struct {
+	AttemptId     int
+	AttemptNumber int
+	AssessmentId  int
+	AttemptDate   time.Time
+}

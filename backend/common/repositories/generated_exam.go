@@ -62,6 +62,17 @@ func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string
 
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.HasAttemptsWith(examattempt.HasUserWith(user.IDEQ(userUid)))).
-		WithAttempts().
+		WithExam(
+			func(query *ent.ExamQuery) {
+				query.WithCategory()
+			},
+		).
+		WithAttempts(
+			func(query *ent.ExamAttemptQuery) {
+				query.WithAssesment().
+					Order(ent.Desc(examattempt.FieldUpdatedAt))
+			},
+		).
+		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
 		All(ctx)
 }
