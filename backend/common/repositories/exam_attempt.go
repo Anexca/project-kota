@@ -35,6 +35,17 @@ func (e *ExamAttemptRepository) GetById(ctx context.Context, attemptId int, user
 		).
 		Only(ctx)
 }
+func (e *ExamAttemptRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.ExamAttempt, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return e.dbClient.ExamAttempt.Query().
+		Where(examattempt.HasUserWith(user.IDEQ(userUid))).
+		WithGeneratedexam().
+		All(ctx)
+}
 
 func (e *ExamAttemptRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error) {
 	userUid, err := uuid.Parse(userId)

@@ -3,9 +3,15 @@ package repositories
 import (
 	"common/ent"
 	"common/ent/exam"
+	"common/ent/examattempt"
+	"common/ent/examcategory"
 	"common/ent/generatedexam"
+	"common/ent/user"
 	"context"
 	"fmt"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type GeneratedExamRepository struct {
@@ -48,4 +54,52 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		WithAttempts().
 		WithExam().
 		All(ctx)
+}
+
+func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	if page < 1 {
+		page = 1
+	}
+
+	offset := (page - 1) * limit
+
+	query := q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.HasAttemptsWith(examattempt.HasUserWith(user.IDEQ(userUid)))).
+		WithExam(
+			func(query *ent.ExamQuery) {
+				query.WithCategory()
+			},
+		).
+		WithAttempts(
+			func(attemptQuery *ent.ExamAttemptQuery) {
+				attemptQuery.WithAssesment().
+					Order(ent.Desc(examattempt.FieldUpdatedAt))
+
+				if from != nil && to != nil {
+					attemptQuery.Where(examattempt.UpdatedAtGTE(*from), examattempt.UpdatedAtLTE(*to))
+				} else if from != nil {
+					attemptQuery.Where(examattempt.UpdatedAtGTE(*from))
+				} else if to != nil {
+					attemptQuery.Where(examattempt.UpdatedAtLTE(*to))
+				}
+			},
+		).
+		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
+		Limit(limit).
+		Offset(offset)
+
+	if examTypeId != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.IDEQ(*examTypeId)))
+	}
+
+	if categoryID != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.HasCategoryWith(examcategory.IDEQ(*categoryID))))
+	}
+
+	return query.All(ctx)
 }

@@ -6,6 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"server/pkg/models"
+	"time"
 )
 
 type ExamAttemptService struct {
@@ -69,4 +71,45 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 	}
 
 	return currentAttempt, nil
+}
+
+func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) ([]*models.UserExamAttempt, error) {
+	examWithAttempts, err := e.generatedExamRepository.GetPaginatedExamsByUserAndDate(ctx, userId, page, limit, from, to, examTypeId, categoryId)
+	if err != nil {
+		return nil, err
+	}
+
+	var userExamAttempts []*models.UserExamAttempt
+
+	for _, generatedExam := range examWithAttempts {
+		userExamAttempt := &models.UserExamAttempt{
+			AttemptedExamId: generatedExam.ID,
+			IsActive:        generatedExam.IsActive,
+			ExamType:        generatedExam.Edges.Exam.Name,
+			ExamTypeId:      generatedExam.Edges.Exam.ID,
+			ExamCategory:    generatedExam.Edges.Exam.Edges.Category.Name,
+			ExamCategoryId:  generatedExam.Edges.Exam.Edges.Category.ID,
+			Topic:           generatedExam.RawExamData["topic"].(string),
+			Type:            generatedExam.RawExamData["type"].(string),
+			Attempts:        []models.Attempt{},
+		}
+
+		for i, attempt := range generatedExam.Edges.Attempts {
+			attemptModel := models.Attempt{
+				AttemptId:     attempt.ID,
+				AttemptNumber: i + 1,
+				AttemptDate:   attempt.UpdatedAt,
+			}
+
+			if attempt.Edges.Assesment != nil {
+				attemptModel.AssessmentId = attempt.Edges.Assesment.ID
+			}
+
+			userExamAttempt.Attempts = append(userExamAttempt.Attempts, attemptModel)
+		}
+
+		userExamAttempts = append(userExamAttempts, userExamAttempt)
+	}
+
+	return userExamAttempts, nil
 }
