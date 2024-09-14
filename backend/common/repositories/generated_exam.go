@@ -56,7 +56,7 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		All(ctx)
 }
 
-func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) ([]*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
@@ -76,29 +76,29 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 			},
 		).
 		WithAttempts(
-			func(query *ent.ExamAttemptQuery) {
-				query.WithAssesment().
+			func(attemptQuery *ent.ExamAttemptQuery) {
+				attemptQuery.WithAssesment().
 					Order(ent.Desc(examattempt.FieldUpdatedAt))
+
+				if from != nil && to != nil {
+					attemptQuery.Where(examattempt.UpdatedAtGTE(*from), examattempt.UpdatedAtLTE(*to))
+				} else if from != nil {
+					attemptQuery.Where(examattempt.UpdatedAtGTE(*from))
+				} else if to != nil {
+					attemptQuery.Where(examattempt.UpdatedAtLTE(*to))
+				}
 			},
 		).
 		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
 		Limit(limit).
 		Offset(offset)
 
-	if from != nil && to != nil {
-		query = query.Where(generatedexam.UpdatedAtGTE(*from), generatedexam.UpdatedAtLTE(*to))
-	} else if from != nil {
-		query = query.Where(generatedexam.UpdatedAtGTE(*from))
-	} else if to != nil {
-		query = query.Where(generatedexam.UpdatedAtLTE(*to))
-	}
-
 	if examTypeId != nil {
 		query = query.Where(generatedexam.HasExamWith(exam.IDEQ(*examTypeId)))
 	}
 
-	if categoryId != nil {
-		query = query.Where(generatedexam.HasExamWith(exam.HasCategoryWith(examcategory.IDEQ(*categoryId))))
+	if categoryID != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.HasCategoryWith(examcategory.IDEQ(*categoryID))))
 	}
 
 	return query.All(ctx)
