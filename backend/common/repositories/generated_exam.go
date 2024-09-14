@@ -54,11 +54,17 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		All(ctx)
 }
 
-func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string, page, limit int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
 	}
+
+	if page < 1 {
+		page = 1
+	}
+
+	offset := (page - 1) * limit
 
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.HasAttemptsWith(examattempt.HasUserWith(user.IDEQ(userUid)))).
@@ -74,5 +80,7 @@ func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string
 			},
 		).
 		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
+		Limit(limit).
+		Offset(offset).
 		All(ctx)
 }
