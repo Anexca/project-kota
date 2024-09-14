@@ -15,7 +15,7 @@ func (s *Server) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := s.userService.GetUser(r.Context(), userId)
+	user, err := s.userService.GetUserProfile(r.Context(), userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
