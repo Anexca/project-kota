@@ -62,6 +62,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 				r.Get("/{id}", s.GetAssesmentById)
 			})
 
+			r.Route("/history", func(r chi.Router) {
+				r.Get("/", s.GetExamAttempts)
+			})
+
 			r.Get("/{id}", s.GetGeneratedExamById)
 			r.Get("/{id}/assessments", s.GetExamAssessments)
 		})
@@ -74,6 +78,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Post("/{userSubscriptionId}/cancel", s.CancelUserSubscription)
 			r.Post("/{userSubscriptionId}/activate", s.ActivateUserSubscription)
 		})
+
 	})
 
 	r.Get("/subscriptions", s.GetAllSubscriptions)

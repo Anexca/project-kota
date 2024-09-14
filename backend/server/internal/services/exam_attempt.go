@@ -70,3 +70,7 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 
 	return currentAttempt, nil
 }
+
+func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string) ([]*ent.GeneratedExam, error) {
+	return e.generatedExamRepository.GetByUserId(ctx, userId)
+}

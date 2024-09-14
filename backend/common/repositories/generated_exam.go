@@ -3,9 +3,13 @@ package repositories
 import (
 	"common/ent"
 	"common/ent/exam"
+	"common/ent/examattempt"
 	"common/ent/generatedexam"
+	"common/ent/user"
 	"context"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 type GeneratedExamRepository struct {
@@ -47,5 +51,17 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		Where(generatedexam.HasExamWith(exam.ID(ex.ID)), generatedexam.IsActive(true)).
 		WithAttempts().
 		WithExam().
+		All(ctx)
+}
+
+func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.GeneratedExam, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.HasAttemptsWith(examattempt.HasUserWith(user.IDEQ(userUid)))).
+		WithAttempts().
 		All(ctx)
 }

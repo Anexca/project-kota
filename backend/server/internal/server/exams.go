@@ -121,3 +121,33 @@ func (s *Server) GetExamAssessments(w http.ResponseWriter, r *http.Request) {
 
 	s.WriteJson(w, http.StatusOK, response)
 }
+
+func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+	}
+
+	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("exam not found"))
+			return
+		}
+
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
+			return
+		}
+
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	response := &Response{
+		Data: attempts,
+	}
+
+	s.WriteJson(w, http.StatusOK, response)
+}
