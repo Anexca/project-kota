@@ -28,7 +28,11 @@ func (e *ExamAttemptRepository) GetById(ctx context.Context, attemptId int, user
 
 	return e.dbClient.ExamAttempt.Query().
 		Where(examattempt.IDEQ(attemptId), examattempt.HasUserWith(user.IDEQ(userUid))).
-		WithGeneratedexam().
+		WithGeneratedexam(
+			func(query *ent.GeneratedExamQuery) {
+				query.WithExam()
+			},
+		).
 		Only(ctx)
 }
 

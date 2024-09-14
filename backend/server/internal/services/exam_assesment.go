@@ -104,12 +104,12 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 		return nil, err
 	}
 
-	attempt, err := e.examAttemptRepository.GetById(ctx, assessment.ID, userId)
+	attempt, err := e.examAttemptRepository.GetById(ctx, assessment.Edges.Attempt.ID, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, attempt.Edges.Generatedexam.ID, userId)
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, attempt.Edges.Generatedexam.Edges.Exam.ID, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check access: %w", err)
 	}
