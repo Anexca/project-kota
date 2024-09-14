@@ -8,6 +8,7 @@ import (
 	"common/ent/user"
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -54,7 +55,7 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		All(ctx)
 }
 
-func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string, page, limit int) ([]*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string, page, limit int, from, to *time.Time) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string
 
 	offset := (page - 1) * limit
 
-	return q.dbClient.GeneratedExam.Query().
+	query := q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.HasAttemptsWith(examattempt.HasUserWith(user.IDEQ(userUid)))).
 		WithExam(
 			func(query *ent.ExamQuery) {
@@ -81,6 +82,15 @@ func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string
 		).
 		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
 		Limit(limit).
-		Offset(offset).
-		All(ctx)
+		Offset(offset)
+
+	if from != nil && to != nil {
+		query = query.Where(generatedexam.UpdatedAtGTE(*from), generatedexam.UpdatedAtLTE(*to))
+	} else if from != nil {
+		query = query.Where(generatedexam.UpdatedAtGTE(*from))
+	} else if to != nil {
+		query = query.Where(generatedexam.UpdatedAtLTE(*to))
+	}
+
+	return query.All(ctx)
 }

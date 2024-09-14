@@ -7,6 +7,7 @@ import (
 	"server/pkg/constants"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -126,8 +127,10 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+		return
 	}
 
+	// Pagination parameters
 	pageStr := r.URL.Query().Get("page")
 	limitStr := r.URL.Query().Get("limit")
 
@@ -146,11 +149,36 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit)
+	// Date range parameters (optional)
+	fromStr := r.URL.Query().Get("from")
+	toStr := r.URL.Query().Get("to")
+
+	var from, to *time.Time
+
+	if fromStr != "" {
+		if fromParsed, err := time.Parse(time.RFC3339, fromStr); err == nil {
+			from = &fromParsed
+		} else {
+			s.ErrorJson(w, errors.New("invalid 'from' date format, expected RFC3339"), http.StatusBadRequest)
+			return
+		}
+	}
+
+	if toStr != "" {
+		if toParsed, err := time.Parse(time.RFC3339, toStr); err == nil {
+			to = &toParsed
+		} else {
+			s.ErrorJson(w, errors.New("invalid 'to' date format, expected RFC3339"), http.StatusBadRequest)
+			return
+		}
+	}
+
+	// Fetch exam attempts from the service
+	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
-			s.ErrorJson(w, errors.New("exam not found"))
+			s.ErrorJson(w, errors.New("exam not found"), http.StatusNotFound)
 			return
 		}
 

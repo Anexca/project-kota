@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"server/pkg/models"
+	"time"
 )
 
 type ExamAttemptService struct {
@@ -72,8 +73,8 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 	return currentAttempt, nil
 }
 
-func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int) ([]*models.UserExamAttempt, error) {
-	examWithAttempts, err := e.generatedExamRepository.GetByUserId(ctx, userId, page, limit)
+func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time) ([]*models.UserExamAttempt, error) {
+	examWithAttempts, err := e.generatedExamRepository.GetByUserId(ctx, userId, page, limit, from, to)
 	if err != nil {
 		return nil, err
 	}
