@@ -31,23 +31,32 @@ export function Login() {
     resolver: yupResolver(LoginSchema),
   });
   const onSumbit = async (formData: LoginType) => {
-    const { email, password } = formData;
+    try {
+      const { email, password } = formData;
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        toast({
+          title: error.message || "Something went wrong.",
+          variant: "destructive",
+          description:
+            "Sorry there is some problem in proccessing your request.",
+        });
+        return;
+      }
+      if (data) {
+        loadSession();
+        navigate(`/${paths.HOMEPAGE}`);
+      }
+    } catch (error) {
       toast({
-        title: error.message || "Something went wrong.",
+        title: "Something went wrong.",
         variant: "destructive",
         description: "Sorry there is some problem in proccessing your request.",
       });
-      return;
-    }
-    if (data) {
-      loadSession();
-      navigate(`/${paths.HOMEPAGE}`);
     }
   };
   const loginWithGoogle = async () => {
@@ -60,7 +69,6 @@ export function Login() {
         },
       },
     });
-    console.log(data);
 
     if (error) {
       toast({

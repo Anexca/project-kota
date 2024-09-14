@@ -31,6 +31,17 @@ const toastVariants = cva(
         default: "border bg-background text-foreground",
         success: "border-green-700 bg-green-100 text-green-700",
         destructive: "border-destructive bg-orange-100 text-orange-700",
+
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "border border-secondary bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "border hover:bg-accent hover:text-accent-foreground",
+        link: "border-none text-primary underline-offset-4 hover:underline",
+        info: "border bg-info text-info-foreground hover:bg-info/90",
+        danger: "border bg-danger text-danger-foreground hover:bg-danger/90",
+        warning:
+          "border bg-warning text-warning-foreground hover:bg-warning/90",
       },
     },
     defaultVariants: {

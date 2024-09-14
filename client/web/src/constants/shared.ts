@@ -9,3 +9,9 @@ export const questionType: Record<string, string> = {
   formal_letter: "Formal Letter",
   essay: "Essay",
 };
+
+export const ScreenSizeQuery = {
+  smallScreen: "(min-width: 640px)",
+  mediumScreen: "(min-width: 768px)",
+  largeScreen: "(min-width: 1024px)",
+};
