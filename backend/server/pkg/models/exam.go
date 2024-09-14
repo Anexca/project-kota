@@ -47,13 +47,15 @@ type AssessmentDetails struct {
 }
 
 type UserExamAttempt struct {
-	Id           int
-	IsActive     bool
-	ExamName     string
-	ExamCategory string
-	Topic        string
-	Type         string
-	Attempts     []Attempt
+	AttemptedExamId int
+	IsActive        bool
+	ExamType        string
+	ExamTypeId      int
+	ExamCategory    string
+	ExamCategoryId  int
+	Topic           string
+	Type            string
+	Attempts        []Attempt
 }
 
 type Attempt struct {

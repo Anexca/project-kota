@@ -173,8 +173,32 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Exam type and category filters (optional)
+	examTypeIdStr := r.URL.Query().Get("examTypeId")
+	categoryIdStr := r.URL.Query().Get("categoryID")
+
+	var examTypeId, categoryID *int
+
+	if examTypeIdStr != "" {
+		if examTypeParsed, err := strconv.Atoi(examTypeIdStr); err == nil && examTypeParsed > 0 {
+			examTypeId = &examTypeParsed
+		} else {
+			s.ErrorJson(w, errors.New("invalid 'examTypeId' format, expected positive integer"), http.StatusBadRequest)
+			return
+		}
+	}
+
+	if categoryIdStr != "" {
+		if categoryParsed, err := strconv.Atoi(categoryIdStr); err == nil && categoryParsed > 0 {
+			categoryID = &categoryParsed
+		} else {
+			s.ErrorJson(w, errors.New("invalid 'categoryID' format, expected positive integer"), http.StatusBadRequest)
+			return
+		}
+	}
+
 	// Fetch exam attempts from the service
-	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to)
+	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to, examTypeId, categoryID)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

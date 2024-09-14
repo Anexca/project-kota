@@ -73,8 +73,8 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 	return currentAttempt, nil
 }
 
-func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time) ([]*models.UserExamAttempt, error) {
-	examWithAttempts, err := e.generatedExamRepository.GetByUserId(ctx, userId, page, limit, from, to)
+func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) ([]*models.UserExamAttempt, error) {
+	examWithAttempts, err := e.generatedExamRepository.GetPaginatedExamsByUserAndDate(ctx, userId, page, limit, from, to, examTypeId, categoryId)
 	if err != nil {
 		return nil, err
 	}
@@ -83,13 +83,15 @@ func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, pag
 
 	for _, generatedExam := range examWithAttempts {
 		userExamAttempt := &models.UserExamAttempt{
-			Id:           generatedExam.ID,
-			IsActive:     generatedExam.IsActive,
-			ExamName:     generatedExam.Edges.Exam.Name,
-			ExamCategory: generatedExam.Edges.Exam.Edges.Category.Name,
-			Topic:        generatedExam.RawExamData["topic"].(string),
-			Type:         generatedExam.RawExamData["type"].(string),
-			Attempts:     []models.Attempt{},
+			AttemptedExamId: generatedExam.ID,
+			IsActive:        generatedExam.IsActive,
+			ExamType:        generatedExam.Edges.Exam.Name,
+			ExamTypeId:      generatedExam.Edges.Exam.ID,
+			ExamCategory:    generatedExam.Edges.Exam.Edges.Category.Name,
+			ExamCategoryId:  generatedExam.Edges.Exam.Edges.Category.ID,
+			Topic:           generatedExam.RawExamData["topic"].(string),
+			Type:            generatedExam.RawExamData["type"].(string),
+			Attempts:        []models.Attempt{},
 		}
 
 		for i, attempt := range generatedExam.Edges.Attempts {

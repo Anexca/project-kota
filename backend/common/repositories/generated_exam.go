@@ -4,6 +4,7 @@ import (
 	"common/ent"
 	"common/ent/exam"
 	"common/ent/examattempt"
+	"common/ent/examcategory"
 	"common/ent/generatedexam"
 	"common/ent/user"
 	"context"
@@ -55,7 +56,7 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		All(ctx)
 }
 
-func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string, page, limit int, from, to *time.Time) ([]*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
@@ -90,6 +91,14 @@ func (q *GeneratedExamRepository) GetByUserId(ctx context.Context, userId string
 		query = query.Where(generatedexam.UpdatedAtGTE(*from))
 	} else if to != nil {
 		query = query.Where(generatedexam.UpdatedAtLTE(*to))
+	}
+
+	if examTypeId != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.IDEQ(*examTypeId)))
+	}
+
+	if categoryId != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.HasCategoryWith(examcategory.IDEQ(*categoryId))))
 	}
 
 	return query.All(ctx)
