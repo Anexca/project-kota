@@ -26,6 +26,11 @@ func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.R
 
 	cachedQuestions, err := s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
 	if err != nil {
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
+			return
+		}
+
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}

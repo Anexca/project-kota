@@ -98,13 +98,27 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 	return assessmentModel, nil
 }
 
-func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (models.AssessmentDetails, error) {
+func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) {
 	assessment, err := e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
 	if err != nil {
-		return models.AssessmentDetails{}, err
+		return nil, err
 	}
 
-	assessmentModel := models.AssessmentDetails{
+	attempt, err := e.examAttemptRepository.GetById(ctx, assessment.ID, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, attempt.Edges.Generatedexam.ID, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check access: %w", err)
+	}
+
+	if !hasAccess {
+		return nil, errors.New("forbidden")
+	}
+
+	assessmentModel := &models.AssessmentDetails{
 		Id:                assessment.ID,
 		CompletedSeconds:  assessment.CompletedSeconds,
 		Status:            assessment.Status.String(),
@@ -129,6 +143,20 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 		return nil, err
 	}
 
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	if err != nil {
+		return nil, err
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check access: %w", err)
+	}
+
+	if !hasAccess {
+		return nil, errors.New("forbidden")
+	}
+
 	assessmentsList := make([]models.AssessmentDetails, 0, len(assessments))
 
 	for _, assessment := range assessments {
@@ -147,6 +175,24 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string, userId string) {
 	assesmentModel := &commonRepositories.AssesmentModel{}
+	generatedExamData, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	if err != nil {
+		log.Println("error getting generated exam", err)
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		return
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExamData.Edges.Exam.ID, userId)
+	if err != nil {
+		log.Println("error getting exam", err)
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		return
+	}
+
+	if !hasAccess {
+		log.Println("user does not have access to assess exam", err)
+		return
+	}
 
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	commonServices "common/services"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"server/pkg/models"
 	"sort"
@@ -139,7 +140,7 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 	}
 
 	if !hasAccess {
-		return nil, nil
+		return nil, errors.New("forbidden")
 	}
 
 	sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
@@ -162,7 +163,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	}
 
 	if !hasAccess {
-		return nil, nil
+		return nil, errors.New("forbidden")
 	}
 
 	userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
