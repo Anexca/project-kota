@@ -54,6 +54,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Route("/user", func(r chi.Router) {
 			r.Get("/", s.GetUserProfile)
 			r.Put("/", s.UpdateUser)
+			r.Get("/transactions", s.GetUserTransactions)
 		})
 
 		r.Route("/exams", func(r chi.Router) {
