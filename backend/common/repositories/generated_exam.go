@@ -51,6 +51,7 @@ func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams
 		_, err := tx.GeneratedExam.UpdateOneID(generatedExam.ID).
 			SetIsActive(generatedExam.IsActive).
 			SetRawExamData(generatedExam.RawExamData).
+			SetIsOpen(generatedExam.IsOpen).
 			Save(ctx)
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
@@ -67,9 +68,9 @@ func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams
 	return nil
 }
 
-func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.ID(generatedExamId), generatedexam.IsActiveEQ(isActive)).
+		Where(generatedexam.ID(generatedExamId), generatedexam.IsActiveEQ(!isOpen), generatedexam.IsOpenEQ(isOpen)).
 		WithExam().
 		Only(ctx)
 }

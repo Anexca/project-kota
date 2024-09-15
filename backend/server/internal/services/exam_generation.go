@@ -231,7 +231,7 @@ func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examT
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	generatedExams, err := e.generatedExamRepository.GetByMonthOffset(ctx, exam, 0, 2)
+	generatedExams, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -240,7 +240,7 @@ func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examT
 }
 
 func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) {
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, !isOpen)
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
 	}
