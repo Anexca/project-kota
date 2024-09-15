@@ -71,6 +71,19 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
+	isOpen, err := GetHttpRequestContextValue(r, constants.OpenExamKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
+		return
+	}
+
+	isOpenValue, err := strconv.ParseBool(isOpen)
+	if err != nil {
+		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
+		return
 	}
 
 	var request services.DescriptiveExamAssesmentRequest
@@ -85,7 +98,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, false)
+	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, isOpenValue)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

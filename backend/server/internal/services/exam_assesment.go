@@ -140,25 +140,27 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 	return assessmentModel, nil
 }
 
-func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generatedExamId int, userId string) ([]models.AssessmentDetails, error) {
+func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generatedExamId int, userId string, isOpen bool) ([]models.AssessmentDetails, error) {
 	assessments, err := e.examAssesmentRepository.GetByExam(ctx, generatedExamId, userId)
 
 	if err != nil {
 		return nil, err
 	}
 
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, true)
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, err
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to check access: %w", err)
-	}
+	if !isOpen {
+		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check access: %w", err)
+		}
 
-	if !hasAccess {
-		return nil, errors.New("forbidden")
+		if !hasAccess {
+			return nil, errors.New("forbidden")
+		}
 	}
 
 	assessmentsList := make([]models.AssessmentDetails, 0, len(assessments))

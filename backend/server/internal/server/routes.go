@@ -46,6 +46,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuthMiddleware(s.authService))
+		r.Use(middlewares.SetOpenExamContext(false))
 
 		r.Route("/user", func(r chi.Router) {
 			r.Get("/", s.GetUserProfile)
@@ -71,6 +72,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 
 		r.Route("/open-exams", func(r chi.Router) {
+			r.Use(middlewares.SetOpenExamContext(true))
+
 			r.Route("/banking", func(r chi.Router) {
 				r.Get("/descriptive", s.GetOpenBankingDescriptiveQuestions)
 			})
