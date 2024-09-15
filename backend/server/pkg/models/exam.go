@@ -59,8 +59,9 @@ type UserExamAttempt struct {
 }
 
 type Attempt struct {
-	AttemptId     int       `json:"attempt_id"`
-	AttemptNumber int       `json:"attempt_number"`
-	AssessmentId  int       `json:"assessment_id"`
-	AttemptDate   time.Time `json:"attempt_date"`
+	AttemptId        int       `json:"attempt_id"`
+	AttemptNumber    int       `json:"attempt_number"`
+	AssessmentStatus string    `json:"assessment_status"`
+	AssessmentId     int       `json:"assessment_id"`
+	AttemptDate      time.Time `json:"attempt_date"`
 }

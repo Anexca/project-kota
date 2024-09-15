@@ -108,6 +108,7 @@ func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, pag
 
 			if attempt.Edges.Assesment != nil {
 				attemptModel.AssessmentId = attempt.Edges.Assesment.ID
+				attemptModel.AssessmentStatus = string(attempt.Edges.Assesment.Status)
 			}
 
 			userExamAttempt.Attempts = append(userExamAttempt.Attempts, attemptModel)
