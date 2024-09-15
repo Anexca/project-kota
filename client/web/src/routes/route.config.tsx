@@ -17,6 +17,8 @@ import PricingPlan from "../pages/pricing-plan";
 import TermsOfService from "../pages/terms-of-service";
 import PrivacyPolicy from "../pages/privacy-policy";
 import ContactUs from "../pages/contact-us";
+import PreviousSubmissionPage from "../pages/previous-submissions";
+import ViewPastSubmission from "../pages/view-past-submission";
 
 const routes: RouteObject[] = [
   {
@@ -78,7 +80,11 @@ const routes: RouteObject[] = [
           },
           {
             path: `${paths.MY_SUMBISSIONS}`,
-            element: <div>Comming soon</div>,
+            element: <PreviousSubmissionPage />,
+          },
+          {
+            path: `${paths.MY_SUMBISSIONS}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+            element: <ViewPastSubmission />,
           },
         ],
       },

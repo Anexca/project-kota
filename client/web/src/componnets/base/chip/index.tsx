@@ -4,7 +4,7 @@ import { ICONS, IconType } from "../../../constants/icons";
 import { cn } from "../../../lib/utils";
 
 const chipVariants = cva(
-  "text-xs inline-flex items-center justify-center rounded-full px-2.5 py-0.5",
+  "text-xs inline-flex items-center justify-center rounded-full px-2 py-0.5",
   {
     variants: {
       variant: {
