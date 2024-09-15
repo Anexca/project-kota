@@ -10,22 +10,33 @@ export const getQuestions = async (isOpenExam?: boolean) => {
   return response.data;
 };
 
-export const getQuestionById = async (questionId: string) => {
-  const response = await axiosInstance.get(`/exams/${questionId}`);
+export const getQuestionById = async (questionId: string, isOpen?: boolean) => {
+  const response = await axiosInstance.get(`/exams/${questionId}`, {
+    params: {
+      isopen: isOpen,
+    },
+  });
   return response.data;
 };
 export const sendAnswerForAssesment = async ({
   questionId,
   answer,
   completedTime,
+  isOpen,
 }: {
   questionId: number;
   answer: string;
   completedTime: number;
+  isOpen?: boolean;
 }) => {
   const response = await axiosInstance.post(
     `/exams/banking/descriptive/${questionId}/evaluate`,
-    { completed_seconds: completedTime, content: answer }
+    { completed_seconds: completedTime, content: answer },
+    {
+      params: {
+        isopen: isOpen,
+      },
+    }
   );
   return response.data;
 };
