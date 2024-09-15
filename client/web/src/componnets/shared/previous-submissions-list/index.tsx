@@ -35,7 +35,13 @@ const iconSet = {
     />
   ),
 };
-const PreviousSubmissions = ({ question }: { question: IQuestion }) => {
+const PreviousSubmissions = ({
+  question,
+  isOpenExam,
+}: {
+  question: IQuestion;
+  isOpenExam?: boolean;
+}) => {
   const [submissionList, setSubmissionList] = useState<ISubmission[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -56,7 +62,9 @@ const PreviousSubmissions = ({ question }: { question: IQuestion }) => {
   };
   const viewSubmission = (id: number) => {
     navigate(
-      `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${question.id}/${paths.SUBMISSION}/${id}`
+      `/${isOpenExam ? paths.COMMUNITY_EXAMS : paths.EXAMS}/banking/${
+        paths.DISCRIPTIVE
+      }/${question.id}/${paths.SUBMISSION}/${id}`
     );
   };
   useEffect(() => {

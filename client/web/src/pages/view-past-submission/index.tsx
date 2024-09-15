@@ -1,10 +1,12 @@
 import { paths } from "../../routes/route.constant";
 import DescriptiveSubmission from "../descriptive-submission";
 
-const ViewPastSubmission = () => {
+const ViewPastSubmission = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   return (
     <DescriptiveSubmission
-      backLink={`/${paths.EXAMS}/${paths.MY_SUMBISSIONS}`}
+      backLink={`/${isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS}/${
+        paths.MY_SUMBISSIONS
+      }`}
     />
   );
 };

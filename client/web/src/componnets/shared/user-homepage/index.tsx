@@ -1,4 +1,6 @@
+import { useMemo } from "react";
 import { paths } from "../../../routes/route.constant";
+import useUserProfileStore from "../../../store/user-info-store";
 import { Button } from "../../base/button/button";
 import Chip from "../../base/chip";
 import Icon from "../../base/icon";
@@ -10,11 +12,19 @@ import { AnimatedBeamHeading } from "./beam-heading";
 
 const exams = [
   {
+    title: "Community Banking Descriptive Exams",
+    desc: "2 free Questions every week. AI-Assisted Descriptive Assessment with Insights. Get understanding about your weak and strong points.",
+    link: `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`,
+    type: "Descriptive",
+    isActive: true,
+  },
+  {
     title: "Banking Descriptive Exams",
     desc: "AI-Assisted Descriptive Assessment with Insights. Get understanding about your weak and strong points.",
     link: `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`,
     type: "Descriptive",
     isActive: true,
+    isPremium: true,
   },
   {
     title: "Banking MCQ Exams",
@@ -90,6 +100,7 @@ const ExamCard = ({
   srNumber,
   type,
   isActive,
+  isPremium,
 }: {
   title: string;
   desc: string;
@@ -97,7 +108,15 @@ const ExamCard = ({
   srNumber: number;
   type: string;
   isActive: boolean;
+  isPremium?: boolean;
 }) => {
+  const { profile } = useUserProfileStore();
+  const showAttempt = useMemo(() => {
+    if (isPremium) {
+      return !!profile.active_subscriptions;
+    }
+    return true;
+  }, []);
   return (
     <article className="rounded-md shadow-sm bg-white flex flex-col md:flex-row gap-4 p-3 px-4 md:p3 text-sm">
       <div className="flex-1">
@@ -115,14 +134,25 @@ const ExamCard = ({
       </div>
       <div className="flex flex-col items-stretch gap-2 md:justify-center md:w-32">
         {isActive ? (
-          <StyledLink
-            to={link}
-            size={"sm"}
-            className="px-3 py-1"
-            variant={"info"}
-          >
-            <Icon icon="play_circle" className="mr-2" /> Attempt
-          </StyledLink>
+          showAttempt ? (
+            <StyledLink
+              to={link}
+              size={"sm"}
+              className="px-3 py-1"
+              variant={"info"}
+            >
+              <Icon icon="play_circle" className="mr-2" /> Attempt
+            </StyledLink>
+          ) : (
+            <StyledLink
+              to={`/${paths.PRICING_PLAN}`}
+              size={"sm"}
+              className="px-3 py-1"
+              variant={"warning"}
+            >
+              <Icon icon="send" className="mr-2" /> Buy Plan
+            </StyledLink>
+          )
         ) : (
           <Button
             disabled

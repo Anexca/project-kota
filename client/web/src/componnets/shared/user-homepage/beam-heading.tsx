@@ -31,7 +31,7 @@ export function AnimatedBeamHeading() {
 
   return (
     <div
-      className="relative flex w-full max-w-[500px] items-center justify-center overflow-hidden p-2 py-10 md:p-10  "
+      className="relative flex w-full max-w-[500px] items-center justify-center overflow-hidden py-10 md:p-10  "
       ref={containerRef}
     >
       <div className="flex h-full w-full flex-col items-stretch justify-between gap-10">

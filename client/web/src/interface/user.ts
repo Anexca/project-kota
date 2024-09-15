@@ -22,3 +22,10 @@ export interface IUserSubscription {
     payment_method: string;
   };
 }
+
+export interface IMyTransactions {
+  amount: number;
+  payment_date: string;
+  payment_status: string;
+  payment_method: string;
+}

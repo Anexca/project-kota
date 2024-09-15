@@ -16,6 +16,7 @@ import { Button } from "../../base/button/button";
 import useSessionStore from "../../../store/auth-store";
 import { useMediaQuery } from "../../../hooks/use-media-query";
 import { ScreenSizeQuery } from "../../../constants/shared";
+import { StyledLink } from "../../base/styled-link";
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
@@ -69,6 +70,11 @@ const components: JSX.Element[] = [
     children={"Manage and update your profile"}
   />,
   <ListItem
+    title="My Transactions"
+    href={`/${paths.PROFILE}/${paths.MY_TRANSACTIONS}`}
+    children={"View your transaction history."}
+  />,
+  <ListItem
     title="My Plan"
     href={`/${paths.PRICING_PLAN}`}
     children={"View your plans."}
@@ -82,6 +88,12 @@ const mobileComponents: JSX.Element[] = [
     children={"My Profile"}
     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground w-full"
   />,
+  <StyledLink
+    variant={"outline"}
+    to={`/${paths.PROFILE}/${paths.MY_TRANSACTIONS}`}
+  >
+    My Transactions
+  </StyledLink>,
   <Link
     to={`/${paths.PRICING_PLAN}`}
     children={"My Plan"}
@@ -98,6 +110,7 @@ export function NavigationHeaderMenu({ initial }: { initial: string }) {
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger
+            onClick={() => {}}
             noChevron
             className="relative flex h-9 w-full items-center justify-center px-4 before:absolute before:inset-0 before:rounded-full before:bg-primary before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95 sm:w-max gap-2 !text-white"
           >
