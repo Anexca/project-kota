@@ -58,8 +58,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 
 		r.Route("/exams", func(r chi.Router) {
-			r.Use(middlewares.SetOpenExamContext(false))
-
 			r.Route("/banking", func(r chi.Router) {
 				r.Get("/descriptive", s.GetBankingDescriptiveQuestions)
 				r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
@@ -75,23 +73,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 			r.Get("/{id}", s.GetGeneratedExamById)
 			r.Get("/{id}/assessments", s.GetExamAssessments)
-		})
-
-		r.Route("/open-exams", func(r chi.Router) {
-			r.Use(middlewares.SetOpenExamContext(true))
-
-			r.Route("/banking", func(r chi.Router) {
-				r.Get("/descriptive", s.GetOpenBankingDescriptiveQuestions)
-				r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
-			})
-
-			r.Route("/assesments", func(r chi.Router) {
-				r.Get("/{id}", s.GetAssesmentById)
-			})
-
-			r.Get("/{id}", s.GetOpenGeneratedExamById)
-			r.Get("/{id}/assessments", s.GetExamAssessments)
-
 		})
 
 		r.Route("/subscriptions", func(r chi.Router) {

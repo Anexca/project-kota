@@ -68,9 +68,23 @@ func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams
 	return nil
 }
 
-func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(!isOpen), generatedexam.IsOpenEQ(isOpen)).
+		Where(generatedexam.IDEQ(generatedExamId)).
+		WithExam().
+		Only(ctx)
+}
+
+func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen)).
+		WithExam().
+		Only(ctx)
+}
+
+func (q GeneratedExamRepository) GetActiveById(ctx context.Context, generatedExamId int, IsActive bool) (*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(IsActive)).
 		WithExam().
 		Only(ctx)
 }

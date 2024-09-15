@@ -20,7 +20,7 @@ func NewExamAttemptRepository(dbClient *ent.Client) *ExamAttemptRepository {
 	}
 }
 
-func (e *ExamAttemptRepository) GetById(ctx context.Context, attemptId int, userId string, isOpen bool) (*ent.ExamAttempt, error) {
+func (e *ExamAttemptRepository) GetById(ctx context.Context, attemptId int, userId string) (*ent.ExamAttempt, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,6 @@ func (e *ExamAttemptRepository) GetById(ctx context.Context, attemptId int, user
 		WithGeneratedexam(
 			func(query *ent.GeneratedExamQuery) {
 				query.WithExam()
-				query.Where(generatedexam.IsOpen(isOpen))
 			},
 		).
 		Only(ctx)
