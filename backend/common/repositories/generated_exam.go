@@ -70,7 +70,7 @@ func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams
 
 func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.ID(generatedExamId), generatedexam.IsActiveEQ(!isOpen), generatedexam.IsOpenEQ(isOpen)).
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(!isOpen), generatedexam.IsOpenEQ(isOpen)).
 		WithExam().
 		Only(ctx)
 }
