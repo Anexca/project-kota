@@ -1,3 +1,4 @@
+import { IPastExamAttempt } from "../interface/past-submission";
 import axiosInstance from "./base";
 
 export const getQuestions = async () => {
@@ -30,5 +31,11 @@ export const getAssesmetsResult = async (assesmetId: number) => {
 };
 export const getPastSubmission = async (examId: number) => {
   const response = await axiosInstance.get(`/exams/${examId}/assessments`);
+  return response.data;
+};
+export const getPastAttemptedSubmissions = async () => {
+  const response = await axiosInstance.get<{ data: IPastExamAttempt[] }>(
+    `/exams/history`
+  );
   return response.data;
 };

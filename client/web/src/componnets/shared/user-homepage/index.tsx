@@ -1,16 +1,42 @@
-import { Link } from "react-router-dom";
+import { paths } from "../../../routes/route.constant";
+import { Button } from "../../base/button/button";
+import Chip from "../../base/chip";
 import Icon from "../../base/icon";
+import { StyledLink } from "../../base/styled-link";
 import Container from "../container";
 import Footer from "../footer";
 import Header from "../header/header";
 import { AnimatedBeamHeading } from "./beam-heading";
-import { paths } from "../../../routes/route.constant";
+
+const exams = [
+  {
+    title: "Banking Descriptive Exams",
+    desc: "AI-Assisted Descriptive Assessment with Insights. Get understanding about your weak and strong points.",
+    link: `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`,
+    type: "Descriptive",
+    isActive: true,
+  },
+  {
+    title: "Banking MCQ Exams",
+    desc: "Practice Banking MCQs to boost your knowledge and exam readiness with detailed solutions and explanations.",
+    link: `/${paths.EXAMS}/banking/${paths.MCQ}`,
+    type: "MCQ",
+    isActive: false,
+  },
+  {
+    title: "Ranked MCQ Exams",
+    desc: "Compete in Ranked MCQ Exams and see how you rank among others while improving your skills.",
+    link: `/${paths.EXAMS}/ranked/${paths.MCQ}`,
+    type: "MCQ",
+    isActive: false,
+  },
+];
 
 const UserHomePage = () => {
   return (
     <div>
       <Header />
-      <div className="relative" id="home">
+      <div className="relative bg-neutral-100/50" id="home">
         <div
           aria-hidden="true"
           className="absolute inset-0 grid grid-cols-2 -space-x-52 opacity-40 dark:opacity-20"
@@ -34,23 +60,15 @@ const UserHomePage = () => {
                 <Icon icon="arrow_right" className="text-info rotate-90" />
               </div>
             </div>
-            <div className="w-full bg-white mt-28">
+            <div className="w-full py-28">
               <Container>
                 <h4 className="border-b py-2 font-bold text-center">
-                  Available Test
+                  Available Exams
                 </h4>
-                <div className="p-2 md:p-4">
-                  <Link to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}>
-                    <div className="shadow rounded-sm p-4 border">
-                      <div className="font-semibold text-base">
-                        Banking Descriptive Exams
-                      </div>
-                      <div className=" text-sm">
-                        AI-Assisted Descriptive Assessment with Insights. Get
-                        understanding about your weak and strong points.
-                      </div>
-                    </div>
-                  </Link>
+                <div className="p-2 px-0 my-4 space-y-4">
+                  {exams.map((item, index) => (
+                    <ExamCard {...item} srNumber={index + 1} />
+                  ))}
                 </div>
               </Container>
             </div>
@@ -64,3 +82,58 @@ const UserHomePage = () => {
 };
 
 export default UserHomePage;
+
+const ExamCard = ({
+  desc,
+  link,
+  title,
+  srNumber,
+  type,
+  isActive,
+}: {
+  title: string;
+  desc: string;
+  link: string;
+  srNumber: number;
+  type: string;
+  isActive: boolean;
+}) => {
+  return (
+    <article className="rounded-md shadow-sm bg-white flex flex-col md:flex-row gap-4 p-3 px-4 md:p3 text-sm">
+      <div className="flex-1">
+        <p className="font-medium text-balance md:text-pretty text-black mb-2">
+          #{srNumber} - {title}
+        </p>
+        <p className="text-balance md:text-pretty text-sm text-black mb-2">
+          {desc}
+        </p>
+        <div className="flex gap-2 flex-wrap">
+          <Chip icon="tags" variant={"info"}>
+            {type}
+          </Chip>
+        </div>
+      </div>
+      <div className="flex flex-col items-stretch gap-2 md:justify-center md:w-32">
+        {isActive ? (
+          <StyledLink
+            to={link}
+            size={"sm"}
+            className="px-3 py-1"
+            variant={"info"}
+          >
+            <Icon icon="play_circle" className="mr-2" /> Attempt
+          </StyledLink>
+        ) : (
+          <Button
+            disabled
+            size={"sm"}
+            className="px-3 py-1"
+            variant={"secondary"}
+          >
+            <Icon icon="clock" className="mr-2" /> Comming soon
+          </Button>
+        )}
+      </div>
+    </article>
+  );
+};
