@@ -116,7 +116,7 @@ const ExamCard = ({
       return !!profile.active_subscriptions;
     }
     return true;
-  }, []);
+  }, [profile]);
   return (
     <article className="rounded-md shadow-sm bg-white flex flex-col md:flex-row gap-4 p-3 px-4 md:p3 text-sm">
       <div className="flex-1">
