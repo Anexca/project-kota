@@ -19,7 +19,7 @@ const PreviousSubmissionPage = () => {
     try {
       await supabase.auth.getSession();
       const data = await getPastAttemptedSubmissions();
-      setQuestions(data.data);
+      setQuestions(data.data || []);
     } catch (error) {
       toast({
         title: "Oh ho Something went wrong.",
@@ -53,18 +53,24 @@ const PreviousSubmissionPage = () => {
         </div>
       ) : (
         <div className="animate-fadeIn flex flex-col gap-2">
-          {submisions.map((item) => {
-            return (
-              <AttemptedSubmissionsCard
-                key={item.attempted_exam_id}
-                topic={item.topic}
-                type={item.type}
-                srNumber={item.attempted_exam_id}
-                category={item.exam_category}
-                submissions={item.attempts}
-              />
-            );
-          })}
+          {submisions.length ? (
+            submisions.map((item) => {
+              return (
+                <AttemptedSubmissionsCard
+                  key={item.attempted_exam_id}
+                  topic={item.topic}
+                  type={item.type}
+                  srNumber={item.attempted_exam_id}
+                  category={item.exam_category}
+                  submissions={item.attempts}
+                />
+              );
+            })
+          ) : (
+            <div className="flex flex-col gap-2 justify-center items-center">
+              You don't have any submissions yet. Please attempt some exams.
+            </div>
+          )}
         </div>
       )}
     </div>
