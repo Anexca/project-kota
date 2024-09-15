@@ -67,9 +67,9 @@ func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams
 	return nil
 }
 
-func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.ID(generatedExamId)).
+		Where(generatedexam.ID(generatedExamId), generatedexam.IsActiveEQ(isActive)).
 		WithExam().
 		Only(ctx)
 }

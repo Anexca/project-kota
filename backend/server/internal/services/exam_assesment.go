@@ -53,7 +53,7 @@ func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *E
 }
 
 func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest, userId string) (*models.AssessmentDetails, error) {
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, true)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 		return nil, err
 	}
 
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, true)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string, userId string) {
 	assesmentModel := &commonRepositories.AssesmentModel{}
-	generatedExamData, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	generatedExamData, err := e.generatedExamRepository.GetById(ctx, generatedExamId, true)
 	if err != nil {
 		log.Println("error getting generated exam", err)
 		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})

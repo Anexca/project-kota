@@ -198,18 +198,20 @@ func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examT
 }
 
 func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) {
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, !isOpen)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to check access: %w", err)
-	}
+	if !isOpen {
+		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check access: %w", err)
+		}
 
-	if !hasAccess && !isOpen {
-		return nil, errors.New("forbidden")
+		if !hasAccess {
+			return nil, errors.New("forbidden")
+		}
 	}
 
 	userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)

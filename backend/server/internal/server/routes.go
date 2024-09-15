@@ -75,7 +75,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 				r.Get("/descriptive", s.GetOpenBankingDescriptiveQuestions)
 			})
 
-			r.Get("/{id}", s.GetGeneratedExamById)
+			r.Get("/{id}", s.GetOpenGeneratedExamById)
 
 		})
 
