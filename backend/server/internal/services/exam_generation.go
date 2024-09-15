@@ -7,7 +7,9 @@ import (
 	commonServices "common/services"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"server/pkg/models"
 	"sort"
 
@@ -15,6 +17,7 @@ import (
 )
 
 type ExamGenerationService struct {
+	accessService           *AccessService
 	redisService            *commonServices.RedisService
 	examRepository          *commonRepositories.ExamRepository
 	generatedExamRepository *commonRepositories.GeneratedExamRepository
@@ -26,6 +29,7 @@ type ExamGenerationService struct {
 
 func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *ExamGenerationService {
 	redisService := commonServices.NewRedisService(redisClient)
+	accessService := NewAccessService(dbClient)
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	cachedExamRepository := commonRepositories.NewCachedExamRepository(dbClient)
@@ -34,6 +38,7 @@ func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 
 	return &ExamGenerationService{
+		accessService:           accessService,
 		redisService:            redisService,
 		examRepository:          examRepository,
 		examCategoryRepository:  examCategoryRepository,
@@ -60,6 +65,77 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 	err = e.ProcessExamData(ctx, exam, modelType, cachedData)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	currentOpenQuestions, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
+	if err != nil {
+		return fmt.Errorf("failed to get currentOpenQuestions: %w", err)
+	}
+
+	for _, coe := range currentOpenQuestions {
+		coe.IsOpen = false
+	}
+
+	err = e.generatedExamRepository.UpdateMany(ctx, currentOpenQuestions)
+	if err != nil {
+		return fmt.Errorf("failed to mark current open questions closed: %w", err)
+	}
+
+	generatedOldExams, err := e.generatedExamRepository.GetByMonthOffset(ctx, exam, 0, 2)
+	if err != nil {
+		return fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	for _, goe := range generatedOldExams {
+		goe.IsOpen = true
+	}
+
+	err = e.generatedExamRepository.UpdateMany(ctx, generatedOldExams)
+	if err != nil {
+		return fmt.Errorf("failed to create new open exams: %w", err)
+	}
+
+	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), examName)
+
+	return nil
+}
+
+func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examType commonConstants.ExamType) error {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return err
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	sort.SliceStable(generatedExams, func(i, j int) bool {
+		return generatedExams[i].UpdatedAt.After(generatedExams[j].UpdatedAt)
+	})
+
+	if len(generatedExams) > 30 {
+		for _, generatedExam := range generatedExams[30:] { // Skip the first 30 exams
+			generatedExam.IsActive = false
+		}
+
+		if err := e.generatedExamRepository.UpdateMany(ctx, generatedExams[30:]); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -122,12 +198,21 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
 	examName := commonConstants.EXAMS[examType]
 
 	exam, err := e.examRepository.GetByName(ctx, examName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, exam.ID, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check access: %w", err)
+	}
+
+	if !hasAccess {
+		return nil, errors.New("forbidden")
 	}
 
 	sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
@@ -138,20 +223,47 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
 }
 
-func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string) (models.GeneratedExamOverview, error) {
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
 	if err != nil {
-		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get generated exam: %w", err)
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	return e.buildGeneratedExamOverviewList(ctx, generatedExams, exam, userId)
+}
+
+func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) {
+	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get generated exam: %w", err)
+	}
+
+	if !isOpen {
+		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check access: %w", err)
+		}
+
+		if !hasAccess {
+			return nil, errors.New("forbidden")
+		}
 	}
 
 	userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
 	if err != nil {
-		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get user attempts: %w", err)
+		return nil, fmt.Errorf("failed to get user attempts: %w", err)
 	}
 
 	examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam.ID)
 	if err != nil {
-		return models.GeneratedExamOverview{}, fmt.Errorf("failed to get exam settings: %w", err)
+		return nil, fmt.Errorf("failed to get exam settings: %w", err)
 	}
 
 	return e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts), nil
@@ -164,8 +276,8 @@ func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam)
 	return exams
 }
 
-func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, exam *ent.Exam, userId string) ([]models.GeneratedExamOverview, error) {
-	generatedExamOverviewList := make([]models.GeneratedExamOverview, 0, len(latestExams))
+func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, exam *ent.Exam, userId string) ([]*models.GeneratedExamOverview, error) {
+	generatedExamOverviewList := make([]*models.GeneratedExamOverview, 0, len(latestExams))
 
 	for _, generatedExam := range latestExams {
 		userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
@@ -182,8 +294,8 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 	return generatedExamOverviewList, nil
 }
 
-func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.GeneratedExam, examSettings *ent.ExamSetting, examAttempts []*ent.ExamAttempt) models.GeneratedExamOverview {
-	return models.GeneratedExamOverview{
+func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.GeneratedExam, examSettings *ent.ExamSetting, examAttempts []*ent.ExamAttempt) *models.GeneratedExamOverview {
+	return &models.GeneratedExamOverview{
 		Id:                generatedExam.ID,
 		RawExamData:       generatedExam.RawExamData,
 		CreatedAt:         generatedExam.CreatedAt,

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { supabase } from "../supabase/client";
 import useSessionStore from "../store/auth-store";
+import { paths } from "../routes/route.constant";
 
 // Create an axios instance
 const axiosBase = axios.create({
@@ -37,7 +38,10 @@ axiosBase.interceptors.response.use(
       await useSessionStore.getState().logout();
       return;
     }
-
+    if (error.response && error.response.status === 403) {
+      window.location.href = `/${paths.HOMEPAGE}`;
+      return;
+    }
     return Promise.reject(error);
   }
 );

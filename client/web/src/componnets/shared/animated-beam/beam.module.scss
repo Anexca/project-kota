@@ -1,0 +1,18 @@
+.animate_beam{
+    animation: MoveGradient 0.5s ease-in-out 0s infinite;
+}
+
+@keyframes MoveGradient {
+    from{
+        x1:0%;
+        x2:0%;
+        y1:0%;
+        y2:0%;
+    }
+    to{
+        x1:var(--x1);
+        x2:var(--x2);
+        y1:var(--y1);
+        y2:var(--y2);
+    }
+}

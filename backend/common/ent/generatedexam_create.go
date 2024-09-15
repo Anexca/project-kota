@@ -42,6 +42,20 @@ func (gec *GeneratedExamCreate) SetRawExamData(m map[string]interface{}) *Genera
 	return gec
 }
 
+// SetIsOpen sets the "is_open" field.
+func (gec *GeneratedExamCreate) SetIsOpen(b bool) *GeneratedExamCreate {
+	gec.mutation.SetIsOpen(b)
+	return gec
+}
+
+// SetNillableIsOpen sets the "is_open" field if the given value is not nil.
+func (gec *GeneratedExamCreate) SetNillableIsOpen(b *bool) *GeneratedExamCreate {
+	if b != nil {
+		gec.SetIsOpen(*b)
+	}
+	return gec
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (gec *GeneratedExamCreate) SetCreatedAt(t time.Time) *GeneratedExamCreate {
 	gec.mutation.SetCreatedAt(t)
@@ -143,6 +157,10 @@ func (gec *GeneratedExamCreate) defaults() {
 		v := generatedexam.DefaultIsActive
 		gec.mutation.SetIsActive(v)
 	}
+	if _, ok := gec.mutation.IsOpen(); !ok {
+		v := generatedexam.DefaultIsOpen
+		gec.mutation.SetIsOpen(v)
+	}
 	if _, ok := gec.mutation.CreatedAt(); !ok {
 		v := generatedexam.DefaultCreatedAt()
 		gec.mutation.SetCreatedAt(v)
@@ -157,6 +175,9 @@ func (gec *GeneratedExamCreate) defaults() {
 func (gec *GeneratedExamCreate) check() error {
 	if _, ok := gec.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "GeneratedExam.is_active"`)}
+	}
+	if _, ok := gec.mutation.IsOpen(); !ok {
+		return &ValidationError{Name: "is_open", err: errors.New(`ent: missing required field "GeneratedExam.is_open"`)}
 	}
 	if _, ok := gec.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "GeneratedExam.created_at"`)}
@@ -197,6 +218,10 @@ func (gec *GeneratedExamCreate) createSpec() (*GeneratedExam, *sqlgraph.CreateSp
 	if value, ok := gec.mutation.RawExamData(); ok {
 		_spec.SetField(generatedexam.FieldRawExamData, field.TypeJSON, value)
 		_node.RawExamData = value
+	}
+	if value, ok := gec.mutation.IsOpen(); ok {
+		_spec.SetField(generatedexam.FieldIsOpen, field.TypeBool, value)
+		_node.IsOpen = value
 	}
 	if value, ok := gec.mutation.CreatedAt(); ok {
 		_spec.SetField(generatedexam.FieldCreatedAt, field.TypeTime, value)

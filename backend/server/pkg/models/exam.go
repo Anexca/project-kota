@@ -45,3 +45,23 @@ type AssessmentDetails struct {
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
 }
+
+type UserExamAttempt struct {
+	AttemptedExamId int       `json:"attempted_exam_id"`
+	IsActive        bool      `json:"is_active"`
+	ExamType        string    `json:"exam_type"`
+	ExamTypeId      int       `json:"exam_type_id"`
+	ExamCategory    string    `json:"exam_category"`
+	ExamCategoryId  int       `json:"exam_category_id"`
+	Topic           string    `json:"topic"`
+	Type            string    `json:"type"`
+	Attempts        []Attempt `json:"attempts"`
+}
+
+type Attempt struct {
+	AttemptId        int       `json:"attempt_id"`
+	AttemptNumber    int       `json:"attempt_number"`
+	AssessmentStatus string    `json:"assessment_status"`
+	AssessmentId     int       `json:"assessment_id"`
+	AttemptDate      time.Time `json:"attempt_date"`
+}

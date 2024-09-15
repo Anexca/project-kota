@@ -31,6 +31,9 @@ func (Exam) Edges() []ent.Edge {
 			Ref("exams").
 			Unique(), // Many Exams belong to one ExamCategory
 
+		// One Exam belongs to many Subscriptions through the SubscriptionExam relationship
+		edge.To("subscriptions", SubscriptionExam.Type),
+
 		edge.To("setting", ExamSetting.Type).
 			Unique(), // Each Exam has one ExamSetting
 

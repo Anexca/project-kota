@@ -158,6 +158,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "raw_exam_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
+		{Name: "is_open", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_generatedexams", Type: field.TypeInt, Nullable: true},
@@ -170,8 +171,88 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "generated_exams_exams_generatedexams",
-				Columns:    []*schema.Column{GeneratedExamsColumns[5]},
+				Columns:    []*schema.Column{GeneratedExamsColumns[6]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// PaymentsColumns holds the columns for the "payments" table.
+	PaymentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "amount", Type: field.TypeInt},
+		{Name: "payment_date", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"CREATED", "AUTHORIZED", "CAPTURED", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED", "PENDING", "PROCESSING", "CANCELLED", "DISPUTED"}},
+		{Name: "payment_method", Type: field.TypeString},
+		{Name: "provider_payment_id", Type: field.TypeString, Unique: true},
+		{Name: "provider_invoice_id", Type: field.TypeString, Unique: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_payments", Type: field.TypeUUID, Nullable: true},
+		{Name: "user_subscription_payments", Type: field.TypeInt, Nullable: true},
+	}
+	// PaymentsTable holds the schema information for the "payments" table.
+	PaymentsTable = &schema.Table{
+		Name:       "payments",
+		Columns:    PaymentsColumns,
+		PrimaryKey: []*schema.Column{PaymentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "payments_users_payments",
+				Columns:    []*schema.Column{PaymentsColumns[9]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "payments_user_subscriptions_payments",
+				Columns:    []*schema.Column{PaymentsColumns[10]},
+				RefColumns: []*schema.Column{UserSubscriptionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// SubscriptionsColumns holds the columns for the "subscriptions" table.
+	SubscriptionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "provider_plan_id", Type: field.TypeString},
+		{Name: "price", Type: field.TypeInt},
+		{Name: "duration_in_months", Type: field.TypeInt},
+		{Name: "is_active", Type: field.TypeBool},
+		{Name: "name", Type: field.TypeString},
+		{Name: "raw_subscription_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// SubscriptionsTable holds the schema information for the "subscriptions" table.
+	SubscriptionsTable = &schema.Table{
+		Name:       "subscriptions",
+		Columns:    SubscriptionsColumns,
+		PrimaryKey: []*schema.Column{SubscriptionsColumns[0]},
+	}
+	// SubscriptionExamsColumns holds the columns for the "subscription_exams" table.
+	SubscriptionExamsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_subscriptions", Type: field.TypeInt, Nullable: true},
+		{Name: "subscription_exams", Type: field.TypeInt, Nullable: true},
+	}
+	// SubscriptionExamsTable holds the schema information for the "subscription_exams" table.
+	SubscriptionExamsTable = &schema.Table{
+		Name:       "subscription_exams",
+		Columns:    SubscriptionExamsColumns,
+		PrimaryKey: []*schema.Column{SubscriptionExamsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "subscription_exams_exams_subscriptions",
+				Columns:    []*schema.Column{SubscriptionExamsColumns[3]},
+				RefColumns: []*schema.Column{ExamsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "subscription_exams_subscriptions_exams",
+				Columns:    []*schema.Column{SubscriptionExamsColumns[4]},
+				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -182,12 +263,47 @@ var (
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "first_name", Type: field.TypeString, Nullable: true},
 		{Name: "last_name", Type: field.TypeString, Nullable: true},
+		{Name: "phone_number", Type: field.TypeString, Nullable: true},
+		{Name: "payment_provider_customer_id", Type: field.TypeString, Unique: true, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
+	}
+	// UserSubscriptionsColumns holds the columns for the "user_subscriptions" table.
+	UserSubscriptionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "is_active", Type: field.TypeBool},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"ACTIVE", "CANCELED", "EXPIRED", "PENDING", "PAUSED"}, Default: "PENDING"},
+		{Name: "start_date", Type: field.TypeTime, Nullable: true},
+		{Name: "end_date", Type: field.TypeTime, Nullable: true},
+		{Name: "provider_subscription_id", Type: field.TypeString, Unique: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "subscription_user_subscriptions", Type: field.TypeInt, Nullable: true},
+		{Name: "user_subscriptions", Type: field.TypeUUID, Nullable: true},
+	}
+	// UserSubscriptionsTable holds the schema information for the "user_subscriptions" table.
+	UserSubscriptionsTable = &schema.Table{
+		Name:       "user_subscriptions",
+		Columns:    UserSubscriptionsColumns,
+		PrimaryKey: []*schema.Column{UserSubscriptionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_subscriptions_subscriptions_user_subscriptions",
+				Columns:    []*schema.Column{UserSubscriptionsColumns[8]},
+				RefColumns: []*schema.Column{SubscriptionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "user_subscriptions_users_subscriptions",
+				Columns:    []*schema.Column{UserSubscriptionsColumns[9]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
@@ -198,7 +314,11 @@ var (
 		ExamCategoriesTable,
 		ExamSettingsTable,
 		GeneratedExamsTable,
+		PaymentsTable,
+		SubscriptionsTable,
+		SubscriptionExamsTable,
 		UsersTable,
+		UserSubscriptionsTable,
 	}
 )
 
@@ -210,4 +330,10 @@ func init() {
 	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable
 	GeneratedExamsTable.ForeignKeys[0].RefTable = ExamsTable
+	PaymentsTable.ForeignKeys[0].RefTable = UsersTable
+	PaymentsTable.ForeignKeys[1].RefTable = UserSubscriptionsTable
+	SubscriptionExamsTable.ForeignKeys[0].RefTable = ExamsTable
+	SubscriptionExamsTable.ForeignKeys[1].RefTable = SubscriptionsTable
+	UserSubscriptionsTable.ForeignKeys[0].RefTable = SubscriptionsTable
+	UserSubscriptionsTable.ForeignKeys[1].RefTable = UsersTable
 }

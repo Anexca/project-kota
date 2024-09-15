@@ -40,6 +40,8 @@ type Exam struct {
 type ExamEdges struct {
 	// Category holds the value of the category edge.
 	Category *ExamCategory `json:"category,omitempty"`
+	// Subscriptions holds the value of the subscriptions edge.
+	Subscriptions []*SubscriptionExam `json:"subscriptions,omitempty"`
 	// Setting holds the value of the setting edge.
 	Setting *ExamSetting `json:"setting,omitempty"`
 	// CachedExam holds the value of the cached_exam edge.
@@ -48,7 +50,7 @@ type ExamEdges struct {
 	Generatedexams []*GeneratedExam `json:"generatedexams,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -62,12 +64,21 @@ func (e ExamEdges) CategoryOrErr() (*ExamCategory, error) {
 	return nil, &NotLoadedError{edge: "category"}
 }
 
+// SubscriptionsOrErr returns the Subscriptions value or an error if the edge
+// was not loaded in eager-loading.
+func (e ExamEdges) SubscriptionsOrErr() ([]*SubscriptionExam, error) {
+	if e.loadedTypes[1] {
+		return e.Subscriptions, nil
+	}
+	return nil, &NotLoadedError{edge: "subscriptions"}
+}
+
 // SettingOrErr returns the Setting value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ExamEdges) SettingOrErr() (*ExamSetting, error) {
 	if e.Setting != nil {
 		return e.Setting, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: examsetting.Label}
 	}
 	return nil, &NotLoadedError{edge: "setting"}
@@ -76,7 +87,7 @@ func (e ExamEdges) SettingOrErr() (*ExamSetting, error) {
 // CachedExamOrErr returns the CachedExam value or an error if the edge
 // was not loaded in eager-loading.
 func (e ExamEdges) CachedExamOrErr() ([]*CachedExam, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.CachedExam, nil
 	}
 	return nil, &NotLoadedError{edge: "cached_exam"}
@@ -85,7 +96,7 @@ func (e ExamEdges) CachedExamOrErr() ([]*CachedExam, error) {
 // GeneratedexamsOrErr returns the Generatedexams value or an error if the edge
 // was not loaded in eager-loading.
 func (e ExamEdges) GeneratedexamsOrErr() ([]*GeneratedExam, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Generatedexams, nil
 	}
 	return nil, &NotLoadedError{edge: "generatedexams"}
@@ -180,6 +191,11 @@ func (e *Exam) Value(name string) (ent.Value, error) {
 // QueryCategory queries the "category" edge of the Exam entity.
 func (e *Exam) QueryCategory() *ExamCategoryQuery {
 	return NewExamClient(e.config).QueryCategory(e)
+}
+
+// QuerySubscriptions queries the "subscriptions" edge of the Exam entity.
+func (e *Exam) QuerySubscriptions() *SubscriptionExamQuery {
+	return NewExamClient(e.config).QuerySubscriptions(e)
 }
 
 // QuerySetting queries the "setting" edge of the Exam entity.

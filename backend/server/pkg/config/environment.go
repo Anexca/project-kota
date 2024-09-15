@@ -23,6 +23,8 @@ type Environment struct {
 	SupabaseKey        string
 	AIServiceAccessKey string
 	AIServiceUrl       string
+	RazorpayKey        string
+	RazorpaySecret     string
 }
 
 func LoadEnvironment() (*Environment, error) {
@@ -49,6 +51,8 @@ func LoadEnvironment() (*Environment, error) {
 		AIServiceUrl:       os.Getenv("AI_SERVICE_URL"),
 		IsProduction:       os.Getenv("ENV") == "production",
 		CorsAllowedOrigin:  os.Getenv("CORS_ALLOWED_ORIGIN"),
+		RazorpayKey:        os.Getenv("RAZORPAY_KEY"),
+		RazorpaySecret:     os.Getenv("RAZORPAY_SECRET"),
 	}
 
 	if env.ServerPort == "" || env.CorsAllowedOrigin == "" {
@@ -69,6 +73,10 @@ func LoadEnvironment() (*Environment, error) {
 
 	if env.AIServiceAccessKey == "" || env.AIServiceUrl == "" {
 		return nil, errors.New("missing AI Service environment variables")
+	}
+
+	if env.RazorpayKey == "" || env.RazorpaySecret == "" {
+		return nil, errors.New("missing Razorpay env keys")
 	}
 
 	return env, nil

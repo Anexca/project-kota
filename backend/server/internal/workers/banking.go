@@ -17,5 +17,17 @@ func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 		return err
 	}
 
+	err = w.examService.MarkExpiredExamsInactive(ctx, EXAM_TYPE)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (w *Worker) MarkDescriptiveQuestionsAsOpenInDatabase() error {
+	ctx := context.Background()
+	const EXAM_TYPE = commonConstants.Descriptive
+
+	return w.examService.MarkQuestionsAsOpen(ctx, EXAM_TYPE)
 }

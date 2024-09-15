@@ -10,8 +10,12 @@ import (
 	"common/ent/examcategory"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
+	"common/ent/payment"
 	"common/ent/schema"
+	"common/ent/subscription"
+	"common/ent/subscriptionexam"
 	"common/ent/user"
+	"common/ent/usersubscription"
 	"time"
 )
 
@@ -113,20 +117,72 @@ func init() {
 	generatedexamDescIsActive := generatedexamFields[0].Descriptor()
 	// generatedexam.DefaultIsActive holds the default value on creation for the is_active field.
 	generatedexam.DefaultIsActive = generatedexamDescIsActive.Default.(bool)
+	// generatedexamDescIsOpen is the schema descriptor for is_open field.
+	generatedexamDescIsOpen := generatedexamFields[2].Descriptor()
+	// generatedexam.DefaultIsOpen holds the default value on creation for the is_open field.
+	generatedexam.DefaultIsOpen = generatedexamDescIsOpen.Default.(bool)
 	// generatedexamDescCreatedAt is the schema descriptor for created_at field.
-	generatedexamDescCreatedAt := generatedexamFields[2].Descriptor()
+	generatedexamDescCreatedAt := generatedexamFields[3].Descriptor()
 	// generatedexam.DefaultCreatedAt holds the default value on creation for the created_at field.
 	generatedexam.DefaultCreatedAt = generatedexamDescCreatedAt.Default.(func() time.Time)
 	// generatedexamDescUpdatedAt is the schema descriptor for updated_at field.
-	generatedexamDescUpdatedAt := generatedexamFields[3].Descriptor()
+	generatedexamDescUpdatedAt := generatedexamFields[4].Descriptor()
 	// generatedexam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	generatedexam.DefaultUpdatedAt = generatedexamDescUpdatedAt.Default.(func() time.Time)
 	// generatedexam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	generatedexam.UpdateDefaultUpdatedAt = generatedexamDescUpdatedAt.UpdateDefault.(func() time.Time)
+	paymentFields := schema.Payment{}.Fields()
+	_ = paymentFields
+	// paymentDescCreatedAt is the schema descriptor for created_at field.
+	paymentDescCreatedAt := paymentFields[6].Descriptor()
+	// payment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	payment.DefaultCreatedAt = paymentDescCreatedAt.Default.(func() time.Time)
+	// paymentDescUpdatedAt is the schema descriptor for updated_at field.
+	paymentDescUpdatedAt := paymentFields[7].Descriptor()
+	// payment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	payment.DefaultUpdatedAt = paymentDescUpdatedAt.Default.(func() time.Time)
+	// payment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	payment.UpdateDefaultUpdatedAt = paymentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	subscriptionFields := schema.Subscription{}.Fields()
+	_ = subscriptionFields
+	// subscriptionDescCreatedAt is the schema descriptor for created_at field.
+	subscriptionDescCreatedAt := subscriptionFields[6].Descriptor()
+	// subscription.DefaultCreatedAt holds the default value on creation for the created_at field.
+	subscription.DefaultCreatedAt = subscriptionDescCreatedAt.Default.(func() time.Time)
+	// subscriptionDescUpdatedAt is the schema descriptor for updated_at field.
+	subscriptionDescUpdatedAt := subscriptionFields[7].Descriptor()
+	// subscription.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	subscription.DefaultUpdatedAt = subscriptionDescUpdatedAt.Default.(func() time.Time)
+	// subscription.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	subscription.UpdateDefaultUpdatedAt = subscriptionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	subscriptionexamFields := schema.SubscriptionExam{}.Fields()
+	_ = subscriptionexamFields
+	// subscriptionexamDescCreatedAt is the schema descriptor for created_at field.
+	subscriptionexamDescCreatedAt := subscriptionexamFields[0].Descriptor()
+	// subscriptionexam.DefaultCreatedAt holds the default value on creation for the created_at field.
+	subscriptionexam.DefaultCreatedAt = subscriptionexamDescCreatedAt.Default.(func() time.Time)
+	// subscriptionexamDescUpdatedAt is the schema descriptor for updated_at field.
+	subscriptionexamDescUpdatedAt := subscriptionexamFields[1].Descriptor()
+	// subscriptionexam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	subscriptionexam.DefaultUpdatedAt = subscriptionexamDescUpdatedAt.Default.(func() time.Time)
+	// subscriptionexam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	subscriptionexam.UpdateDefaultUpdatedAt = subscriptionexamDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescEmail is the schema descriptor for email field.
 	userDescEmail := userFields[1].Descriptor()
 	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
+	usersubscriptionFields := schema.UserSubscription{}.Fields()
+	_ = usersubscriptionFields
+	// usersubscriptionDescCreatedAt is the schema descriptor for created_at field.
+	usersubscriptionDescCreatedAt := usersubscriptionFields[5].Descriptor()
+	// usersubscription.DefaultCreatedAt holds the default value on creation for the created_at field.
+	usersubscription.DefaultCreatedAt = usersubscriptionDescCreatedAt.Default.(func() time.Time)
+	// usersubscriptionDescUpdatedAt is the schema descriptor for updated_at field.
+	usersubscriptionDescUpdatedAt := usersubscriptionFields[6].Descriptor()
+	// usersubscription.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	usersubscription.DefaultUpdatedAt = usersubscriptionDescUpdatedAt.Default.(func() time.Time)
+	// usersubscription.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	usersubscription.UpdateDefaultUpdatedAt = usersubscriptionDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

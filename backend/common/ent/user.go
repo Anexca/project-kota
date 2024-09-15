@@ -23,6 +23,10 @@ type User struct {
 	FirstName string `json:"first_name,omitempty"`
 	// LastName holds the value of the "last_name" field.
 	LastName string `json:"last_name,omitempty"`
+	// PhoneNumber holds the value of the "phone_number" field.
+	PhoneNumber string `json:"phone_number,omitempty"`
+	// PaymentProviderCustomerID holds the value of the "payment_provider_customer_id" field.
+	PaymentProviderCustomerID string `json:"payment_provider_customer_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -33,9 +37,13 @@ type User struct {
 type UserEdges struct {
 	// Attempts holds the value of the attempts edge.
 	Attempts []*ExamAttempt `json:"attempts,omitempty"`
+	// Subscriptions holds the value of the subscriptions edge.
+	Subscriptions []*UserSubscription `json:"subscriptions,omitempty"`
+	// Payments holds the value of the payments edge.
+	Payments []*Payment `json:"payments,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // AttemptsOrErr returns the Attempts value or an error if the edge
@@ -47,12 +55,30 @@ func (e UserEdges) AttemptsOrErr() ([]*ExamAttempt, error) {
 	return nil, &NotLoadedError{edge: "attempts"}
 }
 
+// SubscriptionsOrErr returns the Subscriptions value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) SubscriptionsOrErr() ([]*UserSubscription, error) {
+	if e.loadedTypes[1] {
+		return e.Subscriptions, nil
+	}
+	return nil, &NotLoadedError{edge: "subscriptions"}
+}
+
+// PaymentsOrErr returns the Payments value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) PaymentsOrErr() ([]*Payment, error) {
+	if e.loadedTypes[2] {
+		return e.Payments, nil
+	}
+	return nil, &NotLoadedError{edge: "payments"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldEmail, user.FieldFirstName, user.FieldLastName:
+		case user.FieldEmail, user.FieldFirstName, user.FieldLastName, user.FieldPhoneNumber, user.FieldPaymentProviderCustomerID:
 			values[i] = new(sql.NullString)
 		case user.FieldID:
 			values[i] = new(uuid.UUID)
@@ -95,6 +121,18 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.LastName = value.String
 			}
+		case user.FieldPhoneNumber:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field phone_number", values[i])
+			} else if value.Valid {
+				u.PhoneNumber = value.String
+			}
+		case user.FieldPaymentProviderCustomerID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field payment_provider_customer_id", values[i])
+			} else if value.Valid {
+				u.PaymentProviderCustomerID = value.String
+			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -111,6 +149,16 @@ func (u *User) Value(name string) (ent.Value, error) {
 // QueryAttempts queries the "attempts" edge of the User entity.
 func (u *User) QueryAttempts() *ExamAttemptQuery {
 	return NewUserClient(u.config).QueryAttempts(u)
+}
+
+// QuerySubscriptions queries the "subscriptions" edge of the User entity.
+func (u *User) QuerySubscriptions() *UserSubscriptionQuery {
+	return NewUserClient(u.config).QuerySubscriptions(u)
+}
+
+// QueryPayments queries the "payments" edge of the User entity.
+func (u *User) QueryPayments() *PaymentQuery {
+	return NewUserClient(u.config).QueryPayments(u)
 }
 
 // Update returns a builder for updating this User.
@@ -144,6 +192,12 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("last_name=")
 	builder.WriteString(u.LastName)
+	builder.WriteString(", ")
+	builder.WriteString("phone_number=")
+	builder.WriteString(u.PhoneNumber)
+	builder.WriteString(", ")
+	builder.WriteString("payment_provider_customer_id=")
+	builder.WriteString(u.PaymentProviderCustomerID)
 	builder.WriteByte(')')
 	return builder.String()
 }

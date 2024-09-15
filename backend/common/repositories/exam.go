@@ -4,6 +4,7 @@ import (
 	"common/ent"
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/generatedexam"
 	"context"
 )
 
@@ -30,6 +31,8 @@ func (e *ExamRepository) GetByName(ctx context.Context, name string) (*ent.Exam,
 	return e.dbClient.Exam.Query().
 		Where(exam.Name(name)).
 		WithSetting().
-		WithGeneratedexams().
+		WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
+			geq.Where(generatedexam.IsActiveEQ(true))
+		}).
 		First(ctx)
 }
