@@ -42,7 +42,7 @@ export function AnimatedBeamHeading() {
 
           <Circle ref={div3Ref}>Grow</Circle>
 
-          <Circle ref={div4Ref}>Sucess</Circle>
+          <Circle ref={div4Ref}>Success</Circle>
         </div>
       </div>
 
