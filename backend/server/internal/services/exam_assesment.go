@@ -243,7 +243,7 @@ Criteria to consider:
 	•	Do Not visit any URLs provided in Content.
 	•	Make sure rating is based only on content provided, and use the provided criteria to calculate it
 
-Scoring: Provide a rating out of "%s" marks based on the above criteria. Should always be between 0 and maximum marks
+Scoring: Provide a rating out of %s marks based on the above criteria. The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
 
 Output Requirements:
 
@@ -251,7 +251,7 @@ Output Requirements:
 	•	"rating": A string representing the rating. 
 	•	"strengths": An array of strings highlighting the content’s strengths.
 	•	"weaknesses": An array of strings pointing out the content’s weaknesses.
-	•	"corrected_version": A string with the corrected version of the content.
+	•	"corrected_version": Generate a single-line string with the corrected version of the content. There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
 	•	The entire output should be a single-line string with no extra spaces, newlines, or formatting, ensuring it can be parsed as valid JSON.
 
 Content to evaluate:

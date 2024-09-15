@@ -15,7 +15,7 @@ import {
 import ProfanityError from "../../componnets/shared/profanity_error/profanity-error";
 import { questionType } from "../../constants/shared";
 
-const DescriptiveSubmission = () => {
+const DescriptiveSubmission = ({ backLink }: { backLink?: string }) => {
   const [question, setQuestion] = useState<IQuestion | null>(null);
 
   const [assessment, setAssessment] = useState<Evalution | null>(null);
@@ -52,7 +52,7 @@ const DescriptiveSubmission = () => {
         <div className="text-sm font-medium">
           <Link
             className="text-info mr-2 text-sm"
-            to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
+            to={backLink || `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
           >
             <Icon icon="arrow_back" /> Back
           </Link>{" "}

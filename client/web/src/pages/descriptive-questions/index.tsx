@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { getQuestions } from "../../services/exam.service";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Checkbox } from "../../componnets/base/checkbox";
 import DescriptiveQuestionCard from "../../componnets/shared/descriptive-question-card";
 import { IQuestion } from "../../interface/question";
 import { paths } from "../../routes/route.constant";
 import { supabase } from "../../supabase/client";
 
+import Icon from "../../componnets/base/icon";
 import {
   Sheet,
   SheetContent,
@@ -85,6 +86,14 @@ const DescriptiveQuestion = () => {
   return (
     <div className="pt-2 w-full md:max-w-2xl 2xl:max-w-2xl mx-auto flex flex-col gap-2 p-4">
       <div className="py-2">
+        <div className="flex gap-2 items-center">
+          <Link to={`/${paths.HOMEPAGE}`} className="p-0">
+            <Icon icon="arrow_back" className="text-info text-lg" />
+          </Link>
+          <span className="text-lg font-semibold">
+            Banking Descriptive Question
+          </span>
+        </div>
         <div className="text-sm text-black font-medium mb-2">
           Get started with the questions below.
         </div>

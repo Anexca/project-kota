@@ -4,6 +4,7 @@ import { router } from "./routes/router";
 import { Toaster } from "./componnets/base/toaster";
 import useSessionStore from "./store/auth-store";
 import { useEffect } from "react";
+import SessionProvider from "./componnets/shared/session-provider";
 
 function App() {
   const { loadSession } = useSessionStore();
@@ -13,7 +14,9 @@ function App() {
   return (
     <>
       <Toaster />
-      <RouterProvider router={router} />
+      <SessionProvider>
+        <RouterProvider router={router} />
+      </SessionProvider>
     </>
   );
 }

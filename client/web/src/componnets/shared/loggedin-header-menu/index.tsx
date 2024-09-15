@@ -91,7 +91,8 @@ const mobileComponents: JSX.Element[] = [
 ];
 
 export function NavigationHeaderMenu({ initial }: { initial: string }) {
-  const isMobileView = useMediaQuery(ScreenSizeQuery.largeScreen);
+  const isMobileView = useMediaQuery(ScreenSizeQuery.largeScreen, true);
+
   return isMobileView ? (
     <NavigationMenu>
       <NavigationMenuList>

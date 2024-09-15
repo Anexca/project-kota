@@ -19,6 +19,7 @@ export const ICONS = {
   file: "fa-solid fa-file",
   rupee: "fa-solid fa-indian-rupee-sign",
   chevron_down: "fa-solid fa-chevron-down",
+  tags: "fa fa-tags",
 };
 type IconType = keyof typeof ICONS;
 export type { IconType };
