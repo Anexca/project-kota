@@ -15,6 +15,8 @@ type RateLimiterEntry struct {
 
 var limiters = sync.Map{}
 
+var globalLimiter = ratelimit.New(15)
+
 const cleanupInterval = time.Minute * 5
 const expirationDuration = time.Minute * 10
 
@@ -22,7 +24,7 @@ func GetRateLimiter(ip string) ratelimit.Limiter {
 	now := time.Now()
 	entry, ok := limiters.Load(ip)
 	if !ok {
-		newLimiter := ratelimit.New(5)
+		newLimiter := ratelimit.New(5) // Set per-IP limit here
 		limiters.Store(ip, RateLimiterEntry{limiter: newLimiter, lastAccess: now})
 		return newLimiter
 	}
@@ -40,6 +42,7 @@ func StartCleanupRoutine() {
 			limiters.Range(func(key, value interface{}) bool {
 				limiterEntry := value.(RateLimiterEntry)
 				if now.Sub(limiterEntry.lastAccess) > expirationDuration {
+					// Remove limiter if it's older than the expiration duration
 					limiters.Delete(key)
 				}
 				return true
@@ -50,6 +53,9 @@ func StartCleanupRoutine() {
 
 func RateLimiterMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		globalLimiter.Take() // Wait until the global rate limit allows this request
+
+		// Extract the client's IP address
 		ip := r.RemoteAddr
 		limiter := GetRateLimiter(ip)
 		limiter.Take()
