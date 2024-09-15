@@ -4637,6 +4637,7 @@ type GeneratedExamMutation struct {
 	id              *int
 	is_active       *bool
 	raw_exam_data   *map[string]interface{}
+	is_open         *bool
 	created_at      *time.Time
 	updated_at      *time.Time
 	clearedFields   map[string]struct{}
@@ -4831,6 +4832,42 @@ func (m *GeneratedExamMutation) RawExamDataCleared() bool {
 func (m *GeneratedExamMutation) ResetRawExamData() {
 	m.raw_exam_data = nil
 	delete(m.clearedFields, generatedexam.FieldRawExamData)
+}
+
+// SetIsOpen sets the "is_open" field.
+func (m *GeneratedExamMutation) SetIsOpen(b bool) {
+	m.is_open = &b
+}
+
+// IsOpen returns the value of the "is_open" field in the mutation.
+func (m *GeneratedExamMutation) IsOpen() (r bool, exists bool) {
+	v := m.is_open
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsOpen returns the old "is_open" field's value of the GeneratedExam entity.
+// If the GeneratedExam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GeneratedExamMutation) OldIsOpen(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsOpen is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsOpen requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsOpen: %w", err)
+	}
+	return oldValue.IsOpen, nil
+}
+
+// ResetIsOpen resets all changes to the "is_open" field.
+func (m *GeneratedExamMutation) ResetIsOpen() {
+	m.is_open = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -5032,12 +5069,15 @@ func (m *GeneratedExamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GeneratedExamMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.is_active != nil {
 		fields = append(fields, generatedexam.FieldIsActive)
 	}
 	if m.raw_exam_data != nil {
 		fields = append(fields, generatedexam.FieldRawExamData)
+	}
+	if m.is_open != nil {
+		fields = append(fields, generatedexam.FieldIsOpen)
 	}
 	if m.created_at != nil {
 		fields = append(fields, generatedexam.FieldCreatedAt)
@@ -5057,6 +5097,8 @@ func (m *GeneratedExamMutation) Field(name string) (ent.Value, bool) {
 		return m.IsActive()
 	case generatedexam.FieldRawExamData:
 		return m.RawExamData()
+	case generatedexam.FieldIsOpen:
+		return m.IsOpen()
 	case generatedexam.FieldCreatedAt:
 		return m.CreatedAt()
 	case generatedexam.FieldUpdatedAt:
@@ -5074,6 +5116,8 @@ func (m *GeneratedExamMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldIsActive(ctx)
 	case generatedexam.FieldRawExamData:
 		return m.OldRawExamData(ctx)
+	case generatedexam.FieldIsOpen:
+		return m.OldIsOpen(ctx)
 	case generatedexam.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case generatedexam.FieldUpdatedAt:
@@ -5100,6 +5144,13 @@ func (m *GeneratedExamMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRawExamData(v)
+		return nil
+	case generatedexam.FieldIsOpen:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsOpen(v)
 		return nil
 	case generatedexam.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -5178,6 +5229,9 @@ func (m *GeneratedExamMutation) ResetField(name string) error {
 		return nil
 	case generatedexam.FieldRawExamData:
 		m.ResetRawExamData()
+		return nil
+	case generatedexam.FieldIsOpen:
+		m.ResetIsOpen()
 		return nil
 	case generatedexam.FieldCreatedAt:
 		m.ResetCreatedAt()

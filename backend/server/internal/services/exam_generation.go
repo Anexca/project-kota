@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"server/pkg/models"
 	"sort"
 
@@ -65,6 +66,47 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	currentOpenQuestions, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
+	if err != nil {
+		return fmt.Errorf("failed to get currentOpenQuestions: %w", err)
+	}
+
+	for _, coe := range currentOpenQuestions {
+		coe.IsOpen = false
+	}
+
+	err = e.generatedExamRepository.UpdateMany(ctx, currentOpenQuestions)
+	if err != nil {
+		return fmt.Errorf("failed to mark current open questions closed: %w", err)
+	}
+
+	generatedOldExams, err := e.generatedExamRepository.GetByMonthOffset(ctx, exam, 0, 2)
+	if err != nil {
+		return fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	for _, goe := range generatedOldExams {
+		goe.IsOpen = true
+	}
+
+	err = e.generatedExamRepository.UpdateMany(ctx, generatedOldExams)
+	if err != nil {
+		return fmt.Errorf("failed to create new open exams: %w", err)
+	}
+
+	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), examName)
 
 	return nil
 }
@@ -189,7 +231,7 @@ func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examT
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	generatedExams, err := e.generatedExamRepository.GetOpenGeneratedExamsByExam(ctx, exam, 0)
+	generatedExams, err := e.generatedExamRepository.GetByMonthOffset(ctx, exam, 0, 2)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}

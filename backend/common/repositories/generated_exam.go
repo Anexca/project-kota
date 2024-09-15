@@ -83,7 +83,13 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		All(ctx)
 }
 
-func (q *GeneratedExamRepository) GetOpenGeneratedExamsByExam(ctx context.Context, ex *ent.Exam, monthOffset int) ([]*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.IsOpenEQ(true), generatedexam.HasExamWith(exam.ID(examId))).
+		All(ctx)
+}
+
+func (q *GeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.Exam, monthOffset, limit int) ([]*ent.GeneratedExam, error) {
 	now := time.Now()
 
 	targetMonth := now.AddDate(0, -monthOffset, 0)
@@ -99,8 +105,8 @@ func (q *GeneratedExamRepository) GetOpenGeneratedExamsByExam(ctx context.Contex
 		).
 		WithAttempts().
 		WithExam().
-		Order(ent.Asc(generatedexam.FieldCreatedAt)).
-		Limit(5).
+		Order(ent.Desc(generatedexam.FieldCreatedAt)).
+		Limit(limit).
 		All(ctx)
 }
 

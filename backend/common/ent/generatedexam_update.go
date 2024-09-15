@@ -56,6 +56,20 @@ func (geu *GeneratedExamUpdate) ClearRawExamData() *GeneratedExamUpdate {
 	return geu
 }
 
+// SetIsOpen sets the "is_open" field.
+func (geu *GeneratedExamUpdate) SetIsOpen(b bool) *GeneratedExamUpdate {
+	geu.mutation.SetIsOpen(b)
+	return geu
+}
+
+// SetNillableIsOpen sets the "is_open" field if the given value is not nil.
+func (geu *GeneratedExamUpdate) SetNillableIsOpen(b *bool) *GeneratedExamUpdate {
+	if b != nil {
+		geu.SetIsOpen(*b)
+	}
+	return geu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (geu *GeneratedExamUpdate) SetUpdatedAt(t time.Time) *GeneratedExamUpdate {
 	geu.mutation.SetUpdatedAt(t)
@@ -182,6 +196,9 @@ func (geu *GeneratedExamUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if geu.mutation.RawExamDataCleared() {
 		_spec.ClearField(generatedexam.FieldRawExamData, field.TypeJSON)
 	}
+	if value, ok := geu.mutation.IsOpen(); ok {
+		_spec.SetField(generatedexam.FieldIsOpen, field.TypeBool, value)
+	}
 	if value, ok := geu.mutation.UpdatedAt(); ok {
 		_spec.SetField(generatedexam.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -302,6 +319,20 @@ func (geuo *GeneratedExamUpdateOne) SetRawExamData(m map[string]interface{}) *Ge
 // ClearRawExamData clears the value of the "raw_exam_data" field.
 func (geuo *GeneratedExamUpdateOne) ClearRawExamData() *GeneratedExamUpdateOne {
 	geuo.mutation.ClearRawExamData()
+	return geuo
+}
+
+// SetIsOpen sets the "is_open" field.
+func (geuo *GeneratedExamUpdateOne) SetIsOpen(b bool) *GeneratedExamUpdateOne {
+	geuo.mutation.SetIsOpen(b)
+	return geuo
+}
+
+// SetNillableIsOpen sets the "is_open" field if the given value is not nil.
+func (geuo *GeneratedExamUpdateOne) SetNillableIsOpen(b *bool) *GeneratedExamUpdateOne {
+	if b != nil {
+		geuo.SetIsOpen(*b)
+	}
 	return geuo
 }
 
@@ -460,6 +491,9 @@ func (geuo *GeneratedExamUpdateOne) sqlSave(ctx context.Context) (_node *Generat
 	}
 	if geuo.mutation.RawExamDataCleared() {
 		_spec.ClearField(generatedexam.FieldRawExamData, field.TypeJSON)
+	}
+	if value, ok := geuo.mutation.IsOpen(); ok {
+		_spec.SetField(generatedexam.FieldIsOpen, field.TypeBool, value)
 	}
 	if value, ok := geuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(generatedexam.FieldUpdatedAt, field.TypeTime, value)

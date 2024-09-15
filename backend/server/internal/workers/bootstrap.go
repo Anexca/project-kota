@@ -41,4 +41,17 @@ func (w *Worker) RegisterWorkers() {
 
 		log.Println("Finished Worker Job for Adding Descriptive Question in Database")
 	})
+
+	w.cronHandler.AddFunc("*/1 * * * *", func() {
+		// w.cronHandler.AddFunc("0 4 * * *", func() {
+		log.Println("Starting Worker Job for Creating Descriptive Open Questions")
+
+		err := w.MarkDescriptiveQuestionsAsOpenInDatabase()
+		if err != nil {
+			log.Printf("Failed to Create Descriptive Open Questions: %v", err)
+			return
+		}
+
+		log.Println("Finished Worker Job for Creating Descriptive Open Questions")
+	})
 }

@@ -18,6 +18,8 @@ const (
 	FieldIsActive = "is_active"
 	// FieldRawExamData holds the string denoting the raw_exam_data field in the database.
 	FieldRawExamData = "raw_exam_data"
+	// FieldIsOpen holds the string denoting the is_open field in the database.
+	FieldIsOpen = "is_open"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -49,6 +51,7 @@ var Columns = []string{
 	FieldID,
 	FieldIsActive,
 	FieldRawExamData,
+	FieldIsOpen,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -77,6 +80,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultIsActive holds the default value on creation for the "is_active" field.
 	DefaultIsActive bool
+	// DefaultIsOpen holds the default value on creation for the "is_open" field.
+	DefaultIsOpen bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -96,6 +101,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByIsActive orders the results by the is_active field.
 func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
+}
+
+// ByIsOpen orders the results by the is_open field.
+func ByIsOpen(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsOpen, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

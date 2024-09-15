@@ -23,6 +23,8 @@ type GeneratedExam struct {
 	IsActive bool `json:"is_active,omitempty"`
 	// RawExamData holds the value of the "raw_exam_data" field.
 	RawExamData map[string]interface{} `json:"raw_exam_data,omitempty"`
+	// IsOpen holds the value of the "is_open" field.
+	IsOpen bool `json:"is_open,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -72,7 +74,7 @@ func (*GeneratedExam) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case generatedexam.FieldRawExamData:
 			values[i] = new([]byte)
-		case generatedexam.FieldIsActive:
+		case generatedexam.FieldIsActive, generatedexam.FieldIsOpen:
 			values[i] = new(sql.NullBool)
 		case generatedexam.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -114,6 +116,12 @@ func (ge *GeneratedExam) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &ge.RawExamData); err != nil {
 					return fmt.Errorf("unmarshal field raw_exam_data: %w", err)
 				}
+			}
+		case generatedexam.FieldIsOpen:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_open", values[i])
+			} else if value.Valid {
+				ge.IsOpen = value.Bool
 			}
 		case generatedexam.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -185,6 +193,9 @@ func (ge *GeneratedExam) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("raw_exam_data=")
 	builder.WriteString(fmt.Sprintf("%v", ge.RawExamData))
+	builder.WriteString(", ")
+	builder.WriteString("is_open=")
+	builder.WriteString(fmt.Sprintf("%v", ge.IsOpen))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(ge.CreatedAt.Format(time.ANSIC))

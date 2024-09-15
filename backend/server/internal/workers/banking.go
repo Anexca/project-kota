@@ -24,3 +24,10 @@ func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 
 	return nil
 }
+
+func (w *Worker) MarkDescriptiveQuestionsAsOpenInDatabase() error {
+	ctx := context.Background()
+	const EXAM_TYPE = commonConstants.Descriptive
+
+	return w.examService.MarkQuestionsAsOpen(ctx, EXAM_TYPE)
+}
