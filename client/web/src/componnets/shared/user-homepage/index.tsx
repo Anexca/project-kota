@@ -8,7 +8,7 @@ import { paths } from "../../../routes/route.constant";
 
 const UserHomePage = () => {
   return (
-    <>
+    <div>
       <Header />
       <div className="relative" id="home">
         <div
@@ -20,7 +20,7 @@ const UserHomePage = () => {
         </div>
         <div className="max-w-7xl mx-auto px-6 md:px-12 xl:px-6">
           <div className="relative ml-auto pt-20">
-            <div className="lg:w-2/3 text-center mx-auto min-h-[80vh]">
+            <div className="lg:w-2/3 text-center mx-auto ">
               <div className="text-lg mb-2">Your Go-To Place for </div>
               <div className="text-2xl text-info font-semibold mb-4">
                 Complete Exam Preparation
@@ -34,7 +34,7 @@ const UserHomePage = () => {
                 <Icon icon="arrow_right" className="text-info rotate-90" />
               </div>
             </div>
-            <div className="w-full bg-white">
+            <div className="w-full bg-white mt-28">
               <Container>
                 <h4 className="border-b py-2 font-bold text-center">
                   Available Test
@@ -59,7 +59,7 @@ const UserHomePage = () => {
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 };
 

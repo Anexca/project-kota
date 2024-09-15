@@ -26,7 +26,7 @@ const Header = () => {
   const links = session ? loggedInLinks : loggedOutLinks;
 
   return (
-    <header className="sticky top-0 z-10 ">
+    <header className="sticky top-0 z-50 ">
       <nav className="z-10 w-full border-b border-black/5 dark:border-white/5  bg-white/30 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 md:px-4 xl:px-4">
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-2 md:gap-0 ">
