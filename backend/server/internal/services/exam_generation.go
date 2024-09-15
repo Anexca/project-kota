@@ -92,7 +92,7 @@ func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examTyp
 		return fmt.Errorf("failed to mark current open questions closed: %w", err)
 	}
 
-	generatedOldExams, err := e.generatedExamRepository.GetByMonthOffset(ctx, exam, 0, 2)
+	generatedOldExams, err := e.generatedExamRepository.GetByWeekOffset(ctx, exam, 1, 2) // Get last weeks 2 questions
 	if err != nil {
 		return fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -240,7 +240,7 @@ func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examT
 }
 
 func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) {
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, isOpen)
+	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
 	}

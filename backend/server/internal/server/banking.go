@@ -6,6 +6,7 @@ import (
 	"errors"
 	"server/internal/services"
 	"server/pkg/constants"
+	"server/pkg/models"
 	"strconv"
 	"strings"
 
@@ -36,37 +37,34 @@ func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.R
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
-	}
-
-	cachedQuestions, err := s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
-	if err != nil {
-		if strings.Contains(err.Error(), "forbidden") {
-			s.ErrorJson(w, err, http.StatusForbidden)
-			return
-		}
-
-		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	s.WriteJson(w, http.StatusOK, &Response{Data: cachedQuestions})
-}
+	isOpenStr := r.URL.Query().Get("isopen")
+	var cachedQuestions []*models.GeneratedExamOverview
 
-func (s *Server) GetOpenBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
-	const EXAM_TYPE = commonConstants.Descriptive
+	if isOpenStr != "" {
+		var isOpen bool
+		isOpen, err = strconv.ParseBool(isOpenStr)
+		if err != nil {
+			s.ErrorJson(w, errors.New("invalid isopen query param, should be either true or false"), http.StatusBadRequest)
+			return
+		}
 
-	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+		if isOpen {
+			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), EXAM_TYPE, userId)
+		} else {
+			cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
+		}
+	} else {
+		cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
 	}
 
-	cachedQuestions, err := s.examGenerationService.GetOpenGeneratedExams(r.Context(), EXAM_TYPE, userId)
 	if err != nil {
 		if strings.Contains(err.Error(), "forbidden") {
 			s.ErrorJson(w, err, http.StatusForbidden)
 			return
 		}
-
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -88,16 +86,18 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	isOpen, err := GetHttpRequestContextValue(r, constants.OpenExamKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
-		return
-	}
+	isOpenStr := r.URL.Query().Get("isopen")
 
-	isOpenValue, err := strconv.ParseBool(isOpen)
-	if err != nil {
-		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
-		return
+	var isOpen bool
+	if isOpenStr != "" {
+		isOpen, err = strconv.ParseBool(isOpenStr)
+		if err != nil {
+			s.ErrorJson(w, errors.New("invalid isopen query param, should be either true or false"), http.StatusBadRequest)
+			return
+		}
+
+	} else {
+		isOpen = false
 	}
 
 	var request services.DescriptiveExamAssesmentRequest
@@ -112,7 +112,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, isOpenValue)
+	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, isOpen)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -134,7 +134,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request, userId, isOpenValue)
+	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request, userId, isOpen)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

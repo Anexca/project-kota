@@ -25,11 +25,15 @@ import {
   AlertTitle,
   AlertDescription,
 } from "../../componnets/base/alert/alert";
+import { useState } from "react";
+import Loader from "../../componnets/shared/loder";
 
 export function ForgotPassword() {
   const navigate = useNavigate();
   const { loadSession } = useSessionStore();
   const { toast } = useToast();
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const { handleSubmit, control } = useForm({
     defaultValues: {
       email: "",
@@ -38,19 +42,31 @@ export function ForgotPassword() {
   });
   const onSumbit = async (formData: ForgotPasswordType) => {
     const { email } = formData;
-
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) {
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) {
+        toast({
+          title: error.message || "Something went wrong.",
+          variant: "destructive",
+          description:
+            "Sorry there is some problem in processing your request.",
+        });
+        return;
+      }
+      if (data) {
+        const session = await loadSession();
+        session && navigate(`/${paths.HOMEPAGE}`);
+      }
+    } catch (error) {
       toast({
-        title: error.message || "Something went wrong.",
+        title: "Something went wrong.",
         variant: "destructive",
-        description: "Sorry there is some problem in proccessing your request.",
+        description: "Sorry there is some problem in processing your request.",
       });
-      return;
-    }
-    if (data) {
-      const session = await loadSession();
-      session && navigate(`/${paths.HOMEPAGE}`);
+    } finally {
+      setSubmitted(true);
+      setSubmitting(false);
     }
   };
 
@@ -83,16 +99,22 @@ export function ForgotPassword() {
                 />
               </div>
 
-              <Button type="submit" className="w-full">
-                Send Recovery Mail
+              <Button type="submit" className="w-full" disabled={submitted}>
+                {submitting ? (
+                  <Loader color={"outline"} />
+                ) : (
+                  "Send Recovery Mail"
+                )}
               </Button>
             </form>
-            <Alert variant={"success"} className="mt-4">
-              <AlertTitle>Success ✌</AlertTitle>
-              <AlertDescription>
-                Please check you mail box for password reset mail.
-              </AlertDescription>
-            </Alert>
+            {submitted ? (
+              <Alert variant={"success"} className="mt-4">
+                <AlertTitle>Success ✌</AlertTitle>
+                <AlertDescription>
+                  Please check you mail box for password reset mail.
+                </AlertDescription>
+              </Alert>
+            ) : null}
 
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}

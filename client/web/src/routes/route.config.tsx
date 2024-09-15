@@ -19,6 +19,7 @@ import PrivacyPolicy from "../pages/privacy-policy";
 import ContactUs from "../pages/contact-us";
 import PreviousSubmissionPage from "../pages/previous-submissions";
 import ViewPastSubmission from "../pages/view-past-submission";
+import MyTransactions from "../pages/my-transactions";
 
 const routes: RouteObject[] = [
   {
@@ -62,9 +63,19 @@ const routes: RouteObject[] = [
         path: paths.PROFILE,
         element: (
           <GeneralLayout>
-            <UserProfile />
+            <Outlet />
           </GeneralLayout>
         ),
+        children: [
+          {
+            index: true,
+            element: <UserProfile />,
+          },
+          {
+            path: paths.MY_TRANSACTIONS,
+            element: <MyTransactions />,
+          },
+        ],
       },
       {
         path: paths.EXAMS,
@@ -89,8 +100,31 @@ const routes: RouteObject[] = [
         ],
       },
       {
+        path: paths.COMMUNITY_EXAMS,
+        element: <GeneralLayout />,
+        children: [
+          {
+            path: `banking/${paths.DISCRIPTIVE}`,
+            element: <DescriptiveQuestion isOpenMode />,
+          },
+          {
+            path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+            element: (
+              <DescriptiveSubmission
+                isOpenMode
+                backLink={`/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`}
+              />
+            ),
+          },
+        ],
+      },
+      {
         path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
         element: <DiscriptiveExam />,
+      },
+      {
+        path: `${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
+        element: <DiscriptiveExam isOpenMode />,
       },
     ],
   },

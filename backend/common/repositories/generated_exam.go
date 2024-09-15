@@ -68,9 +68,23 @@ func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams
 	return nil
 }
 
-func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
+func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(!isOpen), generatedexam.IsOpenEQ(isOpen)).
+		Where(generatedexam.IDEQ(generatedExamId)).
+		WithExam().
+		Only(ctx)
+}
+
+func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen)).
+		WithExam().
+		Only(ctx)
+}
+
+func (q GeneratedExamRepository) GetActiveById(ctx context.Context, generatedExamId int, IsActive bool) (*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(IsActive)).
 		WithExam().
 		Only(ctx)
 }
@@ -103,6 +117,35 @@ func (q *GeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.
 			generatedexam.IsActive(false),
 			generatedexam.CreatedAtGTE(firstOfMonth),
 			generatedexam.CreatedAtLTE(lastOfMonth),
+		).
+		WithAttempts().
+		WithExam().
+		Order(ent.Desc(generatedexam.FieldCreatedAt)).
+		Limit(limit).
+		All(ctx)
+}
+
+func (q *GeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error) {
+	now := time.Now()
+
+	targetWeek := now.AddDate(0, 0, -7*weekOffset)
+
+	year, week := targetWeek.ISOWeek()
+	firstOfWeek := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
+	for firstOfWeek.Weekday() != time.Monday { // Adjust to the start of the week
+		firstOfWeek = firstOfWeek.AddDate(0, 0, 1)
+	}
+	firstOfWeek = firstOfWeek.AddDate(0, 0, (week-1)*7)
+
+	// Calculate the end of the week (Saturday)
+	lastOfWeek := firstOfWeek.AddDate(0, 0, 6).Add(time.Hour*23 + time.Minute*59 + time.Second*59) // End of Saturday
+
+	return q.dbClient.GeneratedExam.Query().
+		Where(
+			generatedexam.HasExamWith(exam.ID(ex.ID)),
+			generatedexam.IsActive(false),
+			generatedexam.CreatedAtGTE(firstOfWeek),
+			generatedexam.CreatedAtLTE(lastOfWeek),
 		).
 		WithAttempts().
 		WithExam().

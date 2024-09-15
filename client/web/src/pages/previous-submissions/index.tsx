@@ -3,12 +3,11 @@ import { getPastAttemptedSubmissions } from "../../services/exam.service";
 
 import { Link } from "react-router-dom";
 import { paths } from "../../routes/route.constant";
-import { supabase } from "../../supabase/client";
 
 import Icon from "../../componnets/base/icon";
+import AttemptedSubmissionsCard from "../../componnets/shared/attempted-submissions-card";
 import { useToast } from "../../hooks/use-toast";
 import { IPastExamAttempt } from "../../interface/past-submission";
-import AttemptedSubmissionsCard from "../../componnets/shared/attempted-submissions-card";
 
 const PreviousSubmissionPage = () => {
   const [submisions, setQuestions] = useState<IPastExamAttempt[]>([]);
@@ -17,7 +16,6 @@ const PreviousSubmissionPage = () => {
   const getQuestionsList = async () => {
     setLoading(true);
     try {
-      await supabase.auth.getSession();
       const data = await getPastAttemptedSubmissions();
       setQuestions(data.data || []);
     } catch (error) {
