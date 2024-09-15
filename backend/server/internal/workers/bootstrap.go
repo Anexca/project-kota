@@ -43,7 +43,7 @@ func (w *Worker) RegisterWorkers() {
 	})
 
 	// w.cronHandler.AddFunc("*/1 * * * *", func() {
-	w.cronHandler.AddFunc("0 4 * * *", func() {
+	w.cronHandler.AddFunc("0 0 * * 0", func() {
 		log.Println("Starting Worker Job for Creating Descriptive Open Questions")
 
 		err := w.MarkDescriptiveQuestionsAsOpenInDatabase()
