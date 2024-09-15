@@ -125,6 +125,35 @@ func (q *GeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.
 		All(ctx)
 }
 
+func (q *GeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error) {
+	now := time.Now()
+
+	targetWeek := now.AddDate(0, 0, -7*weekOffset)
+
+	year, week := targetWeek.ISOWeek()
+	firstOfWeek := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
+	for firstOfWeek.Weekday() != time.Monday { // Adjust to the start of the week
+		firstOfWeek = firstOfWeek.AddDate(0, 0, 1)
+	}
+	firstOfWeek = firstOfWeek.AddDate(0, 0, (week-1)*7)
+
+	// Calculate the end of the week (Saturday)
+	lastOfWeek := firstOfWeek.AddDate(0, 0, 6).Add(time.Hour*23 + time.Minute*59 + time.Second*59) // End of Saturday
+
+	return q.dbClient.GeneratedExam.Query().
+		Where(
+			generatedexam.HasExamWith(exam.ID(ex.ID)),
+			generatedexam.IsActive(false),
+			generatedexam.CreatedAtGTE(firstOfWeek),
+			generatedexam.CreatedAtLTE(lastOfWeek),
+		).
+		WithAttempts().
+		WithExam().
+		Order(ent.Desc(generatedexam.FieldCreatedAt)).
+		Limit(limit).
+		All(ctx)
+}
+
 func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
