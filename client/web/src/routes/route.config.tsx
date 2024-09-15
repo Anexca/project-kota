@@ -111,19 +111,20 @@ const routes: RouteObject[] = [
             path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
             element: (
               <DescriptiveSubmission
+                isOpenMode
                 backLink={`/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`}
               />
             ),
-          },
-          {
-            path: `${paths.MY_SUMBISSIONS}/:questionId/${paths.SUBMISSION}/:assesmentId`,
-            element: <ViewPastSubmission isOpenMode />,
           },
         ],
       },
       {
         path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
         element: <DiscriptiveExam />,
+      },
+      {
+        path: `${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
+        element: <DiscriptiveExam isOpenMode />,
       },
     ],
   },

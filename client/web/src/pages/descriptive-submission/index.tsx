@@ -15,17 +15,22 @@ import {
 import ProfanityError from "../../componnets/shared/profanity_error/profanity-error";
 import { questionType } from "../../constants/shared";
 
-const DescriptiveSubmission = ({ backLink }: { backLink?: string }) => {
+const DescriptiveSubmission = ({
+  backLink,
+  isOpenMode,
+}: {
+  backLink?: string;
+  isOpenMode?: boolean;
+}) => {
   const [question, setQuestion] = useState<IQuestion | null>(null);
 
   const [assessment, setAssessment] = useState<Evalution | null>(null);
   const [loading, setLoading] = useState(false);
-
   const params = useParams();
   const { toast } = useToast();
   const fetchQuestionById = async () => {
     if (!params?.questionId) return;
-    const response = await getQuestionById(params?.questionId);
+    const response = await getQuestionById(params?.questionId, isOpenMode);
     setQuestion(response.data);
   };
   const getResultByExamId = async () => {

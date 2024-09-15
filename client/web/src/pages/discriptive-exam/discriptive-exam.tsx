@@ -166,7 +166,7 @@ const Hints = ({ hints }: { hints: string[] }) => {
   );
 };
 
-const DiscriptiveExam = () => {
+const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const param = useParams();
   const navigate = useNavigate();
   const [exitModelOpen, setExitModelOpen] = useState(false);
@@ -188,7 +188,7 @@ const DiscriptiveExam = () => {
   const fetchQuestionById = async () => {
     if (!param?.questionId) return;
     try {
-      const response = await getQuestionById(param?.questionId);
+      const response = await getQuestionById(param?.questionId, isOpenMode);
       setValue("maxWords", response.data.raw_exam_data.max_number_of_words);
       setExamTime(response.data.duration_seconds);
       setQuestion(response.data);
@@ -196,7 +196,7 @@ const DiscriptiveExam = () => {
       toast({
         title: "Something went wrong.",
         variant: "destructive",
-        description: "Sorry there is some problem in proccessing your request.",
+        description: "Sorry there is some problem in processing your request.",
       });
     }
   };
@@ -217,10 +217,11 @@ const DiscriptiveExam = () => {
         questionId: question!.id,
         answer: value.answer,
         completedTime: timeTaken,
+        isOpen: isOpenMode,
       });
       fetchResultRef.current = getResultByExamId(response.data.id);
       toast({
-        title: "Successfully subitted the exam.",
+        title: "Successfully submitted the exam.",
         variant: "success",
         description: "Please wait while we evaluate your answer.",
       });
@@ -228,7 +229,7 @@ const DiscriptiveExam = () => {
       toast({
         title: "Something went wrong.",
         variant: "destructive",
-        description: "Sorry there is some problem in proccessing your request.",
+        description: "Sorry there is some problem in processing your request.",
       });
       return;
     }
@@ -255,7 +256,7 @@ const DiscriptiveExam = () => {
           title: "Something went wrong.",
           variant: "destructive",
           description:
-            "Sorry there is some problem in proccessing your request.",
+            "Sorry there is some problem in processing your request.",
         });
       }
       setLoading(false);
@@ -265,7 +266,11 @@ const DiscriptiveExam = () => {
 
   const exitExam = () => {
     interval.stop();
-    navigate(`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`);
+    navigate(
+      `/${isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS}/banking/${
+        paths.DISCRIPTIVE
+      }`
+    );
   };
 
   useEffect(() => {
@@ -296,7 +301,9 @@ const DiscriptiveExam = () => {
         <div className="mb-4">
           {evaluationResult && (
             <Link
-              to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
+              to={`/${
+                isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS
+              }/banking/${paths.DISCRIPTIVE}`}
               className="text-info pb-2 inline-block"
             >
               <Icon icon="arrow_back" className="text-sm mr-1" /> Exit Exam
