@@ -43,7 +43,7 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 		}
 	}
 
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, isOpen)
+	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, err
 	}

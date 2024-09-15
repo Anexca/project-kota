@@ -20,12 +20,26 @@ func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isOpenStr := r.URL.Query().Get("isopen")
+
+	var isOpen bool
+	if isOpenStr != "" {
+		isOpen, err = strconv.ParseBool(isOpenStr)
+		if err != nil {
+			s.ErrorJson(w, errors.New("invalid isopen query param, should be either true or false"), http.StatusBadRequest)
+			return
+		}
+
+	} else {
+		isOpen = false
+	}
+
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId, userId, false)
+	generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId, userId, isOpen)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -35,38 +49,6 @@ func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 
 		if strings.Contains(err.Error(), "forbidden") {
 			s.ErrorJson(w, err, http.StatusForbidden)
-			return
-		}
-
-		s.ErrorJson(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	responsePayload := Response{
-		Data: generatedExam,
-	}
-
-	s.WriteJson(w, http.StatusOK, &responsePayload)
-}
-
-func (s *Server) GetOpenGeneratedExamById(w http.ResponseWriter, r *http.Request) {
-	idParam := chi.URLParam(r, "id")
-	generatedExamId, err := strconv.Atoi(idParam)
-	if err != nil {
-		s.ErrorJson(w, errors.New("invalid exam id"), http.StatusBadRequest)
-		return
-	}
-
-	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
-	}
-
-	generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId, userId, true)
-	if err != nil {
-		var notFoundError *ent.NotFoundError
-		if errors.As(err, &notFoundError) {
-			s.ErrorJson(w, errors.New("exam not found"))
 			return
 		}
 
@@ -94,19 +76,7 @@ func (s *Server) GetAssesmentById(w http.ResponseWriter, r *http.Request) {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	isOpen, err := GetHttpRequestContextValue(r, constants.OpenExamKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
-		return
-	}
-
-	isOpenValue, err := strconv.ParseBool(isOpen)
-	if err != nil {
-		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
-		return
-	}
-
-	assesment, err := s.examAssesmentService.GetAssesmentById(r.Context(), assesmentId, userId, isOpenValue)
+	assesment, err := s.examAssesmentService.GetAssesmentById(r.Context(), assesmentId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -143,19 +113,7 @@ func (s *Server) GetExamAssessments(w http.ResponseWriter, r *http.Request) {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	isOpen, err := GetHttpRequestContextValue(r, constants.OpenExamKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
-		return
-	}
-
-	isOpenValue, err := strconv.ParseBool(isOpen)
-	if err != nil {
-		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
-		return
-	}
-
-	assessments, err := s.examAssesmentService.GetExamAssessments(r.Context(), generatedExamId, userId, isOpenValue)
+	assessments, err := s.examAssesmentService.GetExamAssessments(r.Context(), generatedExamId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
