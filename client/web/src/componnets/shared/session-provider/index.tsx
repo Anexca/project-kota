@@ -51,8 +51,8 @@ const SessionProvider = ({ children }: PropsWithChildren) => {
       const response = await loadSession();
       if (response) {
         await updateUserProfile();
-        setIsloading(false);
       }
+      setIsloading(false);
     } catch (error) {
       toast({
         title: "Something went wrong",
@@ -61,6 +61,8 @@ const SessionProvider = ({ children }: PropsWithChildren) => {
         variant: "destructive",
         duration: 5000,
       });
+    } finally {
+      setIsloading(false);
     }
   };
 
