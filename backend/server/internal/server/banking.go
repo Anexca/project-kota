@@ -16,6 +16,10 @@ import (
 
 const EXAM_CATEGORY_TYPE = commonConstants.Banking
 
+func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
 	const EXAM_TYPE = commonConstants.Descriptive
 

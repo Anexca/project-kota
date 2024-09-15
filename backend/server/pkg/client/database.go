@@ -37,9 +37,9 @@ func NewDbClient(ctx context.Context) (*ent.Client, error) {
 	drv := entsql.OpenDB(dialect.Postgres, db)
 	client := ent.NewClient(ent.Driver(drv))
 
-	if err := client.Schema.Create(ctx); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
-	}
+	// if err := client.Schema.Create(ctx); err != nil {
+	// 	log.Fatalf("failed creating schema resources: %v", err)
+	// }
 
 	log.Println("connected to database server", environment.DatabaseHost)
 	return client, nil
