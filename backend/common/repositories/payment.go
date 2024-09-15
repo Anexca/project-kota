@@ -3,6 +3,7 @@ package repositories
 import (
 	"common/ent"
 	"common/ent/payment"
+	"common/ent/user"
 	"context"
 	"strings"
 	"time"
@@ -28,6 +29,19 @@ func NewPaymentRepository(dbClient *ent.Client) *PaymentRepository {
 	return &PaymentRepository{
 		dbClient: dbClient,
 	}
+}
+
+func (p *PaymentRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.Payment, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.dbClient.Payment.Query().
+		Where(payment.HasUserWith(user.IDEQ(userUid))).
+		WithSubscription().
+		Order(ent.Desc(payment.FieldUpdatedAt)).
+		All(ctx)
 }
 
 func (p *PaymentRepository) Create(ctx context.Context, model CreatePaymentModel, userId string) (*ent.Payment, error) {

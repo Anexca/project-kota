@@ -34,6 +34,32 @@ func (s *Server) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	s.WriteJson(w, http.StatusOK, &response)
 }
 
+func (s *Server) GetUserTransactions(w http.ResponseWriter, r *http.Request) {
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
+	user, err := s.userService.GetUserTransactions(r.Context(), userId)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("user not found"))
+			return
+		}
+
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	response := Response{
+		Data: user,
+	}
+
+	s.WriteJson(w, http.StatusOK, &response)
+}
+
 func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)

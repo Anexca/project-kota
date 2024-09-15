@@ -15,6 +15,7 @@ import (
 type UserService struct {
 	paymentService             *PaymentService
 	userRepository             *repositories.UserRepository
+	paymentRepositry           *repositories.PaymentRepository
 	userSubscriptionRepository *repositories.UserSubscriptioRepository
 }
 
@@ -35,12 +36,14 @@ type UserProfileResponse struct {
 
 func NewUserService(dbClient *ent.Client, paymentClient *razorpay.Client) *UserService {
 	paymentService := NewPaymentService(paymentClient)
+	paymentRepositry := repositories.NewPaymentRepository(dbClient)
 	userRepository := repositories.NewUserRepository(dbClient)
 	userSubscriptionRepository := repositories.NewUserSubscriptioRepository(dbClient)
 
 	return &UserService{
 		paymentService:             paymentService,
 		userRepository:             userRepository,
+		paymentRepositry:           paymentRepositry,
 		userSubscriptionRepository: userSubscriptionRepository,
 	}
 }
@@ -119,6 +122,28 @@ func (u *UserService) UpdateUser(ctx context.Context, userId string, request Upd
 	}
 
 	return updatedUser, nil
+}
+
+func (u *UserService) GetUserTransactions(ctx context.Context, userId string) ([]models.SubscriptionPaymentDetails, error) {
+	var subscriptionPayments []models.SubscriptionPaymentDetails
+
+	payments, err := u.paymentRepositry.GetByUserId(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, payment := range payments {
+		subscriptionPayment := models.SubscriptionPaymentDetails{
+			Amount:        payment.Amount,
+			PaymentDate:   payment.PaymentDate,
+			PaymentStatus: string(payment.Status),
+			PaymentMethod: payment.PaymentMethod,
+		}
+
+		subscriptionPayments = append(subscriptionPayments, subscriptionPayment)
+	}
+
+	return subscriptionPayments, nil
 }
 
 func (u *UserService) updatePaymentProviderCustomer(user *ent.User) error {
