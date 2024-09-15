@@ -4,11 +4,13 @@ type ExamType string
 type AssessmentStatus string
 
 const (
-	Descriptive ExamType = "DESCRIPTIVE"
+	Descriptive     ExamType = "DESCRIPTIVE"
+	IBPSDescriptive ExamType = "IBPS_DESCRIPTIVE"
 )
 
 var EXAMS = map[ExamType]string{
-	Descriptive: "descriptive",
+	Descriptive:     "descriptive",
+	IBPSDescriptive: "descriptive_ibps_po",
 }
 
 const (

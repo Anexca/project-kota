@@ -1,8 +1,10 @@
 package services
 
 import (
+	"common/constants"
 	"common/ent"
 	"common/repositories"
+	"context"
 )
 
 type ExamCategoryService struct {
@@ -20,4 +22,7 @@ func NewExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
 	}
 }
 
-// func GetExamByCategory
+func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Context) ([]*ent.Exam, error) {
+	examName := constants.EXAMS[constants.Descriptive]
+	return e.examRepository.GetAllByName(ctx, examName)
+}
