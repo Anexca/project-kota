@@ -12,6 +12,7 @@ import {
 import useUserProfileStore from "../../../store/user-info-store";
 import { Button } from "../../base/button/button";
 import Loader from "../loder";
+import { delay } from "../../../lib/utils";
 
 type Props = {
   subscriptionId: string;
@@ -46,6 +47,7 @@ const RazorpayButton = ({
         signature: e.razorpay_signature,
         userSubsId: e.id,
       });
+      await delay(2000);
       await getProfile();
     } catch (error) {
       toast({
@@ -100,7 +102,7 @@ const RazorpayButton = ({
   }, [profile]);
   return (
     <Button
-      disabled={isActive || isDisabled}
+      disabled={isActive || isDisabled || loading}
       className="w-full"
       variant={"success"}
       onClick={openRazorPay}
