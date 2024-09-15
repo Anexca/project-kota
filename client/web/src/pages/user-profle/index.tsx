@@ -49,7 +49,7 @@ const UserProfile = () => {
         phoneNumber: res.data.phone_number,
       };
       reset(sanitizedRespomse);
-      setProfile({ ...profile, ...sanitizedRespomse });
+      setProfile(res.data);
       toast({
         title: "Successful",
         variant: "success",
