@@ -18,10 +18,12 @@ import { paths } from "../../routes/route.constant";
 import useSessionStore from "../../store/auth-store";
 import { supabase } from "../../supabase/client";
 import { LoginSchema, LoginType } from "../../validation-schema/auth";
+import useUserProfileStore from "../../store/user-info-store";
 
 export function Login() {
   const navigate = useNavigate();
   const { loadSession } = useSessionStore();
+  const { getProfile } = useUserProfileStore();
   const { toast } = useToast();
   const { handleSubmit, control } = useForm({
     defaultValues: {
@@ -48,7 +50,8 @@ export function Login() {
         return;
       }
       if (data) {
-        loadSession();
+        await loadSession();
+        await getProfile();
         navigate(`/${paths.HOMEPAGE}`);
       }
     } catch (error) {
@@ -80,6 +83,7 @@ export function Login() {
     }
     if (data) {
       await loadSession();
+      await getProfile();
     }
   };
   return (
