@@ -18,6 +18,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 		log.Fatalln(err)
 	}
 
+	// Start the rate limiter cleanup routine
+	middlewares.StartCleanupRoutine()
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -40,6 +43,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	r.Use(middleware.Heartbeat("/ping"))
+	r.Use(middlewares.RateLimiterMiddleware)
 
 	r.Get("/sup", s.Sup)
 	r.Get("/health", s.HealthCheck)

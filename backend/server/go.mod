@@ -14,7 +14,12 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 )
 
-require github.com/razorpay/razorpay-go v1.3.2 
+require github.com/razorpay/razorpay-go v1.3.2
+
+require (
+	github.com/benbjohnson/clock v1.3.0 // indirect
+	go.uber.org/ratelimit v0.3.1 // indirect
+)
 
 require (
 	github.com/TwiN/go-away v1.6.13
