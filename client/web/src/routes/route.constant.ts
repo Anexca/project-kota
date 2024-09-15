@@ -2,6 +2,7 @@ export enum paths {
   HOMEPAGE = "home",
   STREAM_SELECT = "streams",
   EXAMS = "exams",
+  COMMUNITY_EXAMS = "community-exams",
   DISCRIPTIVE = "descriptive",
   MCQ = "mcq",
   LOGIN = "login",
@@ -17,4 +18,5 @@ export enum paths {
   TERMS_OF_SERVICE = "terms-of-service",
   CONTACT_US = "contact-us",
   PRICING_PLAN = "pricing-plan",
+  MY_TRANSACTIONS = "my-transactions",
 }

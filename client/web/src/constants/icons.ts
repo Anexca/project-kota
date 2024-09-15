@@ -20,6 +20,13 @@ export const ICONS = {
   rupee: "fa-solid fa-indian-rupee-sign",
   chevron_down: "fa-solid fa-chevron-down",
   tags: "fa fa-tags",
+  undo: "fa-solid fa-undo", // added for REFUNDED
+  undo_alt: "fa-solid fa-undo-alt", // added for PARTIALLY_REFUNDED
+  hourglass_half: "fa-regular fa-hourglass-half", // added for PENDING
+  sync: "fa-solid fa-sync-alt", // added for PROCESSING
+  ban: "fa-solid fa-ban", // added for CANCELLED
+  thumbs_up: "fa-solid fa-thumbs-up",
+  bank: "fa-solid fa-bank",
 };
 type IconType = keyof typeof ICONS;
 export type { IconType };

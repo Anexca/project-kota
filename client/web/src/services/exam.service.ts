@@ -1,8 +1,12 @@
 import { IPastExamAttempt } from "../interface/past-submission";
 import axiosInstance from "./base";
 
-export const getQuestions = async () => {
-  const response = await axiosInstance.get("/exams/banking/descriptive");
+export const getQuestions = async (isOpenExam?: boolean) => {
+  const response = await axiosInstance.get("/exams/banking/descriptive", {
+    params: {
+      isopen: !!isOpenExam,
+    },
+  });
   return response.data;
 };
 

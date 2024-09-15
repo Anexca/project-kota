@@ -6,7 +6,6 @@ import { Checkbox } from "../../componnets/base/checkbox";
 import DescriptiveQuestionCard from "../../componnets/shared/descriptive-question-card";
 import { IQuestion } from "../../interface/question";
 import { paths } from "../../routes/route.constant";
-import { supabase } from "../../supabase/client";
 
 import Icon from "../../componnets/base/icon";
 import {
@@ -17,15 +16,18 @@ import {
 } from "../../componnets/base/sheet";
 import PreviousSubmissions from "../../componnets/shared/previous-submissions-list";
 import { useToast } from "../../hooks/use-toast";
+import { StyledLink } from "../../componnets/base/styled-link";
 
 export function ViewSubmissionDrawer({
   open,
   setOpen,
   question,
+  isOpenExam,
 }: {
   open: boolean;
   setOpen: (b: boolean) => void;
   question: IQuestion | null;
+  isOpenExam?: boolean;
 }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -37,13 +39,15 @@ export function ViewSubmissionDrawer({
         <SheetHeader>
           <SheetTitle>Submissions</SheetTitle>
         </SheetHeader>
-        {question && <PreviousSubmissions question={question} />}
+        {question && (
+          <PreviousSubmissions question={question} isOpenExam={isOpenExam} />
+        )}
       </SheetContent>
     </Sheet>
   );
 }
 
-const DescriptiveQuestion = () => {
+const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const [questions, setQuestions] = useState<IQuestion[]>([]);
   const [selectedQuestion, setSelectedQuestions] = useState<IQuestion | null>(
     null
@@ -55,14 +59,13 @@ const DescriptiveQuestion = () => {
   const getQuestionsList = async () => {
     setLoading(true);
     try {
-      await supabase.auth.getSession();
-      const data = await getQuestions();
+      const data = await getQuestions(isOpenMode);
       setQuestions(data.data);
     } catch (error) {
       toast({
         title: "Oh ho Something went wrong.",
         variant: "destructive",
-        description: "Sorry there is some problem in proccessing your request.",
+        description: "Sorry there is some problem in processing your request.",
       });
     }
     setLoading(false);
@@ -72,11 +75,16 @@ const DescriptiveQuestion = () => {
   }, []);
 
   const attempQuestion = (index: number) => {
-    navigate(`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${index}`, {
-      state: {
-        question: questions[index],
-      },
-    });
+    navigate(
+      `/${isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS}/banking/${
+        paths.DISCRIPTIVE
+      }/${index}`,
+      {
+        state: {
+          question: questions[index],
+        },
+      }
+    );
   };
 
   const unattemptedQuestion = useMemo(() => {
@@ -101,6 +109,7 @@ const DescriptiveQuestion = () => {
           open={!!selectedQuestion}
           setOpen={() => setSelectedQuestions(null)}
           question={selectedQuestion}
+          isOpenExam={isOpenMode}
         />
         <div className="flex items-center gap-2  text-sm">
           <span>Show unattempted only</span>
@@ -133,6 +142,26 @@ const DescriptiveQuestion = () => {
               />
             );
           })}
+          {isOpenMode ? (
+            <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
+              <div className=" w-2 bg-yellow-400 rounded-full"></div>
+              <div className="flex flex-col flex-1">
+                <div className="text-sm font-semibold">
+                  Please buy one of our paid plan to get new question daily.
+                </div>
+                <div>
+                  <StyledLink
+                    to={`/${paths.PRICING_PLAN}`}
+                    size={"sm"}
+                    className="px-3 py-1 h-7 mt-2"
+                    variant={"warning"}
+                  >
+                    <Icon icon="send" className="mr-2" /> Buy Plan
+                  </StyledLink>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
     </div>
