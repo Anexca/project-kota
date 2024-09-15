@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"server/pkg/models"
 	"sort"
 
@@ -64,6 +65,77 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 	err = e.ProcessExamData(ctx, exam, modelType, cachedData)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	currentOpenQuestions, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
+	if err != nil {
+		return fmt.Errorf("failed to get currentOpenQuestions: %w", err)
+	}
+
+	for _, coe := range currentOpenQuestions {
+		coe.IsOpen = false
+	}
+
+	err = e.generatedExamRepository.UpdateMany(ctx, currentOpenQuestions)
+	if err != nil {
+		return fmt.Errorf("failed to mark current open questions closed: %w", err)
+	}
+
+	generatedOldExams, err := e.generatedExamRepository.GetByMonthOffset(ctx, exam, 0, 2)
+	if err != nil {
+		return fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	for _, goe := range generatedOldExams {
+		goe.IsOpen = true
+	}
+
+	err = e.generatedExamRepository.UpdateMany(ctx, generatedOldExams)
+	if err != nil {
+		return fmt.Errorf("failed to create new open exams: %w", err)
+	}
+
+	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), examName)
+
+	return nil
+}
+
+func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examType commonConstants.ExamType) error {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return err
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	sort.SliceStable(generatedExams, func(i, j int) bool {
+		return generatedExams[i].UpdatedAt.After(generatedExams[j].UpdatedAt)
+	})
+
+	if len(generatedExams) > 30 {
+		for _, generatedExam := range generatedExams[30:] { // Skip the first 30 exams
+			generatedExam.IsActive = false
+		}
+
+		if err := e.generatedExamRepository.UpdateMany(ctx, generatedExams[30:]); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -151,19 +223,37 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
 }
 
-func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string) (*models.GeneratedExamOverview, error) {
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
+	examName := commonConstants.EXAMS[examType]
+
+	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	return e.buildGeneratedExamOverviewList(ctx, generatedExams, exam, userId)
+}
+
+func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) {
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to check access: %w", err)
-	}
+	if !isOpen {
+		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check access: %w", err)
+		}
 
-	if !hasAccess {
-		return nil, errors.New("forbidden")
+		if !hasAccess {
+			return nil, errors.New("forbidden")
+		}
 	}
 
 	userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)

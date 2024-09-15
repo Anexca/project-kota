@@ -34,24 +34,29 @@ func NewExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
 	}
 }
 
-func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedExamId int, userId string) (*ent.ExamAttempt, error) {
+func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*ent.ExamAttempt, error) {
 	userExamAttempts, err := e.examAtemptRepository.GetByExam(ctx, generatedExamId, userId)
 	if err != nil {
-		return nil, err
+		var notFoundError *ent.NotFoundError
+		if !errors.As(err, &notFoundError) {
+			return nil, err
+		}
 	}
 
-	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId)
+	generatedExam, err := e.generatedExamRepository.GetById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, err
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to check access: %w", err)
-	}
+	if !isOpen {
+		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check access: %w", err)
+		}
 
-	if !hasAccess {
-		return nil, errors.New("forbidden")
+		if !hasAccess {
+			return nil, errors.New("forbidden")
+		}
 	}
 
 	currAttempts := len(userExamAttempts)

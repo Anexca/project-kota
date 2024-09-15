@@ -117,12 +117,16 @@ func init() {
 	generatedexamDescIsActive := generatedexamFields[0].Descriptor()
 	// generatedexam.DefaultIsActive holds the default value on creation for the is_active field.
 	generatedexam.DefaultIsActive = generatedexamDescIsActive.Default.(bool)
+	// generatedexamDescIsOpen is the schema descriptor for is_open field.
+	generatedexamDescIsOpen := generatedexamFields[2].Descriptor()
+	// generatedexam.DefaultIsOpen holds the default value on creation for the is_open field.
+	generatedexam.DefaultIsOpen = generatedexamDescIsOpen.Default.(bool)
 	// generatedexamDescCreatedAt is the schema descriptor for created_at field.
-	generatedexamDescCreatedAt := generatedexamFields[2].Descriptor()
+	generatedexamDescCreatedAt := generatedexamFields[3].Descriptor()
 	// generatedexam.DefaultCreatedAt holds the default value on creation for the created_at field.
 	generatedexam.DefaultCreatedAt = generatedexamDescCreatedAt.Default.(func() time.Time)
 	// generatedexamDescUpdatedAt is the schema descriptor for updated_at field.
-	generatedexamDescUpdatedAt := generatedexamFields[3].Descriptor()
+	generatedexamDescUpdatedAt := generatedexamFields[4].Descriptor()
 	// generatedexam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	generatedexam.DefaultUpdatedAt = generatedexamDescUpdatedAt.Default.(func() time.Time)
 	// generatedexam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

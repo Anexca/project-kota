@@ -38,6 +38,28 @@ func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.R
 	s.WriteJson(w, http.StatusOK, &Response{Data: cachedQuestions})
 }
 
+func (s *Server) GetOpenBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
+	const EXAM_TYPE = commonConstants.Descriptive
+
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+	}
+
+	cachedQuestions, err := s.examGenerationService.GetOpenGeneratedExams(r.Context(), EXAM_TYPE, userId)
+	if err != nil {
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
+			return
+		}
+
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	s.WriteJson(w, http.StatusOK, &Response{Data: cachedQuestions})
+}
+
 func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	generatedExamId, err := strconv.Atoi(idParam)
@@ -49,6 +71,19 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
+	isOpen, err := GetHttpRequestContextValue(r, constants.OpenExamKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
+		return
+	}
+
+	isOpenValue, err := strconv.ParseBool(isOpen)
+	if err != nil {
+		s.ErrorJson(w, errors.New("something went wrong"), http.StatusInternalServerError)
+		return
 	}
 
 	var request services.DescriptiveExamAssesmentRequest
@@ -63,7 +98,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId)
+	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, isOpenValue)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -85,7 +120,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request, userId)
+	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request, userId, isOpenValue)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

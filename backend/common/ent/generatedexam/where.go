@@ -60,6 +60,11 @@ func IsActive(v bool) predicate.GeneratedExam {
 	return predicate.GeneratedExam(sql.FieldEQ(FieldIsActive, v))
 }
 
+// IsOpen applies equality check predicate on the "is_open" field. It's identical to IsOpenEQ.
+func IsOpen(v bool) predicate.GeneratedExam {
+	return predicate.GeneratedExam(sql.FieldEQ(FieldIsOpen, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.GeneratedExam {
 	return predicate.GeneratedExam(sql.FieldEQ(FieldCreatedAt, v))
@@ -88,6 +93,16 @@ func RawExamDataIsNil() predicate.GeneratedExam {
 // RawExamDataNotNil applies the NotNil predicate on the "raw_exam_data" field.
 func RawExamDataNotNil() predicate.GeneratedExam {
 	return predicate.GeneratedExam(sql.FieldNotNull(FieldRawExamData))
+}
+
+// IsOpenEQ applies the EQ predicate on the "is_open" field.
+func IsOpenEQ(v bool) predicate.GeneratedExam {
+	return predicate.GeneratedExam(sql.FieldEQ(FieldIsOpen, v))
+}
+
+// IsOpenNEQ applies the NEQ predicate on the "is_open" field.
+func IsOpenNEQ(v bool) predicate.GeneratedExam {
+	return predicate.GeneratedExam(sql.FieldNEQ(FieldIsOpen, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
