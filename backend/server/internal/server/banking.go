@@ -85,7 +85,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId)
+	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, false)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -107,7 +107,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request, userId)
+	assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &request, userId, false)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

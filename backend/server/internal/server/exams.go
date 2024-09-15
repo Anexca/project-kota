@@ -94,7 +94,7 @@ func (s *Server) GetAssesmentById(w http.ResponseWriter, r *http.Request) {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	assesment, err := s.examAssesmentService.GetAssesmentById(r.Context(), assesmentId, userId)
+	assesment, err := s.examAssesmentService.GetAssesmentById(r.Context(), assesmentId, userId, false)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
