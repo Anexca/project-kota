@@ -132,7 +132,8 @@ const TermsOfService = () => {
         <h2 className="text-xl font-semibold mb-4">12. Contact Information</h2>
         <p className="mb-6">
           If you have any questions about these Terms of Service, please contact
-          us at <span className="font-semibold">support@pseudotest.pro</span>.
+          Harshal Dharmik or Rahil Sheikh at{" "}
+          <span className="font-semibold">support@pseudotest.pro</span>.
         </p>
       </Container>
       <Footer />
