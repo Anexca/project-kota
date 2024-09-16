@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"common/constants"
 	"time"
 
 	"entgo.io/ent"
@@ -13,22 +14,6 @@ type Payment struct {
 	ent.Schema
 }
 
-// PaymentStatus represents the various statuses a payment can have.
-type PaymentStatus string
-
-const (
-	PaymentStatusCreated           PaymentStatus = "CREATED"
-	PaymentStatusAuthorized        PaymentStatus = "AUTHORIZED"
-	PaymentStatusCaptured          PaymentStatus = "CAPTURED"
-	PaymentStatusFailed            PaymentStatus = "FAILED"
-	PaymentStatusRefunded          PaymentStatus = "REFUNDED"
-	PaymentStatusPartiallyRefunded PaymentStatus = "PARTIALLY_REFUNDED"
-	PaymentStatusPending           PaymentStatus = "PENDING"
-	PaymentStatusProcessing        PaymentStatus = "PROCESSING"
-	PaymentStatusCancelled         PaymentStatus = "CANCELLED"
-	PaymentStatusDisputed          PaymentStatus = "DISPUTED"
-)
-
 // Fields of the Payment.
 func (Payment) Fields() []ent.Field {
 	return []ent.Field{
@@ -36,16 +21,16 @@ func (Payment) Fields() []ent.Field {
 		field.Time("payment_date"),
 		field.Enum("status").
 			Values(
-				string(PaymentStatusCreated),
-				string(PaymentStatusAuthorized),
-				string(PaymentStatusCaptured),
-				string(PaymentStatusFailed),
-				string(PaymentStatusRefunded),
-				string(PaymentStatusPartiallyRefunded),
-				string(PaymentStatusPending),
-				string(PaymentStatusProcessing),
-				string(PaymentStatusCancelled),
-				string(PaymentStatusDisputed),
+				string(constants.PaymentStatusCreated),
+				string(constants.PaymentStatusAuthorized),
+				string(constants.PaymentStatusCaptured),
+				string(constants.PaymentStatusFailed),
+				string(constants.PaymentStatusRefunded),
+				string(constants.PaymentStatusPartiallyRefunded),
+				string(constants.PaymentStatusPending),
+				string(constants.PaymentStatusProcessing),
+				string(constants.PaymentStatusCancelled),
+				string(constants.PaymentStatusDisputed),
 			),
 		field.String("payment_method"),
 		field.String("provider_payment_id").Unique(),

@@ -18,7 +18,7 @@ type ExamAssesmentRepository struct {
 
 type AssesmentModel struct {
 	CompletedSeconds  int
-	Status            constants.AssessmentStatus
+	Status            constants.AssessmentStatusType
 	RawAssessmentData map[string]interface{}
 	RawUserSubmission map[string]interface{}
 }

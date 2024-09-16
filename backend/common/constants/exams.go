@@ -1,7 +1,6 @@
 package constants
 
-type ExamType string
-type AssessmentStatus string
+type AssessmentStatusType string
 
 const (
 	Descriptive     ExamType = "DESCRIPTIVE"
@@ -14,7 +13,15 @@ var EXAMS = map[ExamType]string{
 }
 
 const (
-	ASSESSMENT_COMPLETED AssessmentStatus = "COMPLETED"
-	ASSESSMENT_REJECTED  AssessmentStatus = "REJECTED"
-	ASSESSMENT_PENDING   AssessmentStatus = "PENDING"
+	ASSESSMENT_COMPLETED AssessmentStatusType = "COMPLETED"
+	ASSESSMENT_REJECTED  AssessmentStatusType = "REJECTED"
+	ASSESSMENT_PENDING   AssessmentStatusType = "PENDING"
+)
+
+// ExamType represents the various statuses a payment can have.
+type ExamType string
+
+const (
+	ExamTypeDescriptive ExamType = "DESCRIPTIVE"
+	ExamTypeMCQ         ExamType = "MCQ"
 )

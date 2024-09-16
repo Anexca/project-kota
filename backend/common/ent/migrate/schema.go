@@ -37,7 +37,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"DESCRIPTIVE", "MCQ"}, Default: "MCQ"},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"MCQ", "DESCRIPTIVE"}, Default: "DESCRIPTIVE"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},

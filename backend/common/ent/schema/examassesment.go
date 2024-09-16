@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"common/constants"
 	"time"
 
 	"entgo.io/ent"
@@ -13,14 +14,6 @@ import (
 type ExamAssesment struct {
 	ent.Schema
 }
-
-type AssessmentStatusType string
-
-const (
-	AssessmentStatusTypeCompleted ExamType = "COMPLETED"
-	AssessmentStatusTypeRejected  ExamType = "REJECTED"
-	AssessmentStatusTypePending   ExamType = "PENDING"
-)
 
 // Fields of the ExamAssesment.
 func (ExamAssesment) Fields() []ent.Field {
@@ -36,9 +29,9 @@ func (ExamAssesment) Fields() []ent.Field {
 				dialect.Postgres: "jsonb",
 			}),
 		field.Enum("status").Values(
-			string(AssessmentStatusTypeCompleted),
-			string(AssessmentStatusTypeRejected),
-			string(AssessmentStatusTypePending),
+			string(constants.ASSESSMENT_COMPLETED),
+			string(constants.ASSESSMENT_REJECTED),
+			string(constants.ASSESSMENT_PENDING),
 		),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
