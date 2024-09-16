@@ -94,7 +94,8 @@ const PrivacyPolicy = () => {
           <p className="mb-6">
             You have the right to access, update, or delete your personal
             information at any time. If you wish to exercise any of these
-            rights, please contact us at support@pseudotest.pro.
+            rights, please contact Harshal Dharmik or Rahil Sheikh at
+            support@pseudotest.pro.
           </p>
 
           <h2 className="text-xl font-semibold mb-4">7. Children's Privacy</h2>
@@ -102,7 +103,8 @@ const PrivacyPolicy = () => {
             Our Service is not intended for children under the age of 13. We do
             not knowingly collect personal information from children under 13.
             If you are a parent or guardian and believe we have collected such
-            information, please contact us to request its deletion.
+            information, please contact Harshal Dharmik or Rahil Sheikh at
+            support@pseudotest.pro to request its deletion.
           </p>
 
           <h2 className="text-xl font-semibold mb-4">
@@ -118,7 +120,7 @@ const PrivacyPolicy = () => {
           <h2 className="text-xl font-semibold mb-4">9. Contact Us</h2>
           <p className="mb-6">
             If you have any questions about this Privacy Policy or your personal
-            information, please contact us at{" "}
+            information, please contact Harshal Dharmik or Rahil Sheikh at{" "}
             <span className="font-semibold">support@pseudotest.pro</span>.
           </p>
         </div>
