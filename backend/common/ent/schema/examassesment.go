@@ -14,6 +14,14 @@ type ExamAssesment struct {
 	ent.Schema
 }
 
+type AssessmentStatusType string
+
+const (
+	AssessmentStatusTypeCompleted ExamType = "COMPLETED"
+	AssessmentStatusTypeRejected  ExamType = "REJECTED"
+	AssessmentStatusTypePending   ExamType = "PENDING"
+)
+
 // Fields of the ExamAssesment.
 func (ExamAssesment) Fields() []ent.Field {
 	return []ent.Field{
@@ -27,10 +35,11 @@ func (ExamAssesment) Fields() []ent.Field {
 			SchemaType(map[string]string{
 				dialect.Postgres: "jsonb",
 			}),
-		field.Enum("status").Values("COMPLETED", "REJECTED", "PENDING").
-			SchemaType(map[string]string{
-				dialect.Postgres: "status",
-			}),
+		field.Enum("status").Values(
+			string(AssessmentStatusTypeCompleted),
+			string(AssessmentStatusTypeRejected),
+			string(AssessmentStatusTypePending),
+		),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

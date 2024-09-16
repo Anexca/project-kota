@@ -37,6 +37,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"DESCRIPTIVE", "MCQ"}, Default: "MCQ"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -50,7 +51,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exams_exam_categories_exams",
-				Columns:    []*schema.Column{ExamsColumns[6]},
+				Columns:    []*schema.Column{ExamsColumns[7]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -62,7 +63,7 @@ var (
 		{Name: "completed_seconds", Type: field.TypeInt},
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "raw_user_submission", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}, SchemaType: map[string]string{"postgres": "status"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_attempt_assesment", Type: field.TypeInt, Unique: true, Nullable: true},

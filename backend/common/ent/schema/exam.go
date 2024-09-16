@@ -13,11 +13,24 @@ type Exam struct {
 	ent.Schema
 }
 
+// PaymentStatus represents the various statuses a payment can have.
+type ExamType string
+
+const (
+	ExamTypeDescriptive ExamType = "DESCRIPTIVE"
+	ExamTypeMCQ         ExamType = "MCQ"
+)
+
 // Fields of the Exam.
 func (Exam) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("description"),
+		field.Enum("type").
+			Values(
+				string(ExamTypeDescriptive),
+				string(ExamTypeMCQ),
+			).Default("MCQ"),
 		field.Bool("is_active").Default(true),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
