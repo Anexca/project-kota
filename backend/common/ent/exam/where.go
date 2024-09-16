@@ -210,6 +210,26 @@ func DescriptionContainsFold(v string) predicate.Exam {
 	return predicate.Exam(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// TypeEQ applies the EQ predicate on the "type" field.
+func TypeEQ(v Type) predicate.Exam {
+	return predicate.Exam(sql.FieldEQ(FieldType, v))
+}
+
+// TypeNEQ applies the NEQ predicate on the "type" field.
+func TypeNEQ(v Type) predicate.Exam {
+	return predicate.Exam(sql.FieldNEQ(FieldType, v))
+}
+
+// TypeIn applies the In predicate on the "type" field.
+func TypeIn(vs ...Type) predicate.Exam {
+	return predicate.Exam(sql.FieldIn(FieldType, vs...))
+}
+
+// TypeNotIn applies the NotIn predicate on the "type" field.
+func TypeNotIn(vs ...Type) predicate.Exam {
+	return predicate.Exam(sql.FieldNotIn(FieldType, vs...))
+}
+
 // IsActiveEQ applies the EQ predicate on the "is_active" field.
 func IsActiveEQ(v bool) predicate.Exam {
 	return predicate.Exam(sql.FieldEQ(FieldIsActive, v))

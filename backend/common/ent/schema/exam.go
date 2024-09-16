@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"common/constants"
 	"time"
 
 	"entgo.io/ent"
@@ -18,6 +19,11 @@ func (Exam) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("description"),
+		field.Enum("type").
+			Values(
+				string(constants.ExamTypeMCQ),
+				string(constants.ExamTypeDescriptive),
+			).Default(string(constants.ExamTypeDescriptive)),
 		field.Bool("is_active").Default(true),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),

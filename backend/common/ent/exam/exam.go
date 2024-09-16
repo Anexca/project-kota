@@ -3,6 +3,7 @@
 package exam
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -18,6 +19,8 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
 	// FieldIsActive holds the string denoting the is_active field in the database.
 	FieldIsActive = "is_active"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -78,6 +81,7 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldDescription,
+	FieldType,
 	FieldIsActive,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -115,6 +119,32 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 )
 
+// Type defines the type for the "type" enum field.
+type Type string
+
+// TypeDESCRIPTIVE is the default value of the Type enum.
+const DefaultType = TypeDESCRIPTIVE
+
+// Type values.
+const (
+	TypeMCQ         Type = "MCQ"
+	TypeDESCRIPTIVE Type = "DESCRIPTIVE"
+)
+
+func (_type Type) String() string {
+	return string(_type)
+}
+
+// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
+func TypeValidator(_type Type) error {
+	switch _type {
+	case TypeMCQ, TypeDESCRIPTIVE:
+		return nil
+	default:
+		return fmt.Errorf("exam: invalid enum value for type field: %q", _type)
+	}
+}
+
 // OrderOption defines the ordering options for the Exam queries.
 type OrderOption func(*sql.Selector)
 
@@ -131,6 +161,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByType orders the results by the type field.
+func ByType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
 // ByIsActive orders the results by the is_active field.

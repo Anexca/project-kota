@@ -61,6 +61,20 @@ func (eu *ExamUpdate) SetNillableDescription(s *string) *ExamUpdate {
 	return eu
 }
 
+// SetType sets the "type" field.
+func (eu *ExamUpdate) SetType(e exam.Type) *ExamUpdate {
+	eu.mutation.SetType(e)
+	return eu
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableType(e *exam.Type) *ExamUpdate {
+	if e != nil {
+		eu.SetType(*e)
+	}
+	return eu
+}
+
 // SetIsActive sets the "is_active" field.
 func (eu *ExamUpdate) SetIsActive(b bool) *ExamUpdate {
 	eu.mutation.SetIsActive(b)
@@ -280,7 +294,20 @@ func (eu *ExamUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (eu *ExamUpdate) check() error {
+	if v, ok := eu.mutation.GetType(); ok {
+		if err := exam.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Exam.type": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := eu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(exam.Table, exam.Columns, sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt))
 	if ps := eu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -294,6 +321,9 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := eu.mutation.GetType(); ok {
+		_spec.SetField(exam.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := eu.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
@@ -542,6 +572,20 @@ func (euo *ExamUpdateOne) SetNillableDescription(s *string) *ExamUpdateOne {
 	return euo
 }
 
+// SetType sets the "type" field.
+func (euo *ExamUpdateOne) SetType(e exam.Type) *ExamUpdateOne {
+	euo.mutation.SetType(e)
+	return euo
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableType(e *exam.Type) *ExamUpdateOne {
+	if e != nil {
+		euo.SetType(*e)
+	}
+	return euo
+}
+
 // SetIsActive sets the "is_active" field.
 func (euo *ExamUpdateOne) SetIsActive(b bool) *ExamUpdateOne {
 	euo.mutation.SetIsActive(b)
@@ -774,7 +818,20 @@ func (euo *ExamUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (euo *ExamUpdateOne) check() error {
+	if v, ok := euo.mutation.GetType(); ok {
+		if err := exam.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Exam.type": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) {
+	if err := euo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(exam.Table, exam.Columns, sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt))
 	id, ok := euo.mutation.ID()
 	if !ok {
@@ -805,6 +862,9 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if value, ok := euo.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := euo.mutation.GetType(); ok {
+		_spec.SetField(exam.FieldType, field.TypeEnum, value)
 	}
 	if value, ok := euo.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)

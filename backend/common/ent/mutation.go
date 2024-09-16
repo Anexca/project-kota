@@ -667,6 +667,7 @@ type ExamMutation struct {
 	id                    *int
 	name                  *string
 	description           *string
+	_type                 *exam.Type
 	is_active             *bool
 	created_at            *time.Time
 	updated_at            *time.Time
@@ -857,6 +858,42 @@ func (m *ExamMutation) OldDescription(ctx context.Context) (v string, err error)
 // ResetDescription resets all changes to the "description" field.
 func (m *ExamMutation) ResetDescription() {
 	m.description = nil
+}
+
+// SetType sets the "type" field.
+func (m *ExamMutation) SetType(e exam.Type) {
+	m._type = &e
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *ExamMutation) GetType() (r exam.Type, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldType(ctx context.Context) (v exam.Type, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *ExamMutation) ResetType() {
+	m._type = nil
 }
 
 // SetIsActive sets the "is_active" field.
@@ -1241,12 +1278,15 @@ func (m *ExamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.name != nil {
 		fields = append(fields, exam.FieldName)
 	}
 	if m.description != nil {
 		fields = append(fields, exam.FieldDescription)
+	}
+	if m._type != nil {
+		fields = append(fields, exam.FieldType)
 	}
 	if m.is_active != nil {
 		fields = append(fields, exam.FieldIsActive)
@@ -1269,6 +1309,8 @@ func (m *ExamMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case exam.FieldDescription:
 		return m.Description()
+	case exam.FieldType:
+		return m.GetType()
 	case exam.FieldIsActive:
 		return m.IsActive()
 	case exam.FieldCreatedAt:
@@ -1288,6 +1330,8 @@ func (m *ExamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case exam.FieldDescription:
 		return m.OldDescription(ctx)
+	case exam.FieldType:
+		return m.OldType(ctx)
 	case exam.FieldIsActive:
 		return m.OldIsActive(ctx)
 	case exam.FieldCreatedAt:
@@ -1316,6 +1360,13 @@ func (m *ExamMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case exam.FieldType:
+		v, ok := value.(exam.Type)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
 		return nil
 	case exam.FieldIsActive:
 		v, ok := value.(bool)
@@ -1392,6 +1443,9 @@ func (m *ExamMutation) ResetField(name string) error {
 		return nil
 	case exam.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case exam.FieldType:
+		m.ResetType()
 		return nil
 	case exam.FieldIsActive:
 		m.ResetIsActive()

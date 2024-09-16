@@ -23,6 +23,8 @@ type Exam struct {
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// Type holds the value of the "type" field.
+	Type exam.Type `json:"type,omitempty"`
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -111,7 +113,7 @@ func (*Exam) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case exam.FieldID:
 			values[i] = new(sql.NullInt64)
-		case exam.FieldName, exam.FieldDescription:
+		case exam.FieldName, exam.FieldDescription, exam.FieldType:
 			values[i] = new(sql.NullString)
 		case exam.FieldCreatedAt, exam.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -149,6 +151,12 @@ func (e *Exam) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				e.Description = value.String
+			}
+		case exam.FieldType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field type", values[i])
+			} else if value.Valid {
+				e.Type = exam.Type(value.String)
 			}
 		case exam.FieldIsActive:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -241,6 +249,9 @@ func (e *Exam) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(e.Description)
+	builder.WriteString(", ")
+	builder.WriteString("type=")
+	builder.WriteString(fmt.Sprintf("%v", e.Type))
 	builder.WriteString(", ")
 	builder.WriteString("is_active=")
 	builder.WriteString(fmt.Sprintf("%v", e.IsActive))

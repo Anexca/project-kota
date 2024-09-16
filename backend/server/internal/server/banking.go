@@ -17,6 +17,20 @@ import (
 
 const EXAM_CATEGORY_TYPE = commonConstants.Banking
 
+func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.Request) {
+	categories, err := s.examCategoryService.GetBankingDescriptiveExamsTypes(r.Context())
+	if err != nil {
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	response := Response{
+		Data: categories,
+	}
+
+	s.WriteJson(w, http.StatusOK, &response)
+}
+
 func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
 	const EXAM_TYPE = commonConstants.Descriptive
 
