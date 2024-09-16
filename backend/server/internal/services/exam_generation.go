@@ -1,6 +1,7 @@
 package services
 
 import (
+	"common/constants"
 	commonConstants "common/constants"
 	"common/ent"
 	commonRepositories "common/repositories"
@@ -161,6 +162,34 @@ func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, ex
 	return nil
 }
 
+func (e *ExamGenerationService) VMarkExpiredExamsInactive(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetById(ctx, examId)
+	if err != nil {
+		return err
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	sort.SliceStable(generatedExams, func(i, j int) bool {
+		return generatedExams[i].UpdatedAt.After(generatedExams[j].UpdatedAt)
+	})
+
+	if len(generatedExams) > 30 {
+		for _, generatedExam := range generatedExams[30:] { // Skip the first 30 exams
+			generatedExam.IsActive = false
+		}
+
+		if err := e.generatedExamRepository.UpdateMany(ctx, generatedExams[30:]); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (e *ExamGenerationService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (string, error) {
 	cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
 	if err != nil {
@@ -286,6 +315,10 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	}
 
 	return e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts), nil
+}
+
+func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error) {
+	return e.examRepository.GetActiveByType(ctx, examType)
 }
 
 func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam) []*ent.GeneratedExam {

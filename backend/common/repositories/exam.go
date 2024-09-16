@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"common/constants"
 	"common/ent"
 	"common/ent/exam"
 	"common/ent/examcategory"
@@ -49,4 +50,10 @@ func (e *ExamRepository) GetAllByName(ctx context.Context, name string) ([]*ent.
 		Where(exam.NameContains(name)).
 		All(ctx)
 
+}
+
+func (e *ExamRepository) GetActiveByType(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error) {
+	return e.dbClient.Exam.Query().Where(
+		exam.TypeEQ(exam.Type(examType)),
+	).All(ctx)
 }
