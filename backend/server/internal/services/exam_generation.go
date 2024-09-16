@@ -70,6 +70,26 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 	return nil
 }
 
+func (e *ExamGenerationService) VGenerateExams(ctx context.Context, examId int, modelType models.ExamModelType) error {
+
+	exam, err := e.examRepository.GetById(ctx, examId)
+	if err != nil {
+		return err
+	}
+
+	cachedData, err := e.FetchCachedExamData(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	err = e.ProcessExamData(ctx, exam, modelType, cachedData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
 	examName := commonConstants.EXAMS[examType]
 
