@@ -29,7 +29,7 @@ func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategory *en
 
 func (e *ExamRepository) GetByName(ctx context.Context, name string) (*ent.Exam, error) {
 	return e.dbClient.Exam.Query().
-		Where(exam.NameContains(name)).
+		Where(exam.NameEQ(name)).
 		WithSetting().
 		WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
 			geq.Where(generatedexam.IsActiveEQ(true))

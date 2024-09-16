@@ -48,7 +48,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/sup", s.Sup)
 	r.Get("/health", s.HealthCheck)
 
-	r.Get("/exams/banking/descriptive", s.GetBankingDescriptiveCategories)
+	r.Route("/v2", func(r chi.Router) {
+		r.Get("/exams/banking/descriptive", s.GetBankingDescriptiveCategories)
+	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuthMiddleware(s.authService))
@@ -61,7 +63,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Route("/exams", func(r chi.Router) {
 			r.Route("/banking", func(r chi.Router) {
-				// r.Get("/descriptive", s.GetBankingDescriptiveQuestions)
+				r.Get("/descriptive", s.GetBankingDescriptiveQuestions)
 				r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
 			})
 
