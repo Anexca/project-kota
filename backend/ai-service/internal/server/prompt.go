@@ -3,9 +3,16 @@ package server
 import (
 	"ai-service/pkg/models"
 	"net/http"
+	"time"
+
+	"go.uber.org/ratelimit"
 )
 
+var rl = ratelimit.New(1, ratelimit.Per(time.Minute))
+
 func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
+	rl.Take()
+
 	var request models.GetPromptResultsRequest
 
 	if err := s.ReadJson(w, r, &request); err != nil {
