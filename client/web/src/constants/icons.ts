@@ -19,6 +19,9 @@ export const ICONS = {
   file: "fa-solid fa-file",
   rupee: "fa-solid fa-indian-rupee-sign",
   chevron_down: "fa-solid fa-chevron-down",
+  chevron_up: "fa-solid fa-chevron-up",
+  chevron_right: "fa-solid fa-chevron-right",
+  chevron_left: "fa-solid fa-chevron-left",
   tags: "fa fa-tags",
   undo: "fa-solid fa-undo", // added for REFUNDED
   undo_alt: "fa-solid fa-undo-alt", // added for PARTIALLY_REFUNDED
@@ -27,6 +30,7 @@ export const ICONS = {
   ban: "fa-solid fa-ban", // added for CANCELLED
   thumbs_up: "fa-solid fa-thumbs-up",
   bank: "fa-solid fa-bank",
+  ellipses_horizontal: "fa-solid fa-ellipsis",
 };
 type IconType = keyof typeof ICONS;
 export type { IconType };

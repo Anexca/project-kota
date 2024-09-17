@@ -30,8 +30,18 @@ const RazorpayButton = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const getSubscriptionId = async () => {
-    const res = await buySubscription(id);
-    return res.data;
+    try {
+      const res = await buySubscription(id);
+      return res.data;
+    } catch (error) {
+      toast({
+        title: "Something went wrong",
+        description:
+          "There is some error on our side. Please raise a query to us at support@pueudotest.pro if your money is deducted.",
+        variant: "destructive",
+      });
+      return;
+    }
   };
 
   const handleRazorPay = async (e: {
@@ -40,7 +50,6 @@ const RazorpayButton = ({
     razorpay_subscription_id: string;
     id: string;
   }) => {
-    setLoading(true);
     try {
       await alertBackendForSubscription({
         paymentId: e.razorpay_payment_id,
@@ -53,7 +62,7 @@ const RazorpayButton = ({
       toast({
         title: "Something went wrong",
         description:
-          "There is some error on our side. Please raise a query to us if your money is deducted.",
+          "There is some error on our side. Please raise a query to us at support@pueudotest.pro if your money is deducted.",
         variant: "destructive",
       });
     } finally {
@@ -64,33 +73,38 @@ const RazorpayButton = ({
     if (!isComplete) {
       toast({
         title: "Suggestion",
-        description: "Plese complete your user profile in profile section.",
+        description: "Please complete your user profile in profile section.",
         variant: "warning",
         duration: 10000,
       });
       return;
     }
+    setLoading(true);
+
     const res = await getSubscriptionId();
+    if (!res) {
+      setLoading(false);
+      return;
+    }
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY,
       subscription_id: res.provider_subscription_id,
       name: "PsuedoTest",
       description: "Golden Pass",
       handler: async (e: any) => await handleRazorPay({ ...e, id: res.id }),
-      prefill: {
-        name: `${profile.first_name} ${profile.last_name}`,
-        email: profile.email,
-        contact: profile.phone_number,
-      },
       redirect: false,
       theme: {
         color: "#7e22ce",
+      },
+      modal: {
+        ondismiss: function () {
+          setLoading(false);
+        },
       },
     };
 
     ///@ts-ignore
     const rpay = new Razorpay(options);
-
     rpay.open();
     e.preventDefault();
   };
