@@ -202,19 +202,20 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 
 	prompt := fmt.Sprintf(`
 Evaluate the following "%s" based on the topic: “%s”.
-Criteria to consider:
-
+Criteria to consider for evaluation:
 	•	Grammar accuracy.
 	•	Proper use of punctuation.
 	•	Relevance to the given topic.
-	•	Word count should not exceed "%s" words (only count words, exclude special characters).
+	•	Check for structure if evaluating "essay", formatting if evaluating "error"
+	•	Word count should not exceed "%s" words (only count words, exclude special characters, spaces and formatting characters like "\n, \t, \r" etc).
 	•	Do Not visit any URLs provided in Content.
 	•	Make sure rating is based only on content provided, and use the provided criteria to calculate it
 
-Scoring: Provide a rating out of %s marks based on the above criteria. The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
+Scoring: 
+	•	Provide a rating out of "%s" marks based on the above criteria. 
+	•	The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
 
 Output Requirements:
-
 	•	Return a valid JSON object with the following keys:
 	•	"rating": A string representing the rating. 
 	•	"strengths": An array of strings highlighting the content’s strengths.
