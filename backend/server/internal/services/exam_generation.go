@@ -49,27 +49,6 @@ func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *
 	}
 }
 
-func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType commonConstants.ExamType, modelType models.ExamModelType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
-	if err != nil {
-		return err
-	}
-
-	cachedData, err := e.FetchCachedExamData(ctx, exam)
-	if err != nil {
-		return err
-	}
-
-	err = e.ProcessExamData(ctx, exam, modelType, cachedData)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (e *ExamGenerationService) VGenerateExams(ctx context.Context, examId int, modelType models.ExamModelType) error {
 
 	exam, err := e.examRepository.GetById(ctx, examId)
@@ -90,10 +69,8 @@ func (e *ExamGenerationService) VGenerateExams(ctx context.Context, examId int, 
 	return nil
 }
 
-func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetActiveById(ctx, examId, true)
 	if err != nil {
 		return fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -126,15 +103,13 @@ func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examTyp
 		return fmt.Errorf("failed to create new open exams: %w", err)
 	}
 
-	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), examName)
+	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), exam.Name)
 
 	return nil
 }
 
-func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examType commonConstants.ExamType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetById(ctx, examId)
 	if err != nil {
 		return err
 	}
@@ -247,8 +222,7 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 }
 
 func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	examName := commonConstants.EXAMS[examType]
-	exam, err := e.examRepository.GetByName(ctx, examName)
+	exam, err := e.examRepository.GetByName(ctx, "descriptive")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -294,9 +268,7 @@ func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, e
 }
 
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+	exam, err := e.examRepository.GetByName(ctx, "descriptive")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}

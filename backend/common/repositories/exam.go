@@ -27,6 +27,14 @@ func (e *ExamRepository) GetById(ctx context.Context, examId int) (*ent.Exam, er
 		Only(ctx)
 }
 
+func (e *ExamRepository) GetActiveById(ctx context.Context, examId int, isActive bool) (*ent.Exam, error) {
+	return e.dbClient.Exam.Query().
+		Where(exam.IDEQ(examId), exam.IsActiveEQ(isActive)).
+		WithSetting().
+		WithGeneratedexams().
+		Only(ctx)
+}
+
 func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategory *ent.ExamCategory) ([]*ent.Exam, error) {
 	return e.dbClient.Exam.
 		Query().
