@@ -23,6 +23,7 @@ func (e *ExamRepository) GetById(ctx context.Context, examId int) (*ent.Exam, er
 	return e.dbClient.Exam.Query().
 		Where(exam.IDEQ(examId)).
 		WithSetting().
+		WithGeneratedexams().
 		Only(ctx)
 }
 
