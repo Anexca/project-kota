@@ -64,7 +64,7 @@ const RazorpayButton = ({
     if (!isComplete) {
       toast({
         title: "Suggestion",
-        description: "Plese complete your user profile in profile section.",
+        description: "Please complete your user profile in profile section.",
         variant: "warning",
         duration: 10000,
       });
@@ -77,11 +77,6 @@ const RazorpayButton = ({
       name: "PsuedoTest",
       description: "Golden Pass",
       handler: async (e: any) => await handleRazorPay({ ...e, id: res.id }),
-      prefill: {
-        name: `${profile.first_name} ${profile.last_name}`,
-        email: profile.email,
-        contact: profile.phone_number,
-      },
       redirect: false,
       theme: {
         color: "#7e22ce",
