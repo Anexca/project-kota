@@ -1,6 +1,7 @@
 package services
 
 import (
+	"common/constants"
 	commonConstants "common/constants"
 	"common/ent"
 	commonRepositories "common/repositories"
@@ -70,6 +71,26 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 	return nil
 }
 
+func (e *ExamGenerationService) VGenerateExams(ctx context.Context, examId int, modelType models.ExamModelType) error {
+
+	exam, err := e.examRepository.GetById(ctx, examId)
+	if err != nil {
+		return err
+	}
+
+	cachedData, err := e.FetchCachedExamData(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	err = e.ProcessExamData(ctx, exam, modelType, cachedData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
 	examName := commonConstants.EXAMS[examType]
 
@@ -115,6 +136,34 @@ func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, ex
 	examName := commonConstants.EXAMS[examType]
 
 	exam, err := e.examRepository.GetByName(ctx, examName)
+	if err != nil {
+		return err
+	}
+
+	generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
+	if err != nil {
+		return err
+	}
+
+	sort.SliceStable(generatedExams, func(i, j int) bool {
+		return generatedExams[i].UpdatedAt.After(generatedExams[j].UpdatedAt)
+	})
+
+	if len(generatedExams) > 30 {
+		for _, generatedExam := range generatedExams[30:] { // Skip the first 30 exams
+			generatedExam.IsActive = false
+		}
+
+		if err := e.generatedExamRepository.UpdateMany(ctx, generatedExams[30:]); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (e *ExamGenerationService) VMarkExpiredExamsInactive(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetById(ctx, examId)
 	if err != nil {
 		return err
 	}
@@ -222,6 +271,29 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
 }
 
+func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, examId int, userId string) ([]*models.GeneratedExamOverview, error) {
+	exam, err := e.examRepository.GetById(ctx, examId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get exam by name: %w", err)
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, exam.ID, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check access: %w", err)
+	}
+
+	if !hasAccess {
+		return nil, errors.New("forbidden")
+	}
+
+	sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
+
+	limit := min(26, len(sortedExams))
+	latestExams := sortedExams[:limit]
+
+	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
+}
+
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
 	examName := commonConstants.EXAMS[examType]
 
@@ -266,6 +338,10 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	}
 
 	return e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts), nil
+}
+
+func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error) {
+	return e.examRepository.GetActiveByType(ctx, examType)
 }
 
 func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam) []*ent.GeneratedExam {
