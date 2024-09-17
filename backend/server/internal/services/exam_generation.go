@@ -287,6 +287,10 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
 	}
 
+	if !generatedExam.IsActive {
+		return nil, &ent.NotFoundError{}
+	}
+
 	if !isOpen {
 		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
 		if err != nil {
@@ -350,6 +354,8 @@ func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.Ge
 		UpdatedAt:         generatedExam.UpdatedAt,
 		UserAttempts:      len(examAttempts),
 		MaxAttempts:       examSettings.MaxAttempts,
+		ExamName:          generatedExam.Edges.Exam.Name,
+		ExamType:          generatedExam.Edges.Exam.Type.String(),
 		DurationSeconds:   examSettings.DurationSeconds,
 		NumberOfQuestions: examSettings.NumberOfQuestions,
 	}

@@ -90,7 +90,8 @@ func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, pag
 		userExamAttempt := &models.UserExamAttempt{
 			AttemptedExamId: generatedExam.ID,
 			IsActive:        generatedExam.IsActive,
-			ExamType:        generatedExam.Edges.Exam.Name,
+			ExamName:        generatedExam.Edges.Exam.Name,
+			ExamType:        generatedExam.Edges.Exam.Type.String(),
 			ExamTypeId:      generatedExam.Edges.Exam.ID,
 			ExamCategory:    string(generatedExam.Edges.Exam.Edges.Category.Name),
 			ExamCategoryId:  generatedExam.Edges.Exam.Edges.Category.ID,
