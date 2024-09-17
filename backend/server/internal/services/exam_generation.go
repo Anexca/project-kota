@@ -1,7 +1,6 @@
 package services
 
 import (
-	"common/constants"
 	commonConstants "common/constants"
 	"common/ent"
 	commonRepositories "common/repositories"
@@ -340,7 +339,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	return e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts), nil
 }
 
-func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error) {
+func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType commonConstants.ExamType) ([]*ent.Exam, error) {
 	return e.examRepository.GetActiveByType(ctx, examType)
 }
 
