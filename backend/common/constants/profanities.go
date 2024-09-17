@@ -412,6 +412,7 @@ var FalsePositiveProfanities = []string{
 	"nipissing",
 	"oceanus",
 	"oddballs",
+	"of",
 	"onassis",
 	"pahoehoe",
 	"pandanus",

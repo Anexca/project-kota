@@ -7,8 +7,6 @@ import (
 	"server/pkg/models"
 )
 
-const EXAM_CATEGORY_TYPE = commonConstants.Banking
-
 func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 	ctx := context.Background()
 
@@ -34,7 +32,6 @@ func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 
 func (w *Worker) MarkDescriptiveQuestionsAsOpenInDatabase() error {
 	ctx := context.Background()
-	const EXAM_TYPE = commonConstants.Descriptive
-
-	return w.examService.MarkQuestionsAsOpen(ctx, EXAM_TYPE)
+	examId := 1 // only set for general questions, need to make this dynamic
+	return w.examService.MarkQuestionsAsOpen(ctx, examId)
 }

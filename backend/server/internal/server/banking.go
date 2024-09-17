@@ -1,7 +1,6 @@
 package server
 
 import (
-	commonConstants "common/constants"
 	"common/ent"
 	"errors"
 	"server/internal/services"
@@ -14,8 +13,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 )
-
-const EXAM_CATEGORY_TYPE = commonConstants.Banking
 
 func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.Request) {
 	categories, err := s.examCategoryService.GetBankingDescriptiveExamsTypes(r.Context())
@@ -32,7 +29,6 @@ func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.
 }
 
 func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r *http.Request) {
-	const EXAM_TYPE = commonConstants.Descriptive
 
 	idParam := chi.URLParam(r, "id")
 	examId, err := strconv.Atoi(idParam)
@@ -59,7 +55,7 @@ func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r
 		}
 
 		if isOpen {
-			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), EXAM_TYPE, userId)
+			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), "descriptive", userId)
 		} else {
 			cachedQuestions, err = s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
 		}
@@ -80,7 +76,6 @@ func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r
 }
 
 func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
-	const EXAM_TYPE = commonConstants.Descriptive
 
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
@@ -100,12 +95,12 @@ func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.R
 		}
 
 		if isOpen {
-			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), EXAM_TYPE, userId)
+			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), "descriptive", userId)
 		} else {
-			cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
+			cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), "descriptive", userId)
 		}
 	} else {
-		cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
+		cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), "descriptive", userId)
 	}
 
 	if err != nil {

@@ -3,6 +3,7 @@
 package examcategory
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -67,6 +68,28 @@ var (
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
 )
+
+// Name defines the type for the "name" enum field.
+type Name string
+
+// Name values.
+const (
+	NameBANKING Name = "BANKING"
+)
+
+func (n Name) String() string {
+	return string(n)
+}
+
+// NameValidator is a validator for the "name" field enum values. It is called by the builders before save.
+func NameValidator(n Name) error {
+	switch n {
+	case NameBANKING:
+		return nil
+	default:
+		return fmt.Errorf("examcategory: invalid enum value for name field: %q", n)
+	}
+}
 
 // OrderOption defines the ordering options for the ExamCategory queries.
 type OrderOption func(*sql.Selector)

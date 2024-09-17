@@ -1,7 +1,6 @@
 package services
 
 import (
-	"common/constants"
 	commonConstants "common/constants"
 	"common/ent"
 	commonRepositories "common/repositories"
@@ -50,27 +49,6 @@ func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *
 	}
 }
 
-func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType commonConstants.ExamType, modelType models.ExamModelType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
-	if err != nil {
-		return err
-	}
-
-	cachedData, err := e.FetchCachedExamData(ctx, exam)
-	if err != nil {
-		return err
-	}
-
-	err = e.ProcessExamData(ctx, exam, modelType, cachedData)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (e *ExamGenerationService) VGenerateExams(ctx context.Context, examId int, modelType models.ExamModelType) error {
 
 	exam, err := e.examRepository.GetById(ctx, examId)
@@ -91,10 +69,8 @@ func (e *ExamGenerationService) VGenerateExams(ctx context.Context, examId int, 
 	return nil
 }
 
-func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetActiveById(ctx, examId, true)
 	if err != nil {
 		return fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -127,15 +103,13 @@ func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examTyp
 		return fmt.Errorf("failed to create new open exams: %w", err)
 	}
 
-	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), examName)
+	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), exam.Name)
 
 	return nil
 }
 
-func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examType commonConstants.ExamType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetById(ctx, examId)
 	if err != nil {
 		return err
 	}
@@ -248,8 +222,7 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 }
 
 func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	examName := commonConstants.EXAMS[examType]
-	exam, err := e.examRepository.GetByName(ctx, examName)
+	exam, err := e.examRepository.GetByName(ctx, "descriptive")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -295,9 +268,7 @@ func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, e
 }
 
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+	exam, err := e.examRepository.GetByName(ctx, "descriptive")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -314,6 +285,10 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
+	}
+
+	if !generatedExam.IsActive {
+		return nil, &ent.NotFoundError{}
 	}
 
 	if !isOpen {
@@ -340,7 +315,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	return e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts), nil
 }
 
-func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error) {
+func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType commonConstants.ExamType) ([]*ent.Exam, error) {
 	return e.examRepository.GetActiveByType(ctx, examType)
 }
 
@@ -361,6 +336,8 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 		}
 
 		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting, userAttempts)
+		overview.ExamName = exam.Name
+		overview.ExamType = string(exam.Type)
 		overview.UserAttempts = len(userAttempts)
 
 		generatedExamOverviewList = append(generatedExamOverviewList, overview)
@@ -377,6 +354,8 @@ func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.Ge
 		UpdatedAt:         generatedExam.UpdatedAt,
 		UserAttempts:      len(examAttempts),
 		MaxAttempts:       examSettings.MaxAttempts,
+		ExamName:          generatedExam.Edges.Exam.Name,
+		ExamType:          generatedExam.Edges.Exam.Type.String(),
 		DurationSeconds:   examSettings.DurationSeconds,
 		NumberOfQuestions: examSettings.NumberOfQuestions,
 	}
