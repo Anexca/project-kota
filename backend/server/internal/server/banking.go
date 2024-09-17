@@ -15,7 +15,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-const EXAM_CATEGORY_TYPE = commonConstants.Banking
+const EXAM_CATEGORY_TYPE = commonConstants.ExamCategoryNameBanking
 
 func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.Request) {
 	categories, err := s.examCategoryService.GetBankingDescriptiveExamsTypes(r.Context())

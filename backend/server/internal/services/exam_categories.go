@@ -22,7 +22,6 @@ func NewExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
 	}
 }
 
-func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Context) ([]*ent.Exam, error) {
-	examName := constants.EXAMS[constants.Descriptive]
-	return e.examRepository.GetAllByName(ctx, examName)
+func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Context) (*ent.ExamCategory, error) {
+	return e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking)
 }

@@ -7,7 +7,7 @@ import (
 	"server/pkg/models"
 )
 
-const EXAM_CATEGORY_TYPE = commonConstants.Banking
+const EXAM_CATEGORY_TYPE = commonConstants.ExamCategoryNameBanking
 
 func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 	ctx := context.Background()

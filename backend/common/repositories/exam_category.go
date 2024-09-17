@@ -22,5 +22,8 @@ func (e *ExamCategoryRepository) Get(ctx context.Context) ([]*ent.ExamCategory, 
 }
 
 func (e *ExamCategoryRepository) GetByName(ctx context.Context, categoryName constants.ExamCategoryName) (*ent.ExamCategory, error) {
-	return e.dbClient.ExamCategory.Query().Where(examcategory.NameEQ(examcategory.Name(categoryName))).First(ctx)
+	return e.dbClient.ExamCategory.Query().
+		Where(examcategory.NameEQ(examcategory.Name(categoryName))).
+		WithExams().
+		Only(ctx)
 }

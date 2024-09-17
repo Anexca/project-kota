@@ -46,7 +46,7 @@ func (e *ExamRepository) GetByName(ctx context.Context, name string) (*ent.Exam,
 		First(ctx)
 }
 
-func (e *ExamRepository) GetAllByName(ctx context.Context, name string) ([]*ent.Exam, error) {
+func (e *ExamRepository) GetByType(ctx context.Context, name string) ([]*ent.Exam, error) {
 	return e.dbClient.Exam.Query().
 		Where(exam.NameContains(name)).
 		All(ctx)

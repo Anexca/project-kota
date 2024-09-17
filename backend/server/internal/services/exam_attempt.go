@@ -92,7 +92,7 @@ func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, pag
 			IsActive:        generatedExam.IsActive,
 			ExamType:        generatedExam.Edges.Exam.Name,
 			ExamTypeId:      generatedExam.Edges.Exam.ID,
-			ExamCategory:    generatedExam.Edges.Exam.Edges.Category.Name,
+			ExamCategory:    string(generatedExam.Edges.Exam.Edges.Category.Name),
 			ExamCategoryId:  generatedExam.Edges.Exam.Edges.Category.ID,
 			Topic:           generatedExam.RawExamData["topic"].(string),
 			Type:            generatedExam.RawExamData["type"].(string),

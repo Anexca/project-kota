@@ -3,9 +3,9 @@ package constants
 type ExamCategoryName string
 
 const (
-	ExamCategoryTypeName ExamCategoryName = "BANKING"
+	ExamCategoryNameBanking ExamCategoryName = "BANKING"
 )
 
 var EXAM_CATEGORIES = map[ExamCategoryName]string{
-	ExamCategoryTypeName: "banking",
+	ExamCategoryNameBanking: "banking",
 }

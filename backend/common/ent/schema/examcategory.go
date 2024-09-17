@@ -18,7 +18,7 @@ type ExamCategory struct {
 func (ExamCategory) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("name").Values(
-			string(constants.ExamCategoryTypeName),
+			string(constants.ExamCategoryNameBanking),
 		),
 		field.String("description"),
 		field.Bool("is_active").Default(true),
