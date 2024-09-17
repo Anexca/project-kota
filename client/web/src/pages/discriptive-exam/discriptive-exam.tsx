@@ -342,6 +342,10 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                           {...field}
                           className="text-sm min-h-[50vh]"
                           rows={10}
+                          spellCheck={"false"}
+                          autoComplete="off"
+                          autoCorrect="off"
+                          autoCapitalize="off"
                         />
                       );
                     }}
