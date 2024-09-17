@@ -3,6 +3,7 @@ import { useToast } from "../../../hooks/use-toast";
 import useSessionStore from "../../../store/auth-store";
 import useUserProfileStore from "../../../store/user-info-store";
 import Loader from "../loder";
+import { sendSup } from "../../../services/profile.service";
 
 const SessionProvider = ({ children }: PropsWithChildren) => {
   const { toast } = useToast();
@@ -43,6 +44,7 @@ const SessionProvider = ({ children }: PropsWithChildren) => {
   const checkSessionToken = async () => {
     try {
       setIsloading(true);
+      await sendSup();
       if (session) {
         await updateUserProfile();
         setIsloading(false);

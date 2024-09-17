@@ -107,12 +107,22 @@ export default function PricingPlan() {
                 <div className="mt-auto border border-dashed border-[#A9A9AA] tracking-widest mb-2" />
                 <div className="h-28 ">
                   <div className="flex flex-col gap-4 justify-between absolute left-6 right-6 bottom-6">
-                    <div className="flex items-baseline">
-                      <span className="text-4xl font-bold">
-                        <Icon icon="rupee" className="text-3xl" />
-                        {data.price}
-                      </span>
-                      <span>{data.duration}</span>
+                    <div className="flex items-baseline flex-row">
+                      {data.original && (
+                        <div className="flex items-baseline line-through text-destructive mr-2">
+                          <span className="text-2xl font-bold">
+                            <Icon icon="rupee" className="text-xl" />
+                            {data.original}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-baseline">
+                        <span className="text-4xl font-bold">
+                          <Icon icon="rupee" className="text-3xl" />
+                          {data.price}
+                        </span>
+                        <span>{data.duration}</span>
+                      </div>
                     </div>
                     <div className="flex align-bottom">
                       {session ? (
@@ -147,6 +157,7 @@ const staticValue = [
   {
     passType: "Golden Pass",
     price: "19",
+    original: "59",
     duration: "/month",
     static: [
       "AI based descriptive exam assesments.",

@@ -1,4 +1,5 @@
 import { IPastExamAttempt } from "../interface/past-submission";
+import { FilterPagination } from "../interface/utils";
 import axiosInstance from "./base";
 
 export const getQuestions = async (isOpenExam?: boolean) => {
@@ -48,9 +49,12 @@ export const getPastSubmission = async (examId: number) => {
   const response = await axiosInstance.get(`/exams/${examId}/assessments`);
   return response.data;
 };
-export const getPastAttemptedSubmissions = async () => {
+export const getPastAttemptedSubmissions = async (
+  filters?: FilterPagination
+) => {
   const response = await axiosInstance.get<{ data: IPastExamAttempt[] }>(
-    `/exams/history`
+    `/exams/history`,
+    { params: filters }
   );
   return response.data;
 };

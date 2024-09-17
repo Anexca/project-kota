@@ -160,7 +160,7 @@ const ExamCard = ({
             className="px-3 py-1"
             variant={"secondary"}
           >
-            <Icon icon="clock" className="mr-2" /> Comming soon
+            <Icon icon="clock" className="mr-2" /> Coming soon
           </Button>
         )}
       </div>
