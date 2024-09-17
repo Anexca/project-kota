@@ -22,8 +22,8 @@ type ExamCategoryCreate struct {
 }
 
 // SetName sets the "name" field.
-func (ecc *ExamCategoryCreate) SetName(s string) *ExamCategoryCreate {
-	ecc.mutation.SetName(s)
+func (ecc *ExamCategoryCreate) SetName(e examcategory.Name) *ExamCategoryCreate {
+	ecc.mutation.SetName(e)
 	return ecc
 }
 
@@ -144,6 +144,11 @@ func (ecc *ExamCategoryCreate) check() error {
 	if _, ok := ecc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ExamCategory.name"`)}
 	}
+	if v, ok := ecc.mutation.Name(); ok {
+		if err := examcategory.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ExamCategory.name": %w`, err)}
+		}
+	}
 	if _, ok := ecc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "ExamCategory.description"`)}
 	}
@@ -183,7 +188,7 @@ func (ecc *ExamCategoryCreate) createSpec() (*ExamCategory, *sqlgraph.CreateSpec
 		_spec = sqlgraph.NewCreateSpec(examcategory.Table, sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt))
 	)
 	if value, ok := ecc.mutation.Name(); ok {
-		_spec.SetField(examcategory.FieldName, field.TypeString, value)
+		_spec.SetField(examcategory.FieldName, field.TypeEnum, value)
 		_node.Name = value
 	}
 	if value, ok := ecc.mutation.Description(); ok {

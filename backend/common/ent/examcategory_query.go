@@ -299,7 +299,7 @@ func (ecq *ExamCategoryQuery) WithExams(opts ...func(*ExamQuery)) *ExamCategoryQ
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Name examcategory.Name `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -322,7 +322,7 @@ func (ecq *ExamCategoryQuery) GroupBy(field string, fields ...string) *ExamCateg
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Name examcategory.Name `json:"name,omitempty"`
 //	}
 //
 //	client.ExamCategory.Query().

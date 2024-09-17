@@ -3014,7 +3014,7 @@ type ExamCategoryMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	name          *string
+	name          *examcategory.Name
 	description   *string
 	is_active     *bool
 	created_at    *time.Time
@@ -3127,12 +3127,12 @@ func (m *ExamCategoryMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetName sets the "name" field.
-func (m *ExamCategoryMutation) SetName(s string) {
-	m.name = &s
+func (m *ExamCategoryMutation) SetName(e examcategory.Name) {
+	m.name = &e
 }
 
 // Name returns the value of the "name" field in the mutation.
-func (m *ExamCategoryMutation) Name() (r string, exists bool) {
+func (m *ExamCategoryMutation) Name() (r examcategory.Name, exists bool) {
 	v := m.name
 	if v == nil {
 		return
@@ -3143,7 +3143,7 @@ func (m *ExamCategoryMutation) Name() (r string, exists bool) {
 // OldName returns the old "name" field's value of the ExamCategory entity.
 // If the ExamCategory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ExamCategoryMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *ExamCategoryMutation) OldName(ctx context.Context) (v examcategory.Name, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
@@ -3457,7 +3457,7 @@ func (m *ExamCategoryMutation) OldField(ctx context.Context, name string) (ent.V
 func (m *ExamCategoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case examcategory.FieldName:
-		v, ok := value.(string)
+		v, ok := value.(examcategory.Name)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

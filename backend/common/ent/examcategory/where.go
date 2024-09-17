@@ -55,11 +55,6 @@ func IDLTE(id int) predicate.ExamCategory {
 	return predicate.ExamCategory(sql.FieldLTE(FieldID, id))
 }
 
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldEQ(FieldName, v))
-}
-
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.ExamCategory {
 	return predicate.ExamCategory(sql.FieldEQ(FieldDescription, v))
@@ -81,68 +76,23 @@ func UpdatedAt(v time.Time) predicate.ExamCategory {
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.ExamCategory {
+func NameEQ(v Name) predicate.ExamCategory {
 	return predicate.ExamCategory(sql.FieldEQ(FieldName, v))
 }
 
 // NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.ExamCategory {
+func NameNEQ(v Name) predicate.ExamCategory {
 	return predicate.ExamCategory(sql.FieldNEQ(FieldName, v))
 }
 
 // NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.ExamCategory {
+func NameIn(vs ...Name) predicate.ExamCategory {
 	return predicate.ExamCategory(sql.FieldIn(FieldName, vs...))
 }
 
 // NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.ExamCategory {
+func NameNotIn(vs ...Name) predicate.ExamCategory {
 	return predicate.ExamCategory(sql.FieldNotIn(FieldName, vs...))
-}
-
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldGT(FieldName, v))
-}
-
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldGTE(FieldName, v))
-}
-
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldLT(FieldName, v))
-}
-
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldLTE(FieldName, v))
-}
-
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldContains(FieldName, v))
-}
-
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldHasPrefix(FieldName, v))
-}
-
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldHasSuffix(FieldName, v))
-}
-
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldEqualFold(FieldName, v))
-}
-
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.ExamCategory {
-	return predicate.ExamCategory(sql.FieldContainsFold(FieldName, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

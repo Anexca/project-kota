@@ -114,7 +114,7 @@ var (
 	// ExamCategoriesColumns holds the columns for the "exam_categories" table.
 	ExamCategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeEnum, Enums: []string{"BANKING"}},
 		{Name: "description", Type: field.TypeString},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "created_at", Type: field.TypeTime},

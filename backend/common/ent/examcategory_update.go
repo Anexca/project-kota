@@ -30,15 +30,15 @@ func (ecu *ExamCategoryUpdate) Where(ps ...predicate.ExamCategory) *ExamCategory
 }
 
 // SetName sets the "name" field.
-func (ecu *ExamCategoryUpdate) SetName(s string) *ExamCategoryUpdate {
-	ecu.mutation.SetName(s)
+func (ecu *ExamCategoryUpdate) SetName(e examcategory.Name) *ExamCategoryUpdate {
+	ecu.mutation.SetName(e)
 	return ecu
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (ecu *ExamCategoryUpdate) SetNillableName(s *string) *ExamCategoryUpdate {
-	if s != nil {
-		ecu.SetName(*s)
+func (ecu *ExamCategoryUpdate) SetNillableName(e *examcategory.Name) *ExamCategoryUpdate {
+	if e != nil {
+		ecu.SetName(*e)
 	}
 	return ecu
 }
@@ -154,7 +154,20 @@ func (ecu *ExamCategoryUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ecu *ExamCategoryUpdate) check() error {
+	if v, ok := ecu.mutation.Name(); ok {
+		if err := examcategory.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ExamCategory.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (ecu *ExamCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := ecu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(examcategory.Table, examcategory.Columns, sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt))
 	if ps := ecu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -164,7 +177,7 @@ func (ecu *ExamCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := ecu.mutation.Name(); ok {
-		_spec.SetField(examcategory.FieldName, field.TypeString, value)
+		_spec.SetField(examcategory.FieldName, field.TypeEnum, value)
 	}
 	if value, ok := ecu.mutation.Description(); ok {
 		_spec.SetField(examcategory.FieldDescription, field.TypeString, value)
@@ -241,15 +254,15 @@ type ExamCategoryUpdateOne struct {
 }
 
 // SetName sets the "name" field.
-func (ecuo *ExamCategoryUpdateOne) SetName(s string) *ExamCategoryUpdateOne {
-	ecuo.mutation.SetName(s)
+func (ecuo *ExamCategoryUpdateOne) SetName(e examcategory.Name) *ExamCategoryUpdateOne {
+	ecuo.mutation.SetName(e)
 	return ecuo
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (ecuo *ExamCategoryUpdateOne) SetNillableName(s *string) *ExamCategoryUpdateOne {
-	if s != nil {
-		ecuo.SetName(*s)
+func (ecuo *ExamCategoryUpdateOne) SetNillableName(e *examcategory.Name) *ExamCategoryUpdateOne {
+	if e != nil {
+		ecuo.SetName(*e)
 	}
 	return ecuo
 }
@@ -378,7 +391,20 @@ func (ecuo *ExamCategoryUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ecuo *ExamCategoryUpdateOne) check() error {
+	if v, ok := ecuo.mutation.Name(); ok {
+		if err := examcategory.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ExamCategory.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (ecuo *ExamCategoryUpdateOne) sqlSave(ctx context.Context) (_node *ExamCategory, err error) {
+	if err := ecuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(examcategory.Table, examcategory.Columns, sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt))
 	id, ok := ecuo.mutation.ID()
 	if !ok {
@@ -405,7 +431,7 @@ func (ecuo *ExamCategoryUpdateOne) sqlSave(ctx context.Context) (_node *ExamCate
 		}
 	}
 	if value, ok := ecuo.mutation.Name(); ok {
-		_spec.SetField(examcategory.FieldName, field.TypeString, value)
+		_spec.SetField(examcategory.FieldName, field.TypeEnum, value)
 	}
 	if value, ok := ecuo.mutation.Description(); ok {
 		_spec.SetField(examcategory.FieldDescription, field.TypeString, value)
