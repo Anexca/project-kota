@@ -5,6 +5,7 @@ import (
 	"common/ent"
 	"common/repositories"
 	"context"
+	"server/pkg/models"
 )
 
 type ExamCategoryService struct {
@@ -22,6 +23,27 @@ func NewExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
 	}
 }
 
-func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Context) (*ent.ExamCategory, error) {
-	return e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking)
+func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Context) ([]models.CategoryExamType, error) {
+	category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking)
+	if err != nil {
+		return nil, err
+	}
+
+	var categoryExamTypes []models.CategoryExamType
+
+	for _, exam := range category.Edges.Exams {
+		categoryExamType := models.CategoryExamType{
+			Id:           exam.ID,
+			ExamName:     exam.Name,
+			CategoryId:   category.ID,
+			IsActive:     exam.IsActive,
+			Description:  exam.Description,
+			TypeOfExam:   exam.Type.String(),
+			CategoryName: category.Name.String(),
+		}
+
+		categoryExamTypes = append(categoryExamTypes, categoryExamType)
+	}
+
+	return categoryExamTypes, nil
 }

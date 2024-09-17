@@ -3,6 +3,7 @@ package repositories
 import (
 	"common/constants"
 	"common/ent"
+	"common/ent/exam"
 	"common/ent/examcategory"
 	"context"
 )
@@ -24,6 +25,8 @@ func (e *ExamCategoryRepository) Get(ctx context.Context) ([]*ent.ExamCategory, 
 func (e *ExamCategoryRepository) GetByName(ctx context.Context, categoryName constants.ExamCategoryName) (*ent.ExamCategory, error) {
 	return e.dbClient.ExamCategory.Query().
 		Where(examcategory.NameEQ(examcategory.Name(categoryName))).
-		WithExams().
+		WithExams(func(eq *ent.ExamQuery) {
+			eq.Order(ent.Asc(exam.FieldIsActive))
+		}).
 		Only(ctx)
 }
