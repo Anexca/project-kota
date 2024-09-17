@@ -39,7 +39,7 @@ func (a *AccessService) UserHasAccessToExam(ctx context.Context, examId int, use
 			}
 
 			for _, exam := range subscription.Edges.Exams {
-				if exam.ID == examId {
+				if exam.Edges.Exam.ID == examId {
 					return true, nil
 				}
 			}

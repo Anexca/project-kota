@@ -31,6 +31,54 @@ func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.
 	s.WriteJson(w, http.StatusOK, &response)
 }
 
+func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r *http.Request) {
+	const EXAM_TYPE = commonConstants.Descriptive
+
+	idParam := chi.URLParam(r, "id")
+	examId, err := strconv.Atoi(idParam)
+	if err != nil {
+		s.ErrorJson(w, errors.New("invalid exam id"), http.StatusBadRequest)
+		return
+	}
+
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+		return
+	}
+
+	isOpenStr := r.URL.Query().Get("isopen")
+	var cachedQuestions []*models.GeneratedExamOverview
+
+	if isOpenStr != "" {
+		var isOpen bool
+		isOpen, err = strconv.ParseBool(isOpenStr)
+		if err != nil {
+			s.ErrorJson(w, errors.New("invalid isopen query param, should be either true or false"), http.StatusBadRequest)
+			return
+		}
+
+		if isOpen {
+			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), EXAM_TYPE, userId)
+		} else {
+			cachedQuestions, err = s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
+		}
+	} else {
+		cachedQuestions, err = s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
+	}
+
+	if err != nil {
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
+			return
+		}
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	s.WriteJson(w, http.StatusOK, &Response{Data: cachedQuestions})
+}
+
 func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
 	const EXAM_TYPE = commonConstants.Descriptive
 

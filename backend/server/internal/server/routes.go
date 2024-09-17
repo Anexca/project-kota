@@ -61,6 +61,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Route("/exams", func(r chi.Router) {
 				r.Route("/banking", func(r chi.Router) {
 					r.Get("/descriptive", s.GetBankingDescriptiveCategories)
+					r.Get("/descriptive/{id}", s.GetBankingDescriptiveQuestionsByExamId)
 					r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
 				})
 
