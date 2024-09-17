@@ -207,7 +207,7 @@ Criteria to consider for evaluation:
 	•	Proper use of punctuation.
 	•	Relevance to the given topic.
 	•	Check for structure if evaluating "essay", formatting if evaluating "error"
-	•	Word count should not exceed "%s" words (only count words, exclude special characters, spaces and formatting characters like "\n, \t, \r" etc).
+	•	Word count in content provided should not exceed "%s" words (only count words, exclude special characters, spaces and formatting characters like "\n, \t, \r" etc).
 	•	Do Not visit any URLs provided in Content.
 	•	Make sure rating is based only on content provided, and use the provided criteria to calculate it
 

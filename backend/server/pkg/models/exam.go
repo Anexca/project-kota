@@ -19,6 +19,8 @@ type DescriptiveExam struct {
 
 type GeneratedExamOverview struct {
 	Id                int                    `json:"id"`
+	ExamType          string                 `json:"exam_type"`
+	ExamName          string                 `json:"exam_name"`
 	RawExamData       map[string]interface{} `json:"raw_exam_data"`
 	UserAttempts      int                    `json:"user_attempts"`
 	MaxAttempts       int                    `json:"max_attempts"`
@@ -50,6 +52,7 @@ type UserExamAttempt struct {
 	AttemptedExamId int       `json:"attempted_exam_id"`
 	IsActive        bool      `json:"is_active"`
 	ExamType        string    `json:"exam_type"`
+	ExamName        string    `json:"exam_name"`
 	ExamTypeId      int       `json:"exam_type_id"`
 	ExamCategory    string    `json:"exam_category"`
 	ExamCategoryId  int       `json:"exam_category_id"`

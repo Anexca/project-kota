@@ -360,6 +360,8 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 		}
 
 		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting, userAttempts)
+		overview.ExamName = exam.Name
+		overview.ExamType = string(exam.Type)
 		overview.UserAttempts = len(userAttempts)
 
 		generatedExamOverviewList = append(generatedExamOverviewList, overview)
