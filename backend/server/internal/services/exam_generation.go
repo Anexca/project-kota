@@ -222,7 +222,8 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 }
 
 func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	exam, err := e.examRepository.GetByName(ctx, "descriptive")
+	exam, err := e.examRepository.GetById(ctx, 1)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -268,7 +269,8 @@ func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, e
 }
 
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	exam, err := e.examRepository.GetByName(ctx, "descriptive")
+	exam, err := e.examRepository.GetById(ctx, 1)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
