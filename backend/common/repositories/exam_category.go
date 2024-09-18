@@ -26,7 +26,7 @@ func (e *ExamCategoryRepository) GetByName(ctx context.Context, categoryName con
 	return e.dbClient.ExamCategory.Query().
 		Where(examcategory.NameEQ(examcategory.Name(categoryName))).
 		WithExams(func(eq *ent.ExamQuery) {
-			eq.Order(ent.Asc(exam.FieldIsActive))
+			eq.Order(ent.Desc(exam.FieldIsActive), ent.Asc(exam.FieldID))
 		}).
 		Only(ctx)
 }
