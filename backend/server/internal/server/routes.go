@@ -79,6 +79,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Route("/subscriptions", func(r chi.Router) {
 			r.Post("/{subscriptionId}/buy", s.StartSubscription)
+			r.Post("/{subscriptionId}/buy", s.StartSubscription)
 		})
 
 		r.Route("/user-subscriptions", func(r chi.Router) {
@@ -86,6 +87,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Post("/{userSubscriptionId}/activate", s.ActivateUserSubscription)
 		})
 	})
+
+	r.Get("/subscriptions", s.GetAllSubscriptions)
+	r.Get("/exams/banking/descriptive", s.GetBankingDescriptiveCategories)
 
 	return r
 }
