@@ -59,7 +59,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Route("/exams", func(r chi.Router) {
 			r.Route("/banking", func(r chi.Router) {
-				r.Get("/descriptive", s.GetBankingDescriptiveCategories)
 				r.Get("/descriptive/open", s.GetOpenQuestions)
 				r.Get("/descriptive/{id}", s.GetBankingDescriptiveQuestionsByExamId)
 				r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
@@ -89,6 +88,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	})
 
 	r.Get("/subscriptions", s.GetAllSubscriptions)
+	r.Get("/categories/exams/{id}", s.GetExamById)
 	r.Get("/exams/banking/descriptive", s.GetBankingDescriptiveCategories)
 
 	return r
