@@ -19,10 +19,18 @@ func (v *ValidationError) Error() string {
 	return fmt.Sprintf("Validation failed for %d fields", len(v.Errors))
 }
 
+type ResponsePagination struct {
+	CurrentPage int `json:"current_page"`
+	TotalPages  int `json:"total_pages"`
+	PerPage     int `json:"per_page"`
+	TotalItems  int `json:"total_items"`
+}
+
 type Response struct {
-	Error   bool   `json:"error"`
-	Message string `json:"message,omitempty"`
-	Data    any    `json:"data,omitempty"`
+	Error      bool               `json:"error"`
+	Message    string             `json:"message,omitempty"`
+	Data       any                `json:"data,omitempty"`
+	Pagination ResponsePagination `json:"pagination,omitempty"`
 }
 
 func (app *Server) ReadJson(w http.ResponseWriter, r *http.Request, data any) error {
