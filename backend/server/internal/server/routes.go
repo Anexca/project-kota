@@ -51,42 +51,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAuthMiddleware(s.authService))
 
-		r.Route("/v2", func(r chi.Router) {
-			r.Route("/user", func(r chi.Router) {
-				r.Get("/", s.GetUserProfile)
-				r.Put("/", s.UpdateUser)
-				r.Get("/transactions", s.GetUserTransactions)
-			})
-
-			r.Route("/exams", func(r chi.Router) {
-				r.Route("/banking", func(r chi.Router) {
-					r.Get("/descriptive", s.GetBankingDescriptiveCategories)
-					r.Get("/descriptive/{id}", s.GetBankingDescriptiveQuestionsByExamId)
-					r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
-				})
-
-				r.Route("/assesments", func(r chi.Router) {
-					r.Get("/{id}", s.GetAssesmentById)
-				})
-
-				r.Route("/history", func(r chi.Router) {
-					r.Get("/", s.GetExamAttempts)
-				})
-
-				r.Get("/{id}", s.GetGeneratedExamById)
-				r.Get("/{id}/assessments", s.GetExamAssessments)
-			})
-
-			r.Route("/subscriptions", func(r chi.Router) {
-				r.Post("/{subscriptionId}/buy", s.StartSubscription)
-			})
-
-			r.Route("/user-subscriptions", func(r chi.Router) {
-				r.Post("/{userSubscriptionId}/cancel", s.CancelUserSubscription)
-				r.Post("/{userSubscriptionId}/activate", s.ActivateUserSubscription)
-			})
-		})
-
 		r.Route("/user", func(r chi.Router) {
 			r.Get("/", s.GetUserProfile)
 			r.Put("/", s.UpdateUser)
@@ -95,7 +59,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Route("/exams", func(r chi.Router) {
 			r.Route("/banking", func(r chi.Router) {
-				r.Get("/descriptive", s.GetBankingDescriptiveQuestions)
+				r.Get("/descriptive", s.GetBankingDescriptiveCategories)
+				r.Get("/descriptive/{id}", s.GetBankingDescriptiveQuestionsByExamId)
 				r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
 			})
 
@@ -119,10 +84,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Post("/{userSubscriptionId}/cancel", s.CancelUserSubscription)
 			r.Post("/{userSubscriptionId}/activate", s.ActivateUserSubscription)
 		})
-
 	})
-
-	r.Get("/subscriptions", s.GetAllSubscriptions)
 
 	return r
 }
