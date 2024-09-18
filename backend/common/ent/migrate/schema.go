@@ -39,6 +39,7 @@ var (
 		{Name: "description", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"MCQ", "DESCRIPTIVE"}, Default: "DESCRIPTIVE"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "logo_url", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_category_exams", Type: field.TypeInt, Nullable: true},
@@ -51,7 +52,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exams_exam_categories_exams",
-				Columns:    []*schema.Column{ExamsColumns[7]},
+				Columns:    []*schema.Column{ExamsColumns[8]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

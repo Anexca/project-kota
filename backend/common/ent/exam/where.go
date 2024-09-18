@@ -70,6 +70,11 @@ func IsActive(v bool) predicate.Exam {
 	return predicate.Exam(sql.FieldEQ(FieldIsActive, v))
 }
 
+// LogoURL applies equality check predicate on the "logo_url" field. It's identical to LogoURLEQ.
+func LogoURL(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldEQ(FieldLogoURL, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Exam {
 	return predicate.Exam(sql.FieldEQ(FieldCreatedAt, v))
@@ -238,6 +243,81 @@ func IsActiveEQ(v bool) predicate.Exam {
 // IsActiveNEQ applies the NEQ predicate on the "is_active" field.
 func IsActiveNEQ(v bool) predicate.Exam {
 	return predicate.Exam(sql.FieldNEQ(FieldIsActive, v))
+}
+
+// LogoURLEQ applies the EQ predicate on the "logo_url" field.
+func LogoURLEQ(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldEQ(FieldLogoURL, v))
+}
+
+// LogoURLNEQ applies the NEQ predicate on the "logo_url" field.
+func LogoURLNEQ(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldNEQ(FieldLogoURL, v))
+}
+
+// LogoURLIn applies the In predicate on the "logo_url" field.
+func LogoURLIn(vs ...string) predicate.Exam {
+	return predicate.Exam(sql.FieldIn(FieldLogoURL, vs...))
+}
+
+// LogoURLNotIn applies the NotIn predicate on the "logo_url" field.
+func LogoURLNotIn(vs ...string) predicate.Exam {
+	return predicate.Exam(sql.FieldNotIn(FieldLogoURL, vs...))
+}
+
+// LogoURLGT applies the GT predicate on the "logo_url" field.
+func LogoURLGT(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldGT(FieldLogoURL, v))
+}
+
+// LogoURLGTE applies the GTE predicate on the "logo_url" field.
+func LogoURLGTE(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldGTE(FieldLogoURL, v))
+}
+
+// LogoURLLT applies the LT predicate on the "logo_url" field.
+func LogoURLLT(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldLT(FieldLogoURL, v))
+}
+
+// LogoURLLTE applies the LTE predicate on the "logo_url" field.
+func LogoURLLTE(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldLTE(FieldLogoURL, v))
+}
+
+// LogoURLContains applies the Contains predicate on the "logo_url" field.
+func LogoURLContains(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldContains(FieldLogoURL, v))
+}
+
+// LogoURLHasPrefix applies the HasPrefix predicate on the "logo_url" field.
+func LogoURLHasPrefix(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldHasPrefix(FieldLogoURL, v))
+}
+
+// LogoURLHasSuffix applies the HasSuffix predicate on the "logo_url" field.
+func LogoURLHasSuffix(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldHasSuffix(FieldLogoURL, v))
+}
+
+// LogoURLIsNil applies the IsNil predicate on the "logo_url" field.
+func LogoURLIsNil() predicate.Exam {
+	return predicate.Exam(sql.FieldIsNull(FieldLogoURL))
+}
+
+// LogoURLNotNil applies the NotNil predicate on the "logo_url" field.
+func LogoURLNotNil() predicate.Exam {
+	return predicate.Exam(sql.FieldNotNull(FieldLogoURL))
+}
+
+// LogoURLEqualFold applies the EqualFold predicate on the "logo_url" field.
+func LogoURLEqualFold(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldEqualFold(FieldLogoURL, v))
+}
+
+// LogoURLContainsFold applies the ContainsFold predicate on the "logo_url" field.
+func LogoURLContainsFold(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldContainsFold(FieldLogoURL, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -46,11 +46,11 @@ func init() {
 	// exam.DefaultIsActive holds the default value on creation for the is_active field.
 	exam.DefaultIsActive = examDescIsActive.Default.(bool)
 	// examDescCreatedAt is the schema descriptor for created_at field.
-	examDescCreatedAt := examFields[4].Descriptor()
+	examDescCreatedAt := examFields[5].Descriptor()
 	// exam.DefaultCreatedAt holds the default value on creation for the created_at field.
 	exam.DefaultCreatedAt = examDescCreatedAt.Default.(func() time.Time)
 	// examDescUpdatedAt is the schema descriptor for updated_at field.
-	examDescUpdatedAt := examFields[5].Descriptor()
+	examDescUpdatedAt := examFields[6].Descriptor()
 	// exam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	exam.DefaultUpdatedAt = examDescUpdatedAt.Default.(func() time.Time)
 	// exam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
