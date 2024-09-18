@@ -20,6 +20,7 @@ import ContactUs from "../pages/contact-us";
 import PreviousSubmissionPage from "../pages/previous-submissions";
 import ViewPastSubmission from "../pages/view-past-submission";
 import MyTransactions from "../pages/my-transactions";
+import DescriptiveQuestionCategories from "../pages/descriptive-questions-categories";
 
 const routes: RouteObject[] = [
   {
@@ -83,10 +84,14 @@ const routes: RouteObject[] = [
         children: [
           {
             path: `banking/${paths.DISCRIPTIVE}`,
+            element: <DescriptiveQuestionCategories />,
+          },
+          {
+            path: `banking/${paths.DISCRIPTIVE}/:categoryId`,
             element: <DescriptiveQuestion />,
           },
           {
-            path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+            path: `banking/${paths.DISCRIPTIVE}/:categoryId/:questionId/${paths.SUBMISSION}/:assesmentId`,
             element: <DescriptiveSubmission />,
           },
           {
@@ -119,7 +124,7 @@ const routes: RouteObject[] = [
         ],
       },
       {
-        path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
+        path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:categoryId/:questionId`,
         element: <DiscriptiveExam />,
       },
       {

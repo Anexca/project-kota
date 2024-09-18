@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getQuestions } from "../../services/exam.service";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Checkbox } from "../../componnets/base/checkbox";
 import DescriptiveQuestionCard from "../../componnets/shared/descriptive-question-card";
 import { IQuestion } from "../../interface/question";
@@ -76,6 +76,7 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const [selectedQuestion, setSelectedQuestions] = useState<IQuestion | null>(
     null
   );
+  const params = useParams();
   const [showUnattempted, setShowUnattempted] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -83,7 +84,9 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const getQuestionsList = async () => {
     setLoading(true);
     try {
-      const data = await getQuestions(isOpenMode);
+      const data = await getQuestions({
+        categoryId: params.categoryId! || "open",
+      });
       setQuestions(data.data);
     } catch (error) {
       toast({
@@ -99,19 +102,13 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   }, []);
 
   const attempQuestion = (index: number) => {
-    navigate(
-      `/${isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS}/banking/${
-        paths.DISCRIPTIVE
-      }/${index}`,
-      {
-        state: {
-          question: questions[index],
-        },
-      }
-    );
+    const path = isOpenMode
+      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`
+      : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${params.categoryId}/${index}`;
+    navigate(path);
   };
 
-  const unattemptedQuestion = useMemo(() => {
+  const questionList = useMemo(() => {
     if (filterType || showUnattempted) {
       return questions.filter((i) => {
         let condition = true;
@@ -126,14 +123,14 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     }
     return questions;
   }, [questions, filterType, showUnattempted]);
-  // const questionList = showUnattempted ? unattemptedQuestion : questions;
-  const questionList = unattemptedQuestion;
-
+  const backPath = isOpenMode
+    ? `/${paths.HOMEPAGE}`
+    : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`;
   return (
     <div className="pt-2 w-full md:max-w-2xl 2xl:max-w-2xl mx-auto flex flex-col gap-2 p-4">
       <div className="py-2">
         <div className="flex gap-2 items-center">
-          <Link to={`/${paths.HOMEPAGE}`} className="p-0">
+          <Link to={backPath} className="p-0">
             <Icon icon="arrow_back" className="text-info text-lg" />
           </Link>
           <span className="text-lg font-semibold">
