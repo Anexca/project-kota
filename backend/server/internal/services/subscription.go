@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"server/pkg/config"
+	"server/pkg/models"
 	"time"
 
 	"github.com/razorpay/razorpay-go"
@@ -46,8 +47,29 @@ func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client
 	}
 }
 
-func (s *SubscriptionService) GetAll(ctx context.Context) ([]*ent.Subscription, error) {
-	return s.subscriptionRepository.GetAll(ctx)
+func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.SubscriptionOverview, error) {
+	subscriptions, err := s.subscriptionRepository.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var subscriptionOverviews []models.SubscriptionOverview
+
+	for _, subscription := range subscriptions {
+		subscriptionOverview := models.SubscriptionOverview{
+			Id:                  subscription.ID,
+			ProviderPlanID:      subscription.ProviderPlanID,
+			Name:                subscription.Name,
+			IsActive:            subscription.IsActive,
+			RawSubscriptionData: subscription.RawSubscriptionData,
+			DurationInMonths:    subscription.DurationInMonths,
+			Price:               subscription.Price,
+		}
+
+		subscriptionOverviews = append(subscriptionOverviews, subscriptionOverview)
+	}
+
+	return subscriptionOverviews, nil
 }
 
 func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*ent.UserSubscription, error) {

@@ -238,7 +238,7 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to, examTypeId, categoryID)
+	paginatedAttempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to, examTypeId, categoryID)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -256,7 +256,13 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := &Response{
-		Data: attempts,
+		Data: paginatedAttempts.Data,
+		Pagination: ResponsePagination{
+			CurrentPage: paginatedAttempts.CurrentPage,
+			TotalPages:  paginatedAttempts.TotalPages,
+			PerPage:     paginatedAttempts.PerPage,
+			TotalItems:  paginatedAttempts.TotalItems,
+		},
 	}
 
 	s.WriteJson(w, http.StatusOK, response)

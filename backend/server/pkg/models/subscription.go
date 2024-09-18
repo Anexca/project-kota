@@ -18,3 +18,13 @@ type SubscriptionPaymentDetails struct {
 	PaymentStatus string    `json:"payment_status"` // Status of the payment
 	PaymentMethod string    `json:"payment_method"` // Payment method (e.g., card, upi)
 }
+
+type SubscriptionOverview struct {
+	Id                  int                    `json:"id"`
+	ProviderPlanID      string                 `json:"provider_plan_id"`
+	Price               int                    `json:"price"`
+	DurationInMonths    int                    `json:"duration_in_months"`
+	IsActive            bool                   `json:"is_active"`
+	Name                string                 `json:"name"`
+	RawSubscriptionData map[string]interface{} `json:"raw_subscription_data,omitempty"`
+}

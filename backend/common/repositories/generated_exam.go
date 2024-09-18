@@ -202,3 +202,37 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 
 	return query.All(ctx)
 }
+
+func (q *GeneratedExamRepository) GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return 0, err
+	}
+
+	query := q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.HasAttemptsWith(examattempt.HasUserWith(user.IDEQ(userUid))))
+
+	if examTypeId != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.IDEQ(*examTypeId)))
+	}
+
+	if categoryID != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.HasCategoryWith(examcategory.IDEQ(*categoryID))))
+	}
+
+	if from != nil && to != nil {
+		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtGTE(*from), examattempt.UpdatedAtLTE(*to)))
+	} else if from != nil {
+		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtGTE(*from)))
+	} else if to != nil {
+		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtLTE(*to)))
+	}
+
+	// Get total count
+	totalCount, err := query.Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return totalCount, nil
+}
