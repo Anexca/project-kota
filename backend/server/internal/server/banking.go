@@ -5,7 +5,6 @@ import (
 	"errors"
 	"server/internal/services"
 	"server/pkg/constants"
-	"server/pkg/models"
 	"strconv"
 	"strings"
 
@@ -42,25 +41,7 @@ func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r
 		return
 	}
 
-	isOpenStr := r.URL.Query().Get("isopen")
-	var cachedQuestions []*models.GeneratedExamOverview
-
-	if isOpenStr != "" {
-		var isOpen bool
-		isOpen, err = strconv.ParseBool(isOpenStr)
-		if err != nil {
-			s.ErrorJson(w, errors.New("invalid isopen query param, should be either true or false"), http.StatusBadRequest)
-			return
-		}
-
-		if isOpen {
-			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), "descriptive", userId)
-		} else {
-			cachedQuestions, err = s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
-		}
-	} else {
-		cachedQuestions, err = s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
-	}
+	cachedQuestions, err := s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "forbidden") {
