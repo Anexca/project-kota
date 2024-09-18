@@ -16,3 +16,15 @@ export interface IQuestion {
   created_at: string;
   updated_at: string;
 }
+
+export const typeOfExam = ["DESCRIPTIVE"] as const;
+export const categoryOfExam = ["BANKING"] as const;
+export interface ICategory {
+  exam_type_id: number;
+  exam_name: string;
+  description: string;
+  type_of_exam: (typeof typeOfExam)[number];
+  is_active: boolean;
+  category_name: (typeof categoryOfExam)[number];
+  category_id: number;
+}

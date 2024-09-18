@@ -264,13 +264,12 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     recursiveFetcher();
   };
 
+  const endExamNavigatePath = isOpenMode
+    ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`
+    : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${param.categoryId}`;
   const exitExam = () => {
     interval.stop();
-    navigate(
-      `/${isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS}/banking/${
-        paths.DISCRIPTIVE
-      }`
-    );
+    navigate(endExamNavigatePath);
   };
 
   useEffect(() => {
@@ -301,9 +300,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
         <div className="mb-4">
           {evaluationResult && (
             <Link
-              to={`/${
-                isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS
-              }/banking/${paths.DISCRIPTIVE}`}
+              to={endExamNavigatePath}
               className="text-info pb-2 inline-block"
             >
               <Icon icon="arrow_back" className="text-sm mr-1" /> Exit Exam

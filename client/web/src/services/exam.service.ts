@@ -2,12 +2,22 @@ import { IPastExamAttempt } from "../interface/past-submission";
 import { FilterPagination } from "../interface/utils";
 import axiosInstance from "./base";
 
-export const getQuestions = async (isOpenExam?: boolean) => {
+export const getQuestionsCategories = async (isOpenExam?: boolean) => {
   const response = await axiosInstance.get("/exams/banking/descriptive", {
     params: {
       isopen: !!isOpenExam,
     },
   });
+  return response.data;
+};
+export const getQuestions = async ({
+  categoryId,
+}: {
+  categoryId: number | string;
+}) => {
+  const response = await axiosInstance.get(
+    `/exams/banking/descriptive/${categoryId}`
+  );
   return response.data;
 };
 
