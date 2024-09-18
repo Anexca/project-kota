@@ -40,6 +40,7 @@ func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Contex
 			Description:  exam.Description,
 			TypeOfExam:   exam.Type.String(),
 			CategoryName: category.Name.String(),
+			LogoUrl:      exam.LogoURL,
 		}
 
 		categoryExamTypes = append(categoryExamTypes, categoryExamType)
