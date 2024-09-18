@@ -77,7 +77,7 @@ func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId i
 
 func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen)).
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen), generatedexam.IsActive(!isOpen)).
 		WithExam().
 		Only(ctx)
 }
