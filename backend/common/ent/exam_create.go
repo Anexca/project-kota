@@ -65,6 +65,20 @@ func (ec *ExamCreate) SetNillableIsActive(b *bool) *ExamCreate {
 	return ec
 }
 
+// SetLogoURL sets the "logo_url" field.
+func (ec *ExamCreate) SetLogoURL(s string) *ExamCreate {
+	ec.mutation.SetLogoURL(s)
+	return ec
+}
+
+// SetNillableLogoURL sets the "logo_url" field if the given value is not nil.
+func (ec *ExamCreate) SetNillableLogoURL(s *string) *ExamCreate {
+	if s != nil {
+		ec.SetLogoURL(*s)
+	}
+	return ec
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (ec *ExamCreate) SetCreatedAt(t time.Time) *ExamCreate {
 	ec.mutation.SetCreatedAt(t)
@@ -295,6 +309,10 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
 		_node.IsActive = value
+	}
+	if value, ok := ec.mutation.LogoURL(); ok {
+		_spec.SetField(exam.FieldLogoURL, field.TypeString, value)
+		_node.LogoURL = value
 	}
 	if value, ok := ec.mutation.CreatedAt(); ok {
 		_spec.SetField(exam.FieldCreatedAt, field.TypeTime, value)

@@ -58,6 +58,10 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 		}
 
 		for _, exam := range exams {
+			if !exam.IsActive {
+				continue
+			}
+
 			examSetting, err := q.examSettingRepository.GetByExam(ctx, exam.ID)
 			if err != nil {
 				log.Printf("Error getting exam setting for exam %s: %v", exam.Name, err)

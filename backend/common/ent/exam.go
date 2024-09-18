@@ -27,6 +27,8 @@ type Exam struct {
 	Type exam.Type `json:"type,omitempty"`
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
+	// LogoURL holds the value of the "logo_url" field.
+	LogoURL string `json:"logo_url,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -113,7 +115,7 @@ func (*Exam) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case exam.FieldID:
 			values[i] = new(sql.NullInt64)
-		case exam.FieldName, exam.FieldDescription, exam.FieldType:
+		case exam.FieldName, exam.FieldDescription, exam.FieldType, exam.FieldLogoURL:
 			values[i] = new(sql.NullString)
 		case exam.FieldCreatedAt, exam.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -163,6 +165,12 @@ func (e *Exam) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field is_active", values[i])
 			} else if value.Valid {
 				e.IsActive = value.Bool
+			}
+		case exam.FieldLogoURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field logo_url", values[i])
+			} else if value.Valid {
+				e.LogoURL = value.String
 			}
 		case exam.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -255,6 +263,9 @@ func (e *Exam) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("is_active=")
 	builder.WriteString(fmt.Sprintf("%v", e.IsActive))
+	builder.WriteString(", ")
+	builder.WriteString("logo_url=")
+	builder.WriteString(e.LogoURL)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(e.CreatedAt.Format(time.ANSIC))

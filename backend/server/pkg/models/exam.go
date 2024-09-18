@@ -75,6 +75,7 @@ type CategoryExamType struct {
 	Description  string `json:"description"`
 	TypeOfExam   string `json:"type_of_exam"`
 	IsActive     bool   `json:"is_active"`
-	CategoryName string `json:"category_name"`
-	CategoryId   int    `json:"category_id"`
+	CategoryName string `json:"category_name,omitempty"`
+	CategoryId   int    `json:"category_id,omitempty"`
+	LogoUrl      string `json:"logo_url"`
 }

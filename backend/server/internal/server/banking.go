@@ -13,20 +13,6 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.Request) {
-	categories, err := s.examCategoryService.GetBankingDescriptiveExamsTypes(r.Context())
-	if err != nil {
-		s.ErrorJson(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	response := Response{
-		Data: categories,
-	}
-
-	s.WriteJson(w, http.StatusOK, &response)
-}
-
 func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	examId, err := strconv.Atoi(idParam)

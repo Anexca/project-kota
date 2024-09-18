@@ -23,6 +23,8 @@ const (
 	FieldType = "type"
 	// FieldIsActive holds the string denoting the is_active field in the database.
 	FieldIsActive = "is_active"
+	// FieldLogoURL holds the string denoting the logo_url field in the database.
+	FieldLogoURL = "logo_url"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -83,6 +85,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldType,
 	FieldIsActive,
+	FieldLogoURL,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -171,6 +174,11 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 // ByIsActive orders the results by the is_active field.
 func ByIsActive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsActive, opts...).ToFunc()
+}
+
+// ByLogoURL orders the results by the logo_url field.
+func ByLogoURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLogoURL, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

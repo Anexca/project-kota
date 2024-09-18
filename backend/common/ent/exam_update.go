@@ -89,6 +89,26 @@ func (eu *ExamUpdate) SetNillableIsActive(b *bool) *ExamUpdate {
 	return eu
 }
 
+// SetLogoURL sets the "logo_url" field.
+func (eu *ExamUpdate) SetLogoURL(s string) *ExamUpdate {
+	eu.mutation.SetLogoURL(s)
+	return eu
+}
+
+// SetNillableLogoURL sets the "logo_url" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableLogoURL(s *string) *ExamUpdate {
+	if s != nil {
+		eu.SetLogoURL(*s)
+	}
+	return eu
+}
+
+// ClearLogoURL clears the value of the "logo_url" field.
+func (eu *ExamUpdate) ClearLogoURL() *ExamUpdate {
+	eu.mutation.ClearLogoURL()
+	return eu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (eu *ExamUpdate) SetUpdatedAt(t time.Time) *ExamUpdate {
 	eu.mutation.SetUpdatedAt(t)
@@ -327,6 +347,12 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := eu.mutation.LogoURL(); ok {
+		_spec.SetField(exam.FieldLogoURL, field.TypeString, value)
+	}
+	if eu.mutation.LogoURLCleared() {
+		_spec.ClearField(exam.FieldLogoURL, field.TypeString)
 	}
 	if value, ok := eu.mutation.UpdatedAt(); ok {
 		_spec.SetField(exam.FieldUpdatedAt, field.TypeTime, value)
@@ -600,6 +626,26 @@ func (euo *ExamUpdateOne) SetNillableIsActive(b *bool) *ExamUpdateOne {
 	return euo
 }
 
+// SetLogoURL sets the "logo_url" field.
+func (euo *ExamUpdateOne) SetLogoURL(s string) *ExamUpdateOne {
+	euo.mutation.SetLogoURL(s)
+	return euo
+}
+
+// SetNillableLogoURL sets the "logo_url" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableLogoURL(s *string) *ExamUpdateOne {
+	if s != nil {
+		euo.SetLogoURL(*s)
+	}
+	return euo
+}
+
+// ClearLogoURL clears the value of the "logo_url" field.
+func (euo *ExamUpdateOne) ClearLogoURL() *ExamUpdateOne {
+	euo.mutation.ClearLogoURL()
+	return euo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (euo *ExamUpdateOne) SetUpdatedAt(t time.Time) *ExamUpdateOne {
 	euo.mutation.SetUpdatedAt(t)
@@ -868,6 +914,12 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if value, ok := euo.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := euo.mutation.LogoURL(); ok {
+		_spec.SetField(exam.FieldLogoURL, field.TypeString, value)
+	}
+	if euo.mutation.LogoURLCleared() {
+		_spec.ClearField(exam.FieldLogoURL, field.TypeString)
 	}
 	if value, ok := euo.mutation.UpdatedAt(); ok {
 		_spec.SetField(exam.FieldUpdatedAt, field.TypeTime, value)
