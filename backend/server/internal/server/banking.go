@@ -29,7 +29,6 @@ func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.
 }
 
 func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r *http.Request) {
-
 	idParam := chi.URLParam(r, "id")
 	examId, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -68,46 +67,13 @@ func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r
 			s.ErrorJson(w, err, http.StatusForbidden)
 			return
 		}
-		s.ErrorJson(w, err, http.StatusInternalServerError)
-		return
-	}
 
-	s.WriteJson(w, http.StatusOK, &Response{Data: cachedQuestions})
-}
-
-func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
-
-	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
-		return
-	}
-
-	isOpenStr := r.URL.Query().Get("isopen")
-	var cachedQuestions []*models.GeneratedExamOverview
-
-	if isOpenStr != "" {
-		var isOpen bool
-		isOpen, err = strconv.ParseBool(isOpenStr)
-		if err != nil {
-			s.ErrorJson(w, errors.New("invalid isopen query param, should be either true or false"), http.StatusBadRequest)
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("exam type not found"))
 			return
 		}
 
-		if isOpen {
-			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), "descriptive", userId)
-		} else {
-			cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), "descriptive", userId)
-		}
-	} else {
-		cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), "descriptive", userId)
-	}
-
-	if err != nil {
-		if strings.Contains(err.Error(), "forbidden") {
-			s.ErrorJson(w, err, http.StatusForbidden)
-			return
-		}
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}
