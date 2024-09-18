@@ -16,12 +16,12 @@ func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 	}
 
 	for _, exam := range exams {
-		err := w.examService.VGenerateExams(ctx, exam.ID, models.DescriptiveExamType)
+		err := w.examService.GenerateExams(ctx, exam.ID, models.DescriptiveExamType)
 		if err != nil {
 			log.Printf("Failed to Add Descriptive Question in Database: %v", err)
 		}
 
-		err = w.examService.VMarkExpiredExamsInactive(ctx, exam.ID)
+		err = w.examService.MarkExpiredExamsInactive(ctx, exam.ID)
 		if err != nil {
 			log.Printf("Failed to Add Descriptive Question in Database: %v", err)
 		}
