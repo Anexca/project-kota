@@ -21,6 +21,7 @@ import {
   UserProfileSchema,
   UserProfileType,
 } from "../../validation-schema/user-profile-schema";
+import { Input } from "../../componnets/base/input/input";
 
 const UserProfile = () => {
   const [loading, setIsloading] = useState(false);
@@ -88,6 +89,12 @@ const UserProfile = () => {
             noValidate
             className="grid gap-4"
           >
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="email">Email</Label>
+              </div>
+              <Input value={profile.email} disabled />
+            </div>
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="email">First Name</Label>

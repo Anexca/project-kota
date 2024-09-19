@@ -10,6 +10,8 @@ import { useToast } from "../../hooks/use-toast";
 import { getQuestionsCategories } from "../../services/exam.service";
 import { Button } from "../../componnets/base/button/button";
 import Chip from "../../componnets/base/chip";
+import { StyledLink } from "../../componnets/base/styled-link";
+import useUserProfileStore from "../../store/user-info-store";
 
 const DescriptiveQuestionCategories = ({
   isOpenMode,
@@ -17,7 +19,7 @@ const DescriptiveQuestionCategories = ({
   isOpenMode?: boolean;
 }) => {
   const [categories, setCategories] = useState<ICategory[]>([]);
-
+  const { profile } = useUserProfileStore();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -73,17 +75,13 @@ const DescriptiveQuestionCategories = ({
               <article className="rounded-md shadow-sm bg-white flex flex-col md:flex-row gap-4 p-3 px-4 md:p3 text-sm">
                 <div className="flex flex-1">
                   <div className="mr-2">
-                    {/* <img
-                      className="h-10"
-                      src="https://cdn.testbook.com/resources/productionimages/Indian%20Bank%20Apprentice_All_1720620359.png"
-                    /> */}
-                    <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center font-semibold text-xl ">
-                      {item.exam_name[0]}
-                    </div>
+                    <img
+                      className="h-10 aspect-square object-contain"
+                      src={item.logo_url}
+                    />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-balance md:text-pretty text-black mb-2">
-                      #{item.exam_type_id} -{" "}
+                    <p className="font-semibold text-balance md:text-pretty text-black mb-1">
                       {item.exam_name.split("_").join(" ")}
                     </p>
                     <p className="font-medium text-balance md:text-pretty text-black mb-2">
@@ -97,15 +95,26 @@ const DescriptiveQuestionCategories = ({
                   </div>
                 </div>
                 <div className="flex flex-col items-stretch gap-2 md:justify-center md:w-32">
-                  <Button
-                    onClick={() => getQuestions(item.exam_type_id)}
-                    disabled={!item.is_active}
-                    size={"sm"}
-                    className="px-3 py-1"
-                    variant={"info"}
-                  >
-                    <Icon icon="play_circle" className="mr-2" /> Attempt
-                  </Button>
+                  {profile?.active_subscriptions?.length ? (
+                    <Button
+                      onClick={() => getQuestions(item.exam_type_id)}
+                      disabled={!item.is_active}
+                      size={"sm"}
+                      className="px-3 py-1"
+                      variant={"info"}
+                    >
+                      <Icon icon="play_circle" className="mr-2" /> Attempt
+                    </Button>
+                  ) : (
+                    <StyledLink
+                      to={`/${paths.PRICING_PLAN}`}
+                      size={"sm"}
+                      className="px-3 py-1"
+                      variant={"warning"}
+                    >
+                      <Icon icon="send" className="mr-2" /> Buy Plan
+                    </StyledLink>
+                  )}
                 </div>
               </article>
             );

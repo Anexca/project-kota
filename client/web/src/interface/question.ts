@@ -27,4 +27,5 @@ export interface ICategory {
   is_active: boolean;
   category_name: (typeof categoryOfExam)[number];
   category_id: number;
+  logo_url: string;
 }
