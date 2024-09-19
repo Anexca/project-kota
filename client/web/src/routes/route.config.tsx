@@ -21,123 +21,134 @@ import PreviousSubmissionPage from "../pages/previous-submissions";
 import ViewPastSubmission from "../pages/view-past-submission";
 import MyTransactions from "../pages/my-transactions";
 import DescriptiveQuestionCategories from "../pages/descriptive-questions-categories";
+import ErrorBoundary from "./error-boundary";
 
 const routes: RouteObject[] = [
   {
     path: "/",
-    element: <Navigate to={paths.HOMEPAGE} />,
-  },
-  {
-    path: paths.HOMEPAGE,
-    element: <HomePage />,
-  },
-  {
-    path: paths.REGISTER,
     element: (
-      <SignedInRoute>
-        <RegisterPage />
-      </SignedInRoute>
-    ),
-  },
-  {
-    path: paths.LOGIN,
-    element: (
-      <SignedInRoute>
-        <Login />
-      </SignedInRoute>
-    ),
-  },
-  {
-    path: paths.FORGOT_PASSWORD,
-    element: <ForgotPassword />,
-  },
-
-  {
-    path: "",
-    element: (
-      <ProtectedRoute>
+      <ErrorBoundary>
         <Outlet />
-      </ProtectedRoute>
+      </ErrorBoundary>
     ),
     children: [
       {
-        path: paths.PROFILE,
+        path: "/",
+        element: <Navigate to={paths.HOMEPAGE} />,
+      },
+      {
+        path: paths.HOMEPAGE,
+        element: <HomePage />,
+      },
+      {
+        path: paths.REGISTER,
         element: (
-          <GeneralLayout>
+          <SignedInRoute>
+            <RegisterPage />
+          </SignedInRoute>
+        ),
+      },
+      {
+        path: paths.LOGIN,
+        element: (
+          <SignedInRoute>
+            <Login />
+          </SignedInRoute>
+        ),
+      },
+      {
+        path: paths.FORGOT_PASSWORD,
+        element: <ForgotPassword />,
+      },
+
+      {
+        path: "",
+        element: (
+          <ProtectedRoute>
             <Outlet />
-          </GeneralLayout>
+          </ProtectedRoute>
         ),
         children: [
           {
-            index: true,
-            element: <UserProfile />,
-          },
-          {
-            path: paths.MY_TRANSACTIONS,
-            element: <MyTransactions />,
-          },
-        ],
-      },
-      {
-        path: paths.EXAMS,
-        element: <GeneralLayout />,
-        children: [
-          {
-            path: `banking/${paths.DISCRIPTIVE}`,
-            element: <DescriptiveQuestionCategories />,
-          },
-          {
-            path: `banking/${paths.DISCRIPTIVE}/:categoryId`,
-            element: <DescriptiveQuestion />,
-          },
-          {
-            path: `banking/${paths.DISCRIPTIVE}/:categoryId/:questionId/${paths.SUBMISSION}/:assesmentId`,
-            element: <DescriptiveSubmission />,
-          },
-          {
-            path: `${paths.MY_SUMBISSIONS}`,
-            element: <PreviousSubmissionPage />,
-          },
-          {
-            path: `${paths.MY_SUMBISSIONS}/:questionId/${paths.SUBMISSION}/:assesmentId`,
-            element: <ViewPastSubmission />,
-          },
-        ],
-      },
-      {
-        path: paths.COMMUNITY_EXAMS,
-        element: <GeneralLayout />,
-        children: [
-          {
-            path: `banking/${paths.DISCRIPTIVE}`,
-            element: <DescriptiveQuestion isOpenMode />,
-          },
-          {
-            path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+            path: paths.PROFILE,
             element: (
-              <DescriptiveSubmission
-                isOpenMode
-                backLink={`/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`}
-              />
+              <GeneralLayout>
+                <Outlet />
+              </GeneralLayout>
             ),
+            children: [
+              {
+                index: true,
+                element: <UserProfile />,
+              },
+              {
+                path: paths.MY_TRANSACTIONS,
+                element: <MyTransactions />,
+              },
+            ],
+          },
+          {
+            path: paths.EXAMS,
+            element: <GeneralLayout />,
+            children: [
+              {
+                path: `banking/${paths.DISCRIPTIVE}`,
+                element: <DescriptiveQuestionCategories />,
+              },
+              {
+                path: `banking/${paths.DISCRIPTIVE}/:categoryId`,
+                element: <DescriptiveQuestion />,
+              },
+              {
+                path: `banking/${paths.DISCRIPTIVE}/:categoryId/:questionId/${paths.SUBMISSION}/:assesmentId`,
+                element: <DescriptiveSubmission />,
+              },
+              {
+                path: `${paths.MY_SUMBISSIONS}`,
+                element: <PreviousSubmissionPage />,
+              },
+              {
+                path: `${paths.MY_SUMBISSIONS}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+                element: <ViewPastSubmission />,
+              },
+            ],
+          },
+          {
+            path: paths.COMMUNITY_EXAMS,
+            element: <GeneralLayout />,
+            children: [
+              {
+                path: `banking/${paths.DISCRIPTIVE}`,
+                element: <DescriptiveQuestion isOpenMode />,
+              },
+              {
+                path: `banking/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
+                element: (
+                  <DescriptiveSubmission
+                    isOpenMode
+                    backLink={`/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`}
+                  />
+                ),
+              },
+            ],
+          },
+          {
+            path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:categoryId/:questionId`,
+            element: <DiscriptiveExam />,
+          },
+          {
+            path: `${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
+            element: <DiscriptiveExam isOpenMode />,
           },
         ],
       },
-      {
-        path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:categoryId/:questionId`,
-        element: <DiscriptiveExam />,
-      },
-      {
-        path: `${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
-        element: <DiscriptiveExam isOpenMode />,
-      },
+      { path: paths.PRICING_PLAN, element: <PricingPlan /> },
+      { path: "/terms-of-service", element: <TermsOfService /> },
+      { path: "/privacy-policy", element: <PrivacyPolicy /> },
+      { path: "/contact-us", element: <ContactUs /> },
+      { path: "*", element: <NotFound /> },
     ],
   },
-  { path: paths.PRICING_PLAN, element: <PricingPlan /> },
-  { path: "/terms-of-service", element: <TermsOfService /> },
-  { path: "/privacy-policy", element: <PrivacyPolicy /> },
-  { path: "/contact-us", element: <ContactUs /> },
-  { path: "*", element: <NotFound /> },
 ];
 
 export default routes;
