@@ -60,6 +60,11 @@ func CompletedSeconds(v int) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldCompletedSeconds, v))
 }
 
+// Remarks applies equality check predicate on the "remarks" field. It's identical to RemarksEQ.
+func Remarks(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEQ(FieldRemarks, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldCreatedAt, v))
@@ -138,6 +143,81 @@ func StatusIn(vs ...Status) predicate.ExamAssesment {
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// RemarksEQ applies the EQ predicate on the "remarks" field.
+func RemarksEQ(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEQ(FieldRemarks, v))
+}
+
+// RemarksNEQ applies the NEQ predicate on the "remarks" field.
+func RemarksNEQ(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNEQ(FieldRemarks, v))
+}
+
+// RemarksIn applies the In predicate on the "remarks" field.
+func RemarksIn(vs ...string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldIn(FieldRemarks, vs...))
+}
+
+// RemarksNotIn applies the NotIn predicate on the "remarks" field.
+func RemarksNotIn(vs ...string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNotIn(FieldRemarks, vs...))
+}
+
+// RemarksGT applies the GT predicate on the "remarks" field.
+func RemarksGT(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldGT(FieldRemarks, v))
+}
+
+// RemarksGTE applies the GTE predicate on the "remarks" field.
+func RemarksGTE(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldGTE(FieldRemarks, v))
+}
+
+// RemarksLT applies the LT predicate on the "remarks" field.
+func RemarksLT(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldLT(FieldRemarks, v))
+}
+
+// RemarksLTE applies the LTE predicate on the "remarks" field.
+func RemarksLTE(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldLTE(FieldRemarks, v))
+}
+
+// RemarksContains applies the Contains predicate on the "remarks" field.
+func RemarksContains(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldContains(FieldRemarks, v))
+}
+
+// RemarksHasPrefix applies the HasPrefix predicate on the "remarks" field.
+func RemarksHasPrefix(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldHasPrefix(FieldRemarks, v))
+}
+
+// RemarksHasSuffix applies the HasSuffix predicate on the "remarks" field.
+func RemarksHasSuffix(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldHasSuffix(FieldRemarks, v))
+}
+
+// RemarksIsNil applies the IsNil predicate on the "remarks" field.
+func RemarksIsNil() predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldIsNull(FieldRemarks))
+}
+
+// RemarksNotNil applies the NotNil predicate on the "remarks" field.
+func RemarksNotNil() predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNotNull(FieldRemarks))
+}
+
+// RemarksEqualFold applies the EqualFold predicate on the "remarks" field.
+func RemarksEqualFold(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEqualFold(FieldRemarks, v))
+}
+
+// RemarksContainsFold applies the ContainsFold predicate on the "remarks" field.
+func RemarksContainsFold(v string) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldContainsFold(FieldRemarks, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -65,6 +65,7 @@ var (
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "raw_user_submission", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}},
+		{Name: "remarks", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_attempt_assesment", Type: field.TypeInt, Unique: true, Nullable: true},
@@ -77,7 +78,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exam_assesments_exam_attempts_assesment",
-				Columns:    []*schema.Column{ExamAssesmentsColumns[7]},
+				Columns:    []*schema.Column{ExamAssesmentsColumns[8]},
 				RefColumns: []*schema.Column{ExamAttemptsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

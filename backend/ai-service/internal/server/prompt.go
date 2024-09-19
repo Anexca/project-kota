@@ -8,7 +8,8 @@ import (
 	"go.uber.org/ratelimit"
 )
 
-var rl = ratelimit.New(1, ratelimit.Per(time.Minute))
+// var rl = ratelimit.New(1, ratelimit.Per(time.Minute))
+var rl = ratelimit.New(10, ratelimit.Per(time.Second))
 
 func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 	rl.Take()

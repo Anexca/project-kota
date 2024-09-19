@@ -27,6 +27,8 @@ type ExamAssesment struct {
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
 	// Status holds the value of the "status" field.
 	Status examassesment.Status `json:"status,omitempty"`
+	// Remarks holds the value of the "remarks" field.
+	Remarks string `json:"remarks,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -67,7 +69,7 @@ func (*ExamAssesment) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case examassesment.FieldID, examassesment.FieldCompletedSeconds:
 			values[i] = new(sql.NullInt64)
-		case examassesment.FieldStatus:
+		case examassesment.FieldStatus, examassesment.FieldRemarks:
 			values[i] = new(sql.NullString)
 		case examassesment.FieldCreatedAt, examassesment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -121,6 +123,12 @@ func (ea *ExamAssesment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				ea.Status = examassesment.Status(value.String)
+			}
+		case examassesment.FieldRemarks:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field remarks", values[i])
+			} else if value.Valid {
+				ea.Remarks = value.String
 			}
 		case examassesment.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -193,6 +201,9 @@ func (ea *ExamAssesment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", ea.Status))
+	builder.WriteString(", ")
+	builder.WriteString("remarks=")
+	builder.WriteString(ea.Remarks)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(ea.CreatedAt.Format(time.ANSIC))
