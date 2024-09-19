@@ -57,7 +57,10 @@ const DescriptiveSubmission = ({
         <div className="text-sm font-medium">
           <Link
             className="text-info mr-2 text-sm"
-            to={backLink || `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
+            to={
+              backLink ||
+              `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${params.categoryId}`
+            }
           >
             <Icon icon="arrow_back" /> Back
           </Link>{" "}

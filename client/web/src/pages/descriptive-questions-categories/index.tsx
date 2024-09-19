@@ -101,9 +101,17 @@ const DescriptiveQuestionCategories = ({
                       disabled={!item.is_active}
                       size={"sm"}
                       className="px-3 py-1"
-                      variant={"info"}
+                      variant={item.is_active ? "info" : "outline"}
                     >
-                      <Icon icon="play_circle" className="mr-2" /> Attempt
+                      {item.is_active ? (
+                        <>
+                          <Icon icon="play_circle" className="mr-2" /> Attempt
+                        </>
+                      ) : (
+                        <>
+                          <Icon icon="clock" className="mr-2" /> Coming soon
+                        </>
+                      )}
                     </Button>
                   ) : (
                     <StyledLink
