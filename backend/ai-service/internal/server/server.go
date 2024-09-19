@@ -40,8 +40,8 @@ func InitServer(genAiClient *genai.Client, redisClient *redis.Client) *http.Serv
 		Addr:         fmt.Sprintf(":%d", NewServer.port),
 		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  100 * time.Minute,
+		WriteTimeout: 100 * time.Minute,
 		ErrorLog:     logger,
 	}
 

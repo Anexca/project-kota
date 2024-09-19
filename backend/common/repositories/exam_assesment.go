@@ -53,6 +53,10 @@ func (e *ExamAssesmentRepository) Update(ctx context.Context, assessmentId int, 
 		query.SetRawAssesmentData(model.RawAssessmentData)
 	}
 
+	if model.Remarks != "" {
+		query.SetRemarks(model.Remarks)
+	}
+
 	_, err := query.Save(ctx)
 	return err
 }
