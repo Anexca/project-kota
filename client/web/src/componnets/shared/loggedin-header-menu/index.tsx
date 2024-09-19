@@ -17,6 +17,7 @@ import useSessionStore from "../../../store/auth-store";
 import { useMediaQuery } from "../../../hooks/use-media-query";
 import { ScreenSizeQuery } from "../../../constants/shared";
 import { StyledLink } from "../../base/styled-link";
+import useUserProfileStore from "../../../store/user-info-store";
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
@@ -48,8 +49,10 @@ ListItem.displayName = "ListItem";
 const LogoutButton = () => {
   const navigation = useNavigate();
   const { logout } = useSessionStore();
+  const { clearProfile } = useUserProfileStore();
   const logoutHandler = async () => {
     await logout();
+    clearProfile();
     navigation(`/${paths.HOMEPAGE}`);
   };
   return (

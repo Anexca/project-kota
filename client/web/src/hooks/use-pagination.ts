@@ -36,12 +36,7 @@ export function usePagination({
   onChange,
 }: PaginationParams) {
   const _total = Math.max(Math.trunc(total), 0);
-  //   const [activePage, setActivePage] = useUncontrolled({
-  //     value: page,
-  //     onChange,
-  //     defaultValue: initialPage,
-  //     finalValue: initialPage,
-  //   });
+
   const activePage = page;
   const setActivePage = onChange;
   const setPage = (pageNumber: number) => {

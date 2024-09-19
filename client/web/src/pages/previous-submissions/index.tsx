@@ -9,26 +9,35 @@ import AttemptedSubmissionsCard from "../../componnets/shared/attempted-submissi
 import { DateFilterSection } from "../../componnets/shared/filter-section";
 import { useToast } from "../../hooks/use-toast";
 import { IPastExamAttempt } from "../../interface/past-submission";
+import { PaginationComponent } from "../../componnets/shared/pagination";
+import { DateFilterType, IPaginationType } from "../../interface/utils";
 
-type DateFilterType = {
-  from?: Date;
-  to?: Date;
+const paginationInit = {
+  current_page: 1,
+  total_items: 0,
+  per_page: 10,
+  total_pages: 1,
 };
-
 const PreviousSubmissionPage = () => {
   const [dateFilter, setDateFilters] = useState<DateFilterType>({});
-
+  const [pagination, setPagination] = useState<IPaginationType>(paginationInit);
   const [submissions, setQuestions] = useState<IPastExamAttempt[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const getSubmissionList = async (dateFilter: DateFilterType) => {
+  const getSubmissionList = async (
+    dateFilter: DateFilterType,
+    pagination: IPaginationType
+  ) => {
     setLoading(true);
     try {
       const data = await getPastAttemptedSubmissions({
         from: dateFilter?.from?.toISOString(),
         to: dateFilter?.to?.toISOString(),
+        limit: pagination.per_page,
+        page: pagination.current_page,
       });
       setQuestions(data.data || []);
+      setPagination(data.pagination);
     } catch (error) {
       toast({
         title: "Oh ho Something went wrong.",
@@ -39,15 +48,20 @@ const PreviousSubmissionPage = () => {
     setLoading(false);
   };
   useEffect(() => {
-    getSubmissionList(dateFilter);
+    getSubmissionList(dateFilter, pagination);
   }, []);
 
   const updateDateFilter = (key: string) => (date?: Date) => {
     const newDate = { ...dateFilter, [key]: date };
     setDateFilters(newDate);
-    getSubmissionList(newDate);
+    setPagination(paginationInit);
+    getSubmissionList(newDate, pagination);
   };
-
+  const updatePagination = (pageNumber: number) => {
+    const newPagination = { ...pagination, current_page: pageNumber };
+    setPagination(newPagination);
+    getSubmissionList(dateFilter, newPagination);
+  };
   return (
     <div className="pt-2 w-full md:max-w-2xl 2xl:max-w-2xl mx-auto flex flex-col gap-2 p-4">
       <div className="py-2">
@@ -101,6 +115,13 @@ const PreviousSubmissionPage = () => {
           )}
         </div>
       )}
+      <div className="mt-4">
+        <PaginationComponent
+          currentPage={pagination.current_page}
+          onChange={updatePagination}
+          totalPage={pagination.total_pages}
+        />
+      </div>
     </div>
   );
 };
