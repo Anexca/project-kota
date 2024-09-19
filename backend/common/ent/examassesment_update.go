@@ -82,6 +82,26 @@ func (eau *ExamAssesmentUpdate) SetNillableStatus(e *examassesment.Status) *Exam
 	return eau
 }
 
+// SetRemarks sets the "remarks" field.
+func (eau *ExamAssesmentUpdate) SetRemarks(s string) *ExamAssesmentUpdate {
+	eau.mutation.SetRemarks(s)
+	return eau
+}
+
+// SetNillableRemarks sets the "remarks" field if the given value is not nil.
+func (eau *ExamAssesmentUpdate) SetNillableRemarks(s *string) *ExamAssesmentUpdate {
+	if s != nil {
+		eau.SetRemarks(*s)
+	}
+	return eau
+}
+
+// ClearRemarks clears the value of the "remarks" field.
+func (eau *ExamAssesmentUpdate) ClearRemarks() *ExamAssesmentUpdate {
+	eau.mutation.ClearRemarks()
+	return eau
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (eau *ExamAssesmentUpdate) SetUpdatedAt(t time.Time) *ExamAssesmentUpdate {
 	eau.mutation.SetUpdatedAt(t)
@@ -194,6 +214,12 @@ func (eau *ExamAssesmentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := eau.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 	}
+	if value, ok := eau.mutation.Remarks(); ok {
+		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)
+	}
+	if eau.mutation.RemarksCleared() {
+		_spec.ClearField(examassesment.FieldRemarks, field.TypeString)
+	}
 	if value, ok := eau.mutation.UpdatedAt(); ok {
 		_spec.SetField(examassesment.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -296,6 +322,26 @@ func (eauo *ExamAssesmentUpdateOne) SetNillableStatus(e *examassesment.Status) *
 	if e != nil {
 		eauo.SetStatus(*e)
 	}
+	return eauo
+}
+
+// SetRemarks sets the "remarks" field.
+func (eauo *ExamAssesmentUpdateOne) SetRemarks(s string) *ExamAssesmentUpdateOne {
+	eauo.mutation.SetRemarks(s)
+	return eauo
+}
+
+// SetNillableRemarks sets the "remarks" field if the given value is not nil.
+func (eauo *ExamAssesmentUpdateOne) SetNillableRemarks(s *string) *ExamAssesmentUpdateOne {
+	if s != nil {
+		eauo.SetRemarks(*s)
+	}
+	return eauo
+}
+
+// ClearRemarks clears the value of the "remarks" field.
+func (eauo *ExamAssesmentUpdateOne) ClearRemarks() *ExamAssesmentUpdateOne {
+	eauo.mutation.ClearRemarks()
 	return eauo
 }
 
@@ -440,6 +486,12 @@ func (eauo *ExamAssesmentUpdateOne) sqlSave(ctx context.Context) (_node *ExamAss
 	}
 	if value, ok := eauo.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := eauo.mutation.Remarks(); ok {
+		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)
+	}
+	if eauo.mutation.RemarksCleared() {
+		_spec.ClearField(examassesment.FieldRemarks, field.TypeString)
 	}
 	if value, ok := eauo.mutation.UpdatedAt(); ok {
 		_spec.SetField(examassesment.FieldUpdatedAt, field.TypeTime, value)

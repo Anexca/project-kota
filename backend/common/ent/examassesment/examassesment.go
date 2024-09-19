@@ -23,6 +23,8 @@ const (
 	FieldRawUserSubmission = "raw_user_submission"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldRemarks holds the string denoting the remarks field in the database.
+	FieldRemarks = "remarks"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -47,6 +49,7 @@ var Columns = []string{
 	FieldRawAssesmentData,
 	FieldRawUserSubmission,
 	FieldStatus,
+	FieldRemarks,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -121,6 +124,11 @@ func ByCompletedSeconds(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByRemarks orders the results by the remarks field.
+func ByRemarks(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRemarks, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

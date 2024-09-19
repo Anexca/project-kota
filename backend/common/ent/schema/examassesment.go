@@ -33,6 +33,7 @@ func (ExamAssesment) Fields() []ent.Field {
 			string(constants.ASSESSMENT_REJECTED),
 			string(constants.ASSESSMENT_PENDING),
 		),
+		field.String("remarks").Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

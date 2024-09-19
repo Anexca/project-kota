@@ -45,6 +45,20 @@ func (eac *ExamAssesmentCreate) SetStatus(e examassesment.Status) *ExamAssesment
 	return eac
 }
 
+// SetRemarks sets the "remarks" field.
+func (eac *ExamAssesmentCreate) SetRemarks(s string) *ExamAssesmentCreate {
+	eac.mutation.SetRemarks(s)
+	return eac
+}
+
+// SetNillableRemarks sets the "remarks" field if the given value is not nil.
+func (eac *ExamAssesmentCreate) SetNillableRemarks(s *string) *ExamAssesmentCreate {
+	if s != nil {
+		eac.SetRemarks(*s)
+	}
+	return eac
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (eac *ExamAssesmentCreate) SetCreatedAt(t time.Time) *ExamAssesmentCreate {
 	eac.mutation.SetCreatedAt(t)
@@ -200,6 +214,10 @@ func (eac *ExamAssesmentCreate) createSpec() (*ExamAssesment, *sqlgraph.CreateSp
 	if value, ok := eac.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := eac.mutation.Remarks(); ok {
+		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)
+		_node.Remarks = value
 	}
 	if value, ok := eac.mutation.CreatedAt(); ok {
 		_spec.SetField(examassesment.FieldCreatedAt, field.TypeTime, value)

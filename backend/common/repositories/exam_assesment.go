@@ -21,6 +21,7 @@ type AssesmentModel struct {
 	Status            constants.AssessmentStatusType
 	RawAssessmentData map[string]interface{}
 	RawUserSubmission map[string]interface{}
+	Remarks           string
 }
 
 func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {

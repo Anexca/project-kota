@@ -1719,6 +1719,7 @@ type ExamAssesmentMutation struct {
 	raw_assesment_data   *map[string]interface{}
 	raw_user_submission  *map[string]interface{}
 	status               *examassesment.Status
+	remarks              *string
 	created_at           *time.Time
 	updated_at           *time.Time
 	clearedFields        map[string]struct{}
@@ -2004,6 +2005,55 @@ func (m *ExamAssesmentMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetRemarks sets the "remarks" field.
+func (m *ExamAssesmentMutation) SetRemarks(s string) {
+	m.remarks = &s
+}
+
+// Remarks returns the value of the "remarks" field in the mutation.
+func (m *ExamAssesmentMutation) Remarks() (r string, exists bool) {
+	v := m.remarks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemarks returns the old "remarks" field's value of the ExamAssesment entity.
+// If the ExamAssesment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamAssesmentMutation) OldRemarks(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemarks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemarks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemarks: %w", err)
+	}
+	return oldValue.Remarks, nil
+}
+
+// ClearRemarks clears the value of the "remarks" field.
+func (m *ExamAssesmentMutation) ClearRemarks() {
+	m.remarks = nil
+	m.clearedFields[examassesment.FieldRemarks] = struct{}{}
+}
+
+// RemarksCleared returns if the "remarks" field was cleared in this mutation.
+func (m *ExamAssesmentMutation) RemarksCleared() bool {
+	_, ok := m.clearedFields[examassesment.FieldRemarks]
+	return ok
+}
+
+// ResetRemarks resets all changes to the "remarks" field.
+func (m *ExamAssesmentMutation) ResetRemarks() {
+	m.remarks = nil
+	delete(m.clearedFields, examassesment.FieldRemarks)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ExamAssesmentMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -2149,7 +2199,7 @@ func (m *ExamAssesmentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamAssesmentMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.completed_seconds != nil {
 		fields = append(fields, examassesment.FieldCompletedSeconds)
 	}
@@ -2161,6 +2211,9 @@ func (m *ExamAssesmentMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, examassesment.FieldStatus)
+	}
+	if m.remarks != nil {
+		fields = append(fields, examassesment.FieldRemarks)
 	}
 	if m.created_at != nil {
 		fields = append(fields, examassesment.FieldCreatedAt)
@@ -2184,6 +2237,8 @@ func (m *ExamAssesmentMutation) Field(name string) (ent.Value, bool) {
 		return m.RawUserSubmission()
 	case examassesment.FieldStatus:
 		return m.Status()
+	case examassesment.FieldRemarks:
+		return m.Remarks()
 	case examassesment.FieldCreatedAt:
 		return m.CreatedAt()
 	case examassesment.FieldUpdatedAt:
@@ -2205,6 +2260,8 @@ func (m *ExamAssesmentMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldRawUserSubmission(ctx)
 	case examassesment.FieldStatus:
 		return m.OldStatus(ctx)
+	case examassesment.FieldRemarks:
+		return m.OldRemarks(ctx)
 	case examassesment.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case examassesment.FieldUpdatedAt:
@@ -2245,6 +2302,13 @@ func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case examassesment.FieldRemarks:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemarks(v)
 		return nil
 	case examassesment.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -2308,6 +2372,9 @@ func (m *ExamAssesmentMutation) ClearedFields() []string {
 	if m.FieldCleared(examassesment.FieldRawAssesmentData) {
 		fields = append(fields, examassesment.FieldRawAssesmentData)
 	}
+	if m.FieldCleared(examassesment.FieldRemarks) {
+		fields = append(fields, examassesment.FieldRemarks)
+	}
 	return fields
 }
 
@@ -2324,6 +2391,9 @@ func (m *ExamAssesmentMutation) ClearField(name string) error {
 	switch name {
 	case examassesment.FieldRawAssesmentData:
 		m.ClearRawAssesmentData()
+		return nil
+	case examassesment.FieldRemarks:
+		m.ClearRemarks()
 		return nil
 	}
 	return fmt.Errorf("unknown ExamAssesment nullable field %s", name)
@@ -2344,6 +2414,9 @@ func (m *ExamAssesmentMutation) ResetField(name string) error {
 		return nil
 	case examassesment.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case examassesment.FieldRemarks:
+		m.ResetRemarks()
 		return nil
 	case examassesment.FieldCreatedAt:
 		m.ResetCreatedAt()
