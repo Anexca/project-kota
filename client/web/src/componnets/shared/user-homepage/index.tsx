@@ -145,12 +145,12 @@ const ExamCard = ({
             </StyledLink>
           ) : (
             <StyledLink
-              to={`/${paths.PRICING_PLAN}`}
+              to={link}
               size={"sm"}
               className="px-3 py-1"
-              variant={"warning"}
+              variant={"default"}
             >
-              <Icon icon="send" className="mr-2" /> Buy Plan
+              <Icon icon="arrow_right" className="mr-2" /> View Exams
             </StyledLink>
           )
         ) : (
