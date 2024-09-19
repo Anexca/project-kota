@@ -3,6 +3,7 @@ package repositories
 import (
 	"common/ent"
 	"common/ent/exam"
+	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
 	"common/ent/generatedexam"
@@ -188,7 +189,7 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 				}
 			},
 		).
-		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
+		Order(ent.Desc(examassesment.FieldUpdatedAt)).
 		Limit(limit).
 		Offset(offset)
 
