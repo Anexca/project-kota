@@ -20,10 +20,10 @@ func (v *ValidationError) Error() string {
 }
 
 type ResponsePagination struct {
-	CurrentPage int `json:"current_page"`
-	TotalPages  int `json:"total_pages"`
-	PerPage     int `json:"per_page"`
-	TotalItems  int `json:"total_items"`
+	CurrentPage int `json:"current_page,omitempty"`
+	TotalPages  int `json:"total_pages,omitempty"`
+	PerPage     int `json:"per_page,omitempty"`
+	TotalItems  int `json:"total_items,omitempty"`
 }
 
 type Response struct {
