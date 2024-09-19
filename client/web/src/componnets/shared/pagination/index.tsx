@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import {
   Pagination,
   PaginationContent,
@@ -11,15 +9,27 @@ import {
 } from "../../base/pagination";
 import { usePagination } from "../../../hooks/use-pagination";
 
-export function PaginationComponent({}) {
-  const [page, onChange] = useState(1);
-  const pagination = usePagination({ total: 10, page, onChange });
+type PaginationComponent = {
+  totalPage: number;
+  currentPage: number;
+  onChange: (p: number) => void;
+};
+export function PaginationComponent({
+  currentPage,
+  onChange,
+  totalPage,
+}: PaginationComponent) {
+  const pagination = usePagination({
+    total: totalPage,
+    page: currentPage,
+    onChange,
+  });
 
   return (
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious />
+          <PaginationPrevious onClick={() => pagination.previous()} />
         </PaginationItem>
 
         {pagination.range.map((item) => {
@@ -32,14 +42,19 @@ export function PaginationComponent({}) {
           }
           return (
             <PaginationItem>
-              <PaginationLink onClick={() => pagination.setPage(item)}>
+              <PaginationLink
+                isActive={item == currentPage}
+                onClick={() =>
+                  !(item == currentPage) && pagination.setPage(item)
+                }
+              >
                 {item}
               </PaginationLink>
             </PaginationItem>
           );
         })}
         <PaginationItem>
-          <PaginationNext />
+          <PaginationNext onClick={() => pagination.next()} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
