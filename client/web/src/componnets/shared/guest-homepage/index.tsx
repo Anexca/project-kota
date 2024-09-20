@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ScreenSizeQuery } from "../../../constants/shared";
 import { useMediaQuery } from "../../../hooks/use-media-query";
 import { useToast } from "../../../hooks/use-toast";
@@ -10,6 +10,7 @@ import Chip from "../../base/chip";
 import Footer from "../footer";
 import Header from "../header/header";
 import StrippedLoader from "../stripped-loader";
+import { ToastAction } from "../../base/toast";
 
 const Card = ({
   title,
@@ -107,6 +108,7 @@ const GuestHomePage = () => {
   const isDesktopMode = useMediaQuery(ScreenSizeQuery.largeScreen, true);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const getQuestionsList = async () => {
     setLoading(true);
     try {
@@ -120,6 +122,22 @@ const GuestHomePage = () => {
       });
     }
     setLoading(false);
+  };
+  const showNotification = () => {
+    toast({
+      title: "Hold On!",
+      variant: "info",
+      description:
+        "You'll need to sign in before taking the exam. Let's get you set up!",
+      action: (
+        <ToastAction
+          altText="Login"
+          onClick={() => navigate(`/${paths.LOGIN}`)}
+        >
+          Login
+        </ToastAction>
+      ),
+    });
   };
   useEffect(() => {
     getQuestionsList();
@@ -233,8 +251,12 @@ const GuestHomePage = () => {
                         </div>
                       ))
                   : categoryList.map((item) => (
-                      <div className="p-4">
-                        <article className="overflow-hidden rounded-lg border border-gray-100 p-4 flex gap-3 items-center">
+                      <div className="p-4 ">
+                        <article
+                          onClick={showNotification}
+                          role="button"
+                          className=" cursor-pointer overflow-hidden rounded-lg border border-gray-100 p-4 flex gap-3 items-center"
+                        >
                           <div className="h-10 aspect-square">
                             <img
                               src={item.logo_url}

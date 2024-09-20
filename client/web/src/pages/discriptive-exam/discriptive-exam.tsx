@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../componnets/base/button/button";
@@ -34,9 +34,10 @@ import Chip from "../../componnets/base/chip";
 import ProfanityError from "../../componnets/shared/profanity_error/profanity-error";
 import { Evalution } from "../../interface/evaluation";
 import { questionType } from "../../constants/shared";
+import { StyledLink } from "../../componnets/base/styled-link";
 
-const ConformationDialog = ({ timerStart, time }: any) => {
-  const [open, setOpen] = useState(true);
+const ConformationDialog = ({ timerStart, time, open, setOpen }: any) => {
+  // const [open, setOpen] = useState(true);
   return (
     <Dialog open={open} defaultOpen>
       <DialogContent noCloseButton>
@@ -131,6 +132,42 @@ const EndExamDialog = ({
     </Dialog>
   );
 };
+const AssessmentResponseDialog = ({
+  open,
+  categoryId,
+}: {
+  open: boolean;
+  categoryId: string;
+}) => {
+  return (
+    <Dialog open={open}>
+      <DialogContent noCloseButton>
+        <DialogHeader>
+          <DialogTitle className="text-center mb-2">
+            Taking longer than expected to complete.
+          </DialogTitle>
+          <DialogDescription>
+            <div className="mb-2 text-neutral-700 font-semibold text-center text-balance">
+              Our AI is currently processing a high volume of requests. You can
+              view the assessment on the 'My Submissions' page or by checking
+              'View Assessments' after 2-4 minutes.
+            </div>
+            <div className="flex gap-2 justify-center ">
+              <StyledLink
+                variant={"info"}
+                to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${categoryId}`}
+                className="p-2 h-8"
+              >
+                Back To Questions
+              </StyledLink>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter></DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 const Hints = ({ hints }: { hints: string[] }) => {
   return (
     <details className="mt-2 group overflow-hidden rounded [&_summary::-webkit-details-marker]:hidden">
@@ -165,16 +202,20 @@ const Hints = ({ hints }: { hints: string[] }) => {
     </details>
   );
 };
-
+const EXAM_TIMEOUT = 30;
 const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const param = useParams();
   const navigate = useNavigate();
+  const [startUpModal, setStartUpModal] = useState(true);
   const [exitModelOpen, setExitModelOpen] = useState(false);
+  const [assessmentTimeoutModelOpen, setAssessmentTimeoutModelOpen] =
+    useState(false);
   const [question, setQuestion] = useState<IQuestion | null>(null);
   const [examTime, setExamTime] = useState(0);
   const interval = useInterval(() => setExamTime((s) => s - 1), 1000);
   const fetchResultRef = useRef<any>(null);
   const fetcherTimeOut = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<number>(0);
   const [evaluationResult, setEvaluationResult] = useState<Evalution | null>(
     null
   );
@@ -204,6 +245,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     return async () => {
       const data = await getAssesmetsResult(examId);
       return data as Evalution;
+      // return { data: { status: "PENDING" } };
     };
   };
 
@@ -220,6 +262,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
         isOpen: isOpenMode,
       });
       fetchResultRef.current = getResultByExamId(response.data.id);
+
       toast({
         title: "Successfully submitted the exam.",
         variant: "success",
@@ -233,7 +276,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
       });
       return;
     }
-
+    timeoutRef.current = new Date().getTime();
     const recursiveFetcher = async () => {
       try {
         const r = await fetchResultRef.current();
@@ -241,6 +284,14 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
 
         clearTimeout(fetcherTimeOut?.current);
         if (data.status === "PENDING") {
+          if (
+            Math.floor((new Date().getTime() - timeoutRef.current) / 1000) >=
+            EXAM_TIMEOUT
+          ) {
+            clearTimeout(fetcherTimeOut?.current);
+            exitExamAfterTimeout();
+            return;
+          }
           fetcherTimeOut.current = setTimeout(recursiveFetcher, 2000);
           return;
         }
@@ -282,18 +333,35 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   useEffect(() => {
     fetchQuestionById();
   }, []);
+  const exitExamAfterTimeout = () => {
+    setAssessmentTimeoutModelOpen(true);
+  };
 
+  const noAttemptLeft = useMemo(() => {
+    const hasAttemptLeft =
+      (question?.max_attempts || 0) - (question?.user_attempts || 0) == 0 &&
+      question;
+    interval.stop();
+
+    return hasAttemptLeft;
+  }, [question]);
   return (
     <div className="flex flex-col pb-4">
       <ConformationDialog
         timerStart={() => interval.start()}
         time={question ? question?.duration_seconds / 60 : 0}
+        open={startUpModal && !noAttemptLeft}
+        setOpen={setStartUpModal}
       />
       {question && !examTime && <AutoSubmittDialog />}
       <EndExamDialog
         open={exitModelOpen}
         close={() => setExitModelOpen(false)}
         exitExam={exitExam}
+      />
+      <AssessmentResponseDialog
+        open={assessmentTimeoutModelOpen}
+        categoryId={param.categoryId!}
       />
       <TestHeader currentTime={examTime} active={interval.active} />
       <Container className="p-2">
@@ -325,7 +393,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
               <Hints hints={question?.raw_exam_data?.hints || []} />
             )}
         </div>
-        {!evaluationResult && (
+        {!evaluationResult && !noAttemptLeft && (
           <>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
@@ -398,7 +466,28 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
             </p>
           </>
         )}
-
+        {noAttemptLeft && (
+          <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
+            <div className=" w-2 bg-info rounded-full"></div>
+            <div className="flex flex-col flex-1">
+              <div className="text-sm font-semibold text-info">
+                Max Attempts Exceeded
+              </div>
+              <div className="text-sm font-medium">
+                You've reached the maximum number of attempts for this question.
+              </div>
+              <div className="text-sm font-medium pt-2">
+                <StyledLink
+                  size={"sm"}
+                  className="h-7 px-3"
+                  to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
+                >
+                  Back To Questions
+                </StyledLink>
+              </div>
+            </div>
+          </div>
+        )}
         {evaluationResult?.status === "COMPLETED" ? (
           <DiffChecker
             rating={evaluationResult.raw_assesment_data.rating}
