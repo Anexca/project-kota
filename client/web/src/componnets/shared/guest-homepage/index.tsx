@@ -284,7 +284,7 @@ const GuestHomePage = () => {
               {upcomingFeatures.map((item) => (
                 <div className="p-4 lg:grayscale grayscale-0 transition duration-200 hover:grayscale-0">
                   <Card
-                    chip={<Chip icon="clock">Comming Soon</Chip>}
+                    chip={<Chip icon="clock">Coming Soon</Chip>}
                     title={item.title}
                     description={item.description}
                     icon={item.icon}

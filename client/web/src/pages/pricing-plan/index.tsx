@@ -62,7 +62,7 @@ export default function PricingPlan() {
                   toward excellence today!
                 </div>
                 <div className="text-lg leading-7 lg:mt-4">
-                  New plans and feature comming soon.
+                  New plans and feature coming soon.
                 </div>
                 <div className="text-end">
                   <Icon
@@ -194,6 +194,6 @@ const staticValue = [
       "Tracking of attempted exams.",
     ],
     isDisabled: true,
-    buttonText: "Comming soon",
+    buttonText: "Coming soon",
   },
 ];
