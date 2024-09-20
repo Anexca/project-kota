@@ -49,10 +49,9 @@ func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *
 	}
 }
 
-func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType commonConstants.ExamType, modelType models.ExamModelType) error {
-	examName := commonConstants.EXAMS[examType]
+func (e *ExamGenerationService) GenerateExams(ctx context.Context, examId int, modelType models.ExamModelType) error {
 
-	exam, err := e.examRepository.GetByName(ctx, examName)
+	exam, err := e.examRepository.GetById(ctx, examId)
 	if err != nil {
 		return err
 	}
@@ -70,10 +69,8 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examType comm
 	return nil
 }
 
-func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examType commonConstants.ExamType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetActiveById(ctx, examId, true)
 	if err != nil {
 		return fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -106,15 +103,13 @@ func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examTyp
 		return fmt.Errorf("failed to create new open exams: %w", err)
 	}
 
-	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), examName)
+	log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), exam.Name)
 
 	return nil
 }
 
-func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examType commonConstants.ExamType) error {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examId int) error {
+	exam, err := e.examRepository.GetById(ctx, examId)
 	if err != nil {
 		return err
 	}
@@ -198,10 +193,8 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	examName := commonConstants.EXAMS[examType]
-
-	exam, err := e.examRepository.GetByName(ctx, examName)
+func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, examId int, userId string) ([]*models.GeneratedExamOverview, error) {
+	exam, err := e.examRepository.GetActiveById(ctx, examId, true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -224,9 +217,8 @@ func (e *ExamGenerationService) GetGeneratedExams(ctx context.Context, examType 
 }
 
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
-	examName := commonConstants.EXAMS[examType]
+	exam, err := e.examRepository.GetActiveById(ctx, 1, true)
 
-	exam, err := e.examRepository.GetByName(ctx, examName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -266,7 +258,15 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 		return nil, fmt.Errorf("failed to get exam settings: %w", err)
 	}
 
-	return e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts), nil
+	examOverview := e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts)
+	examOverview.ExamName = generatedExam.Edges.Exam.Name
+	examOverview.ExamType = generatedExam.Edges.Exam.Type.String()
+
+	return examOverview, nil
+}
+
+func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType commonConstants.ExamType) ([]*ent.Exam, error) {
+	return e.examRepository.GetActiveByType(ctx, examType)
 }
 
 func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam) []*ent.GeneratedExam {
@@ -286,6 +286,8 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 		}
 
 		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting, userAttempts)
+		overview.ExamName = exam.Name
+		overview.ExamType = string(exam.Type)
 		overview.UserAttempts = len(userAttempts)
 
 		generatedExamOverviewList = append(generatedExamOverviewList, overview)

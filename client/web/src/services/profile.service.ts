@@ -12,3 +12,6 @@ export const getUserTransactions = async () => {
   const response = await axiosInstance.get("/user/transactions");
   return response.data;
 };
+export const sendSup = async () => {
+  await axiosInstance.get("/sup");
+};

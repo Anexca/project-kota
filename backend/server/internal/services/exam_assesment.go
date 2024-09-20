@@ -152,7 +152,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	generatedExamData, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		log.Println("error getting generated exam", err)
-		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting generated exam, %v", err)})
 		return
 	}
 
@@ -160,7 +160,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExamData.Edges.Exam.ID, userId)
 		if err != nil {
 			log.Println("error getting exam", err)
-			e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+			e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error checking exam, %v", err)})
 			return
 		}
 
@@ -173,14 +173,14 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId, isOpen)
 	if err != nil {
 		log.Println("error getting exam", err)
-		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting exam, %v", err)})
 		return
 	}
 
 	jsonData, err := json.Marshal(generatedExam.RawExamData)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
 		return
 	}
 
@@ -188,7 +188,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal(jsonData, &descriptiveExam)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
 		return
 	}
 
@@ -196,25 +196,26 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
 			"profanity_check": "detected",
 			"profane_content": goaway.ExtractProfanity(content),
-		}})
+		}, Remarks: fmt.Sprintf("profanities detected in content, %v", goaway.ExtractProfanity(content))})
 		return
 	}
 
 	prompt := fmt.Sprintf(`
 Evaluate the following "%s" based on the topic: “%s”.
-Criteria to consider:
-
+Criteria to consider for evaluation:
 	•	Grammar accuracy.
 	•	Proper use of punctuation.
 	•	Relevance to the given topic.
-	•	Word count should not exceed "%s" words (only count words, exclude special characters).
+	•	Check for structure if evaluating "essay", formatting if evaluating "error"
+	•	Word count in content provided should not exceed "%s" words (only count words, exclude special characters, spaces and formatting characters like "\n, \t, \r" etc).
 	•	Do Not visit any URLs provided in Content.
 	•	Make sure rating is based only on content provided, and use the provided criteria to calculate it
 
-Scoring: Provide a rating out of %s marks based on the above criteria. The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
+Scoring: 
+	•	Provide a rating out of "%s" marks based on the above criteria. 
+	•	The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
 
 Output Requirements:
-
 	•	Return a valid JSON object with the following keys:
 	•	"rating": A string representing the rating. 
 	•	"strengths": An array of strings highlighting the content’s strengths.
@@ -229,7 +230,7 @@ Content to evaluate:
 
 	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.PRO_15)
 	if err != nil {
-		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting prompt results, %v", err)})
 		log.Printf("Error getting prompt result: %v", err)
 		return
 	}
@@ -237,7 +238,7 @@ Content to evaluate:
 	if strings.Contains(response, "FinishReasonSafety") {
 		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
 			"profanity_check": "detected",
-		}})
+		}, Remarks: "profanity detected by AI"})
 
 		return
 	}
@@ -246,7 +247,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &rawJsonData)
 	if err != nil {
 		log.Println("error response from AI service", err)
-		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error response from AI Service, %v", err)})
 		return
 	}
 
@@ -254,7 +255,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &assessmentResult)
 	if err != nil {
 		log.Println("response from AI service does not match criteria", err)
-		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED})
+		e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("response from AI service does not match criteria, %v", err)})
 		return
 	}
 

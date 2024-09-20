@@ -1,12 +1,10 @@
 package server
 
 import (
-	commonConstants "common/constants"
 	"common/ent"
 	"errors"
 	"server/internal/services"
 	"server/pkg/constants"
-	"server/pkg/models"
 	"strconv"
 	"strings"
 
@@ -15,10 +13,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-const EXAM_CATEGORY_TYPE = commonConstants.Banking
-
-func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
-	const EXAM_TYPE = commonConstants.Descriptive
+func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	examId, err := strconv.Atoi(idParam)
+	if err != nil {
+		s.ErrorJson(w, errors.New("invalid exam id"), http.StatusBadRequest)
+		return
+	}
 
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
@@ -26,31 +27,20 @@ func (s *Server) GetBankingDescriptiveQuestions(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	isOpenStr := r.URL.Query().Get("isopen")
-	var cachedQuestions []*models.GeneratedExamOverview
-
-	if isOpenStr != "" {
-		var isOpen bool
-		isOpen, err = strconv.ParseBool(isOpenStr)
-		if err != nil {
-			s.ErrorJson(w, errors.New("invalid isopen query param, should be either true or false"), http.StatusBadRequest)
-			return
-		}
-
-		if isOpen {
-			cachedQuestions, err = s.examGenerationService.GetOpenGeneratedExams(r.Context(), EXAM_TYPE, userId)
-		} else {
-			cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
-		}
-	} else {
-		cachedQuestions, err = s.examGenerationService.GetGeneratedExams(r.Context(), EXAM_TYPE, userId)
-	}
+	cachedQuestions, err := s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "forbidden") {
 			s.ErrorJson(w, err, http.StatusForbidden)
 			return
 		}
+
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("exam type not found"))
+			return
+		}
+
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}

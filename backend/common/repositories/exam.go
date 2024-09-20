@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"common/constants"
 	"common/ent"
 	"common/ent/exam"
 	"common/ent/examcategory"
@@ -18,21 +19,53 @@ func NewExamRespository(dbClient *ent.Client) *ExamRepository {
 	}
 }
 
+func (e *ExamRepository) GetById(ctx context.Context, examId int) (*ent.Exam, error) {
+	return e.dbClient.Exam.Query().
+		Where(exam.IDEQ(examId)).
+		WithSetting().
+		WithGeneratedexams().
+		Only(ctx)
+}
+
+func (e *ExamRepository) GetActiveById(ctx context.Context, examId int, isActive bool) (*ent.Exam, error) {
+	return e.dbClient.Exam.Query().
+		Where(exam.IDEQ(examId), exam.IsActiveEQ(isActive), exam.HasGeneratedexamsWith(generatedexam.IsActiveEQ(isActive))).
+		WithSetting().
+		WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
+			geq.Where(generatedexam.IsActiveEQ(isActive))
+		}).
+		Order(ent.Desc(exam.FieldUpdatedAt)).
+		Only(ctx)
+}
+
 func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategory *ent.ExamCategory) ([]*ent.Exam, error) {
 	return e.dbClient.Exam.
 		Query().
 		Where(exam.HasCategoryWith(
 			examcategory.ID(examCategory.ID),
-		)).
+		), exam.IsActiveEQ(true)).
 		All(ctx)
 }
 
 func (e *ExamRepository) GetByName(ctx context.Context, name string) (*ent.Exam, error) {
 	return e.dbClient.Exam.Query().
-		Where(exam.Name(name)).
+		Where(exam.NameContains(name)).
 		WithSetting().
 		WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
 			geq.Where(generatedexam.IsActiveEQ(true))
 		}).
-		First(ctx)
+		Only(ctx)
+}
+
+func (e *ExamRepository) GetByType(ctx context.Context, name string) ([]*ent.Exam, error) {
+	return e.dbClient.Exam.Query().
+		Where(exam.NameContains(name)).
+		All(ctx)
+
+}
+
+func (e *ExamRepository) GetActiveByType(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error) {
+	return e.dbClient.Exam.Query().Where(
+		exam.TypeEQ(exam.Type(examType)),
+	).All(ctx)
 }

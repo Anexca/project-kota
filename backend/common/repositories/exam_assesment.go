@@ -18,9 +18,10 @@ type ExamAssesmentRepository struct {
 
 type AssesmentModel struct {
 	CompletedSeconds  int
-	Status            constants.AssessmentStatus
+	Status            constants.AssessmentStatusType
 	RawAssessmentData map[string]interface{}
 	RawUserSubmission map[string]interface{}
+	Remarks           string
 }
 
 func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
@@ -50,6 +51,10 @@ func (e *ExamAssesmentRepository) Update(ctx context.Context, assessmentId int, 
 
 	if model.RawAssessmentData != nil {
 		query.SetRawAssesmentData(model.RawAssessmentData)
+	}
+
+	if model.Remarks != "" {
+		query.SetRemarks(model.Remarks)
 	}
 
 	_, err := query.Save(ctx)

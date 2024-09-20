@@ -42,15 +42,15 @@ func init() {
 	examFields := schema.Exam{}.Fields()
 	_ = examFields
 	// examDescIsActive is the schema descriptor for is_active field.
-	examDescIsActive := examFields[2].Descriptor()
+	examDescIsActive := examFields[3].Descriptor()
 	// exam.DefaultIsActive holds the default value on creation for the is_active field.
 	exam.DefaultIsActive = examDescIsActive.Default.(bool)
 	// examDescCreatedAt is the schema descriptor for created_at field.
-	examDescCreatedAt := examFields[3].Descriptor()
+	examDescCreatedAt := examFields[5].Descriptor()
 	// exam.DefaultCreatedAt holds the default value on creation for the created_at field.
 	exam.DefaultCreatedAt = examDescCreatedAt.Default.(func() time.Time)
 	// examDescUpdatedAt is the schema descriptor for updated_at field.
-	examDescUpdatedAt := examFields[4].Descriptor()
+	examDescUpdatedAt := examFields[6].Descriptor()
 	// exam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	exam.DefaultUpdatedAt = examDescUpdatedAt.Default.(func() time.Time)
 	// exam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -58,11 +58,11 @@ func init() {
 	examassesmentFields := schema.ExamAssesment{}.Fields()
 	_ = examassesmentFields
 	// examassesmentDescCreatedAt is the schema descriptor for created_at field.
-	examassesmentDescCreatedAt := examassesmentFields[4].Descriptor()
+	examassesmentDescCreatedAt := examassesmentFields[5].Descriptor()
 	// examassesment.DefaultCreatedAt holds the default value on creation for the created_at field.
 	examassesment.DefaultCreatedAt = examassesmentDescCreatedAt.Default.(func() time.Time)
 	// examassesmentDescUpdatedAt is the schema descriptor for updated_at field.
-	examassesmentDescUpdatedAt := examassesmentFields[5].Descriptor()
+	examassesmentDescUpdatedAt := examassesmentFields[6].Descriptor()
 	// examassesment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	examassesment.DefaultUpdatedAt = examassesmentDescUpdatedAt.Default.(func() time.Time)
 	// examassesment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

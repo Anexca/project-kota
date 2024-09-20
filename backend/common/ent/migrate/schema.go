@@ -37,7 +37,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"MCQ", "DESCRIPTIVE"}, Default: "DESCRIPTIVE"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "logo_url", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_category_exams", Type: field.TypeInt, Nullable: true},
@@ -50,7 +52,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exams_exam_categories_exams",
-				Columns:    []*schema.Column{ExamsColumns[6]},
+				Columns:    []*schema.Column{ExamsColumns[8]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -62,7 +64,8 @@ var (
 		{Name: "completed_seconds", Type: field.TypeInt},
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "raw_user_submission", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}, SchemaType: map[string]string{"postgres": "status"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}},
+		{Name: "remarks", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_attempt_assesment", Type: field.TypeInt, Unique: true, Nullable: true},
@@ -75,7 +78,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exam_assesments_exam_attempts_assesment",
-				Columns:    []*schema.Column{ExamAssesmentsColumns[7]},
+				Columns:    []*schema.Column{ExamAssesmentsColumns[8]},
 				RefColumns: []*schema.Column{ExamAttemptsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -113,7 +116,7 @@ var (
 	// ExamCategoriesColumns holds the columns for the "exam_categories" table.
 	ExamCategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeEnum, Enums: []string{"BANKING"}},
 		{Name: "description", Type: field.TypeString},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "created_at", Type: field.TypeTime},

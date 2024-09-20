@@ -3,6 +3,7 @@ package repositories
 import (
 	"common/ent"
 	"common/ent/exam"
+	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
 	"common/ent/generatedexam"
@@ -77,7 +78,7 @@ func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId i
 
 func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen)).
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen), generatedexam.IsActive(!isOpen)).
 		WithExam().
 		Only(ctx)
 }
@@ -101,6 +102,7 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 func (q *GeneratedExamRepository) GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.IsOpenEQ(true), generatedexam.HasExamWith(exam.ID(examId))).
+		WithExam().
 		All(ctx)
 }
 
@@ -187,7 +189,7 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 				}
 			},
 		).
-		Order(ent.Desc(generatedexam.FieldUpdatedAt)).
+		Order(ent.Desc(examassesment.FieldUpdatedAt)).
 		Limit(limit).
 		Offset(offset)
 
@@ -200,4 +202,38 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 	}
 
 	return query.All(ctx)
+}
+
+func (q *GeneratedExamRepository) GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return 0, err
+	}
+
+	query := q.dbClient.GeneratedExam.Query().
+		Where(generatedexam.HasAttemptsWith(examattempt.HasUserWith(user.IDEQ(userUid))))
+
+	if examTypeId != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.IDEQ(*examTypeId)))
+	}
+
+	if categoryID != nil {
+		query = query.Where(generatedexam.HasExamWith(exam.HasCategoryWith(examcategory.IDEQ(*categoryID))))
+	}
+
+	if from != nil && to != nil {
+		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtGTE(*from), examattempt.UpdatedAtLTE(*to)))
+	} else if from != nil {
+		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtGTE(*from)))
+	} else if to != nil {
+		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtLTE(*to)))
+	}
+
+	// Get total count
+	totalCount, err := query.Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return totalCount, nil
 }

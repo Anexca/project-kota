@@ -18,7 +18,7 @@ type ExamCategory struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
+	Name examcategory.Name `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// IsActive holds the value of the "is_active" field.
@@ -89,7 +89,7 @@ func (ec *ExamCategory) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				ec.Name = value.String
+				ec.Name = examcategory.Name(value.String)
 			}
 		case examcategory.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -157,7 +157,7 @@ func (ec *ExamCategory) String() string {
 	builder.WriteString("ExamCategory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ec.ID))
 	builder.WriteString("name=")
-	builder.WriteString(ec.Name)
+	builder.WriteString(fmt.Sprintf("%v", ec.Name))
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(ec.Description)

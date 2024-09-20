@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"server/pkg/models"
 	"time"
 )
@@ -78,7 +79,7 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 	return currentAttempt, nil
 }
 
-func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) ([]*models.UserExamAttempt, error) {
+func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) (*models.PaginatedData, error) {
 	examWithAttempts, err := e.generatedExamRepository.GetPaginatedExamsByUserAndDate(ctx, userId, page, limit, from, to, examTypeId, categoryId)
 	if err != nil {
 		return nil, err
@@ -90,9 +91,10 @@ func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, pag
 		userExamAttempt := &models.UserExamAttempt{
 			AttemptedExamId: generatedExam.ID,
 			IsActive:        generatedExam.IsActive,
-			ExamType:        generatedExam.Edges.Exam.Name,
+			ExamName:        generatedExam.Edges.Exam.Name,
+			ExamType:        generatedExam.Edges.Exam.Type.String(),
 			ExamTypeId:      generatedExam.Edges.Exam.ID,
-			ExamCategory:    generatedExam.Edges.Exam.Edges.Category.Name,
+			ExamCategory:    string(generatedExam.Edges.Exam.Edges.Category.Name),
 			ExamCategoryId:  generatedExam.Edges.Exam.Edges.Category.ID,
 			Topic:           generatedExam.RawExamData["topic"].(string),
 			Type:            generatedExam.RawExamData["type"].(string),
@@ -117,5 +119,18 @@ func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, pag
 		userExamAttempts = append(userExamAttempts, userExamAttempt)
 	}
 
-	return userExamAttempts, nil
+	totalCount, err := e.generatedExamRepository.GetCountOfFilteredExamsDataByUserAndDate(ctx, userId, from, to, examTypeId, categoryId)
+	if err != nil {
+		return nil, err
+	}
+
+	paginatedData := &models.PaginatedData{
+		CurrentPage: page,
+		TotalItems:  totalCount,
+		TotalPages:  int(math.Ceil(float64(totalCount) / float64(limit))),
+		Data:        userExamAttempts,
+		PerPage:     limit,
+	}
+
+	return paginatedData, nil
 }

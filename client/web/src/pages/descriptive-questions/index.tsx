@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getQuestions } from "../../services/exam.service";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Checkbox } from "../../componnets/base/checkbox";
 import DescriptiveQuestionCard from "../../componnets/shared/descriptive-question-card";
 import { IQuestion } from "../../interface/question";
@@ -9,14 +9,22 @@ import { paths } from "../../routes/route.constant";
 
 import Icon from "../../componnets/base/icon";
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../componnets/base/select";
+import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "../../componnets/base/sheet";
+import NoPremiumBanner from "../../componnets/shared/no-premium-banner";
 import PreviousSubmissions from "../../componnets/shared/previous-submissions-list";
 import { useToast } from "../../hooks/use-toast";
-import { StyledLink } from "../../componnets/base/styled-link";
 
 export function ViewSubmissionDrawer({
   open,
@@ -47,11 +55,28 @@ export function ViewSubmissionDrawer({
   );
 }
 
+const selectOptions = [
+  {
+    label: "All",
+    value: "all",
+  },
+  {
+    label: "Essay",
+    value: "essay",
+  },
+  {
+    label: "Formal Letter",
+    value: "formal_letter",
+  },
+];
+
 const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
+  const [filterType, setFilterType] = useState("all");
   const [questions, setQuestions] = useState<IQuestion[]>([]);
   const [selectedQuestion, setSelectedQuestions] = useState<IQuestion | null>(
     null
   );
+  const params = useParams();
   const [showUnattempted, setShowUnattempted] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -59,7 +84,9 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const getQuestionsList = async () => {
     setLoading(true);
     try {
-      const data = await getQuestions(isOpenMode);
+      const data = await getQuestions({
+        categoryId: params.categoryId! || "open",
+      });
       setQuestions(data.data);
     } catch (error) {
       toast({
@@ -75,27 +102,35 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   }, []);
 
   const attempQuestion = (index: number) => {
-    navigate(
-      `/${isOpenMode ? paths.COMMUNITY_EXAMS : paths.EXAMS}/banking/${
-        paths.DISCRIPTIVE
-      }/${index}`,
-      {
-        state: {
-          question: questions[index],
-        },
-      }
-    );
+    const path = isOpenMode
+      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`
+      : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${params.categoryId}/${index}`;
+    navigate(path);
   };
 
-  const unattemptedQuestion = useMemo(() => {
-    return questions.filter((i) => !i.user_attempts);
-  }, [questions]);
-  const questionList = showUnattempted ? unattemptedQuestion : questions;
+  const questionList = useMemo(() => {
+    if (filterType || showUnattempted) {
+      return questions.filter((i) => {
+        let condition = true;
+        if (showUnattempted) {
+          condition = !i.user_attempts;
+        }
+        if (filterType !== "all") {
+          condition = condition && filterType == i.raw_exam_data.type;
+        }
+        return condition;
+      });
+    }
+    return questions;
+  }, [questions, filterType, showUnattempted]);
+  const backPath = isOpenMode
+    ? `/${paths.HOMEPAGE}`
+    : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`;
   return (
     <div className="pt-2 w-full md:max-w-2xl 2xl:max-w-2xl mx-auto flex flex-col gap-2 p-4">
       <div className="py-2">
         <div className="flex gap-2 items-center">
-          <Link to={`/${paths.HOMEPAGE}`} className="p-0">
+          <Link to={backPath} className="p-0">
             <Icon icon="arrow_back" className="text-info text-lg" />
           </Link>
           <span className="text-lg font-semibold">
@@ -117,6 +152,22 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
             variant={"info"}
             onCheckedChange={(s: boolean) => setShowUnattempted(s)}
           />
+          <span className="ml-auto">
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-[180px] text-sm h-8">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {selectOptions.map((i) => (
+                    <SelectItem className="!text-sm" value={i.value}>
+                      {i.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </span>
         </div>
       </div>
       {loading ? (
@@ -142,26 +193,7 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
               />
             );
           })}
-          {isOpenMode ? (
-            <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
-              <div className=" w-2 bg-yellow-400 rounded-full"></div>
-              <div className="flex flex-col flex-1">
-                <div className="text-sm font-semibold">
-                  Please buy one of our paid plan to get new question daily.
-                </div>
-                <div>
-                  <StyledLink
-                    to={`/${paths.PRICING_PLAN}`}
-                    size={"sm"}
-                    className="px-3 py-1 h-7 mt-2"
-                    variant={"warning"}
-                  >
-                    <Icon icon="send" className="mr-2" /> Buy Plan
-                  </StyledLink>
-                </div>
-              </div>
-            </div>
-          ) : null}
+          {isOpenMode ? <NoPremiumBanner /> : null}
         </div>
       )}
     </div>

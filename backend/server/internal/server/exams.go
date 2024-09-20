@@ -12,6 +12,33 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+func (s *Server) GetOpenQuestions(w http.ResponseWriter, r *http.Request) {
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+	}
+
+	cachedQuestions, err := s.examGenerationService.GetOpenGeneratedExams(r.Context(), "descriptive", userId)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
+			return
+		}
+
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("exam type not found"))
+			return
+		}
+
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	s.WriteJson(w, http.StatusOK, &Response{Data: cachedQuestions})
+}
+
 func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	generatedExamId, err := strconv.Atoi(idParam)
@@ -211,7 +238,7 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	attempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to, examTypeId, categoryID)
+	paginatedAttempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to, examTypeId, categoryID)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -229,7 +256,13 @@ func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := &Response{
-		Data: attempts,
+		Data: paginatedAttempts.Data,
+		Pagination: ResponsePagination{
+			CurrentPage: paginatedAttempts.CurrentPage,
+			TotalPages:  paginatedAttempts.TotalPages,
+			PerPage:     paginatedAttempts.PerPage,
+			TotalItems:  paginatedAttempts.TotalItems,
+		},
 	}
 
 	s.WriteJson(w, http.StatusOK, response)

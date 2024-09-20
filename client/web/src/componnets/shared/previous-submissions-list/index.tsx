@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../../../hooks/use-toast";
 import { IQuestion } from "../../../interface/question";
 import { paths } from "../../../routes/route.constant";
@@ -45,6 +45,7 @@ const PreviousSubmissions = ({
   const [submissionList, setSubmissionList] = useState<ISubmission[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const param = useParams();
   const { toast } = useToast();
   const fetchPastSubmissions = async () => {
     setLoading(true);
@@ -61,11 +62,10 @@ const PreviousSubmissions = ({
     setLoading(false);
   };
   const viewSubmission = (id: number) => {
-    navigate(
-      `/${isOpenExam ? paths.COMMUNITY_EXAMS : paths.EXAMS}/banking/${
-        paths.DISCRIPTIVE
-      }/${question.id}/${paths.SUBMISSION}/${id}`
-    );
+    const path = isOpenExam
+      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/${question.id}/${paths.SUBMISSION}/${id}`
+      : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${param.categoryId}/${question.id}/${paths.SUBMISSION}/${id}`;
+    navigate(path);
   };
   useEffect(() => {
     fetchPastSubmissions();

@@ -37,6 +37,20 @@ func (ec *ExamCreate) SetDescription(s string) *ExamCreate {
 	return ec
 }
 
+// SetType sets the "type" field.
+func (ec *ExamCreate) SetType(e exam.Type) *ExamCreate {
+	ec.mutation.SetType(e)
+	return ec
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (ec *ExamCreate) SetNillableType(e *exam.Type) *ExamCreate {
+	if e != nil {
+		ec.SetType(*e)
+	}
+	return ec
+}
+
 // SetIsActive sets the "is_active" field.
 func (ec *ExamCreate) SetIsActive(b bool) *ExamCreate {
 	ec.mutation.SetIsActive(b)
@@ -47,6 +61,20 @@ func (ec *ExamCreate) SetIsActive(b bool) *ExamCreate {
 func (ec *ExamCreate) SetNillableIsActive(b *bool) *ExamCreate {
 	if b != nil {
 		ec.SetIsActive(*b)
+	}
+	return ec
+}
+
+// SetLogoURL sets the "logo_url" field.
+func (ec *ExamCreate) SetLogoURL(s string) *ExamCreate {
+	ec.mutation.SetLogoURL(s)
+	return ec
+}
+
+// SetNillableLogoURL sets the "logo_url" field if the given value is not nil.
+func (ec *ExamCreate) SetNillableLogoURL(s *string) *ExamCreate {
+	if s != nil {
+		ec.SetLogoURL(*s)
 	}
 	return ec
 }
@@ -197,6 +225,10 @@ func (ec *ExamCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ec *ExamCreate) defaults() {
+	if _, ok := ec.mutation.GetType(); !ok {
+		v := exam.DefaultType
+		ec.mutation.SetType(v)
+	}
 	if _, ok := ec.mutation.IsActive(); !ok {
 		v := exam.DefaultIsActive
 		ec.mutation.SetIsActive(v)
@@ -218,6 +250,14 @@ func (ec *ExamCreate) check() error {
 	}
 	if _, ok := ec.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Exam.description"`)}
+	}
+	if _, ok := ec.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Exam.type"`)}
+	}
+	if v, ok := ec.mutation.GetType(); ok {
+		if err := exam.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Exam.type": %w`, err)}
+		}
 	}
 	if _, ok := ec.mutation.IsActive(); !ok {
 		return &ValidationError{Name: "is_active", err: errors.New(`ent: missing required field "Exam.is_active"`)}
@@ -262,9 +302,17 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
+	if value, ok := ec.mutation.GetType(); ok {
+		_spec.SetField(exam.FieldType, field.TypeEnum, value)
+		_node.Type = value
+	}
 	if value, ok := ec.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
 		_node.IsActive = value
+	}
+	if value, ok := ec.mutation.LogoURL(); ok {
+		_spec.SetField(exam.FieldLogoURL, field.TypeString, value)
+		_node.LogoURL = value
 	}
 	if value, ok := ec.mutation.CreatedAt(); ok {
 		_spec.SetField(exam.FieldCreatedAt, field.TypeTime, value)

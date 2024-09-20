@@ -1,15 +1,11 @@
 package constants
 
-type ExamCategoryType string
+type ExamCategoryName string
 
 const (
-	Banking     ExamCategoryType = "BANKING"
-	Engineering ExamCategoryType = "ENGINEERING"
-	Medical     ExamCategoryType = "MEDICAL"
+	ExamCategoryNameBanking ExamCategoryName = "BANKING"
 )
 
-var EXAM_CATEGORIES = map[ExamCategoryType]string{
-	Banking:     "banking",
-	Engineering: "engineering",
-	Medical:     "medical",
+var EXAM_CATEGORIES = map[ExamCategoryName]string{
+	ExamCategoryNameBanking: "banking",
 }

@@ -1,8 +1,16 @@
-import { Link } from "react-router-dom";
-import Header from "../header/header";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ScreenSizeQuery } from "../../../constants/shared";
+import { useMediaQuery } from "../../../hooks/use-media-query";
+import { useToast } from "../../../hooks/use-toast";
+import { ICategory } from "../../../interface/question";
 import { paths } from "../../../routes/route.constant";
+import { getQuestionsCategories } from "../../../services/exam.service";
 import Chip from "../../base/chip";
 import Footer from "../footer";
+import Header from "../header/header";
+import StrippedLoader from "../stripped-loader";
+import { ToastAction } from "../../base/toast";
 
 const Card = ({
   title,
@@ -96,6 +104,45 @@ const upcomingFeatures = [
 ];
 
 const GuestHomePage = () => {
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const isDesktopMode = useMediaQuery(ScreenSizeQuery.largeScreen, true);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const getQuestionsList = async () => {
+    setLoading(true);
+    try {
+      const data = await getQuestionsCategories();
+      setCategories(data.data);
+    } catch (error) {
+      toast({
+        title: "Oh ho Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in processing your request.",
+      });
+    }
+    setLoading(false);
+  };
+  const showNotification = () => {
+    toast({
+      title: "Hold On!",
+      variant: "info",
+      description:
+        "You'll need to sign in before taking the exam. Let's get you set up!",
+      action: (
+        <ToastAction
+          altText="Login"
+          onClick={() => navigate(`/${paths.LOGIN}`)}
+        >
+          Login
+        </ToastAction>
+      ),
+    });
+  };
+  useEffect(() => {
+    getQuestionsList();
+  }, []);
+  const categoryList = isDesktopMode ? categories : categories.slice(0, 6);
   return (
     <>
       <Header />
@@ -188,6 +235,48 @@ const GuestHomePage = () => {
                 </div>
               ))}
             </div>
+
+            <>
+              <div className="text-center my-4 font-bold text-2xl underline mt-14">
+                Descriptive Exams we Offer
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+                {loading
+                  ? "*"
+                      .repeat(10)
+                      .split("")
+                      .map(() => (
+                        <div className="p-4">
+                          <StrippedLoader className="w-full h-20" />
+                        </div>
+                      ))
+                  : categoryList.map((item) => (
+                      <div className="p-4 ">
+                        <article
+                          onClick={showNotification}
+                          role="button"
+                          className=" cursor-pointer overflow-hidden rounded-lg border border-gray-100 p-4 flex gap-3 items-center"
+                        >
+                          <div className="h-10 aspect-square">
+                            <img
+                              src={item.logo_url}
+                              className="object-contain "
+                            />
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-900 sm:text-xl">
+                            {item.exam_name.split("_").join(" ")}
+                          </h3>
+                        </article>
+                      </div>
+                    ))}
+              </div>
+              {!isDesktopMode && (
+                <div className="w-full font-medium text-center animate-pulse pb-8">
+                  And Many More Exams
+                </div>
+              )}
+            </>
+
             <div className="text-center my-4 font-bold text-2xl underline">
               Exciting Upcoming Features
             </div>
@@ -195,7 +284,7 @@ const GuestHomePage = () => {
               {upcomingFeatures.map((item) => (
                 <div className="p-4 lg:grayscale grayscale-0 transition duration-200 hover:grayscale-0">
                   <Card
-                    chip={<Chip icon="clock">Comming Soon</Chip>}
+                    chip={<Chip icon="clock">Coming Soon</Chip>}
                     title={item.title}
                     description={item.description}
                     icon={item.icon}

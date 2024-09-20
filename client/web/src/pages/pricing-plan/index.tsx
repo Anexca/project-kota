@@ -62,7 +62,7 @@ export default function PricingPlan() {
                   toward excellence today!
                 </div>
                 <div className="text-lg leading-7 lg:mt-4">
-                  New plans and feature comming soon.
+                  New plans and feature coming soon.
                 </div>
                 <div className="text-end">
                   <Icon
@@ -104,16 +104,41 @@ export default function PricingPlan() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-auto border border-dashed border-[#A9A9AA] tracking-widest mb-2" />
-                <div className="h-28 ">
-                  <div className="flex flex-col gap-4 justify-between absolute left-6 right-6 bottom-6">
-                    <div className="flex items-baseline">
-                      <span className="text-4xl font-bold">
-                        <Icon icon="rupee" className="text-3xl" />
-                        {data.price}
+                <div>
+                  {!data.isDisabled &&
+                    profile?.active_subscriptions?.[0]
+                      ?.provider_subscription_id && (
+                      <span className="text-sm flex gap-2 font-bold">
+                        Valid upto
+                        <Chip icon="clock" className="mb-2">
+                          {new Date(
+                            profile.active_subscriptions[0].end_date
+                          ).toLocaleDateString()}
+                        </Chip>
                       </span>
-                      <span>{data.duration}</span>
+                    )}
+                </div>
+                <div className="mt-auto border border-dashed border-[#A9A9AA] tracking-widest mb-2" />
+                <div className="">
+                  <div className="flex flex-col gap-4 justify-between ">
+                    <div className="flex items-baseline flex-row">
+                      {data.original && (
+                        <div className="flex items-baseline line-through text-destructive mr-2">
+                          <span className="text-2xl font-bold">
+                            <Icon icon="rupee" className="text-xl" />
+                            {data.original}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-baseline">
+                        <span className="text-4xl font-bold">
+                          <Icon icon="rupee" className="text-3xl" />
+                          {data.price}
+                        </span>
+                        <span>{data.duration}</span>
+                      </div>
                     </div>
+
                     <div className="flex align-bottom">
                       {session ? (
                         <RazorpayButton
@@ -147,6 +172,7 @@ const staticValue = [
   {
     passType: "Golden Pass",
     price: "19",
+    original: "59",
     duration: "/month",
     static: [
       "AI based descriptive exam assesments.",
@@ -168,6 +194,6 @@ const staticValue = [
       "Tracking of attempted exams.",
     ],
     isDisabled: true,
-    buttonText: "Comming soon",
+    buttonText: "Coming soon",
   },
 ];

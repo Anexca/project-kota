@@ -61,6 +61,20 @@ func (eu *ExamUpdate) SetNillableDescription(s *string) *ExamUpdate {
 	return eu
 }
 
+// SetType sets the "type" field.
+func (eu *ExamUpdate) SetType(e exam.Type) *ExamUpdate {
+	eu.mutation.SetType(e)
+	return eu
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableType(e *exam.Type) *ExamUpdate {
+	if e != nil {
+		eu.SetType(*e)
+	}
+	return eu
+}
+
 // SetIsActive sets the "is_active" field.
 func (eu *ExamUpdate) SetIsActive(b bool) *ExamUpdate {
 	eu.mutation.SetIsActive(b)
@@ -72,6 +86,26 @@ func (eu *ExamUpdate) SetNillableIsActive(b *bool) *ExamUpdate {
 	if b != nil {
 		eu.SetIsActive(*b)
 	}
+	return eu
+}
+
+// SetLogoURL sets the "logo_url" field.
+func (eu *ExamUpdate) SetLogoURL(s string) *ExamUpdate {
+	eu.mutation.SetLogoURL(s)
+	return eu
+}
+
+// SetNillableLogoURL sets the "logo_url" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableLogoURL(s *string) *ExamUpdate {
+	if s != nil {
+		eu.SetLogoURL(*s)
+	}
+	return eu
+}
+
+// ClearLogoURL clears the value of the "logo_url" field.
+func (eu *ExamUpdate) ClearLogoURL() *ExamUpdate {
+	eu.mutation.ClearLogoURL()
 	return eu
 }
 
@@ -280,7 +314,20 @@ func (eu *ExamUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (eu *ExamUpdate) check() error {
+	if v, ok := eu.mutation.GetType(); ok {
+		if err := exam.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Exam.type": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := eu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(exam.Table, exam.Columns, sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt))
 	if ps := eu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -295,8 +342,17 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 	}
+	if value, ok := eu.mutation.GetType(); ok {
+		_spec.SetField(exam.FieldType, field.TypeEnum, value)
+	}
 	if value, ok := eu.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := eu.mutation.LogoURL(); ok {
+		_spec.SetField(exam.FieldLogoURL, field.TypeString, value)
+	}
+	if eu.mutation.LogoURLCleared() {
+		_spec.ClearField(exam.FieldLogoURL, field.TypeString)
 	}
 	if value, ok := eu.mutation.UpdatedAt(); ok {
 		_spec.SetField(exam.FieldUpdatedAt, field.TypeTime, value)
@@ -542,6 +598,20 @@ func (euo *ExamUpdateOne) SetNillableDescription(s *string) *ExamUpdateOne {
 	return euo
 }
 
+// SetType sets the "type" field.
+func (euo *ExamUpdateOne) SetType(e exam.Type) *ExamUpdateOne {
+	euo.mutation.SetType(e)
+	return euo
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableType(e *exam.Type) *ExamUpdateOne {
+	if e != nil {
+		euo.SetType(*e)
+	}
+	return euo
+}
+
 // SetIsActive sets the "is_active" field.
 func (euo *ExamUpdateOne) SetIsActive(b bool) *ExamUpdateOne {
 	euo.mutation.SetIsActive(b)
@@ -553,6 +623,26 @@ func (euo *ExamUpdateOne) SetNillableIsActive(b *bool) *ExamUpdateOne {
 	if b != nil {
 		euo.SetIsActive(*b)
 	}
+	return euo
+}
+
+// SetLogoURL sets the "logo_url" field.
+func (euo *ExamUpdateOne) SetLogoURL(s string) *ExamUpdateOne {
+	euo.mutation.SetLogoURL(s)
+	return euo
+}
+
+// SetNillableLogoURL sets the "logo_url" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableLogoURL(s *string) *ExamUpdateOne {
+	if s != nil {
+		euo.SetLogoURL(*s)
+	}
+	return euo
+}
+
+// ClearLogoURL clears the value of the "logo_url" field.
+func (euo *ExamUpdateOne) ClearLogoURL() *ExamUpdateOne {
+	euo.mutation.ClearLogoURL()
 	return euo
 }
 
@@ -774,7 +864,20 @@ func (euo *ExamUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (euo *ExamUpdateOne) check() error {
+	if v, ok := euo.mutation.GetType(); ok {
+		if err := exam.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Exam.type": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) {
+	if err := euo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(exam.Table, exam.Columns, sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt))
 	id, ok := euo.mutation.ID()
 	if !ok {
@@ -806,8 +909,17 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	if value, ok := euo.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 	}
+	if value, ok := euo.mutation.GetType(); ok {
+		_spec.SetField(exam.FieldType, field.TypeEnum, value)
+	}
 	if value, ok := euo.mutation.IsActive(); ok {
 		_spec.SetField(exam.FieldIsActive, field.TypeBool, value)
+	}
+	if value, ok := euo.mutation.LogoURL(); ok {
+		_spec.SetField(exam.FieldLogoURL, field.TypeString, value)
+	}
+	if euo.mutation.LogoURLCleared() {
+		_spec.ClearField(exam.FieldLogoURL, field.TypeString)
 	}
 	if value, ok := euo.mutation.UpdatedAt(); ok {
 		_spec.SetField(exam.FieldUpdatedAt, field.TypeTime, value)

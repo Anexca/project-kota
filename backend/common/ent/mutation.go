@@ -667,7 +667,9 @@ type ExamMutation struct {
 	id                    *int
 	name                  *string
 	description           *string
+	_type                 *exam.Type
 	is_active             *bool
+	logo_url              *string
 	created_at            *time.Time
 	updated_at            *time.Time
 	clearedFields         map[string]struct{}
@@ -859,6 +861,42 @@ func (m *ExamMutation) ResetDescription() {
 	m.description = nil
 }
 
+// SetType sets the "type" field.
+func (m *ExamMutation) SetType(e exam.Type) {
+	m._type = &e
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *ExamMutation) GetType() (r exam.Type, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldType(ctx context.Context) (v exam.Type, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *ExamMutation) ResetType() {
+	m._type = nil
+}
+
 // SetIsActive sets the "is_active" field.
 func (m *ExamMutation) SetIsActive(b bool) {
 	m.is_active = &b
@@ -893,6 +931,55 @@ func (m *ExamMutation) OldIsActive(ctx context.Context) (v bool, err error) {
 // ResetIsActive resets all changes to the "is_active" field.
 func (m *ExamMutation) ResetIsActive() {
 	m.is_active = nil
+}
+
+// SetLogoURL sets the "logo_url" field.
+func (m *ExamMutation) SetLogoURL(s string) {
+	m.logo_url = &s
+}
+
+// LogoURL returns the value of the "logo_url" field in the mutation.
+func (m *ExamMutation) LogoURL() (r string, exists bool) {
+	v := m.logo_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLogoURL returns the old "logo_url" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldLogoURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLogoURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLogoURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLogoURL: %w", err)
+	}
+	return oldValue.LogoURL, nil
+}
+
+// ClearLogoURL clears the value of the "logo_url" field.
+func (m *ExamMutation) ClearLogoURL() {
+	m.logo_url = nil
+	m.clearedFields[exam.FieldLogoURL] = struct{}{}
+}
+
+// LogoURLCleared returns if the "logo_url" field was cleared in this mutation.
+func (m *ExamMutation) LogoURLCleared() bool {
+	_, ok := m.clearedFields[exam.FieldLogoURL]
+	return ok
+}
+
+// ResetLogoURL resets all changes to the "logo_url" field.
+func (m *ExamMutation) ResetLogoURL() {
+	m.logo_url = nil
+	delete(m.clearedFields, exam.FieldLogoURL)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -1241,15 +1328,21 @@ func (m *ExamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, exam.FieldName)
 	}
 	if m.description != nil {
 		fields = append(fields, exam.FieldDescription)
 	}
+	if m._type != nil {
+		fields = append(fields, exam.FieldType)
+	}
 	if m.is_active != nil {
 		fields = append(fields, exam.FieldIsActive)
+	}
+	if m.logo_url != nil {
+		fields = append(fields, exam.FieldLogoURL)
 	}
 	if m.created_at != nil {
 		fields = append(fields, exam.FieldCreatedAt)
@@ -1269,8 +1362,12 @@ func (m *ExamMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case exam.FieldDescription:
 		return m.Description()
+	case exam.FieldType:
+		return m.GetType()
 	case exam.FieldIsActive:
 		return m.IsActive()
+	case exam.FieldLogoURL:
+		return m.LogoURL()
 	case exam.FieldCreatedAt:
 		return m.CreatedAt()
 	case exam.FieldUpdatedAt:
@@ -1288,8 +1385,12 @@ func (m *ExamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case exam.FieldDescription:
 		return m.OldDescription(ctx)
+	case exam.FieldType:
+		return m.OldType(ctx)
 	case exam.FieldIsActive:
 		return m.OldIsActive(ctx)
+	case exam.FieldLogoURL:
+		return m.OldLogoURL(ctx)
 	case exam.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case exam.FieldUpdatedAt:
@@ -1317,12 +1418,26 @@ func (m *ExamMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDescription(v)
 		return nil
+	case exam.FieldType:
+		v, ok := value.(exam.Type)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
 	case exam.FieldIsActive:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIsActive(v)
+		return nil
+	case exam.FieldLogoURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLogoURL(v)
 		return nil
 	case exam.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1367,7 +1482,11 @@ func (m *ExamMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ExamMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(exam.FieldLogoURL) {
+		fields = append(fields, exam.FieldLogoURL)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1380,6 +1499,11 @@ func (m *ExamMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ExamMutation) ClearField(name string) error {
+	switch name {
+	case exam.FieldLogoURL:
+		m.ClearLogoURL()
+		return nil
+	}
 	return fmt.Errorf("unknown Exam nullable field %s", name)
 }
 
@@ -1393,8 +1517,14 @@ func (m *ExamMutation) ResetField(name string) error {
 	case exam.FieldDescription:
 		m.ResetDescription()
 		return nil
+	case exam.FieldType:
+		m.ResetType()
+		return nil
 	case exam.FieldIsActive:
 		m.ResetIsActive()
+		return nil
+	case exam.FieldLogoURL:
+		m.ResetLogoURL()
 		return nil
 	case exam.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -1589,6 +1719,7 @@ type ExamAssesmentMutation struct {
 	raw_assesment_data   *map[string]interface{}
 	raw_user_submission  *map[string]interface{}
 	status               *examassesment.Status
+	remarks              *string
 	created_at           *time.Time
 	updated_at           *time.Time
 	clearedFields        map[string]struct{}
@@ -1874,6 +2005,55 @@ func (m *ExamAssesmentMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetRemarks sets the "remarks" field.
+func (m *ExamAssesmentMutation) SetRemarks(s string) {
+	m.remarks = &s
+}
+
+// Remarks returns the value of the "remarks" field in the mutation.
+func (m *ExamAssesmentMutation) Remarks() (r string, exists bool) {
+	v := m.remarks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemarks returns the old "remarks" field's value of the ExamAssesment entity.
+// If the ExamAssesment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamAssesmentMutation) OldRemarks(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemarks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemarks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemarks: %w", err)
+	}
+	return oldValue.Remarks, nil
+}
+
+// ClearRemarks clears the value of the "remarks" field.
+func (m *ExamAssesmentMutation) ClearRemarks() {
+	m.remarks = nil
+	m.clearedFields[examassesment.FieldRemarks] = struct{}{}
+}
+
+// RemarksCleared returns if the "remarks" field was cleared in this mutation.
+func (m *ExamAssesmentMutation) RemarksCleared() bool {
+	_, ok := m.clearedFields[examassesment.FieldRemarks]
+	return ok
+}
+
+// ResetRemarks resets all changes to the "remarks" field.
+func (m *ExamAssesmentMutation) ResetRemarks() {
+	m.remarks = nil
+	delete(m.clearedFields, examassesment.FieldRemarks)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ExamAssesmentMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -2019,7 +2199,7 @@ func (m *ExamAssesmentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamAssesmentMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.completed_seconds != nil {
 		fields = append(fields, examassesment.FieldCompletedSeconds)
 	}
@@ -2031,6 +2211,9 @@ func (m *ExamAssesmentMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, examassesment.FieldStatus)
+	}
+	if m.remarks != nil {
+		fields = append(fields, examassesment.FieldRemarks)
 	}
 	if m.created_at != nil {
 		fields = append(fields, examassesment.FieldCreatedAt)
@@ -2054,6 +2237,8 @@ func (m *ExamAssesmentMutation) Field(name string) (ent.Value, bool) {
 		return m.RawUserSubmission()
 	case examassesment.FieldStatus:
 		return m.Status()
+	case examassesment.FieldRemarks:
+		return m.Remarks()
 	case examassesment.FieldCreatedAt:
 		return m.CreatedAt()
 	case examassesment.FieldUpdatedAt:
@@ -2075,6 +2260,8 @@ func (m *ExamAssesmentMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldRawUserSubmission(ctx)
 	case examassesment.FieldStatus:
 		return m.OldStatus(ctx)
+	case examassesment.FieldRemarks:
+		return m.OldRemarks(ctx)
 	case examassesment.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case examassesment.FieldUpdatedAt:
@@ -2115,6 +2302,13 @@ func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case examassesment.FieldRemarks:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemarks(v)
 		return nil
 	case examassesment.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -2178,6 +2372,9 @@ func (m *ExamAssesmentMutation) ClearedFields() []string {
 	if m.FieldCleared(examassesment.FieldRawAssesmentData) {
 		fields = append(fields, examassesment.FieldRawAssesmentData)
 	}
+	if m.FieldCleared(examassesment.FieldRemarks) {
+		fields = append(fields, examassesment.FieldRemarks)
+	}
 	return fields
 }
 
@@ -2194,6 +2391,9 @@ func (m *ExamAssesmentMutation) ClearField(name string) error {
 	switch name {
 	case examassesment.FieldRawAssesmentData:
 		m.ClearRawAssesmentData()
+		return nil
+	case examassesment.FieldRemarks:
+		m.ClearRemarks()
 		return nil
 	}
 	return fmt.Errorf("unknown ExamAssesment nullable field %s", name)
@@ -2214,6 +2414,9 @@ func (m *ExamAssesmentMutation) ResetField(name string) error {
 		return nil
 	case examassesment.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case examassesment.FieldRemarks:
+		m.ResetRemarks()
 		return nil
 	case examassesment.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -2960,7 +3163,7 @@ type ExamCategoryMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	name          *string
+	name          *examcategory.Name
 	description   *string
 	is_active     *bool
 	created_at    *time.Time
@@ -3073,12 +3276,12 @@ func (m *ExamCategoryMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetName sets the "name" field.
-func (m *ExamCategoryMutation) SetName(s string) {
-	m.name = &s
+func (m *ExamCategoryMutation) SetName(e examcategory.Name) {
+	m.name = &e
 }
 
 // Name returns the value of the "name" field in the mutation.
-func (m *ExamCategoryMutation) Name() (r string, exists bool) {
+func (m *ExamCategoryMutation) Name() (r examcategory.Name, exists bool) {
 	v := m.name
 	if v == nil {
 		return
@@ -3089,7 +3292,7 @@ func (m *ExamCategoryMutation) Name() (r string, exists bool) {
 // OldName returns the old "name" field's value of the ExamCategory entity.
 // If the ExamCategory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ExamCategoryMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *ExamCategoryMutation) OldName(ctx context.Context) (v examcategory.Name, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
@@ -3403,7 +3606,7 @@ func (m *ExamCategoryMutation) OldField(ctx context.Context, name string) (ent.V
 func (m *ExamCategoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case examcategory.FieldName:
-		v, ok := value.(string)
+		v, ok := value.(examcategory.Name)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
