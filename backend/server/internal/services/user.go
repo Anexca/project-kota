@@ -13,7 +13,7 @@ import (
 )
 
 type UserService struct {
-	paymentService             *PaymentServiceV2
+	paymentService             *PaymentService
 	userRepository             *repositories.UserRepository
 	paymentRepositry           *repositories.PaymentRepository
 	userSubscriptionRepository *repositories.UserSubscriptioRepository
@@ -35,7 +35,7 @@ type UserProfileResponse struct {
 }
 
 func NewUserService(dbClient *ent.Client, paymentClient *razorpay.Client) *UserService {
-	paymentService := NewPaymentServiceV2(paymentClient)
+	paymentService := NewPaymentService()
 	paymentRepositry := repositories.NewPaymentRepository(dbClient)
 	userRepository := repositories.NewUserRepository(dbClient)
 	userSubscriptionRepository := repositories.NewUserSubscriptioRepository(dbClient)
@@ -147,15 +147,10 @@ func (u *UserService) GetUserTransactions(ctx context.Context, userId string) ([
 }
 
 func (u *UserService) updatePaymentProviderCustomer(user *ent.User) error {
-	model := UpsertPaymentProviderCustomerModelV2{
+	model := UpsertPaymentProviderCustomerModel{
 		Name:  fmt.Sprintf("%s %s", user.FirstName, user.LastName),
 		Phone: user.PhoneNumber,
 		Email: user.Email,
-	}
-
-	if user.PaymentProviderCustomerID != "" {
-		_, err := u.paymentService.UpdateCustomer(user.PaymentProviderCustomerID, model)
-		return err
 	}
 
 	customer, err := u.paymentService.CreateCustomer(model)
@@ -163,12 +158,11 @@ func (u *UserService) updatePaymentProviderCustomer(user *ent.User) error {
 		return err
 	}
 
-	customerId, ok := customer["id"].(string)
-	if !ok || customerId == "" {
+	customerId := customer.CustomerUid
+	if *customerId == "" {
 		return fmt.Errorf("could not extract customer id from response %v", customer)
 	}
 
-	user.PaymentProviderCustomerID = customerId
-
+	user.PaymentProviderCustomerID = *customerId
 	return nil
 }

@@ -18,6 +18,8 @@ type UpsertPaymentProviderCustomerModel struct {
 	Phone string
 }
 
+var xAPIVersion = "2023-08-01"
+
 func NewPaymentService() *PaymentService {
 	environment, err := config.LoadEnvironment()
 	if err != nil {
@@ -48,7 +50,7 @@ func (p *PaymentService) CreateCustomer(model UpsertPaymentProviderCustomerModel
 	xRequestId := util.GenerateUUID()
 	xIdempotencyKey := util.GenerateUUID()
 
-	resp, _, err := cashfree_pg.PGCreateCustomer(nil, &createCustomerRequest, &xRequestId, &xIdempotencyKey, nil)
+	resp, _, err := cashfree_pg.PGCreateCustomer(&xAPIVersion, &createCustomerRequest, &xRequestId, &xIdempotencyKey, nil)
 	if err != nil {
 		return nil, err
 	}
