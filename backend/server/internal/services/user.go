@@ -13,7 +13,7 @@ import (
 )
 
 type UserService struct {
-	paymentService             *PaymentService
+	paymentService             *PaymentServiceV2
 	userRepository             *repositories.UserRepository
 	paymentRepositry           *repositories.PaymentRepository
 	userSubscriptionRepository *repositories.UserSubscriptioRepository
@@ -35,7 +35,7 @@ type UserProfileResponse struct {
 }
 
 func NewUserService(dbClient *ent.Client, paymentClient *razorpay.Client) *UserService {
-	paymentService := NewPaymentService(paymentClient)
+	paymentService := NewPaymentServiceV2(paymentClient)
 	paymentRepositry := repositories.NewPaymentRepository(dbClient)
 	userRepository := repositories.NewUserRepository(dbClient)
 	userSubscriptionRepository := repositories.NewUserSubscriptioRepository(dbClient)
@@ -147,7 +147,7 @@ func (u *UserService) GetUserTransactions(ctx context.Context, userId string) ([
 }
 
 func (u *UserService) updatePaymentProviderCustomer(user *ent.User) error {
-	model := UpsertPaymentProviderCustomerModel{
+	model := UpsertPaymentProviderCustomerModelV2{
 		Name:  fmt.Sprintf("%s %s", user.FirstName, user.LastName),
 		Phone: user.PhoneNumber,
 		Email: user.Email,

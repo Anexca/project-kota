@@ -17,7 +17,7 @@ import (
 
 type SubscriptionService struct {
 	environment                *config.Environment
-	paymentService             *PaymentService
+	paymentService             *PaymentServiceV2
 	userRepository             *commonRepositories.UserRepository
 	subscriptionRepository     *commonRepositories.SubscriptionRepository
 	userSubscriptionRepository *commonRepositories.UserSubscriptioRepository
@@ -31,7 +31,7 @@ type ActivateUserSubscriptionRequest struct {
 
 func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client) *SubscriptionService {
 	environment, _ := config.LoadEnvironment()
-	paymentService := NewPaymentService(paymentClient)
+	paymentService := NewPaymentServiceV2(paymentClient)
 	userRepository := commonRepositories.NewUserRepository(dbClient)
 	subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
 	userSubscriptionRepository := commonRepositories.NewUserSubscriptioRepository(dbClient)
@@ -99,7 +99,7 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, fmt.Errorf("user already has active subscription")
 	}
 
-	model := CreateSubscriptionModel{
+	model := CreateSubscriptionModelV2{
 		ProviderPlanId:     subscription.ProviderPlanID,
 		TotalBillingCycles: 3,
 		CustomerId:         user.PaymentProviderCustomerID,

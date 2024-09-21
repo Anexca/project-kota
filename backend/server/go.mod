@@ -18,6 +18,8 @@ require github.com/razorpay/razorpay-go v1.3.2
 
 require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
+	github.com/cashfree/cashfree-pg/v4 v4.2.4 // indirect
+	github.com/getsentry/sentry-go v0.18.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 )
 
