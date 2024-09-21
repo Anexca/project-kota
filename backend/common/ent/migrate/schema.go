@@ -185,7 +185,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "amount", Type: field.TypeFloat64},
 		{Name: "payment_date", Type: field.TypeTime},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"CREATED", "AUTHORIZED", "CAPTURED", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED", "PENDING", "PROCESSING", "CANCELLED", "DISPUTED"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"SUCCESS", "NOT_ATTEMPTED", "USER_DROPPED", "FAILED", "PENDING", "CANCELLED"}},
 		{Name: "payment_method", Type: field.TypeString},
 		{Name: "provider_payment_id", Type: field.TypeString, Unique: true},
 		{Name: "provider_invoice_id", Type: field.TypeString, Unique: true},

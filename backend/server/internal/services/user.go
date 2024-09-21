@@ -69,12 +69,17 @@ func (u *UserService) GetUserProfile(ctx context.Context, userId string) (UserPr
 				DurationInMonths:       userSubscription.Edges.Subscription.DurationInMonths,
 				StartDate:              userSubscription.StartDate,
 				EndDate:                userSubscription.EndDate,
-				PaymentDetails: models.SubscriptionPaymentDetails{
+			}
+
+			if len(user.Edges.Payments) > 0 {
+				paymentDetails := models.SubscriptionPaymentDetails{
 					Amount:        userSubscription.Edges.Payments[0].Amount, // Assuming the first payment holds the necessary details
 					PaymentDate:   userSubscription.Edges.Payments[0].PaymentDate,
 					PaymentStatus: string(userSubscription.Edges.Payments[0].Status),
 					PaymentMethod: userSubscription.Edges.Payments[0].PaymentMethod,
-				},
+				}
+
+				subscriptionDetails.PaymentDetails = paymentDetails
 			}
 
 			activeSubscriptions = append(activeSubscriptions, subscriptionDetails)

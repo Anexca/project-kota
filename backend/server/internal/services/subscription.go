@@ -10,7 +10,6 @@ import (
 	"log"
 	"server/pkg/config"
 	"server/pkg/models"
-	"strconv"
 	"time"
 
 	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
@@ -171,12 +170,12 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, user
 
 func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, transaction *cashfree_pg.PaymentEntity, userSubscriptionId int, userId string) (*ent.Payment, error) {
 
-	paymentTimeInt, err := strconv.ParseInt(*transaction.PaymentCompletionTime, 10, 64)
+	const layout = time.RFC3339
+
+	paymentDate, err := time.Parse(layout, *transaction.PaymentCompletionTime)
 	if err != nil {
 		return nil, err
 	}
-
-	paymentDate := time.Unix(paymentTimeInt, 0)
 
 	paymentModel := commonRepositories.CreatePaymentModel{
 		Status:             *transaction.PaymentStatus,
