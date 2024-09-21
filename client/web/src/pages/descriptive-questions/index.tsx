@@ -25,6 +25,8 @@ import {
 import NoPremiumBanner from "../../componnets/shared/no-premium-banner";
 import PreviousSubmissions from "../../componnets/shared/previous-submissions-list";
 import { useToast } from "../../hooks/use-toast";
+import useUserProfileStore from "../../store/user-info-store";
+import { StyledLink } from "../../componnets/base/styled-link";
 
 export function ViewSubmissionDrawer({
   open,
@@ -72,6 +74,8 @@ const selectOptions = [
 
 const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const [filterType, setFilterType] = useState("all");
+  const { profile } = useUserProfileStore();
+
   const [questions, setQuestions] = useState<IQuestion[]>([]);
   const [selectedQuestion, setSelectedQuestions] = useState<IQuestion | null>(
     null
@@ -193,7 +197,28 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
               />
             );
           })}
-          {isOpenMode ? <NoPremiumBanner /> : null}
+          {isOpenMode && !profile?.active_subscriptions?.length ? (
+            <NoPremiumBanner />
+          ) : (
+            <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
+              <div className=" w-2 bg-info rounded-full"></div>
+              <div className="flex flex-col flex-1">
+                <div className="text-sm font-semibold">
+                  Explore more descriptive question.
+                </div>
+                <div>
+                  <StyledLink
+                    to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
+                    size={"sm"}
+                    className="px-3 py-1 h-7 mt-2"
+                    variant={"info"}
+                  >
+                    <Icon icon="send" className="mr-2" /> See More
+                  </StyledLink>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
