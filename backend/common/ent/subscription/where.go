@@ -61,7 +61,7 @@ func ProviderPlanID(v string) predicate.Subscription {
 }
 
 // Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
-func Price(v int) predicate.Subscription {
+func Price(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldEQ(FieldPrice, v))
 }
 
@@ -156,42 +156,42 @@ func ProviderPlanIDContainsFold(v string) predicate.Subscription {
 }
 
 // PriceEQ applies the EQ predicate on the "price" field.
-func PriceEQ(v int) predicate.Subscription {
+func PriceEQ(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldEQ(FieldPrice, v))
 }
 
 // PriceNEQ applies the NEQ predicate on the "price" field.
-func PriceNEQ(v int) predicate.Subscription {
+func PriceNEQ(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldNEQ(FieldPrice, v))
 }
 
 // PriceIn applies the In predicate on the "price" field.
-func PriceIn(vs ...int) predicate.Subscription {
+func PriceIn(vs ...float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldIn(FieldPrice, vs...))
 }
 
 // PriceNotIn applies the NotIn predicate on the "price" field.
-func PriceNotIn(vs ...int) predicate.Subscription {
+func PriceNotIn(vs ...float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldNotIn(FieldPrice, vs...))
 }
 
 // PriceGT applies the GT predicate on the "price" field.
-func PriceGT(v int) predicate.Subscription {
+func PriceGT(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldGT(FieldPrice, v))
 }
 
 // PriceGTE applies the GTE predicate on the "price" field.
-func PriceGTE(v int) predicate.Subscription {
+func PriceGTE(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldGTE(FieldPrice, v))
 }
 
 // PriceLT applies the LT predicate on the "price" field.
-func PriceLT(v int) predicate.Subscription {
+func PriceLT(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldLT(FieldPrice, v))
 }
 
 // PriceLTE applies the LTE predicate on the "price" field.
-func PriceLTE(v int) predicate.Subscription {
+func PriceLTE(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldLTE(FieldPrice, v))
 }
 

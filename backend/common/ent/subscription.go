@@ -21,7 +21,7 @@ type Subscription struct {
 	// ProviderPlanID holds the value of the "provider_plan_id" field.
 	ProviderPlanID string `json:"provider_plan_id,omitempty"`
 	// Price holds the value of the "price" field.
-	Price int `json:"price,omitempty"`
+	Price float64 `json:"price,omitempty"`
 	// DurationInMonths holds the value of the "duration_in_months" field.
 	DurationInMonths int `json:"duration_in_months,omitempty"`
 	// IsActive holds the value of the "is_active" field.
@@ -78,7 +78,9 @@ func (*Subscription) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case subscription.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case subscription.FieldID, subscription.FieldPrice, subscription.FieldDurationInMonths:
+		case subscription.FieldPrice:
+			values[i] = new(sql.NullFloat64)
+		case subscription.FieldID, subscription.FieldDurationInMonths:
 			values[i] = new(sql.NullInt64)
 		case subscription.FieldProviderPlanID, subscription.FieldName:
 			values[i] = new(sql.NullString)
@@ -112,10 +114,10 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 				s.ProviderPlanID = value.String
 			}
 		case subscription.FieldPrice:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field price", values[i])
 			} else if value.Valid {
-				s.Price = int(value.Int64)
+				s.Price = value.Float64
 			}
 		case subscription.FieldDurationInMonths:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

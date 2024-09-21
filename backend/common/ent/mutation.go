@@ -6421,8 +6421,8 @@ type SubscriptionMutation struct {
 	typ                       string
 	id                        *int
 	provider_plan_id          *string
-	price                     *int
-	addprice                  *int
+	price                     *float64
+	addprice                  *float64
 	duration_in_months        *int
 	addduration_in_months     *int
 	is_active                 *bool
@@ -6577,13 +6577,13 @@ func (m *SubscriptionMutation) ResetProviderPlanID() {
 }
 
 // SetPrice sets the "price" field.
-func (m *SubscriptionMutation) SetPrice(i int) {
-	m.price = &i
+func (m *SubscriptionMutation) SetPrice(f float64) {
+	m.price = &f
 	m.addprice = nil
 }
 
 // Price returns the value of the "price" field in the mutation.
-func (m *SubscriptionMutation) Price() (r int, exists bool) {
+func (m *SubscriptionMutation) Price() (r float64, exists bool) {
 	v := m.price
 	if v == nil {
 		return
@@ -6594,7 +6594,7 @@ func (m *SubscriptionMutation) Price() (r int, exists bool) {
 // OldPrice returns the old "price" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldPrice(ctx context.Context) (v int, err error) {
+func (m *SubscriptionMutation) OldPrice(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPrice is only allowed on UpdateOne operations")
 	}
@@ -6608,17 +6608,17 @@ func (m *SubscriptionMutation) OldPrice(ctx context.Context) (v int, err error) 
 	return oldValue.Price, nil
 }
 
-// AddPrice adds i to the "price" field.
-func (m *SubscriptionMutation) AddPrice(i int) {
+// AddPrice adds f to the "price" field.
+func (m *SubscriptionMutation) AddPrice(f float64) {
 	if m.addprice != nil {
-		*m.addprice += i
+		*m.addprice += f
 	} else {
-		m.addprice = &i
+		m.addprice = &f
 	}
 }
 
 // AddedPrice returns the value that was added to the "price" field in this mutation.
-func (m *SubscriptionMutation) AddedPrice() (r int, exists bool) {
+func (m *SubscriptionMutation) AddedPrice() (r float64, exists bool) {
 	v := m.addprice
 	if v == nil {
 		return
@@ -7114,7 +7114,7 @@ func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 		m.SetProviderPlanID(v)
 		return nil
 	case subscription.FieldPrice:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7198,7 +7198,7 @@ func (m *SubscriptionMutation) AddedField(name string) (ent.Value, bool) {
 func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case subscription.FieldPrice:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
