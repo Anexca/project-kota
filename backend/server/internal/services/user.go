@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/razorpay/razorpay-go"
 )
 
 type UserService struct {
@@ -34,7 +33,7 @@ type UserProfileResponse struct {
 	ActiveSubscriptions []models.UserSubscriptionDetails `json:"active_subscriptions"`
 }
 
-func NewUserService(dbClient *ent.Client, paymentClient *razorpay.Client) *UserService {
+func NewUserService(dbClient *ent.Client) *UserService {
 	paymentService := NewPaymentService()
 	paymentRepositry := repositories.NewPaymentRepository(dbClient)
 	userRepository := repositories.NewUserRepository(dbClient)

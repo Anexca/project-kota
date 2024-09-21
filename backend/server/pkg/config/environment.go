@@ -23,8 +23,6 @@ type Environment struct {
 	SupabaseKey           string
 	AIServiceAccessKey    string
 	AIServiceUrl          string
-	RazorpayKey           string
-	RazorpaySecret        string
 	PaymentProviderKey    string
 	PaymentProviderSecret string
 }
@@ -53,8 +51,6 @@ func LoadEnvironment() (*Environment, error) {
 		AIServiceUrl:          os.Getenv("AI_SERVICE_URL"),
 		IsProduction:          os.Getenv("ENV") == "production",
 		CorsAllowedOrigin:     os.Getenv("CORS_ALLOWED_ORIGIN"),
-		RazorpayKey:           os.Getenv("RAZORPAY_KEY"),
-		RazorpaySecret:        os.Getenv("RAZORPAY_SECRET"),
 		PaymentProviderKey:    os.Getenv("PAYMENT_PROVIDER_KEY"),
 		PaymentProviderSecret: os.Getenv("PAYMENT_PROVIDER_SECRET"),
 	}

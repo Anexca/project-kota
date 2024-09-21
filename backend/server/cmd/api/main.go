@@ -28,15 +28,10 @@ func main() {
 		log.Fatalln("cannot connect to supabase", err)
 	}
 
-	paymentClient, err := client.NewRazorpayClient()
-	if err != nil {
-		log.Fatalln("cannot connect to payment client", err)
-	}
-
 	workers := workers.InitWorkers(redisClient, dbClient)
 	defer workers.Stop()
 
-	server := server.InitServer(redisClient, dbClient, supabaseClient, paymentClient)
+	server := server.InitServer(redisClient, dbClient, supabaseClient)
 
 	log.Println("Starting server on address", server.Addr)
 	err = server.ListenAndServe()

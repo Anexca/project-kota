@@ -14,7 +14,6 @@ import (
 	"time"
 
 	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
-	"github.com/razorpay/razorpay-go"
 )
 
 type SubscriptionService struct {
@@ -26,7 +25,7 @@ type SubscriptionService struct {
 	paymentrepository          *commonRepositories.PaymentRepository
 }
 
-func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client) *SubscriptionService {
+func NewSubscriptionService(dbClient *ent.Client) *SubscriptionService {
 	environment, _ := config.LoadEnvironment()
 	paymentService := NewPaymentService()
 	userRepository := commonRepositories.NewUserRepository(dbClient)
