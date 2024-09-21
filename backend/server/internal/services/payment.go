@@ -18,6 +18,15 @@ type UpsertPaymentProviderCustomerModel struct {
 	Phone string
 }
 
+type CreateOrderModel struct {
+	Amount              float64
+	UserId              string
+	CustomerId          string
+	CustomerPhoneNumber string
+	CustomerName        string
+	CustomerEmail       string
+}
+
 var xAPIVersion = "2023-08-01"
 
 func NewPaymentService() *PaymentService {
@@ -51,9 +60,22 @@ func (p *PaymentService) CreateCustomer(model UpsertPaymentProviderCustomerModel
 	xIdempotencyKey := util.GenerateUUID()
 
 	resp, _, err := cashfree_pg.PGCreateCustomer(&xAPIVersion, &createCustomerRequest, &xRequestId, &xIdempotencyKey, nil)
-	if err != nil {
-		return nil, err
+	return resp, err
+}
+
+func (p *PaymentService) CreateOrder(model CreateOrderModel) (*cashfree_pg.OrderEntity, error) {
+	request := cashfree_pg.CreateOrderRequest{
+		OrderAmount: model.Amount,
+		CustomerDetails: cashfree_pg.CustomerDetails{
+			// CustomerUid:   &model.CustomerId,
+			CustomerPhone: model.CustomerPhoneNumber,
+			CustomerId:    model.UserId,
+			CustomerEmail: &model.CustomerEmail,
+			CustomerName:  &model.CustomerName,
+		},
+		OrderCurrency: "INR",
 	}
 
-	return resp, nil
+	response, _, err := cashfree_pg.PGCreateOrder(&xAPIVersion, &request, nil, nil, nil)
+	return response, err
 }

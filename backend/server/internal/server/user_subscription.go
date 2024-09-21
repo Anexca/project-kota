@@ -33,6 +33,11 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if strings.Contains("user already has active subscription", err.Error()) {
+			s.ErrorJson(w, err)
+			return
+		}
+
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
 	}

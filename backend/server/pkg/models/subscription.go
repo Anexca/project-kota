@@ -22,7 +22,7 @@ type SubscriptionPaymentDetails struct {
 type SubscriptionOverview struct {
 	Id                  int                    `json:"id"`
 	ProviderPlanID      string                 `json:"provider_plan_id"`
-	Price               int                    `json:"price"`
+	Price               float64                `json:"price"`
 	DurationInMonths    int                    `json:"duration_in_months"`
 	IsActive            bool                   `json:"is_active"`
 	Name                string                 `json:"name"`
