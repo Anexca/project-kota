@@ -7,24 +7,26 @@ import (
 )
 
 type Environment struct {
-	IsProduction       bool
-	CorsAllowedOrigin  string
-	ServerPort         string
-	DatabaseHost       string
-	DatabasePort       string
-	DatabaseName       string
-	DatabaseUser       string
-	DatabasePassword   string
-	RedisPort          string
-	RedisAddress       string
-	RedisPassword      string
-	RedisDatabase      int
-	SupabaseUrl        string
-	SupabaseKey        string
-	AIServiceAccessKey string
-	AIServiceUrl       string
-	RazorpayKey        string
-	RazorpaySecret     string
+	IsProduction          bool
+	CorsAllowedOrigin     string
+	ServerPort            string
+	DatabaseHost          string
+	DatabasePort          string
+	DatabaseName          string
+	DatabaseUser          string
+	DatabasePassword      string
+	RedisPort             string
+	RedisAddress          string
+	RedisPassword         string
+	RedisDatabase         int
+	SupabaseUrl           string
+	SupabaseKey           string
+	AIServiceAccessKey    string
+	AIServiceUrl          string
+	RazorpayKey           string
+	RazorpaySecret        string
+	PaymentProviderKey    string
+	PaymentProviderSecret string
 }
 
 func LoadEnvironment() (*Environment, error) {
@@ -35,24 +37,26 @@ func LoadEnvironment() (*Environment, error) {
 	}
 
 	env := &Environment{
-		ServerPort:         os.Getenv("PORT"),
-		RedisPort:          os.Getenv("REDIS_PORT"),
-		DatabaseHost:       os.Getenv("DB_HOST"),
-		DatabasePort:       os.Getenv("DB_PORT"),
-		DatabaseName:       os.Getenv("DB_NAME"),
-		DatabaseUser:       os.Getenv("DB_USER"),
-		DatabasePassword:   os.Getenv("DB_PASSWORD"),
-		RedisAddress:       os.Getenv("REDIS_ADDRESS"),
-		RedisPassword:      os.Getenv("REDIS_PASSWORD"),
-		RedisDatabase:      redisDatabase,
-		SupabaseUrl:        os.Getenv("SUPABASE_URL"),
-		SupabaseKey:        os.Getenv("SUPABASE_KEY"),
-		AIServiceAccessKey: os.Getenv("AI_SERVICE_ACCESS_KEY"),
-		AIServiceUrl:       os.Getenv("AI_SERVICE_URL"),
-		IsProduction:       os.Getenv("ENV") == "production",
-		CorsAllowedOrigin:  os.Getenv("CORS_ALLOWED_ORIGIN"),
-		RazorpayKey:        os.Getenv("RAZORPAY_KEY"),
-		RazorpaySecret:     os.Getenv("RAZORPAY_SECRET"),
+		ServerPort:            os.Getenv("PORT"),
+		RedisPort:             os.Getenv("REDIS_PORT"),
+		DatabaseHost:          os.Getenv("DB_HOST"),
+		DatabasePort:          os.Getenv("DB_PORT"),
+		DatabaseName:          os.Getenv("DB_NAME"),
+		DatabaseUser:          os.Getenv("DB_USER"),
+		DatabasePassword:      os.Getenv("DB_PASSWORD"),
+		RedisAddress:          os.Getenv("REDIS_ADDRESS"),
+		RedisPassword:         os.Getenv("REDIS_PASSWORD"),
+		RedisDatabase:         redisDatabase,
+		SupabaseUrl:           os.Getenv("SUPABASE_URL"),
+		SupabaseKey:           os.Getenv("SUPABASE_KEY"),
+		AIServiceAccessKey:    os.Getenv("AI_SERVICE_ACCESS_KEY"),
+		AIServiceUrl:          os.Getenv("AI_SERVICE_URL"),
+		IsProduction:          os.Getenv("ENV") == "production",
+		CorsAllowedOrigin:     os.Getenv("CORS_ALLOWED_ORIGIN"),
+		RazorpayKey:           os.Getenv("RAZORPAY_KEY"),
+		RazorpaySecret:        os.Getenv("RAZORPAY_SECRET"),
+		PaymentProviderKey:    os.Getenv("PAYMENT_PROVIDER_KEY"),
+		PaymentProviderSecret: os.Getenv("PAYMENT_PROVIDER_SECRET"),
 	}
 
 	if env.ServerPort == "" || env.CorsAllowedOrigin == "" {
@@ -75,8 +79,8 @@ func LoadEnvironment() (*Environment, error) {
 		return nil, errors.New("missing AI Service environment variables")
 	}
 
-	if env.RazorpayKey == "" || env.RazorpaySecret == "" {
-		return nil, errors.New("missing Razorpay env keys")
+	if env.PaymentProviderKey == "" || env.PaymentProviderSecret == "" {
+		return nil, errors.New("missing Payment Provider env keys")
 	}
 
 	return env, nil
