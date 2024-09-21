@@ -25,7 +25,7 @@ type CreateOrderModel struct {
 	CustomerPhoneNumber string
 	CustomerName        string
 	CustomerEmail       string
-	ReturnUrl           string
+	ReturnUrl           *string
 }
 
 var xAPIVersion = "2023-08-01"
@@ -75,7 +75,7 @@ func (p *PaymentService) CreateOrder(model CreateOrderModel) (*cashfree_pg.Order
 			CustomerName:  &model.CustomerName,
 		},
 		OrderMeta: &cashfree_pg.OrderMeta{
-			ReturnUrl: &model.ReturnUrl,
+			ReturnUrl: model.ReturnUrl,
 		},
 		OrderCurrency: "INR",
 	}

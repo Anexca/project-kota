@@ -67,7 +67,7 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.Subscription
 	return subscriptionOverviews, nil
 }
 
-func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*models.SubscriptionToActivate, error) {
+func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, returnUrl *string, userId string) (*models.SubscriptionToActivate, error) {
 	user, err := s.userRepository.Get(ctx, userId)
 	if err != nil {
 		return nil, err
@@ -82,17 +82,17 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, err
 	}
 
-	// userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
-	// if err != nil {
-	// 	var notFoundError *ent.NotFoundError
-	// 	if !errors.As(err, &notFoundError) {
-	// 		return nil, err
-	// 	}
-	// }
+	userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if !errors.As(err, &notFoundError) {
+			return nil, err
+		}
+	}
 
-	// if userHasSubscription {
-	// 	return nil, fmt.Errorf("user already has active subscription")
-	// }
+	if userHasSubscription {
+		return nil, fmt.Errorf("user already has active subscription")
+	}
 
 	model := CreateOrderModel{
 		Amount:              subscription.Price,
@@ -101,6 +101,7 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		CustomerEmail:       user.Email,
 		UserId:              userId,
 		CustomerName:        fmt.Sprintf("%s %s", user.FirstName, user.LastName),
+		ReturnUrl:           returnUrl,
 	}
 
 	createdSubscription, err := s.paymentService.CreateOrder(model)
@@ -149,16 +150,12 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, user
 	userSubscriptionToUpdate.IsActive = true
 	userSubscriptionToUpdate.EndDate = time.Now().AddDate(0, userSubscriptionToUpdate.Edges.Subscription.DurationInMonths, 0)
 
-	go func() {
-		bgCtx := context.Background()
-		payment, err := s.StorePaymentForSubscription(bgCtx, transaction, userSubscriptionId, userId)
-		if err != nil {
-			log.Printf("could not store payment %v", err)
-			return
-		}
+	payment, err := s.StorePaymentForSubscription(ctx, transaction, userSubscriptionId, userId)
+	if err != nil {
+		return nil, err
+	}
 
-		log.Println("payment info stored successfully with id", payment.ID)
-	}()
+	log.Println("payment info stored successfully with id", payment.ID)
 
 	err = s.userSubscriptionRepository.Update(ctx, userSubscriptionToUpdate)
 	if err != nil {

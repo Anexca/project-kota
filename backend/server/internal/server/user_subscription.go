@@ -24,7 +24,9 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	userSubscription, err := s.subscriptionService.StartUserSubscription(r.Context(), subscriptionId, userId)
+	returnUrl := r.URL.Query().Get("returnUrl")
+
+	userSubscription, err := s.subscriptionService.StartUserSubscription(r.Context(), subscriptionId, &returnUrl, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -33,6 +35,11 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if strings.Contains("user already has active subscription", err.Error()) {
+			s.ErrorJson(w, err)
+			return
+		}
+
+		if strings.Contains("payment for subscription was not successful", err.Error()) {
 			s.ErrorJson(w, err)
 			return
 		}
