@@ -30,8 +30,15 @@ type SubscriptionOverview struct {
 }
 
 type SubscriptionToActivate struct {
-	Id               int
-	Status           string
-	SubscriptionId   string
-	PaymentSessionId string
+	Id               int    `json:"id"`
+	Status           string `json:"status"`
+	SubscriptionId   string `json:"subscription_id"`
+	PaymentSessionId string `json:"payment_session_id"`
+}
+
+type ActivatedSubscription struct {
+	Id        int       `json:"id"`
+	Status    string    `json:"status"`
+	StartDate time.Time `json:"start_date"`
+	EndDate   time.Time `json:"end_date"`
 }
