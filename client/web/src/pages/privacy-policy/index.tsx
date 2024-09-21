@@ -11,7 +11,9 @@ const PrivacyPolicy = () => {
           <h1 className="text-3xl font-bold text-center mb-8 mt-8">
             Privacy Policy
           </h1>
-          <p className="text-sm text-gray-500 mb-4">Last Updated: [Date]</p>
+          <p className="text-sm text-gray-500 mb-4">
+            Last Updated: 21 Sept 2024
+          </p>
 
           <p className="mb-6">
             At <span className="font-semibold">pseudotest.pro</span> (the
