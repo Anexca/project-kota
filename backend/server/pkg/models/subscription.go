@@ -28,3 +28,10 @@ type SubscriptionOverview struct {
 	Name                string                 `json:"name"`
 	RawSubscriptionData map[string]interface{} `json:"raw_subscription_data,omitempty"`
 }
+
+type SubscriptionToActivate struct {
+	Id               int
+	Status           string
+	SubscriptionId   string
+	PaymentSessionId string
+}

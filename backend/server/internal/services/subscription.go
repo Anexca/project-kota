@@ -72,7 +72,7 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.Subscription
 	return subscriptionOverviews, nil
 }
 
-func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*ent.UserSubscription, error) {
+func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*models.SubscriptionToActivate, error) {
 	user, err := s.userRepository.Get(ctx, userId)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,14 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, err
 	}
 
-	return userSubscription, nil
+	subscriptionToActivate := &models.SubscriptionToActivate{
+		Id:               userSubscription.ID,
+		Status:           string(userSubscription.Status),
+		SubscriptionId:   userSubscription.ProviderSubscriptionID,
+		PaymentSessionId: *createdSubscription.PaymentSessionId,
+	}
+
+	return subscriptionToActivate, nil
 }
 
 func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, request ActivateUserSubscriptionRequest, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
