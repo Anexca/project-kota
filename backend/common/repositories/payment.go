@@ -17,7 +17,7 @@ type PaymentRepository struct {
 
 type CreatePaymentModel struct {
 	UserSubscriptionId int
-	Amount             int
+	Amount             float64
 	PaymentDate        time.Time
 	Status             string
 	PaymentMethod      string

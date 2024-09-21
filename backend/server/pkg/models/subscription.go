@@ -13,7 +13,7 @@ type UserSubscriptionDetails struct {
 }
 
 type SubscriptionPaymentDetails struct {
-	Amount        int       `json:"amount"`         // Payment amount
+	Amount        float64   `json:"amount"`         // Payment amount
 	PaymentDate   time.Time `json:"payment_date"`   // Payment date
 	PaymentStatus string    `json:"payment_status"` // Status of the payment
 	PaymentMethod string    `json:"payment_method"` // Payment method (e.g., card, upi)

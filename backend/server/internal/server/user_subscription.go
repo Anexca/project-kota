@@ -4,7 +4,6 @@ import (
 	"common/ent"
 	"errors"
 	"net/http"
-	"server/internal/services"
 	"server/pkg/constants"
 	"strconv"
 	"strings"
@@ -62,18 +61,7 @@ func (s *Server) ActivateUserSubscription(w http.ResponseWriter, r *http.Request
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	var request services.ActivateUserSubscriptionRequest
-	if err := s.ReadJson(w, r, &request); err != nil {
-		s.ErrorJson(w, errors.New("invalid json request body"))
-		return
-	}
-
-	if err := ValidateInput(&request); err != nil {
-		s.ErrorJson(w, err)
-		return
-	}
-
-	activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(r.Context(), request, userSubscriptionId, userId)
+	activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(r.Context(), userSubscriptionId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

@@ -24,8 +24,8 @@ type PaymentCreate struct {
 }
 
 // SetAmount sets the "amount" field.
-func (pc *PaymentCreate) SetAmount(i int) *PaymentCreate {
-	pc.mutation.SetAmount(i)
+func (pc *PaymentCreate) SetAmount(f float64) *PaymentCreate {
+	pc.mutation.SetAmount(f)
 	return pc
 }
 
@@ -228,7 +228,7 @@ func (pc *PaymentCreate) createSpec() (*Payment, *sqlgraph.CreateSpec) {
 		_spec = sqlgraph.NewCreateSpec(payment.Table, sqlgraph.NewFieldSpec(payment.FieldID, field.TypeInt))
 	)
 	if value, ok := pc.mutation.Amount(); ok {
-		_spec.SetField(payment.FieldAmount, field.TypeInt, value)
+		_spec.SetField(payment.FieldAmount, field.TypeFloat64, value)
 		_node.Amount = value
 	}
 	if value, ok := pc.mutation.PaymentDate(); ok {

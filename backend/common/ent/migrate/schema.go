@@ -183,7 +183,7 @@ var (
 	// PaymentsColumns holds the columns for the "payments" table.
 	PaymentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "amount", Type: field.TypeInt},
+		{Name: "amount", Type: field.TypeFloat64},
 		{Name: "payment_date", Type: field.TypeTime},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"CREATED", "AUTHORIZED", "CAPTURED", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED", "PENDING", "PROCESSING", "CANCELLED", "DISPUTED"}},
 		{Name: "payment_method", Type: field.TypeString},

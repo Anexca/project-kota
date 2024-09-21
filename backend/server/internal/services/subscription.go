@@ -10,8 +10,10 @@ import (
 	"log"
 	"server/pkg/config"
 	"server/pkg/models"
+	"strconv"
 	"time"
 
+	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
 	"github.com/razorpay/razorpay-go"
 )
 
@@ -22,11 +24,6 @@ type SubscriptionService struct {
 	subscriptionRepository     *commonRepositories.SubscriptionRepository
 	userSubscriptionRepository *commonRepositories.UserSubscriptioRepository
 	paymentrepository          *commonRepositories.PaymentRepository
-}
-
-type ActivateUserSubscriptionRequest struct {
-	PaymentId string `json:"payment_id" validate:"required"`
-	Signature string `json:"signature" validate:"required"`
 }
 
 func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client) *SubscriptionService {
@@ -134,25 +131,13 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 	return subscriptionToActivate, nil
 }
 
-func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, request ActivateUserSubscriptionRequest, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
+func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
 	userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	existingPayment, err := s.paymentrepository.GetByProviderPaymentId(ctx, request.PaymentId)
-	if err != nil {
-		var notFoundError *ent.NotFoundError
-		if !errors.As(err, &notFoundError) {
-			return nil, err
-		}
-	}
-
-	if existingPayment != nil {
-		return nil, fmt.Errorf("record of payment with %s id already exists", request.PaymentId)
-	}
-
-	isSuccessful, err := s.paymentService.IsOrderSuccessful(userSubscriptionToUpdate.ProviderSubscriptionID)
+	isSuccessful, transaction, err := s.paymentService.IsOrderSuccessful(userSubscriptionToUpdate.ProviderSubscriptionID)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +153,7 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 
 	go func() {
 		bgCtx := context.Background()
-		payment, err := s.StorePaymentForSubscription(bgCtx, request.PaymentId, userSubscriptionId, userId)
+		payment, err := s.StorePaymentForSubscription(bgCtx, transaction, userSubscriptionId, userId)
 		if err != nil {
 			log.Printf("could not store payment %v", err)
 			return
@@ -185,49 +170,38 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 	return userSubscriptionToUpdate, nil
 }
 
-func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, providerPaymentId string, userSubscriptionId int, userId string) (*ent.Payment, error) {
-	// paymentInfo, err := s.paymentService.GetPayment(providerPaymentId)
-	// if err != nil {
-	// 	return nil, err
-	// }
+func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, transaction *cashfree_pg.PaymentEntity, userSubscriptionId int, userId string) (*ent.Payment, error) {
 
-	// amount, ok := paymentInfo["amount"].(float64)
-	// if !ok {
-	// 	return nil, fmt.Errorf("could not get amount from object %v", paymentInfo)
-	// }
+	paymentTimeInt, err := strconv.ParseInt(*transaction.PaymentCompletionTime, 10, 64)
+	if err != nil {
+		return nil, err
+	}
 
-	// createdAt, ok := paymentInfo["created_at"].(float64)
-	// if !ok {
-	// 	return nil, fmt.Errorf("could not get created_at from object %v", paymentInfo)
-	// }
+	paymentDate := time.Unix(paymentTimeInt, 0)
 
-	// method, ok := paymentInfo["method"].(string)
-	// if !ok {
-	// 	return nil, fmt.Errorf("could not get method from object %v", paymentInfo)
-	// }
+	paymentModel := commonRepositories.CreatePaymentModel{
+		Status:             *transaction.PaymentStatus,
+		PaymentMethod:      determinePaymentMethod(transaction.PaymentMethod),
+		PaymentDate:        paymentDate,
+		Amount:             float64(*transaction.PaymentAmount),
+		UserSubscriptionId: userSubscriptionId,
+		ProviderPaymentId:  *transaction.CfPaymentId,
+	}
 
-	// status, ok := paymentInfo["status"].(string)
-	// if !ok {
-	// 	return nil, fmt.Errorf("could not get status from object %v", paymentInfo)
-	// }
+	return s.paymentrepository.Create(ctx, paymentModel, userId)
 
-	// invoiceId, ok := paymentInfo["invoice_id"].(string)
-	// if !ok {
-	// 	return nil, fmt.Errorf("could not get invoice_id from object %v", paymentInfo)
-	// }
+}
 
-	// paymentModel := commonRepositories.CreatePaymentModel{
-	// 	Status:             status,
-	// 	PaymentMethod:      method,
-	// 	PaymentDate:        time.Unix(int64(createdAt), 0),
-	// 	Amount:             int(amount),
-	// 	UserSubscriptionId: userSubscriptionId,
-	// 	ProviderPaymentId:  providerPaymentId,
-	// 	ProviderInvoiceId:  invoiceId,
-	// }
-
-	// return s.paymentrepository.Create(ctx, paymentModel, userId)
-	return nil, nil
+func determinePaymentMethod(transaction *cashfree_pg.PaymentEntityPaymentMethod) string {
+	if transaction.PaymentMethodUPIInPaymentsEntity != nil {
+		return "UPI"
+	} else if transaction.PaymentMethodCardInPaymentsEntity != nil {
+		return "Card"
+	} else if transaction.PaymentMethodNetBankingInPaymentsEntity != nil {
+		return "Netbanking"
+	}
+	// Add more checks for other payment methods as needed
+	return "Unknown"
 }
 
 func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {

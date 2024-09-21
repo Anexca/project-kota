@@ -56,7 +56,7 @@ func IDLTE(id int) predicate.Payment {
 }
 
 // Amount applies equality check predicate on the "amount" field. It's identical to AmountEQ.
-func Amount(v int) predicate.Payment {
+func Amount(v float64) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldAmount, v))
 }
 
@@ -91,42 +91,42 @@ func UpdatedAt(v time.Time) predicate.Payment {
 }
 
 // AmountEQ applies the EQ predicate on the "amount" field.
-func AmountEQ(v int) predicate.Payment {
+func AmountEQ(v float64) predicate.Payment {
 	return predicate.Payment(sql.FieldEQ(FieldAmount, v))
 }
 
 // AmountNEQ applies the NEQ predicate on the "amount" field.
-func AmountNEQ(v int) predicate.Payment {
+func AmountNEQ(v float64) predicate.Payment {
 	return predicate.Payment(sql.FieldNEQ(FieldAmount, v))
 }
 
 // AmountIn applies the In predicate on the "amount" field.
-func AmountIn(vs ...int) predicate.Payment {
+func AmountIn(vs ...float64) predicate.Payment {
 	return predicate.Payment(sql.FieldIn(FieldAmount, vs...))
 }
 
 // AmountNotIn applies the NotIn predicate on the "amount" field.
-func AmountNotIn(vs ...int) predicate.Payment {
+func AmountNotIn(vs ...float64) predicate.Payment {
 	return predicate.Payment(sql.FieldNotIn(FieldAmount, vs...))
 }
 
 // AmountGT applies the GT predicate on the "amount" field.
-func AmountGT(v int) predicate.Payment {
+func AmountGT(v float64) predicate.Payment {
 	return predicate.Payment(sql.FieldGT(FieldAmount, v))
 }
 
 // AmountGTE applies the GTE predicate on the "amount" field.
-func AmountGTE(v int) predicate.Payment {
+func AmountGTE(v float64) predicate.Payment {
 	return predicate.Payment(sql.FieldGTE(FieldAmount, v))
 }
 
 // AmountLT applies the LT predicate on the "amount" field.
-func AmountLT(v int) predicate.Payment {
+func AmountLT(v float64) predicate.Payment {
 	return predicate.Payment(sql.FieldLT(FieldAmount, v))
 }
 
 // AmountLTE applies the LTE predicate on the "amount" field.
-func AmountLTE(v int) predicate.Payment {
+func AmountLTE(v float64) predicate.Payment {
 	return predicate.Payment(sql.FieldLTE(FieldAmount, v))
 }
 

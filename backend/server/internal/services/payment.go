@@ -25,6 +25,7 @@ type CreateOrderModel struct {
 	CustomerPhoneNumber string
 	CustomerName        string
 	CustomerEmail       string
+	ReturnUrl           string
 }
 
 var xAPIVersion = "2023-08-01"
@@ -73,6 +74,9 @@ func (p *PaymentService) CreateOrder(model CreateOrderModel) (*cashfree_pg.Order
 			CustomerEmail: &model.CustomerEmail,
 			CustomerName:  &model.CustomerName,
 		},
+		OrderMeta: &cashfree_pg.OrderMeta{
+			ReturnUrl: &model.ReturnUrl,
+		},
 		OrderCurrency: "INR",
 	}
 
@@ -80,18 +84,18 @@ func (p *PaymentService) CreateOrder(model CreateOrderModel) (*cashfree_pg.Order
 	return response, err
 }
 
-func (p *PaymentService) IsOrderSuccessful(orderId string) (bool, error) {
+func (p *PaymentService) IsOrderSuccessful(orderId string) (bool, *cashfree_pg.PaymentEntity, error) {
 
 	response, _, err := cashfree_pg.PGOrderFetchPayments(&xAPIVersion, orderId, nil, nil, nil)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
 	for _, transaction := range response {
 		if *transaction.PaymentStatus == "SUCCESS" {
-			return true, nil
+			return true, &transaction, nil
 		}
 	}
 
-	return false, nil
+	return false, nil, nil
 }

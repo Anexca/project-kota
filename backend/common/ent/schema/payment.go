@@ -17,7 +17,7 @@ type Payment struct {
 // Fields of the Payment.
 func (Payment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("amount"),
+		field.Float("amount"),
 		field.Time("payment_date"),
 		field.Enum("status").
 			Values(
