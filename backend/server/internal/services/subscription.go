@@ -202,31 +202,6 @@ func determinePaymentMethod(transaction *cashfree_pg.PaymentEntityPaymentMethod)
 	return "Unknown"
 }
 
-func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
-	userSubscriptionToCancel, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	if userSubscriptionToCancel.Status == usersubscription.StatusCANCELED {
-		return nil, errors.New("user subscrption is already cancelled")
-	}
-
-	// _, err = s.paymentService.CancelUserSubscription(userSubscriptionToCancel.ProviderSubscriptionID)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error canceling subscription with payment provider: %v", err)
-	// }
-
-	userSubscriptionToCancel.Status = usersubscription.StatusCANCELED
-
-	err = s.userSubscriptionRepository.Update(ctx, userSubscriptionToCancel)
-	if err != nil {
-		return nil, err
-	}
-
-	return userSubscriptionToCancel, nil
-}
-
 func (s *SubscriptionService) UserHasActiveSubscription(ctx context.Context, subscription *ent.Subscription, user *ent.User) (bool, error) {
 	userSubscriptions, err := s.userSubscriptionRepository.GetByUserId(ctx, user.ID.String())
 	if err != nil {

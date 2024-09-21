@@ -5902,9 +5902,22 @@ func (m *PaymentMutation) OldProviderInvoiceID(ctx context.Context) (v string, e
 	return oldValue.ProviderInvoiceID, nil
 }
 
+// ClearProviderInvoiceID clears the value of the "provider_invoice_id" field.
+func (m *PaymentMutation) ClearProviderInvoiceID() {
+	m.provider_invoice_id = nil
+	m.clearedFields[payment.FieldProviderInvoiceID] = struct{}{}
+}
+
+// ProviderInvoiceIDCleared returns if the "provider_invoice_id" field was cleared in this mutation.
+func (m *PaymentMutation) ProviderInvoiceIDCleared() bool {
+	_, ok := m.clearedFields[payment.FieldProviderInvoiceID]
+	return ok
+}
+
 // ResetProviderInvoiceID resets all changes to the "provider_invoice_id" field.
 func (m *PaymentMutation) ResetProviderInvoiceID() {
 	m.provider_invoice_id = nil
+	delete(m.clearedFields, payment.FieldProviderInvoiceID)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -6274,7 +6287,11 @@ func (m *PaymentMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *PaymentMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(payment.FieldProviderInvoiceID) {
+		fields = append(fields, payment.FieldProviderInvoiceID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -6287,6 +6304,11 @@ func (m *PaymentMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *PaymentMutation) ClearField(name string) error {
+	switch name {
+	case payment.FieldProviderInvoiceID:
+		m.ClearProviderInvoiceID()
+		return nil
+	}
 	return fmt.Errorf("unknown Payment nullable field %s", name)
 }
 

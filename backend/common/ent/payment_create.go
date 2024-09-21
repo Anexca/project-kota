@@ -59,6 +59,14 @@ func (pc *PaymentCreate) SetProviderInvoiceID(s string) *PaymentCreate {
 	return pc
 }
 
+// SetNillableProviderInvoiceID sets the "provider_invoice_id" field if the given value is not nil.
+func (pc *PaymentCreate) SetNillableProviderInvoiceID(s *string) *PaymentCreate {
+	if s != nil {
+		pc.SetProviderInvoiceID(*s)
+	}
+	return pc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (pc *PaymentCreate) SetCreatedAt(t time.Time) *PaymentCreate {
 	pc.mutation.SetCreatedAt(t)
@@ -191,9 +199,6 @@ func (pc *PaymentCreate) check() error {
 	}
 	if _, ok := pc.mutation.ProviderPaymentID(); !ok {
 		return &ValidationError{Name: "provider_payment_id", err: errors.New(`ent: missing required field "Payment.provider_payment_id"`)}
-	}
-	if _, ok := pc.mutation.ProviderInvoiceID(); !ok {
-		return &ValidationError{Name: "provider_invoice_id", err: errors.New(`ent: missing required field "Payment.provider_invoice_id"`)}
 	}
 	if _, ok := pc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Payment.created_at"`)}

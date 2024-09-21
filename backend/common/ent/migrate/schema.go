@@ -188,7 +188,7 @@ var (
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"SUCCESS", "NOT_ATTEMPTED", "USER_DROPPED", "FAILED", "PENDING", "CANCELLED"}},
 		{Name: "payment_method", Type: field.TypeString},
 		{Name: "provider_payment_id", Type: field.TypeString, Unique: true},
-		{Name: "provider_invoice_id", Type: field.TypeString, Unique: true},
+		{Name: "provider_invoice_id", Type: field.TypeString, Unique: true, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "user_payments", Type: field.TypeUUID, Nullable: true},

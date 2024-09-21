@@ -375,6 +375,16 @@ func ProviderInvoiceIDHasSuffix(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldHasSuffix(FieldProviderInvoiceID, v))
 }
 
+// ProviderInvoiceIDIsNil applies the IsNil predicate on the "provider_invoice_id" field.
+func ProviderInvoiceIDIsNil() predicate.Payment {
+	return predicate.Payment(sql.FieldIsNull(FieldProviderInvoiceID))
+}
+
+// ProviderInvoiceIDNotNil applies the NotNil predicate on the "provider_invoice_id" field.
+func ProviderInvoiceIDNotNil() predicate.Payment {
+	return predicate.Payment(sql.FieldNotNull(FieldProviderInvoiceID))
+}
+
 // ProviderInvoiceIDEqualFold applies the EqualFold predicate on the "provider_invoice_id" field.
 func ProviderInvoiceIDEqualFold(v string) predicate.Payment {
 	return predicate.Payment(sql.FieldEqualFold(FieldProviderInvoiceID, v))

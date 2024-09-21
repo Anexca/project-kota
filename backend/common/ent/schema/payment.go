@@ -30,7 +30,7 @@ func (Payment) Fields() []ent.Field {
 			),
 		field.String("payment_method"),
 		field.String("provider_payment_id").Unique(),
-		field.String("provider_invoice_id").Unique(),
+		field.String("provider_invoice_id").Unique().Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

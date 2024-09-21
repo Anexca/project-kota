@@ -122,6 +122,12 @@ func (pu *PaymentUpdate) SetNillableProviderInvoiceID(s *string) *PaymentUpdate 
 	return pu
 }
 
+// ClearProviderInvoiceID clears the value of the "provider_invoice_id" field.
+func (pu *PaymentUpdate) ClearProviderInvoiceID() *PaymentUpdate {
+	pu.mutation.ClearProviderInvoiceID()
+	return pu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (pu *PaymentUpdate) SetUpdatedAt(t time.Time) *PaymentUpdate {
 	pu.mutation.SetUpdatedAt(t)
@@ -261,6 +267,9 @@ func (pu *PaymentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.ProviderInvoiceID(); ok {
 		_spec.SetField(payment.FieldProviderInvoiceID, field.TypeString, value)
+	}
+	if pu.mutation.ProviderInvoiceIDCleared() {
+		_spec.ClearField(payment.FieldProviderInvoiceID, field.TypeString)
 	}
 	if value, ok := pu.mutation.UpdatedAt(); ok {
 		_spec.SetField(payment.FieldUpdatedAt, field.TypeTime, value)
@@ -434,6 +443,12 @@ func (puo *PaymentUpdateOne) SetNillableProviderInvoiceID(s *string) *PaymentUpd
 	return puo
 }
 
+// ClearProviderInvoiceID clears the value of the "provider_invoice_id" field.
+func (puo *PaymentUpdateOne) ClearProviderInvoiceID() *PaymentUpdateOne {
+	puo.mutation.ClearProviderInvoiceID()
+	return puo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (puo *PaymentUpdateOne) SetUpdatedAt(t time.Time) *PaymentUpdateOne {
 	puo.mutation.SetUpdatedAt(t)
@@ -603,6 +618,9 @@ func (puo *PaymentUpdateOne) sqlSave(ctx context.Context) (_node *Payment, err e
 	}
 	if value, ok := puo.mutation.ProviderInvoiceID(); ok {
 		_spec.SetField(payment.FieldProviderInvoiceID, field.TypeString, value)
+	}
+	if puo.mutation.ProviderInvoiceIDCleared() {
+		_spec.ClearField(payment.FieldProviderInvoiceID, field.TypeString)
 	}
 	if value, ok := puo.mutation.UpdatedAt(); ok {
 		_spec.SetField(payment.FieldUpdatedAt, field.TypeTime, value)
