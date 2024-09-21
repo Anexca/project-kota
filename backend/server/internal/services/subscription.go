@@ -152,9 +152,14 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 		return nil, fmt.Errorf("record of payment with %s id already exists", request.PaymentId)
 	}
 
-	// if !s.paymentService.IsSubscriptionPaymentSignatureValid(request.PaymentId, userSubscriptionToUpdate.ProviderSubscriptionID, request.Signature) {
-	// 	return nil, errors.New("payment verification failed")
-	// }
+	isSuccessful, err := s.paymentService.IsOrderSuccessful(userSubscriptionToUpdate.ProviderSubscriptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isSuccessful {
+		return nil, errors.New("payment for subscription was not successful")
+	}
 
 	userSubscriptionToUpdate.Status = usersubscription.StatusACTIVE
 	userSubscriptionToUpdate.StartDate = time.Now()

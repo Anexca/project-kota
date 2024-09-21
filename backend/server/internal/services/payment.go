@@ -79,3 +79,19 @@ func (p *PaymentService) CreateOrder(model CreateOrderModel) (*cashfree_pg.Order
 	response, _, err := cashfree_pg.PGCreateOrder(&xAPIVersion, &request, nil, nil, nil)
 	return response, err
 }
+
+func (p *PaymentService) IsOrderSuccessful(orderId string) (bool, error) {
+
+	response, _, err := cashfree_pg.PGOrderFetchPayments(&xAPIVersion, orderId, nil, nil, nil)
+	if err != nil {
+		return false, err
+	}
+
+	for _, transaction := range response {
+		if *transaction.PaymentStatus == "SUCCESS" {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
