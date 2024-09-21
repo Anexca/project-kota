@@ -71,7 +71,7 @@ func (u *UserService) GetUserProfile(ctx context.Context, userId string) (UserPr
 				EndDate:                userSubscription.EndDate,
 			}
 
-			if len(user.Edges.Payments) > 0 {
+			if len(userSubscription.Edges.Payments) > 0 {
 				paymentDetails := models.SubscriptionPaymentDetails{
 					Amount:        userSubscription.Edges.Payments[0].Amount, // Assuming the first payment holds the necessary details
 					PaymentDate:   userSubscription.Edges.Payments[0].PaymentDate,
