@@ -79,10 +79,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Route("/subscriptions", func(r chi.Router) {
 			r.Post("/{subscriptionId}/buy", s.StartSubscription)
 		})
+	})
 
-		r.Route("/user-subscriptions", func(r chi.Router) {
-			r.Post("/{userSubscriptionId}/activate", s.ActivateUserSubscription)
-		})
+	r.Route("/webhook", func(r chi.Router) {
+		r.Post("/subscription/payment-success", s.HandleSubscriptionPaymentSuccess)
 	})
 
 	r.Get("/subscriptions", s.GetAllSubscriptions)
