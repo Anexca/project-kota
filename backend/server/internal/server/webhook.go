@@ -1,12 +1,12 @@
 package server
 
 import (
-	"common/ent"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
-	"strings"
 )
 
 func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http.Request) {
@@ -51,31 +51,17 @@ func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http
 		}
 	}
 
-	activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(r.Context(), orderId, userEmail)
-	if err != nil {
-		var notFoundError *ent.NotFoundError
-		if errors.As(err, &notFoundError) {
-			s.ErrorJson(w, errors.New("user subscription not found"))
+	go func() {
+		bgCtx := context.Background()
+
+		activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(bgCtx, orderId, userEmail)
+		if err != nil {
+			log.Println(err.Error())
 			return
 		}
 
-		if strings.Contains(err.Error(), "payment for subscription was not successful") {
-			s.ErrorJson(w, err)
-			return
-		}
+		log.Println("subscription created with id", activatedSubscription.Id)
+	}()
 
-		if strings.Contains(err.Error(), "already exists") {
-			s.ErrorJson(w, err)
-			return
-		}
-
-		s.ErrorJson(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	responsePayload := Response{
-		Data: activatedSubscription,
-	}
-
-	s.WriteJson(w, http.StatusOK, &responsePayload)
+	s.WriteJson(w, http.StatusOK, &Response{})
 }
