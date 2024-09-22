@@ -7,7 +7,7 @@ require (
 	github.com/cashfree/cashfree-pg/v4 v4.2.4
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/cors v1.2.1
-	github.com/go-playground/validator/v10 v10.22.0
+	github.com/go-playground/validator/v10 v10.22.1
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/joho/godotenv v1.5.1
 	github.com/nedpals/supabase-go v0.4.0
