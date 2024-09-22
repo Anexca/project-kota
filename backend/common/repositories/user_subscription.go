@@ -79,3 +79,13 @@ func (u *UserSubscriptioRepository) GetByUserId(ctx context.Context, userId stri
 		WithPayments().
 		All(ctx)
 }
+
+func (u *UserSubscriptioRepository) GetByProviderSubscriptionId(ctx context.Context, providerSubscriptionId string, userId string) (*ent.UserSubscription, error) {
+	userUid, err := uuid.Parse(userId)
+	if err != nil {
+		return nil, err
+	}
+	return u.dbClient.UserSubscription.Query().
+		Where(usersubscription.ProviderSubscriptionIDEQ(providerSubscriptionId), usersubscription.HasUserWith(user.IDEQ(userUid))).
+		Only(ctx)
+}

@@ -34,6 +34,10 @@ func (u *UserRepository) Get(ctx context.Context, userId string) (*ent.User, err
 	return u.dbClient.User.Query().Where(user.IDEQ(userUid)).Only(ctx)
 }
 
+func (u *UserRepository) GetByEmail(ctx context.Context, userEmail string) (*ent.User, error) {
+	return u.dbClient.User.Query().Where(user.EmailEQ(userEmail)).Only(ctx)
+}
+
 func (u *UserRepository) Update(ctx context.Context, updatedUser *ent.User) (*ent.User, error) {
 	return u.dbClient.User.
 		UpdateOneID(updatedUser.ID).

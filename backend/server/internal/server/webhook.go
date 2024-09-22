@@ -1,11 +1,12 @@
 package server
 
 import (
+	"common/ent"
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"net/http"
+	"strings"
 )
 
 func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http.Request) {
@@ -35,16 +36,46 @@ func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http
 		return
 	}
 
-	var orderId string
+	var orderId, userEmail string
 	if data, ok := webhookData["data"].(map[string]interface{}); ok {
 		if order, ok := data["order"].(map[string]interface{}); ok {
 			if orderID, ok := order["order_id"].(string); ok {
 				orderId = orderID
 			}
 		}
+
+		if customerDetails, ok := data["customer_details"].(map[string]interface{}); ok {
+			if email, ok := customerDetails["customer_email"].(string); ok {
+				userEmail = email
+			}
+		}
 	}
 
-	log.Println(orderId)
+	activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(r.Context(), orderId, userEmail)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("user subscription not found"))
+			return
+		}
 
-	s.WriteJson(w, http.StatusOK, &Response{})
+		if strings.Contains(err.Error(), "payment for subscription was not successful") {
+			s.ErrorJson(w, err)
+			return
+		}
+
+		if strings.Contains(err.Error(), "already exists") {
+			s.ErrorJson(w, err)
+			return
+		}
+
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	responsePayload := Response{
+		Data: activatedSubscription,
+	}
+
+	s.WriteJson(w, http.StatusOK, &responsePayload)
 }
