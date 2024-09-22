@@ -76,7 +76,7 @@ func (s *Server) ActivateUserSubscription(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		if strings.Contains(err.Error(), "payment verification failed") {
+		if strings.Contains(err.Error(), "payment for subscription was not successful") {
 			s.ErrorJson(w, err)
 			return
 		}
