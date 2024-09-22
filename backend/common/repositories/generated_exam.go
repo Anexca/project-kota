@@ -130,24 +130,23 @@ func (q *GeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.
 func (q *GeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error) {
 	now := time.Now()
 
-	targetWeek := now.AddDate(0, 0, -7*weekOffset)
+	targetWeekStart := now.AddDate(0, 0, -7*weekOffset)
 
-	year, week := targetWeek.ISOWeek()
-	firstOfWeek := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
-	for firstOfWeek.Weekday() != time.Monday { // Adjust to the start of the week
-		firstOfWeek = firstOfWeek.AddDate(0, 0, 1)
+	for targetWeekStart.Weekday() != time.Monday {
+		targetWeekStart = targetWeekStart.AddDate(0, 0, -1)
 	}
-	firstOfWeek = firstOfWeek.AddDate(0, 0, (week-1)*7)
 
-	// Calculate the end of the week (Saturday)
-	lastOfWeek := firstOfWeek.AddDate(0, 0, 6).Add(time.Hour*23 + time.Minute*59 + time.Second*59) // End of Saturday
+	targetWeekEnd := targetWeekStart.AddDate(0, 0, 6).Add(time.Hour*23 + time.Minute*59 + time.Second*59)
+
+	fmt.Println("Start of week:", targetWeekStart)
+	fmt.Println("End of week:", targetWeekEnd)
 
 	return q.dbClient.GeneratedExam.Query().
 		Where(
-			generatedexam.HasExamWith(exam.ID(ex.ID)),
-			generatedexam.IsActive(false),
-			generatedexam.CreatedAtGTE(firstOfWeek),
-			generatedexam.CreatedAtLTE(lastOfWeek),
+			generatedexam.HasExamWith(exam.IDEQ(ex.ID)),
+			generatedexam.IsActive(false), // assuming you need inactive records
+			generatedexam.CreatedAtGTE(targetWeekStart),
+			generatedexam.CreatedAtLTE(targetWeekEnd),
 		).
 		WithAttempts().
 		WithExam().
@@ -155,7 +154,6 @@ func (q *GeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.E
 		Limit(limit).
 		All(ctx)
 }
-
 func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {

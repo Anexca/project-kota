@@ -336,7 +336,7 @@ func (pq *PaymentQuery) WithSubscription(opts ...func(*UserSubscriptionQuery)) *
 // Example:
 //
 //	var v []struct {
-//		Amount int `json:"amount,omitempty"`
+//		Amount float64 `json:"amount,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -359,7 +359,7 @@ func (pq *PaymentQuery) GroupBy(field string, fields ...string) *PaymentGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Amount int `json:"amount,omitempty"`
+//		Amount float64 `json:"amount,omitempty"`
 //	}
 //
 //	client.Payment.Query().

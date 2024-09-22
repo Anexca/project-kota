@@ -5554,8 +5554,8 @@ type PaymentMutation struct {
 	op                  Op
 	typ                 string
 	id                  *int
-	amount              *int
-	addamount           *int
+	amount              *float64
+	addamount           *float64
 	payment_date        *time.Time
 	status              *payment.Status
 	payment_method      *string
@@ -5672,13 +5672,13 @@ func (m *PaymentMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetAmount sets the "amount" field.
-func (m *PaymentMutation) SetAmount(i int) {
-	m.amount = &i
+func (m *PaymentMutation) SetAmount(f float64) {
+	m.amount = &f
 	m.addamount = nil
 }
 
 // Amount returns the value of the "amount" field in the mutation.
-func (m *PaymentMutation) Amount() (r int, exists bool) {
+func (m *PaymentMutation) Amount() (r float64, exists bool) {
 	v := m.amount
 	if v == nil {
 		return
@@ -5689,7 +5689,7 @@ func (m *PaymentMutation) Amount() (r int, exists bool) {
 // OldAmount returns the old "amount" field's value of the Payment entity.
 // If the Payment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PaymentMutation) OldAmount(ctx context.Context) (v int, err error) {
+func (m *PaymentMutation) OldAmount(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
 	}
@@ -5703,17 +5703,17 @@ func (m *PaymentMutation) OldAmount(ctx context.Context) (v int, err error) {
 	return oldValue.Amount, nil
 }
 
-// AddAmount adds i to the "amount" field.
-func (m *PaymentMutation) AddAmount(i int) {
+// AddAmount adds f to the "amount" field.
+func (m *PaymentMutation) AddAmount(f float64) {
 	if m.addamount != nil {
-		*m.addamount += i
+		*m.addamount += f
 	} else {
-		m.addamount = &i
+		m.addamount = &f
 	}
 }
 
 // AddedAmount returns the value that was added to the "amount" field in this mutation.
-func (m *PaymentMutation) AddedAmount() (r int, exists bool) {
+func (m *PaymentMutation) AddedAmount() (r float64, exists bool) {
 	v := m.addamount
 	if v == nil {
 		return
@@ -5902,9 +5902,22 @@ func (m *PaymentMutation) OldProviderInvoiceID(ctx context.Context) (v string, e
 	return oldValue.ProviderInvoiceID, nil
 }
 
+// ClearProviderInvoiceID clears the value of the "provider_invoice_id" field.
+func (m *PaymentMutation) ClearProviderInvoiceID() {
+	m.provider_invoice_id = nil
+	m.clearedFields[payment.FieldProviderInvoiceID] = struct{}{}
+}
+
+// ProviderInvoiceIDCleared returns if the "provider_invoice_id" field was cleared in this mutation.
+func (m *PaymentMutation) ProviderInvoiceIDCleared() bool {
+	_, ok := m.clearedFields[payment.FieldProviderInvoiceID]
+	return ok
+}
+
 // ResetProviderInvoiceID resets all changes to the "provider_invoice_id" field.
 func (m *PaymentMutation) ResetProviderInvoiceID() {
 	m.provider_invoice_id = nil
+	delete(m.clearedFields, payment.FieldProviderInvoiceID)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -6175,7 +6188,7 @@ func (m *PaymentMutation) OldField(ctx context.Context, name string) (ent.Value,
 func (m *PaymentMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case payment.FieldAmount:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6261,7 +6274,7 @@ func (m *PaymentMutation) AddedField(name string) (ent.Value, bool) {
 func (m *PaymentMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case payment.FieldAmount:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6274,7 +6287,11 @@ func (m *PaymentMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *PaymentMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(payment.FieldProviderInvoiceID) {
+		fields = append(fields, payment.FieldProviderInvoiceID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -6287,6 +6304,11 @@ func (m *PaymentMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *PaymentMutation) ClearField(name string) error {
+	switch name {
+	case payment.FieldProviderInvoiceID:
+		m.ClearProviderInvoiceID()
+		return nil
+	}
 	return fmt.Errorf("unknown Payment nullable field %s", name)
 }
 
@@ -6421,8 +6443,8 @@ type SubscriptionMutation struct {
 	typ                       string
 	id                        *int
 	provider_plan_id          *string
-	price                     *int
-	addprice                  *int
+	price                     *float64
+	addprice                  *float64
 	duration_in_months        *int
 	addduration_in_months     *int
 	is_active                 *bool
@@ -6577,13 +6599,13 @@ func (m *SubscriptionMutation) ResetProviderPlanID() {
 }
 
 // SetPrice sets the "price" field.
-func (m *SubscriptionMutation) SetPrice(i int) {
-	m.price = &i
+func (m *SubscriptionMutation) SetPrice(f float64) {
+	m.price = &f
 	m.addprice = nil
 }
 
 // Price returns the value of the "price" field in the mutation.
-func (m *SubscriptionMutation) Price() (r int, exists bool) {
+func (m *SubscriptionMutation) Price() (r float64, exists bool) {
 	v := m.price
 	if v == nil {
 		return
@@ -6594,7 +6616,7 @@ func (m *SubscriptionMutation) Price() (r int, exists bool) {
 // OldPrice returns the old "price" field's value of the Subscription entity.
 // If the Subscription object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscriptionMutation) OldPrice(ctx context.Context) (v int, err error) {
+func (m *SubscriptionMutation) OldPrice(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPrice is only allowed on UpdateOne operations")
 	}
@@ -6608,17 +6630,17 @@ func (m *SubscriptionMutation) OldPrice(ctx context.Context) (v int, err error) 
 	return oldValue.Price, nil
 }
 
-// AddPrice adds i to the "price" field.
-func (m *SubscriptionMutation) AddPrice(i int) {
+// AddPrice adds f to the "price" field.
+func (m *SubscriptionMutation) AddPrice(f float64) {
 	if m.addprice != nil {
-		*m.addprice += i
+		*m.addprice += f
 	} else {
-		m.addprice = &i
+		m.addprice = &f
 	}
 }
 
 // AddedPrice returns the value that was added to the "price" field in this mutation.
-func (m *SubscriptionMutation) AddedPrice() (r int, exists bool) {
+func (m *SubscriptionMutation) AddedPrice() (r float64, exists bool) {
 	v := m.addprice
 	if v == nil {
 		return
@@ -7114,7 +7136,7 @@ func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 		m.SetProviderPlanID(v)
 		return nil
 	case subscription.FieldPrice:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7198,7 +7220,7 @@ func (m *SubscriptionMutation) AddedField(name string) (ent.Value, bool) {
 func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case subscription.FieldPrice:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

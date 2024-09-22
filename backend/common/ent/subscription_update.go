@@ -45,23 +45,23 @@ func (su *SubscriptionUpdate) SetNillableProviderPlanID(s *string) *Subscription
 }
 
 // SetPrice sets the "price" field.
-func (su *SubscriptionUpdate) SetPrice(i int) *SubscriptionUpdate {
+func (su *SubscriptionUpdate) SetPrice(f float64) *SubscriptionUpdate {
 	su.mutation.ResetPrice()
-	su.mutation.SetPrice(i)
+	su.mutation.SetPrice(f)
 	return su
 }
 
 // SetNillablePrice sets the "price" field if the given value is not nil.
-func (su *SubscriptionUpdate) SetNillablePrice(i *int) *SubscriptionUpdate {
-	if i != nil {
-		su.SetPrice(*i)
+func (su *SubscriptionUpdate) SetNillablePrice(f *float64) *SubscriptionUpdate {
+	if f != nil {
+		su.SetPrice(*f)
 	}
 	return su
 }
 
-// AddPrice adds i to the "price" field.
-func (su *SubscriptionUpdate) AddPrice(i int) *SubscriptionUpdate {
-	su.mutation.AddPrice(i)
+// AddPrice adds f to the "price" field.
+func (su *SubscriptionUpdate) AddPrice(f float64) *SubscriptionUpdate {
+	su.mutation.AddPrice(f)
 	return su
 }
 
@@ -258,10 +258,10 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
 	}
 	if value, ok := su.mutation.Price(); ok {
-		_spec.SetField(subscription.FieldPrice, field.TypeInt, value)
+		_spec.SetField(subscription.FieldPrice, field.TypeFloat64, value)
 	}
 	if value, ok := su.mutation.AddedPrice(); ok {
-		_spec.AddField(subscription.FieldPrice, field.TypeInt, value)
+		_spec.AddField(subscription.FieldPrice, field.TypeFloat64, value)
 	}
 	if value, ok := su.mutation.DurationInMonths(); ok {
 		_spec.SetField(subscription.FieldDurationInMonths, field.TypeInt, value)
@@ -409,23 +409,23 @@ func (suo *SubscriptionUpdateOne) SetNillableProviderPlanID(s *string) *Subscrip
 }
 
 // SetPrice sets the "price" field.
-func (suo *SubscriptionUpdateOne) SetPrice(i int) *SubscriptionUpdateOne {
+func (suo *SubscriptionUpdateOne) SetPrice(f float64) *SubscriptionUpdateOne {
 	suo.mutation.ResetPrice()
-	suo.mutation.SetPrice(i)
+	suo.mutation.SetPrice(f)
 	return suo
 }
 
 // SetNillablePrice sets the "price" field if the given value is not nil.
-func (suo *SubscriptionUpdateOne) SetNillablePrice(i *int) *SubscriptionUpdateOne {
-	if i != nil {
-		suo.SetPrice(*i)
+func (suo *SubscriptionUpdateOne) SetNillablePrice(f *float64) *SubscriptionUpdateOne {
+	if f != nil {
+		suo.SetPrice(*f)
 	}
 	return suo
 }
 
-// AddPrice adds i to the "price" field.
-func (suo *SubscriptionUpdateOne) AddPrice(i int) *SubscriptionUpdateOne {
-	suo.mutation.AddPrice(i)
+// AddPrice adds f to the "price" field.
+func (suo *SubscriptionUpdateOne) AddPrice(f float64) *SubscriptionUpdateOne {
+	suo.mutation.AddPrice(f)
 	return suo
 }
 
@@ -652,10 +652,10 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.Price(); ok {
-		_spec.SetField(subscription.FieldPrice, field.TypeInt, value)
+		_spec.SetField(subscription.FieldPrice, field.TypeFloat64, value)
 	}
 	if value, ok := suo.mutation.AddedPrice(); ok {
-		_spec.AddField(subscription.FieldPrice, field.TypeInt, value)
+		_spec.AddField(subscription.FieldPrice, field.TypeFloat64, value)
 	}
 	if value, ok := suo.mutation.DurationInMonths(); ok {
 		_spec.SetField(subscription.FieldDurationInMonths, field.TypeInt, value)

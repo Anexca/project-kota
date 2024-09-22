@@ -32,6 +32,6 @@ func (w *Worker) AddDescriptiveQuestionsInDatabase() error {
 
 func (w *Worker) MarkDescriptiveQuestionsAsOpenInDatabase() error {
 	ctx := context.Background()
-	examId := 1 // only set for general questions, need to make this dynamic
-	return w.examService.MarkQuestionsAsOpen(ctx, examId)
+	examName := "GENERAL" // only set for general questions, need to make this dynamic
+	return w.examService.MarkQuestionsAsOpen(ctx, examName)
 }

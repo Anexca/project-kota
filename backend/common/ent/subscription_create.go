@@ -29,8 +29,8 @@ func (sc *SubscriptionCreate) SetProviderPlanID(s string) *SubscriptionCreate {
 }
 
 // SetPrice sets the "price" field.
-func (sc *SubscriptionCreate) SetPrice(i int) *SubscriptionCreate {
-	sc.mutation.SetPrice(i)
+func (sc *SubscriptionCreate) SetPrice(f float64) *SubscriptionCreate {
+	sc.mutation.SetPrice(f)
 	return sc
 }
 
@@ -215,7 +215,7 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 		_node.ProviderPlanID = value
 	}
 	if value, ok := sc.mutation.Price(); ok {
-		_spec.SetField(subscription.FieldPrice, field.TypeInt, value)
+		_spec.SetField(subscription.FieldPrice, field.TypeFloat64, value)
 		_node.Price = value
 	}
 	if value, ok := sc.mutation.DurationInMonths(); ok {

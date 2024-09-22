@@ -17,12 +17,11 @@ type PaymentRepository struct {
 
 type CreatePaymentModel struct {
 	UserSubscriptionId int
-	Amount             int
+	Amount             float64
 	PaymentDate        time.Time
 	Status             string
 	PaymentMethod      string
 	ProviderPaymentId  string
-	ProviderInvoiceId  string
 }
 
 func NewPaymentRepository(dbClient *ent.Client) *PaymentRepository {
@@ -58,7 +57,6 @@ func (p *PaymentRepository) Create(ctx context.Context, model CreatePaymentModel
 		SetPaymentMethod(model.PaymentMethod).
 		SetProviderPaymentID(model.ProviderPaymentId).
 		SetPaymentDate(model.PaymentDate).
-		SetProviderInvoiceID(model.ProviderInvoiceId).
 		Save(ctx)
 }
 

@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	entgo.io/ent v0.14.1
+	github.com/cashfree/cashfree-pg/v4 v4.2.4
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/cors v1.2.1
 	github.com/go-playground/validator/v10 v10.22.0
@@ -12,13 +13,14 @@ require (
 	github.com/nedpals/supabase-go v0.4.0
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/robfig/cron/v3 v3.0.1
+	go.uber.org/ratelimit v0.3.1
 )
-
-require github.com/razorpay/razorpay-go v1.3.2
 
 require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
-	go.uber.org/ratelimit v0.3.1 // indirect
+	github.com/cashfree/cashfree-pg/v3 v3.2.14 // indirect
+	github.com/getsentry/sentry-go v0.18.0 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
 
 require (
@@ -29,7 +31,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.0
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect

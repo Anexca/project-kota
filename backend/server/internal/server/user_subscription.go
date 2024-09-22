@@ -4,7 +4,6 @@ import (
 	"common/ent"
 	"errors"
 	"net/http"
-	"server/internal/services"
 	"server/pkg/constants"
 	"strconv"
 	"strings"
@@ -25,11 +24,23 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	userSubscription, err := s.subscriptionService.StartUserSubscription(r.Context(), subscriptionId, userId)
+	returnUrl := r.URL.Query().Get("returnUrl")
+
+	userSubscription, err := s.subscriptionService.StartUserSubscription(r.Context(), subscriptionId, &returnUrl, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
 			s.ErrorJson(w, errors.New("subscription not found"))
+			return
+		}
+
+		if strings.Contains("user already has active subscription", err.Error()) {
+			s.ErrorJson(w, err)
+			return
+		}
+
+		if strings.Contains("payment for subscription was not successful", err.Error()) {
+			s.ErrorJson(w, err)
 			return
 		}
 
@@ -57,18 +68,7 @@ func (s *Server) ActivateUserSubscription(w http.ResponseWriter, r *http.Request
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	var request services.ActivateUserSubscriptionRequest
-	if err := s.ReadJson(w, r, &request); err != nil {
-		s.ErrorJson(w, errors.New("invalid json request body"))
-		return
-	}
-
-	if err := ValidateInput(&request); err != nil {
-		s.ErrorJson(w, err)
-		return
-	}
-
-	activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(r.Context(), request, userSubscriptionId, userId)
+	activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(r.Context(), userSubscriptionId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -92,43 +92,6 @@ func (s *Server) ActivateUserSubscription(w http.ResponseWriter, r *http.Request
 
 	responsePayload := Response{
 		Data: activatedSubscription,
-	}
-
-	s.WriteJson(w, http.StatusOK, &responsePayload)
-}
-
-func (s *Server) CancelUserSubscription(w http.ResponseWriter, r *http.Request) {
-	idParam := chi.URLParam(r, "userSubscriptionId")
-	userSubscriptionId, err := strconv.Atoi(idParam)
-	if err != nil {
-		s.ErrorJson(w, errors.New("invalid user subscription id"), http.StatusBadRequest)
-		return
-	}
-
-	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
-	}
-
-	cancelledSubscription, err := s.subscriptionService.CancelUserSubscription(r.Context(), userSubscriptionId, userId)
-	if err != nil {
-		var notFoundError *ent.NotFoundError
-		if errors.As(err, &notFoundError) {
-			s.ErrorJson(w, errors.New("user subscription not found"))
-			return
-		}
-
-		if strings.Contains(err.Error(), "user subscrption is already cancelled") {
-			s.ErrorJson(w, err)
-			return
-		}
-
-		s.ErrorJson(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	responsePayload := Response{
-		Data: cancelledSubscription,
 	}
 
 	s.WriteJson(w, http.StatusOK, &responsePayload)
