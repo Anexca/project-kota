@@ -15,6 +15,7 @@ import { Button } from "../../base/button/button";
 import Loader from "../loder";
 ///@ts-ignore
 import { load } from "@cashfreepayments/cashfree-js";
+import { paths } from "../../../routes/route.constant";
 
 type Props = {
   subscriptionId: string;
@@ -33,7 +34,10 @@ const CashFreeButton = ({
   const [loading, setLoading] = useState(false);
   const getSubscriptionId = async () => {
     try {
-      const res = await buySubscription(id);
+      const res = await buySubscription(
+        id,
+        `${import.meta.env.VITE_CASHFREE_REDIRECT_URL}/${paths.PRICING_PLAN}`
+      );
       return res.data;
     } catch (error) {
       toast({

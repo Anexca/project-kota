@@ -1,11 +1,10 @@
-import { paths } from "../routes/route.constant";
 import axiosInstance from "./base";
 
 const getPlans = async () => {
   const response = await axiosInstance.get(`/subscriptions`);
   return response.data;
 };
-const buySubscription = async (id: string) => {
+const buySubscription = async (id: string, returnUrl: string) => {
   const response = await axiosInstance.post<{
     data: {
       id: number;
@@ -13,11 +12,7 @@ const buySubscription = async (id: string) => {
       subscription_id: string;
       payment_session_id: string;
     };
-  }>(
-    `/subscriptions/${id}/buy`,
-    {},
-    { params: { returnUrl: `http://localhost:5173/${paths.PRICING_PLAN}` } }
-  );
+  }>(`/subscriptions/${id}/buy`, {}, { params: { returnUrl: returnUrl } });
   return response.data;
 };
 
@@ -36,8 +31,8 @@ const cancelSubscription = async (id: string) => {
   return response.data;
 };
 export {
-  getPlans,
-  buySubscription,
   alertBackendForSubscription,
+  buySubscription,
   cancelSubscription,
+  getPlans,
 };
