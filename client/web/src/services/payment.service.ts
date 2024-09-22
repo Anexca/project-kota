@@ -1,3 +1,4 @@
+import { paths } from "../routes/route.constant";
 import axiosInstance from "./base";
 
 const getPlans = async () => {
@@ -5,25 +6,28 @@ const getPlans = async () => {
   return response.data;
 };
 const buySubscription = async (id: string) => {
-  const response = await axiosInstance.post(`/subscriptions/${id}/buy`);
+  const response = await axiosInstance.post<{
+    data: {
+      id: number;
+      status: string;
+      subscription_id: string;
+      payment_session_id: string;
+    };
+  }>(
+    `/subscriptions/${id}/buy`,
+    {},
+    { params: { returnUrl: `http://localhost:5173/${paths.PRICING_PLAN}` } }
+  );
   return response.data;
 };
 
 const alertBackendForSubscription = async ({
   paymentId,
-  signature,
-  userSubsId,
 }: {
-  userSubsId: string;
-  paymentId: string;
-  signature: string;
+  paymentId: number;
 }) => {
   const response = await axiosInstance.post(
-    `/user-subscriptions/${userSubsId}/activate`,
-    {
-      payment_id: paymentId,
-      signature,
-    }
+    `/user-subscriptions/${paymentId}/activate`
   );
   return response.data;
 };
