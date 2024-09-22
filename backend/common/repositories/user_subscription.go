@@ -87,5 +87,6 @@ func (u *UserSubscriptioRepository) GetByProviderSubscriptionId(ctx context.Cont
 	}
 	return u.dbClient.UserSubscription.Query().
 		Where(usersubscription.ProviderSubscriptionIDEQ(providerSubscriptionId), usersubscription.HasUserWith(user.IDEQ(userUid))).
+		WithSubscription().
 		Only(ctx)
 }

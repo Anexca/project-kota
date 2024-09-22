@@ -83,17 +83,17 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, err
 	}
 
-	// userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
-	// if err != nil {
-	// 	var notFoundError *ent.NotFoundError
-	// 	if !errors.As(err, &notFoundError) {
-	// 		return nil, err
-	// 	}
-	// }
+	userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if !errors.As(err, &notFoundError) {
+			return nil, err
+		}
+	}
 
-	// if userHasSubscription {
-	// 	return nil, fmt.Errorf("user already has active subscription")
-	// }
+	if userHasSubscription {
+		return nil, fmt.Errorf("user already has active subscription")
+	}
 
 	model := CreateOrderModel{
 		Amount:              subscription.FinalPrice,
@@ -133,6 +133,10 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 
 func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, providerSubscriptionId string, userEmail string) (*models.ActivatedSubscription, error) {
 	user, err := s.userRepository.GetByEmail(ctx, userEmail)
+	if err != nil {
+		return nil, err
+
+	}
 	userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetByProviderSubscriptionId(ctx, providerSubscriptionId, user.ID.String())
 	if err != nil {
 		return nil, err
