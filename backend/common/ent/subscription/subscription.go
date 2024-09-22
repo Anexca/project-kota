@@ -16,6 +16,10 @@ const (
 	FieldID = "id"
 	// FieldProviderPlanID holds the string denoting the provider_plan_id field in the database.
 	FieldProviderPlanID = "provider_plan_id"
+	// FieldBasePrice holds the string denoting the base_price field in the database.
+	FieldBasePrice = "base_price"
+	// FieldFinalPrice holds the string denoting the final_price field in the database.
+	FieldFinalPrice = "final_price"
 	// FieldPrice holds the string denoting the price field in the database.
 	FieldPrice = "price"
 	// FieldDurationInMonths holds the string denoting the duration_in_months field in the database.
@@ -56,7 +60,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldProviderPlanID,
-	FieldPrice,
+	FieldBasePrice,
+	FieldFinalPrice,
 	FieldDurationInMonths,
 	FieldIsActive,
 	FieldName,
@@ -69,6 +74,11 @@ var Columns = []string{
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for _, f := range [...]string{FieldPrice} {
+		if column == f {
 			return true
 		}
 	}
@@ -95,6 +105,16 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByProviderPlanID orders the results by the provider_plan_id field.
 func ByProviderPlanID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProviderPlanID, opts...).ToFunc()
+}
+
+// ByBasePrice orders the results by the base_price field.
+func ByBasePrice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBasePrice, opts...).ToFunc()
+}
+
+// ByFinalPrice orders the results by the final_price field.
+func ByFinalPrice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFinalPrice, opts...).ToFunc()
 }
 
 // ByPrice orders the results by the price field.

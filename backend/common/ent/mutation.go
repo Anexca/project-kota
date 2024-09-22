@@ -6443,6 +6443,10 @@ type SubscriptionMutation struct {
 	typ                       string
 	id                        *int
 	provider_plan_id          *string
+	base_price                *float64
+	addbase_price             *float64
+	final_price               *float64
+	addfinal_price            *float64
 	price                     *float64
 	addprice                  *float64
 	duration_in_months        *int
@@ -6598,6 +6602,146 @@ func (m *SubscriptionMutation) ResetProviderPlanID() {
 	m.provider_plan_id = nil
 }
 
+// SetBasePrice sets the "base_price" field.
+func (m *SubscriptionMutation) SetBasePrice(f float64) {
+	m.base_price = &f
+	m.addbase_price = nil
+}
+
+// BasePrice returns the value of the "base_price" field in the mutation.
+func (m *SubscriptionMutation) BasePrice() (r float64, exists bool) {
+	v := m.base_price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBasePrice returns the old "base_price" field's value of the Subscription entity.
+// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubscriptionMutation) OldBasePrice(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBasePrice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBasePrice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBasePrice: %w", err)
+	}
+	return oldValue.BasePrice, nil
+}
+
+// AddBasePrice adds f to the "base_price" field.
+func (m *SubscriptionMutation) AddBasePrice(f float64) {
+	if m.addbase_price != nil {
+		*m.addbase_price += f
+	} else {
+		m.addbase_price = &f
+	}
+}
+
+// AddedBasePrice returns the value that was added to the "base_price" field in this mutation.
+func (m *SubscriptionMutation) AddedBasePrice() (r float64, exists bool) {
+	v := m.addbase_price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearBasePrice clears the value of the "base_price" field.
+func (m *SubscriptionMutation) ClearBasePrice() {
+	m.base_price = nil
+	m.addbase_price = nil
+	m.clearedFields[subscription.FieldBasePrice] = struct{}{}
+}
+
+// BasePriceCleared returns if the "base_price" field was cleared in this mutation.
+func (m *SubscriptionMutation) BasePriceCleared() bool {
+	_, ok := m.clearedFields[subscription.FieldBasePrice]
+	return ok
+}
+
+// ResetBasePrice resets all changes to the "base_price" field.
+func (m *SubscriptionMutation) ResetBasePrice() {
+	m.base_price = nil
+	m.addbase_price = nil
+	delete(m.clearedFields, subscription.FieldBasePrice)
+}
+
+// SetFinalPrice sets the "final_price" field.
+func (m *SubscriptionMutation) SetFinalPrice(f float64) {
+	m.final_price = &f
+	m.addfinal_price = nil
+}
+
+// FinalPrice returns the value of the "final_price" field in the mutation.
+func (m *SubscriptionMutation) FinalPrice() (r float64, exists bool) {
+	v := m.final_price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFinalPrice returns the old "final_price" field's value of the Subscription entity.
+// If the Subscription object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubscriptionMutation) OldFinalPrice(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFinalPrice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFinalPrice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFinalPrice: %w", err)
+	}
+	return oldValue.FinalPrice, nil
+}
+
+// AddFinalPrice adds f to the "final_price" field.
+func (m *SubscriptionMutation) AddFinalPrice(f float64) {
+	if m.addfinal_price != nil {
+		*m.addfinal_price += f
+	} else {
+		m.addfinal_price = &f
+	}
+}
+
+// AddedFinalPrice returns the value that was added to the "final_price" field in this mutation.
+func (m *SubscriptionMutation) AddedFinalPrice() (r float64, exists bool) {
+	v := m.addfinal_price
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearFinalPrice clears the value of the "final_price" field.
+func (m *SubscriptionMutation) ClearFinalPrice() {
+	m.final_price = nil
+	m.addfinal_price = nil
+	m.clearedFields[subscription.FieldFinalPrice] = struct{}{}
+}
+
+// FinalPriceCleared returns if the "final_price" field was cleared in this mutation.
+func (m *SubscriptionMutation) FinalPriceCleared() bool {
+	_, ok := m.clearedFields[subscription.FieldFinalPrice]
+	return ok
+}
+
+// ResetFinalPrice resets all changes to the "final_price" field.
+func (m *SubscriptionMutation) ResetFinalPrice() {
+	m.final_price = nil
+	m.addfinal_price = nil
+	delete(m.clearedFields, subscription.FieldFinalPrice)
+}
+
 // SetPrice sets the "price" field.
 func (m *SubscriptionMutation) SetPrice(f float64) {
 	m.price = &f
@@ -6648,10 +6792,24 @@ func (m *SubscriptionMutation) AddedPrice() (r float64, exists bool) {
 	return *v, true
 }
 
+// ClearPrice clears the value of the "price" field.
+func (m *SubscriptionMutation) ClearPrice() {
+	m.price = nil
+	m.addprice = nil
+	m.clearedFields[subscription.FieldPrice] = struct{}{}
+}
+
+// PriceCleared returns if the "price" field was cleared in this mutation.
+func (m *SubscriptionMutation) PriceCleared() bool {
+	_, ok := m.clearedFields[subscription.FieldPrice]
+	return ok
+}
+
 // ResetPrice resets all changes to the "price" field.
 func (m *SubscriptionMutation) ResetPrice() {
 	m.price = nil
 	m.addprice = nil
+	delete(m.clearedFields, subscription.FieldPrice)
 }
 
 // SetDurationInMonths sets the "duration_in_months" field.
@@ -7045,9 +7203,15 @@ func (m *SubscriptionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubscriptionMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 10)
 	if m.provider_plan_id != nil {
 		fields = append(fields, subscription.FieldProviderPlanID)
+	}
+	if m.base_price != nil {
+		fields = append(fields, subscription.FieldBasePrice)
+	}
+	if m.final_price != nil {
+		fields = append(fields, subscription.FieldFinalPrice)
 	}
 	if m.price != nil {
 		fields = append(fields, subscription.FieldPrice)
@@ -7080,6 +7244,10 @@ func (m *SubscriptionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case subscription.FieldProviderPlanID:
 		return m.ProviderPlanID()
+	case subscription.FieldBasePrice:
+		return m.BasePrice()
+	case subscription.FieldFinalPrice:
+		return m.FinalPrice()
 	case subscription.FieldPrice:
 		return m.Price()
 	case subscription.FieldDurationInMonths:
@@ -7105,6 +7273,10 @@ func (m *SubscriptionMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case subscription.FieldProviderPlanID:
 		return m.OldProviderPlanID(ctx)
+	case subscription.FieldBasePrice:
+		return m.OldBasePrice(ctx)
+	case subscription.FieldFinalPrice:
+		return m.OldFinalPrice(ctx)
 	case subscription.FieldPrice:
 		return m.OldPrice(ctx)
 	case subscription.FieldDurationInMonths:
@@ -7134,6 +7306,20 @@ func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetProviderPlanID(v)
+		return nil
+	case subscription.FieldBasePrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBasePrice(v)
+		return nil
+	case subscription.FieldFinalPrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFinalPrice(v)
 		return nil
 	case subscription.FieldPrice:
 		v, ok := value.(float64)
@@ -7192,6 +7378,12 @@ func (m *SubscriptionMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *SubscriptionMutation) AddedFields() []string {
 	var fields []string
+	if m.addbase_price != nil {
+		fields = append(fields, subscription.FieldBasePrice)
+	}
+	if m.addfinal_price != nil {
+		fields = append(fields, subscription.FieldFinalPrice)
+	}
 	if m.addprice != nil {
 		fields = append(fields, subscription.FieldPrice)
 	}
@@ -7206,6 +7398,10 @@ func (m *SubscriptionMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *SubscriptionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case subscription.FieldBasePrice:
+		return m.AddedBasePrice()
+	case subscription.FieldFinalPrice:
+		return m.AddedFinalPrice()
 	case subscription.FieldPrice:
 		return m.AddedPrice()
 	case subscription.FieldDurationInMonths:
@@ -7219,6 +7415,20 @@ func (m *SubscriptionMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case subscription.FieldBasePrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBasePrice(v)
+		return nil
+	case subscription.FieldFinalPrice:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddFinalPrice(v)
+		return nil
 	case subscription.FieldPrice:
 		v, ok := value.(float64)
 		if !ok {
@@ -7241,6 +7451,15 @@ func (m *SubscriptionMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *SubscriptionMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(subscription.FieldBasePrice) {
+		fields = append(fields, subscription.FieldBasePrice)
+	}
+	if m.FieldCleared(subscription.FieldFinalPrice) {
+		fields = append(fields, subscription.FieldFinalPrice)
+	}
+	if m.FieldCleared(subscription.FieldPrice) {
+		fields = append(fields, subscription.FieldPrice)
+	}
 	if m.FieldCleared(subscription.FieldRawSubscriptionData) {
 		fields = append(fields, subscription.FieldRawSubscriptionData)
 	}
@@ -7258,6 +7477,15 @@ func (m *SubscriptionMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *SubscriptionMutation) ClearField(name string) error {
 	switch name {
+	case subscription.FieldBasePrice:
+		m.ClearBasePrice()
+		return nil
+	case subscription.FieldFinalPrice:
+		m.ClearFinalPrice()
+		return nil
+	case subscription.FieldPrice:
+		m.ClearPrice()
+		return nil
 	case subscription.FieldRawSubscriptionData:
 		m.ClearRawSubscriptionData()
 		return nil
@@ -7271,6 +7499,12 @@ func (m *SubscriptionMutation) ResetField(name string) error {
 	switch name {
 	case subscription.FieldProviderPlanID:
 		m.ResetProviderPlanID()
+		return nil
+	case subscription.FieldBasePrice:
+		m.ResetBasePrice()
+		return nil
+	case subscription.FieldFinalPrice:
+		m.ResetFinalPrice()
 		return nil
 	case subscription.FieldPrice:
 		m.ResetPrice()

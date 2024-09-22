@@ -58,7 +58,8 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.Subscription
 			IsActive:            subscription.IsActive,
 			RawSubscriptionData: subscription.RawSubscriptionData,
 			DurationInMonths:    subscription.DurationInMonths,
-			Price:               subscription.Price,
+			FinalPrice:          subscription.FinalPrice,
+			BasePrice:           subscription.BasePrice,
 		}
 
 		subscriptionOverviews = append(subscriptionOverviews, subscriptionOverview)
@@ -95,7 +96,7 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 	}
 
 	model := CreateOrderModel{
-		Amount:              subscription.Price,
+		Amount:              subscription.FinalPrice,
 		CustomerId:          user.PaymentProviderCustomerID,
 		CustomerPhoneNumber: user.PhoneNumber,
 		CustomerEmail:       user.Email,

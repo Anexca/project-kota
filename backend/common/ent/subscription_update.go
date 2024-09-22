@@ -44,6 +44,60 @@ func (su *SubscriptionUpdate) SetNillableProviderPlanID(s *string) *Subscription
 	return su
 }
 
+// SetBasePrice sets the "base_price" field.
+func (su *SubscriptionUpdate) SetBasePrice(f float64) *SubscriptionUpdate {
+	su.mutation.ResetBasePrice()
+	su.mutation.SetBasePrice(f)
+	return su
+}
+
+// SetNillableBasePrice sets the "base_price" field if the given value is not nil.
+func (su *SubscriptionUpdate) SetNillableBasePrice(f *float64) *SubscriptionUpdate {
+	if f != nil {
+		su.SetBasePrice(*f)
+	}
+	return su
+}
+
+// AddBasePrice adds f to the "base_price" field.
+func (su *SubscriptionUpdate) AddBasePrice(f float64) *SubscriptionUpdate {
+	su.mutation.AddBasePrice(f)
+	return su
+}
+
+// ClearBasePrice clears the value of the "base_price" field.
+func (su *SubscriptionUpdate) ClearBasePrice() *SubscriptionUpdate {
+	su.mutation.ClearBasePrice()
+	return su
+}
+
+// SetFinalPrice sets the "final_price" field.
+func (su *SubscriptionUpdate) SetFinalPrice(f float64) *SubscriptionUpdate {
+	su.mutation.ResetFinalPrice()
+	su.mutation.SetFinalPrice(f)
+	return su
+}
+
+// SetNillableFinalPrice sets the "final_price" field if the given value is not nil.
+func (su *SubscriptionUpdate) SetNillableFinalPrice(f *float64) *SubscriptionUpdate {
+	if f != nil {
+		su.SetFinalPrice(*f)
+	}
+	return su
+}
+
+// AddFinalPrice adds f to the "final_price" field.
+func (su *SubscriptionUpdate) AddFinalPrice(f float64) *SubscriptionUpdate {
+	su.mutation.AddFinalPrice(f)
+	return su
+}
+
+// ClearFinalPrice clears the value of the "final_price" field.
+func (su *SubscriptionUpdate) ClearFinalPrice() *SubscriptionUpdate {
+	su.mutation.ClearFinalPrice()
+	return su
+}
+
 // SetPrice sets the "price" field.
 func (su *SubscriptionUpdate) SetPrice(f float64) *SubscriptionUpdate {
 	su.mutation.ResetPrice()
@@ -62,6 +116,12 @@ func (su *SubscriptionUpdate) SetNillablePrice(f *float64) *SubscriptionUpdate {
 // AddPrice adds f to the "price" field.
 func (su *SubscriptionUpdate) AddPrice(f float64) *SubscriptionUpdate {
 	su.mutation.AddPrice(f)
+	return su
+}
+
+// ClearPrice clears the value of the "price" field.
+func (su *SubscriptionUpdate) ClearPrice() *SubscriptionUpdate {
+	su.mutation.ClearPrice()
 	return su
 }
 
@@ -257,11 +317,32 @@ func (su *SubscriptionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.ProviderPlanID(); ok {
 		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
 	}
+	if value, ok := su.mutation.BasePrice(); ok {
+		_spec.SetField(subscription.FieldBasePrice, field.TypeFloat64, value)
+	}
+	if value, ok := su.mutation.AddedBasePrice(); ok {
+		_spec.AddField(subscription.FieldBasePrice, field.TypeFloat64, value)
+	}
+	if su.mutation.BasePriceCleared() {
+		_spec.ClearField(subscription.FieldBasePrice, field.TypeFloat64)
+	}
+	if value, ok := su.mutation.FinalPrice(); ok {
+		_spec.SetField(subscription.FieldFinalPrice, field.TypeFloat64, value)
+	}
+	if value, ok := su.mutation.AddedFinalPrice(); ok {
+		_spec.AddField(subscription.FieldFinalPrice, field.TypeFloat64, value)
+	}
+	if su.mutation.FinalPriceCleared() {
+		_spec.ClearField(subscription.FieldFinalPrice, field.TypeFloat64)
+	}
 	if value, ok := su.mutation.Price(); ok {
 		_spec.SetField(subscription.FieldPrice, field.TypeFloat64, value)
 	}
 	if value, ok := su.mutation.AddedPrice(); ok {
 		_spec.AddField(subscription.FieldPrice, field.TypeFloat64, value)
+	}
+	if su.mutation.PriceCleared() {
+		_spec.ClearField(subscription.FieldPrice, field.TypeFloat64)
 	}
 	if value, ok := su.mutation.DurationInMonths(); ok {
 		_spec.SetField(subscription.FieldDurationInMonths, field.TypeInt, value)
@@ -408,6 +489,60 @@ func (suo *SubscriptionUpdateOne) SetNillableProviderPlanID(s *string) *Subscrip
 	return suo
 }
 
+// SetBasePrice sets the "base_price" field.
+func (suo *SubscriptionUpdateOne) SetBasePrice(f float64) *SubscriptionUpdateOne {
+	suo.mutation.ResetBasePrice()
+	suo.mutation.SetBasePrice(f)
+	return suo
+}
+
+// SetNillableBasePrice sets the "base_price" field if the given value is not nil.
+func (suo *SubscriptionUpdateOne) SetNillableBasePrice(f *float64) *SubscriptionUpdateOne {
+	if f != nil {
+		suo.SetBasePrice(*f)
+	}
+	return suo
+}
+
+// AddBasePrice adds f to the "base_price" field.
+func (suo *SubscriptionUpdateOne) AddBasePrice(f float64) *SubscriptionUpdateOne {
+	suo.mutation.AddBasePrice(f)
+	return suo
+}
+
+// ClearBasePrice clears the value of the "base_price" field.
+func (suo *SubscriptionUpdateOne) ClearBasePrice() *SubscriptionUpdateOne {
+	suo.mutation.ClearBasePrice()
+	return suo
+}
+
+// SetFinalPrice sets the "final_price" field.
+func (suo *SubscriptionUpdateOne) SetFinalPrice(f float64) *SubscriptionUpdateOne {
+	suo.mutation.ResetFinalPrice()
+	suo.mutation.SetFinalPrice(f)
+	return suo
+}
+
+// SetNillableFinalPrice sets the "final_price" field if the given value is not nil.
+func (suo *SubscriptionUpdateOne) SetNillableFinalPrice(f *float64) *SubscriptionUpdateOne {
+	if f != nil {
+		suo.SetFinalPrice(*f)
+	}
+	return suo
+}
+
+// AddFinalPrice adds f to the "final_price" field.
+func (suo *SubscriptionUpdateOne) AddFinalPrice(f float64) *SubscriptionUpdateOne {
+	suo.mutation.AddFinalPrice(f)
+	return suo
+}
+
+// ClearFinalPrice clears the value of the "final_price" field.
+func (suo *SubscriptionUpdateOne) ClearFinalPrice() *SubscriptionUpdateOne {
+	suo.mutation.ClearFinalPrice()
+	return suo
+}
+
 // SetPrice sets the "price" field.
 func (suo *SubscriptionUpdateOne) SetPrice(f float64) *SubscriptionUpdateOne {
 	suo.mutation.ResetPrice()
@@ -426,6 +561,12 @@ func (suo *SubscriptionUpdateOne) SetNillablePrice(f *float64) *SubscriptionUpda
 // AddPrice adds f to the "price" field.
 func (suo *SubscriptionUpdateOne) AddPrice(f float64) *SubscriptionUpdateOne {
 	suo.mutation.AddPrice(f)
+	return suo
+}
+
+// ClearPrice clears the value of the "price" field.
+func (suo *SubscriptionUpdateOne) ClearPrice() *SubscriptionUpdateOne {
+	suo.mutation.ClearPrice()
 	return suo
 }
 
@@ -651,11 +792,32 @@ func (suo *SubscriptionUpdateOne) sqlSave(ctx context.Context) (_node *Subscript
 	if value, ok := suo.mutation.ProviderPlanID(); ok {
 		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
 	}
+	if value, ok := suo.mutation.BasePrice(); ok {
+		_spec.SetField(subscription.FieldBasePrice, field.TypeFloat64, value)
+	}
+	if value, ok := suo.mutation.AddedBasePrice(); ok {
+		_spec.AddField(subscription.FieldBasePrice, field.TypeFloat64, value)
+	}
+	if suo.mutation.BasePriceCleared() {
+		_spec.ClearField(subscription.FieldBasePrice, field.TypeFloat64)
+	}
+	if value, ok := suo.mutation.FinalPrice(); ok {
+		_spec.SetField(subscription.FieldFinalPrice, field.TypeFloat64, value)
+	}
+	if value, ok := suo.mutation.AddedFinalPrice(); ok {
+		_spec.AddField(subscription.FieldFinalPrice, field.TypeFloat64, value)
+	}
+	if suo.mutation.FinalPriceCleared() {
+		_spec.ClearField(subscription.FieldFinalPrice, field.TypeFloat64)
+	}
 	if value, ok := suo.mutation.Price(); ok {
 		_spec.SetField(subscription.FieldPrice, field.TypeFloat64, value)
 	}
 	if value, ok := suo.mutation.AddedPrice(); ok {
 		_spec.AddField(subscription.FieldPrice, field.TypeFloat64, value)
+	}
+	if suo.mutation.PriceCleared() {
+		_spec.ClearField(subscription.FieldPrice, field.TypeFloat64)
 	}
 	if value, ok := suo.mutation.DurationInMonths(); ok {
 		_spec.SetField(subscription.FieldDurationInMonths, field.TypeInt, value)
