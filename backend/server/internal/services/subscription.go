@@ -131,8 +131,13 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 	return subscriptionToActivate, nil
 }
 
-func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*models.ActivatedSubscription, error) {
-	userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
+func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, providerSubscriptionId string, userEmail string) (*models.ActivatedSubscription, error) {
+	user, err := s.userRepository.GetByEmail(ctx, userEmail)
+	if err != nil {
+		return nil, err
+
+	}
+	userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetByProviderSubscriptionId(ctx, providerSubscriptionId, user.ID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +156,7 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, user
 	userSubscriptionToUpdate.IsActive = true
 	userSubscriptionToUpdate.EndDate = time.Now().AddDate(0, userSubscriptionToUpdate.Edges.Subscription.DurationInMonths, 0)
 
-	payment, err := s.StorePaymentForSubscription(ctx, transaction, userSubscriptionId, userId)
+	payment, err := s.StorePaymentForSubscription(ctx, transaction, userSubscriptionToUpdate.ID, user.ID.String())
 	if err != nil {
 		return nil, err
 	}

@@ -99,3 +99,7 @@ func (p *PaymentService) IsOrderSuccessful(orderId string) (bool, *cashfree_pg.P
 
 	return false, nil, nil
 }
+
+func (p *PaymentService) VerifyWebhookSignature(signature, timestamp, body string) (*cashfree_pg.PGWebhookEvent, error) {
+	return cashfree_pg.PGVerifyWebhookSignature(signature, body, timestamp)
+}
