@@ -20,7 +20,13 @@ type Subscription struct {
 	ID int `json:"id,omitempty"`
 	// ProviderPlanID holds the value of the "provider_plan_id" field.
 	ProviderPlanID string `json:"provider_plan_id,omitempty"`
+	// BasePrice holds the value of the "base_price" field.
+	BasePrice float64 `json:"base_price,omitempty"`
+	// FinalPrice holds the value of the "final_price" field.
+	FinalPrice float64 `json:"final_price,omitempty"`
 	// Price holds the value of the "price" field.
+	//
+	// Deprecated: Field "price" was marked as deprecated in the schema.
 	Price float64 `json:"price,omitempty"`
 	// DurationInMonths holds the value of the "duration_in_months" field.
 	DurationInMonths int `json:"duration_in_months,omitempty"`
@@ -78,7 +84,7 @@ func (*Subscription) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case subscription.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case subscription.FieldPrice:
+		case subscription.FieldBasePrice, subscription.FieldFinalPrice, subscription.FieldPrice:
 			values[i] = new(sql.NullFloat64)
 		case subscription.FieldID, subscription.FieldDurationInMonths:
 			values[i] = new(sql.NullInt64)
@@ -112,6 +118,18 @@ func (s *Subscription) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field provider_plan_id", values[i])
 			} else if value.Valid {
 				s.ProviderPlanID = value.String
+			}
+		case subscription.FieldBasePrice:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field base_price", values[i])
+			} else if value.Valid {
+				s.BasePrice = value.Float64
+			}
+		case subscription.FieldFinalPrice:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field final_price", values[i])
+			} else if value.Valid {
+				s.FinalPrice = value.Float64
 			}
 		case subscription.FieldPrice:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -205,6 +223,12 @@ func (s *Subscription) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
 	builder.WriteString("provider_plan_id=")
 	builder.WriteString(s.ProviderPlanID)
+	builder.WriteString(", ")
+	builder.WriteString("base_price=")
+	builder.WriteString(fmt.Sprintf("%v", s.BasePrice))
+	builder.WriteString(", ")
+	builder.WriteString("final_price=")
+	builder.WriteString(fmt.Sprintf("%v", s.FinalPrice))
 	builder.WriteString(", ")
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", s.Price))

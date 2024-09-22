@@ -28,9 +28,45 @@ func (sc *SubscriptionCreate) SetProviderPlanID(s string) *SubscriptionCreate {
 	return sc
 }
 
+// SetBasePrice sets the "base_price" field.
+func (sc *SubscriptionCreate) SetBasePrice(f float64) *SubscriptionCreate {
+	sc.mutation.SetBasePrice(f)
+	return sc
+}
+
+// SetNillableBasePrice sets the "base_price" field if the given value is not nil.
+func (sc *SubscriptionCreate) SetNillableBasePrice(f *float64) *SubscriptionCreate {
+	if f != nil {
+		sc.SetBasePrice(*f)
+	}
+	return sc
+}
+
+// SetFinalPrice sets the "final_price" field.
+func (sc *SubscriptionCreate) SetFinalPrice(f float64) *SubscriptionCreate {
+	sc.mutation.SetFinalPrice(f)
+	return sc
+}
+
+// SetNillableFinalPrice sets the "final_price" field if the given value is not nil.
+func (sc *SubscriptionCreate) SetNillableFinalPrice(f *float64) *SubscriptionCreate {
+	if f != nil {
+		sc.SetFinalPrice(*f)
+	}
+	return sc
+}
+
 // SetPrice sets the "price" field.
 func (sc *SubscriptionCreate) SetPrice(f float64) *SubscriptionCreate {
 	sc.mutation.SetPrice(f)
+	return sc
+}
+
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (sc *SubscriptionCreate) SetNillablePrice(f *float64) *SubscriptionCreate {
+	if f != nil {
+		sc.SetPrice(*f)
+	}
 	return sc
 }
 
@@ -166,9 +202,6 @@ func (sc *SubscriptionCreate) check() error {
 	if _, ok := sc.mutation.ProviderPlanID(); !ok {
 		return &ValidationError{Name: "provider_plan_id", err: errors.New(`ent: missing required field "Subscription.provider_plan_id"`)}
 	}
-	if _, ok := sc.mutation.Price(); !ok {
-		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Subscription.price"`)}
-	}
 	if _, ok := sc.mutation.DurationInMonths(); !ok {
 		return &ValidationError{Name: "duration_in_months", err: errors.New(`ent: missing required field "Subscription.duration_in_months"`)}
 	}
@@ -213,6 +246,14 @@ func (sc *SubscriptionCreate) createSpec() (*Subscription, *sqlgraph.CreateSpec)
 	if value, ok := sc.mutation.ProviderPlanID(); ok {
 		_spec.SetField(subscription.FieldProviderPlanID, field.TypeString, value)
 		_node.ProviderPlanID = value
+	}
+	if value, ok := sc.mutation.BasePrice(); ok {
+		_spec.SetField(subscription.FieldBasePrice, field.TypeFloat64, value)
+		_node.BasePrice = value
+	}
+	if value, ok := sc.mutation.FinalPrice(); ok {
+		_spec.SetField(subscription.FieldFinalPrice, field.TypeFloat64, value)
+		_node.FinalPrice = value
 	}
 	if value, ok := sc.mutation.Price(); ok {
 		_spec.SetField(subscription.FieldPrice, field.TypeFloat64, value)

@@ -18,7 +18,9 @@ type Subscription struct {
 func (Subscription) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("provider_plan_id"),
-		field.Float("price"),
+		field.Float("base_price").Optional(),
+		field.Float("final_price").Optional(),
+		field.Float("price").Optional().Deprecated(),
 		field.Int("duration_in_months"),
 		field.Bool("is_active"),
 		field.String("name"),

@@ -218,7 +218,9 @@ var (
 	SubscriptionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "provider_plan_id", Type: field.TypeString},
-		{Name: "price", Type: field.TypeFloat64},
+		{Name: "base_price", Type: field.TypeFloat64, Nullable: true},
+		{Name: "final_price", Type: field.TypeFloat64, Nullable: true},
+		{Name: "price", Type: field.TypeFloat64, Nullable: true},
 		{Name: "duration_in_months", Type: field.TypeInt},
 		{Name: "is_active", Type: field.TypeBool},
 		{Name: "name", Type: field.TypeString},
