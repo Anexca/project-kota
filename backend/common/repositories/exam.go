@@ -47,25 +47,15 @@ func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategory *en
 		All(ctx)
 }
 
-func (e *ExamRepository) GetByName(ctx context.Context, name string) (*ent.Exam, error) {
-	return e.dbClient.Exam.Query().
-		Where(exam.NameContains(name)).
-		WithSetting().
-		WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
-			geq.Where(generatedexam.IsActiveEQ(true))
-		}).
-		Only(ctx)
-}
-
-func (e *ExamRepository) GetByType(ctx context.Context, name string) ([]*ent.Exam, error) {
-	return e.dbClient.Exam.Query().
-		Where(exam.NameContains(name)).
-		All(ctx)
-
-}
-
 func (e *ExamRepository) GetActiveByType(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error) {
 	return e.dbClient.Exam.Query().Where(
 		exam.TypeEQ(exam.Type(examType)),
+		exam.IsActiveEQ(true),
 	).All(ctx)
+}
+
+func (e *ExamRepository) GetByName(ctx context.Context, examName string) (*ent.Exam, error) {
+	return e.dbClient.Exam.Query().
+		Where(exam.NameEQ(examName)).
+		Only(ctx)
 }

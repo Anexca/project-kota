@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/razorpay/razorpay-go"
 )
 
 type UserService struct {
@@ -34,8 +33,8 @@ type UserProfileResponse struct {
 	ActiveSubscriptions []models.UserSubscriptionDetails `json:"active_subscriptions"`
 }
 
-func NewUserService(dbClient *ent.Client, paymentClient *razorpay.Client) *UserService {
-	paymentService := NewPaymentService(paymentClient)
+func NewUserService(dbClient *ent.Client) *UserService {
+	paymentService := NewPaymentService()
 	paymentRepositry := repositories.NewPaymentRepository(dbClient)
 	userRepository := repositories.NewUserRepository(dbClient)
 	userSubscriptionRepository := repositories.NewUserSubscriptioRepository(dbClient)
@@ -70,12 +69,17 @@ func (u *UserService) GetUserProfile(ctx context.Context, userId string) (UserPr
 				DurationInMonths:       userSubscription.Edges.Subscription.DurationInMonths,
 				StartDate:              userSubscription.StartDate,
 				EndDate:                userSubscription.EndDate,
-				PaymentDetails: models.SubscriptionPaymentDetails{
+			}
+
+			if len(userSubscription.Edges.Payments) > 0 {
+				paymentDetails := models.SubscriptionPaymentDetails{
 					Amount:        userSubscription.Edges.Payments[0].Amount, // Assuming the first payment holds the necessary details
 					PaymentDate:   userSubscription.Edges.Payments[0].PaymentDate,
 					PaymentStatus: string(userSubscription.Edges.Payments[0].Status),
 					PaymentMethod: userSubscription.Edges.Payments[0].PaymentMethod,
-				},
+				}
+
+				subscriptionDetails.PaymentDetails = paymentDetails
 			}
 
 			activeSubscriptions = append(activeSubscriptions, subscriptionDetails)
@@ -153,22 +157,16 @@ func (u *UserService) updatePaymentProviderCustomer(user *ent.User) error {
 		Email: user.Email,
 	}
 
-	if user.PaymentProviderCustomerID != "" {
-		_, err := u.paymentService.UpdateCustomer(user.PaymentProviderCustomerID, model)
-		return err
-	}
-
 	customer, err := u.paymentService.CreateCustomer(model)
 	if err != nil {
 		return err
 	}
 
-	customerId, ok := customer["id"].(string)
-	if !ok || customerId == "" {
+	customerId := customer.CustomerUid
+	if *customerId == "" {
 		return fmt.Errorf("could not extract customer id from response %v", customer)
 	}
 
-	user.PaymentProviderCustomerID = customerId
-
+	user.PaymentProviderCustomerID = *customerId
 	return nil
 }

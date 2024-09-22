@@ -102,16 +102,12 @@ type Status string
 
 // Status values.
 const (
-	StatusCREATED            Status = "CREATED"
-	StatusAUTHORIZED         Status = "AUTHORIZED"
-	StatusCAPTURED           Status = "CAPTURED"
-	StatusFAILED             Status = "FAILED"
-	StatusREFUNDED           Status = "REFUNDED"
-	StatusPARTIALLY_REFUNDED Status = "PARTIALLY_REFUNDED"
-	StatusPENDING            Status = "PENDING"
-	StatusPROCESSING         Status = "PROCESSING"
-	StatusCANCELLED          Status = "CANCELLED"
-	StatusDISPUTED           Status = "DISPUTED"
+	StatusSUCCESS       Status = "SUCCESS"
+	StatusNOT_ATTEMPTED Status = "NOT_ATTEMPTED"
+	StatusUSER_DROPPED  Status = "USER_DROPPED"
+	StatusFAILED        Status = "FAILED"
+	StatusPENDING       Status = "PENDING"
+	StatusCANCELLED     Status = "CANCELLED"
 )
 
 func (s Status) String() string {
@@ -121,7 +117,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusCREATED, StatusAUTHORIZED, StatusCAPTURED, StatusFAILED, StatusREFUNDED, StatusPARTIALLY_REFUNDED, StatusPENDING, StatusPROCESSING, StatusCANCELLED, StatusDISPUTED:
+	case StatusSUCCESS, StatusNOT_ATTEMPTED, StatusUSER_DROPPED, StatusFAILED, StatusPENDING, StatusCANCELLED:
 		return nil
 	default:
 		return fmt.Errorf("payment: invalid enum value for status field: %q", s)

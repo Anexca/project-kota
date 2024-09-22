@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Chip from "../../componnets/base/chip";
 import Icon from "../../componnets/base/icon";
+import CashFreeButton from "../../componnets/shared/cashfree-button";
 import Header from "../../componnets/shared/header/header";
-import RazorpayButton from "../../componnets/shared/razorpay-button";
+import Loader from "../../componnets/shared/loder";
+import { useToast } from "../../hooks/use-toast";
 import { paths } from "../../routes/route.constant";
 import { getPlans } from "../../services/payment.service";
 import useSessionStore from "../../store/auth-store";
 import useUserProfileStore from "../../store/user-info-store";
-import Chip from "../../componnets/base/chip";
-import Loader from "../../componnets/shared/loder";
-import { useToast } from "../../hooks/use-toast";
 
 export default function PricingPlan() {
   const { session } = useSessionStore();
@@ -76,7 +76,7 @@ export default function PricingPlan() {
             {staticValue.map((data, index) => (
               <div
                 key={index}
-                className="flex flex-col max-w-[360px] md:w-[384px] p-6 py-4 shadow bg-white group rounded-2xl border xl:border-none border-[#0B0641] relative"
+                className="flex flex-col max-w-[360px] md:w-[384px] p-6 py-4 shadow bg-white group rounded-2xl  relative"
               >
                 <div className="flex flex-row gap-5 items-center">
                   <span className="text-2xl font-bold">{data.passType}</span>
@@ -126,14 +126,18 @@ export default function PricingPlan() {
                         <div className="flex items-baseline line-through text-destructive mr-2">
                           <span className="text-2xl font-bold">
                             <Icon icon="rupee" className="text-xl" />
-                            {data.original}
+                            {data?.useAPIPrice
+                              ? plans[0]?.base_price
+                              : data.original}
                           </span>
                         </div>
                       )}
                       <div className="flex items-baseline">
                         <span className="text-4xl font-bold">
                           <Icon icon="rupee" className="text-3xl" />
-                          {data.price}
+                          {data?.useAPIPrice
+                            ? plans[0]?.final_price
+                            : data.price}
                         </span>
                         <span>{data.duration}</span>
                       </div>
@@ -141,13 +145,13 @@ export default function PricingPlan() {
 
                     <div className="flex align-bottom">
                       {session ? (
-                        <RazorpayButton
+                        <CashFreeButton
                           subscriptionId={plans[0]?.provider_plan_id}
                           id={plans[0]?.id}
                           isDisabled={data.isDisabled}
                         >
                           {data.buttonText}
-                        </RazorpayButton>
+                        </CashFreeButton>
                       ) : (
                         <Link
                           to={`/${paths.LOGIN}`}
@@ -174,6 +178,7 @@ const staticValue = [
     price: "19",
     original: "59",
     duration: "/month",
+    useAPIPrice: true,
     static: [
       "AI based descriptive exam assesments.",
       "24/7 support.",

@@ -60,8 +60,18 @@ func ProviderPlanID(v string) predicate.Subscription {
 	return predicate.Subscription(sql.FieldEQ(FieldProviderPlanID, v))
 }
 
+// BasePrice applies equality check predicate on the "base_price" field. It's identical to BasePriceEQ.
+func BasePrice(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldEQ(FieldBasePrice, v))
+}
+
+// FinalPrice applies equality check predicate on the "final_price" field. It's identical to FinalPriceEQ.
+func FinalPrice(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldEQ(FieldFinalPrice, v))
+}
+
 // Price applies equality check predicate on the "price" field. It's identical to PriceEQ.
-func Price(v int) predicate.Subscription {
+func Price(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldEQ(FieldPrice, v))
 }
 
@@ -155,44 +165,154 @@ func ProviderPlanIDContainsFold(v string) predicate.Subscription {
 	return predicate.Subscription(sql.FieldContainsFold(FieldProviderPlanID, v))
 }
 
+// BasePriceEQ applies the EQ predicate on the "base_price" field.
+func BasePriceEQ(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldEQ(FieldBasePrice, v))
+}
+
+// BasePriceNEQ applies the NEQ predicate on the "base_price" field.
+func BasePriceNEQ(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldNEQ(FieldBasePrice, v))
+}
+
+// BasePriceIn applies the In predicate on the "base_price" field.
+func BasePriceIn(vs ...float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldIn(FieldBasePrice, vs...))
+}
+
+// BasePriceNotIn applies the NotIn predicate on the "base_price" field.
+func BasePriceNotIn(vs ...float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldNotIn(FieldBasePrice, vs...))
+}
+
+// BasePriceGT applies the GT predicate on the "base_price" field.
+func BasePriceGT(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldGT(FieldBasePrice, v))
+}
+
+// BasePriceGTE applies the GTE predicate on the "base_price" field.
+func BasePriceGTE(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldGTE(FieldBasePrice, v))
+}
+
+// BasePriceLT applies the LT predicate on the "base_price" field.
+func BasePriceLT(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldLT(FieldBasePrice, v))
+}
+
+// BasePriceLTE applies the LTE predicate on the "base_price" field.
+func BasePriceLTE(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldLTE(FieldBasePrice, v))
+}
+
+// BasePriceIsNil applies the IsNil predicate on the "base_price" field.
+func BasePriceIsNil() predicate.Subscription {
+	return predicate.Subscription(sql.FieldIsNull(FieldBasePrice))
+}
+
+// BasePriceNotNil applies the NotNil predicate on the "base_price" field.
+func BasePriceNotNil() predicate.Subscription {
+	return predicate.Subscription(sql.FieldNotNull(FieldBasePrice))
+}
+
+// FinalPriceEQ applies the EQ predicate on the "final_price" field.
+func FinalPriceEQ(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldEQ(FieldFinalPrice, v))
+}
+
+// FinalPriceNEQ applies the NEQ predicate on the "final_price" field.
+func FinalPriceNEQ(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldNEQ(FieldFinalPrice, v))
+}
+
+// FinalPriceIn applies the In predicate on the "final_price" field.
+func FinalPriceIn(vs ...float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldIn(FieldFinalPrice, vs...))
+}
+
+// FinalPriceNotIn applies the NotIn predicate on the "final_price" field.
+func FinalPriceNotIn(vs ...float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldNotIn(FieldFinalPrice, vs...))
+}
+
+// FinalPriceGT applies the GT predicate on the "final_price" field.
+func FinalPriceGT(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldGT(FieldFinalPrice, v))
+}
+
+// FinalPriceGTE applies the GTE predicate on the "final_price" field.
+func FinalPriceGTE(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldGTE(FieldFinalPrice, v))
+}
+
+// FinalPriceLT applies the LT predicate on the "final_price" field.
+func FinalPriceLT(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldLT(FieldFinalPrice, v))
+}
+
+// FinalPriceLTE applies the LTE predicate on the "final_price" field.
+func FinalPriceLTE(v float64) predicate.Subscription {
+	return predicate.Subscription(sql.FieldLTE(FieldFinalPrice, v))
+}
+
+// FinalPriceIsNil applies the IsNil predicate on the "final_price" field.
+func FinalPriceIsNil() predicate.Subscription {
+	return predicate.Subscription(sql.FieldIsNull(FieldFinalPrice))
+}
+
+// FinalPriceNotNil applies the NotNil predicate on the "final_price" field.
+func FinalPriceNotNil() predicate.Subscription {
+	return predicate.Subscription(sql.FieldNotNull(FieldFinalPrice))
+}
+
 // PriceEQ applies the EQ predicate on the "price" field.
-func PriceEQ(v int) predicate.Subscription {
+func PriceEQ(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldEQ(FieldPrice, v))
 }
 
 // PriceNEQ applies the NEQ predicate on the "price" field.
-func PriceNEQ(v int) predicate.Subscription {
+func PriceNEQ(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldNEQ(FieldPrice, v))
 }
 
 // PriceIn applies the In predicate on the "price" field.
-func PriceIn(vs ...int) predicate.Subscription {
+func PriceIn(vs ...float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldIn(FieldPrice, vs...))
 }
 
 // PriceNotIn applies the NotIn predicate on the "price" field.
-func PriceNotIn(vs ...int) predicate.Subscription {
+func PriceNotIn(vs ...float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldNotIn(FieldPrice, vs...))
 }
 
 // PriceGT applies the GT predicate on the "price" field.
-func PriceGT(v int) predicate.Subscription {
+func PriceGT(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldGT(FieldPrice, v))
 }
 
 // PriceGTE applies the GTE predicate on the "price" field.
-func PriceGTE(v int) predicate.Subscription {
+func PriceGTE(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldGTE(FieldPrice, v))
 }
 
 // PriceLT applies the LT predicate on the "price" field.
-func PriceLT(v int) predicate.Subscription {
+func PriceLT(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldLT(FieldPrice, v))
 }
 
 // PriceLTE applies the LTE predicate on the "price" field.
-func PriceLTE(v int) predicate.Subscription {
+func PriceLTE(v float64) predicate.Subscription {
 	return predicate.Subscription(sql.FieldLTE(FieldPrice, v))
+}
+
+// PriceIsNil applies the IsNil predicate on the "price" field.
+func PriceIsNil() predicate.Subscription {
+	return predicate.Subscription(sql.FieldIsNull(FieldPrice))
+}
+
+// PriceNotNil applies the NotNil predicate on the "price" field.
+func PriceNotNil() predicate.Subscription {
+	return predicate.Subscription(sql.FieldNotNull(FieldPrice))
 }
 
 // DurationInMonthsEQ applies the EQ predicate on the "duration_in_months" field.

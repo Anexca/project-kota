@@ -1,21 +1,15 @@
 package services
 
 import (
+	"common/util"
+	"log"
 	"server/pkg/config"
 
-	"github.com/razorpay/razorpay-go"
-	utils "github.com/razorpay/razorpay-go/utils"
+	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
 )
 
 type PaymentService struct {
-	paymentClient *razorpay.Client
-	environment   *config.Environment
-}
-
-type CreateSubscriptionModel struct {
-	ProviderPlanId     string
-	TotalBillingCycles int
-	CustomerId         string
+	environment *config.Environment
 }
 
 type UpsertPaymentProviderCustomerModel struct {
@@ -24,62 +18,84 @@ type UpsertPaymentProviderCustomerModel struct {
 	Phone string
 }
 
-func NewPaymentService(paymentClient *razorpay.Client) *PaymentService {
-	environment, _ := config.LoadEnvironment()
+type CreateOrderModel struct {
+	Amount              float64
+	UserId              string
+	CustomerId          string
+	CustomerPhoneNumber string
+	CustomerName        string
+	CustomerEmail       string
+	ReturnUrl           *string
+}
+
+var xAPIVersion = "2023-08-01"
+
+func NewPaymentService() *PaymentService {
+	environment, err := config.LoadEnvironment()
+	if err != nil {
+		log.Fatalf("error initiating payment service, %v", err)
+	}
+
+	cashfree_pg.XClientId = &environment.PaymentProviderKey
+	cashfree_pg.XClientSecret = &environment.PaymentProviderSecret
+	cashfree_pg.XEnvironment = cashfree_pg.SANDBOX
+
+	if environment.IsProduction {
+		cashfree_pg.XEnvironment = cashfree_pg.PRODUCTION
+	}
 
 	return &PaymentService{
-		environment:   environment,
-		paymentClient: paymentClient,
+		environment: environment,
 	}
 }
 
-func (p *PaymentService) CreateCustomer(model UpsertPaymentProviderCustomerModel) (map[string]interface{}, error) {
-	data := map[string]interface{}{
-		"name":          model.Name,
-		"contact":       model.Phone,
-		"email":         model.Email,
-		"fail_existing": 0,
+func (p *PaymentService) CreateCustomer(model UpsertPaymentProviderCustomerModel) (*cashfree_pg.CustomerEntity, error) {
+
+	createCustomerRequest := cashfree_pg.CreateCustomerRequest{
+		CustomerPhone: model.Phone,
+		CustomerEmail: &model.Email,
+		CustomerName:  &model.Name,
 	}
 
-	return p.paymentClient.Customer.Create(data, nil)
+	xRequestId := util.GenerateUUID()
+	xIdempotencyKey := util.GenerateUUID()
+
+	resp, _, err := cashfree_pg.PGCreateCustomer(&xAPIVersion, &createCustomerRequest, &xRequestId, &xIdempotencyKey, nil)
+	return resp, err
 }
 
-func (p *PaymentService) UpdateCustomer(customerID string, model UpsertPaymentProviderCustomerModel) (map[string]interface{}, error) {
-	data := map[string]interface{}{
-		"name":    model.Name,
-		"contact": model.Phone,
-		"email":   model.Email,
+func (p *PaymentService) CreateOrder(model CreateOrderModel) (*cashfree_pg.OrderEntity, error) {
+	request := cashfree_pg.CreateOrderRequest{
+		OrderAmount: model.Amount,
+		CustomerDetails: cashfree_pg.CustomerDetails{
+			// CustomerUid:   &model.CustomerId,
+			CustomerPhone: model.CustomerPhoneNumber,
+			CustomerId:    model.UserId,
+			CustomerEmail: &model.CustomerEmail,
+			CustomerName:  &model.CustomerName,
+		},
+		OrderMeta: &cashfree_pg.OrderMeta{
+			ReturnUrl: model.ReturnUrl,
+		},
+		OrderCurrency: "INR",
 	}
 
-	return p.paymentClient.Customer.Edit(customerID, data, nil)
+	response, _, err := cashfree_pg.PGCreateOrder(&xAPIVersion, &request, nil, nil, nil)
+	return response, err
 }
 
-func (p *PaymentService) CreateSubscription(model CreateSubscriptionModel) (map[string]interface{}, error) {
-	data := map[string]interface{}{
-		"plan_id":         model.ProviderPlanId,
-		"total_count":     model.TotalBillingCycles,
-		"customer_notify": 1,
-		"customer_id":     model.CustomerId,
+func (p *PaymentService) IsOrderSuccessful(orderId string) (bool, *cashfree_pg.PaymentEntity, error) {
+
+	response, _, err := cashfree_pg.PGOrderFetchPayments(&xAPIVersion, orderId, nil, nil, nil)
+	if err != nil {
+		return false, nil, err
 	}
 
-	return p.paymentClient.Subscription.Create(data, nil)
-}
-
-func (p *PaymentService) CancelUserSubscription(subscriptionId string) (map[string]interface{}, error) {
-	return p.paymentClient.Subscription.Cancel(subscriptionId, nil, nil)
-}
-
-func (p *PaymentService) GetPayment(paymentId string) (map[string]interface{}, error) {
-	return p.paymentClient.Payment.Fetch(paymentId, nil, nil)
-}
-
-func (p *PaymentService) IsSubscriptionPaymentSignatureValid(paymentId, subscriptionId, signatureToVerify string) bool {
-	params := map[string]interface{}{
-		"razorpay_subscription_id": subscriptionId,
-		"razorpay_payment_id":      paymentId,
+	for _, transaction := range response {
+		if *transaction.PaymentStatus == "SUCCESS" {
+			return true, &transaction, nil
+		}
 	}
 
-	signature := signatureToVerify
-	secret := p.environment.RazorpaySecret
-	return utils.VerifySubscriptionSignature(params, signature, secret)
+	return false, nil, nil
 }

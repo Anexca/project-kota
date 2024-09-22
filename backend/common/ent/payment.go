@@ -21,7 +21,7 @@ type Payment struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Amount holds the value of the "amount" field.
-	Amount int `json:"amount,omitempty"`
+	Amount float64 `json:"amount,omitempty"`
 	// PaymentDate holds the value of the "payment_date" field.
 	PaymentDate time.Time `json:"payment_date,omitempty"`
 	// Status holds the value of the "status" field.
@@ -82,7 +82,9 @@ func (*Payment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case payment.FieldID, payment.FieldAmount:
+		case payment.FieldAmount:
+			values[i] = new(sql.NullFloat64)
+		case payment.FieldID:
 			values[i] = new(sql.NullInt64)
 		case payment.FieldStatus, payment.FieldPaymentMethod, payment.FieldProviderPaymentID, payment.FieldProviderInvoiceID:
 			values[i] = new(sql.NullString)
@@ -114,10 +116,10 @@ func (pa *Payment) assignValues(columns []string, values []any) error {
 			}
 			pa.ID = int(value.Int64)
 		case payment.FieldAmount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				pa.Amount = int(value.Int64)
+				pa.Amount = value.Float64
 			}
 		case payment.FieldPaymentDate:
 			if value, ok := values[i].(*sql.NullTime); !ok {

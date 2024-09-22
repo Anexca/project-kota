@@ -12,7 +12,7 @@ import (
 	"server/pkg/models"
 	"time"
 
-	"github.com/razorpay/razorpay-go"
+	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
 )
 
 type SubscriptionService struct {
@@ -24,14 +24,9 @@ type SubscriptionService struct {
 	paymentrepository          *commonRepositories.PaymentRepository
 }
 
-type ActivateUserSubscriptionRequest struct {
-	PaymentId string `json:"payment_id" validate:"required"`
-	Signature string `json:"signature" validate:"required"`
-}
-
-func NewSubscriptionService(dbClient *ent.Client, paymentClient *razorpay.Client) *SubscriptionService {
+func NewSubscriptionService(dbClient *ent.Client) *SubscriptionService {
 	environment, _ := config.LoadEnvironment()
-	paymentService := NewPaymentService(paymentClient)
+	paymentService := NewPaymentService()
 	userRepository := commonRepositories.NewUserRepository(dbClient)
 	subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
 	userSubscriptionRepository := commonRepositories.NewUserSubscriptioRepository(dbClient)
@@ -63,7 +58,8 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.Subscription
 			IsActive:            subscription.IsActive,
 			RawSubscriptionData: subscription.RawSubscriptionData,
 			DurationInMonths:    subscription.DurationInMonths,
-			Price:               subscription.Price,
+			FinalPrice:          subscription.FinalPrice,
+			BasePrice:           subscription.BasePrice,
 		}
 
 		subscriptionOverviews = append(subscriptionOverviews, subscriptionOverview)
@@ -72,14 +68,14 @@ func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.Subscription
 	return subscriptionOverviews, nil
 }
 
-func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, userId string) (*ent.UserSubscription, error) {
+func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, returnUrl *string, userId string) (*models.SubscriptionToActivate, error) {
 	user, err := s.userRepository.Get(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 
 	if user.PaymentProviderCustomerID == "" {
-		return nil, fmt.Errorf("user %s profile does not have enough data to start subscription", user.Email)
+		return nil, fmt.Errorf("user %s's profile does not have enough data to start subscription", user.Email)
 	}
 
 	subscription, err := s.subscriptionRepository.GetById(ctx, subscriptionId)
@@ -99,26 +95,25 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, fmt.Errorf("user already has active subscription")
 	}
 
-	model := CreateSubscriptionModel{
-		ProviderPlanId:     subscription.ProviderPlanID,
-		TotalBillingCycles: 3,
-		CustomerId:         user.PaymentProviderCustomerID,
+	model := CreateOrderModel{
+		Amount:              subscription.FinalPrice,
+		CustomerId:          user.PaymentProviderCustomerID,
+		CustomerPhoneNumber: user.PhoneNumber,
+		CustomerEmail:       user.Email,
+		UserId:              userId,
+		CustomerName:        fmt.Sprintf("%s %s", user.FirstName, user.LastName),
+		ReturnUrl:           returnUrl,
 	}
 
-	createdSubscription, err := s.paymentService.CreateSubscription(model)
+	createdSubscription, err := s.paymentService.CreateOrder(model)
 	if err != nil {
 		return nil, err
-	}
-
-	createdSubscriptionId, ok := createdSubscription["id"].(string)
-	if !ok {
-		return nil, fmt.Errorf("could not get id from object %v", createdSubscription)
 	}
 
 	userSubscriptionModel := commonRepositories.UserSubscriptionModel{
 		SubscriptionId:         subscriptionId,
 		UserId:                 userId,
-		ProviderSubscriptionId: createdSubscriptionId,
+		ProviderSubscriptionId: *createdSubscription.OrderId,
 	}
 
 	userSubscription, err := s.userSubscriptionRepository.Create(ctx, userSubscriptionModel)
@@ -126,29 +121,29 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, err
 	}
 
-	return userSubscription, nil
+	subscriptionToActivate := &models.SubscriptionToActivate{
+		Id:               userSubscription.ID,
+		Status:           string(userSubscription.Status),
+		SubscriptionId:   userSubscription.ProviderSubscriptionID,
+		PaymentSessionId: *createdSubscription.PaymentSessionId,
+	}
+
+	return subscriptionToActivate, nil
 }
 
-func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, request ActivateUserSubscriptionRequest, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
+func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*models.ActivatedSubscription, error) {
 	userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	existingPayment, err := s.paymentrepository.GetByProviderPaymentId(ctx, request.PaymentId)
+	isSuccessful, transaction, err := s.paymentService.IsOrderSuccessful(userSubscriptionToUpdate.ProviderSubscriptionID)
 	if err != nil {
-		var notFoundError *ent.NotFoundError
-		if !errors.As(err, &notFoundError) {
-			return nil, err
-		}
+		return nil, err
 	}
 
-	if existingPayment != nil {
-		return nil, fmt.Errorf("record of payment with %s id already exists", request.PaymentId)
-	}
-
-	if !s.paymentService.IsSubscriptionPaymentSignatureValid(request.PaymentId, userSubscriptionToUpdate.ProviderSubscriptionID, request.Signature) {
-		return nil, errors.New("payment verification failed")
+	if !isSuccessful {
+		return nil, errors.New("payment for subscription was not successful")
 	}
 
 	userSubscriptionToUpdate.Status = usersubscription.StatusACTIVE
@@ -156,92 +151,60 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, requ
 	userSubscriptionToUpdate.IsActive = true
 	userSubscriptionToUpdate.EndDate = time.Now().AddDate(0, userSubscriptionToUpdate.Edges.Subscription.DurationInMonths, 0)
 
-	go func() {
-		bgCtx := context.Background()
-		payment, err := s.StorePaymentForSubscription(bgCtx, request.PaymentId, userSubscriptionId, userId)
-		if err != nil {
-			log.Printf("could not store payment %v", err)
-			return
-		}
+	payment, err := s.StorePaymentForSubscription(ctx, transaction, userSubscriptionId, userId)
+	if err != nil {
+		return nil, err
+	}
 
-		log.Println("payment info stored successfully with id", payment.ID)
-	}()
+	log.Println("payment info stored successfully with id", payment.ID)
 
 	err = s.userSubscriptionRepository.Update(ctx, userSubscriptionToUpdate)
 	if err != nil {
 		return nil, err
 	}
 
-	return userSubscriptionToUpdate, nil
+	activatedSubscription := models.ActivatedSubscription{
+		Id:        userSubscriptionToUpdate.ID,
+		Status:    string(userSubscriptionToUpdate.Status),
+		StartDate: userSubscriptionToUpdate.StartDate,
+		EndDate:   userSubscriptionToUpdate.EndDate,
+	}
+
+	return &activatedSubscription, nil
 }
 
-func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, providerPaymentId string, userSubscriptionId int, userId string) (*ent.Payment, error) {
-	paymentInfo, err := s.paymentService.GetPayment(providerPaymentId)
+func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, transaction *cashfree_pg.PaymentEntity, userSubscriptionId int, userId string) (*ent.Payment, error) {
+
+	const layout = time.RFC3339
+
+	paymentDate, err := time.Parse(layout, *transaction.PaymentCompletionTime)
 	if err != nil {
 		return nil, err
-	}
-
-	amount, ok := paymentInfo["amount"].(float64)
-	if !ok {
-		return nil, fmt.Errorf("could not get amount from object %v", paymentInfo)
-	}
-
-	createdAt, ok := paymentInfo["created_at"].(float64)
-	if !ok {
-		return nil, fmt.Errorf("could not get created_at from object %v", paymentInfo)
-	}
-
-	method, ok := paymentInfo["method"].(string)
-	if !ok {
-		return nil, fmt.Errorf("could not get method from object %v", paymentInfo)
-	}
-
-	status, ok := paymentInfo["status"].(string)
-	if !ok {
-		return nil, fmt.Errorf("could not get status from object %v", paymentInfo)
-	}
-
-	invoiceId, ok := paymentInfo["invoice_id"].(string)
-	if !ok {
-		return nil, fmt.Errorf("could not get invoice_id from object %v", paymentInfo)
 	}
 
 	paymentModel := commonRepositories.CreatePaymentModel{
-		Status:             status,
-		PaymentMethod:      method,
-		PaymentDate:        time.Unix(int64(createdAt), 0),
-		Amount:             int(amount),
+		Status:             *transaction.PaymentStatus,
+		PaymentMethod:      determinePaymentMethod(transaction.PaymentMethod),
+		PaymentDate:        paymentDate,
+		Amount:             float64(*transaction.PaymentAmount),
 		UserSubscriptionId: userSubscriptionId,
-		ProviderPaymentId:  providerPaymentId,
-		ProviderInvoiceId:  invoiceId,
+		ProviderPaymentId:  *transaction.CfPaymentId,
 	}
 
 	return s.paymentrepository.Create(ctx, paymentModel, userId)
+
 }
 
-func (s *SubscriptionService) CancelUserSubscription(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
-	userSubscriptionToCancel, err := s.userSubscriptionRepository.GetById(ctx, userSubscriptionId, userId)
-	if err != nil {
-		return nil, err
+func determinePaymentMethod(transaction *cashfree_pg.PaymentEntityPaymentMethod) string {
+	if transaction.PaymentMethodUPIInPaymentsEntity != nil {
+		return "UPI"
+	} else if transaction.PaymentMethodCardInPaymentsEntity != nil {
+		return "Card"
+	} else if transaction.PaymentMethodNetBankingInPaymentsEntity != nil {
+		return "Netbanking"
 	}
-
-	if userSubscriptionToCancel.Status == usersubscription.StatusCANCELED {
-		return nil, errors.New("user subscrption is already cancelled")
-	}
-
-	_, err = s.paymentService.CancelUserSubscription(userSubscriptionToCancel.ProviderSubscriptionID)
-	if err != nil {
-		return nil, fmt.Errorf("error canceling subscription with payment provider: %v", err)
-	}
-
-	userSubscriptionToCancel.Status = usersubscription.StatusCANCELED
-
-	err = s.userSubscriptionRepository.Update(ctx, userSubscriptionToCancel)
-	if err != nil {
-		return nil, err
-	}
-
-	return userSubscriptionToCancel, nil
+	// Add more checks for other payment methods as needed
+	return "Unknown"
 }
 
 func (s *SubscriptionService) UserHasActiveSubscription(ctx context.Context, subscription *ent.Subscription, user *ent.User) (bool, error) {

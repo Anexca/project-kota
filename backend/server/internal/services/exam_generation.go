@@ -69,8 +69,8 @@ func (e *ExamGenerationService) GenerateExams(ctx context.Context, examId int, m
 	return nil
 }
 
-func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examId int) error {
-	exam, err := e.examRepository.GetActiveById(ctx, examId, true)
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examName string) error {
+	exam, err := e.examRepository.GetByName(ctx, examName)
 	if err != nil {
 		return fmt.Errorf("failed to get exam by name: %w", err)
 	}

@@ -17,24 +17,20 @@ type Payment struct {
 // Fields of the Payment.
 func (Payment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("amount"),
+		field.Float("amount"),
 		field.Time("payment_date"),
 		field.Enum("status").
 			Values(
-				string(constants.PaymentStatusCreated),
-				string(constants.PaymentStatusAuthorized),
-				string(constants.PaymentStatusCaptured),
+				string(constants.PaymentStatusSuccess),
+				string(constants.PaymentStatusNotAttempted),
+				string(constants.PaymentStatusUserDropped),
 				string(constants.PaymentStatusFailed),
-				string(constants.PaymentStatusRefunded),
-				string(constants.PaymentStatusPartiallyRefunded),
 				string(constants.PaymentStatusPending),
-				string(constants.PaymentStatusProcessing),
 				string(constants.PaymentStatusCancelled),
-				string(constants.PaymentStatusDisputed),
 			),
 		field.String("payment_method"),
 		field.String("provider_payment_id").Unique(),
-		field.String("provider_invoice_id").Unique(),
+		field.String("provider_invoice_id").Unique().Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

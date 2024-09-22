@@ -14,7 +14,6 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/nedpals/supabase-go"
-	"github.com/razorpay/razorpay-go"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -32,18 +31,18 @@ type Server struct {
 	examGenerationService *services.ExamGenerationService
 }
 
-func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient *supabase.Client, paymentClient *razorpay.Client) *http.Server {
+func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient *supabase.Client) *http.Server {
 	logger := commonConfig.SetupLogger()
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 
 	authService := services.NewAuthService(supabaseClient)
 	redisService := commonService.NewRedisService(redisClient)
-	paymentService := services.NewPaymentService(paymentClient)
+	paymentService := services.NewPaymentService()
 	examAttemptService := services.NewExamAttemptService(dbClient)
-	userService := services.NewUserService(dbClient, paymentClient)
+	userService := services.NewUserService(dbClient)
 	examCategoryService := services.NewExamCategoryService(dbClient)
 	examAssesmentService := services.NewExamAssesmentService(redisClient, dbClient)
-	subscriptionService := services.NewSubscriptionService(dbClient, paymentClient)
+	subscriptionService := services.NewSubscriptionService(dbClient)
 	examGenerationService := services.NewExamGenerationService(redisClient, dbClient)
 
 	NewServer := &Server{
