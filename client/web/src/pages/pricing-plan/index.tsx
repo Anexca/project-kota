@@ -10,6 +10,7 @@ import useUserProfileStore from "../../store/user-info-store";
 import Chip from "../../componnets/base/chip";
 import Loader from "../../componnets/shared/loder";
 import { useToast } from "../../hooks/use-toast";
+import CashFreeButton from "../../componnets/shared/cashfree-button";
 
 export default function PricingPlan() {
   const { session } = useSessionStore();
@@ -141,13 +142,13 @@ export default function PricingPlan() {
 
                     <div className="flex align-bottom">
                       {session ? (
-                        <RazorpayButton
+                        <CashFreeButton
                           subscriptionId={plans[0]?.provider_plan_id}
                           id={plans[0]?.id}
                           isDisabled={data.isDisabled}
                         >
                           {data.buttonText}
-                        </RazorpayButton>
+                        </CashFreeButton>
                       ) : (
                         <Link
                           to={`/${paths.LOGIN}`}
