@@ -19,8 +19,11 @@ import { LoginSchema, LoginType } from "../../validation-schema/auth";
 import { supabase } from "../../supabase/client";
 import GoogleIcon from "../../assets/svg/google-icon";
 import useSessionStore from "../../store/auth-store";
+import { useState } from "react";
+import Loader from "../../componnets/shared/loder";
 
 export function RegisterPage() {
+  const [loading, setLoading] = useState(false);
   const { loadSession } = useSessionStore();
   const { toast } = useToast();
   const { handleSubmit, control } = useForm({
@@ -32,6 +35,7 @@ export function RegisterPage() {
   });
   const onSumbit = async (formData: LoginType) => {
     const { email, password } = formData;
+    setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -51,6 +55,7 @@ export function RegisterPage() {
         description: "Please confirm mail to login.",
       });
     }
+    setLoading(false);
   };
   const loginWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -118,8 +123,8 @@ export function RegisterPage() {
                   name="password"
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Register
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? <Loader color={"secondary"} /> : "Register"}
               </Button>
               <Button
                 onClick={loginWithGoogle}
