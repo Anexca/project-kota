@@ -76,7 +76,7 @@ export default function PricingPlan() {
             {staticValue.map((data, index) => (
               <div
                 key={index}
-                className="flex flex-col max-w-[360px] md:w-[384px] p-6 py-4 shadow bg-white group rounded-2xl border xl:border-none border-[#0B0641] relative"
+                className="flex flex-col max-w-[360px] md:w-[384px] p-6 py-4 shadow bg-white group rounded-2xl  relative"
               >
                 <div className="flex flex-row gap-5 items-center">
                   <span className="text-2xl font-bold">{data.passType}</span>
@@ -126,14 +126,18 @@ export default function PricingPlan() {
                         <div className="flex items-baseline line-through text-destructive mr-2">
                           <span className="text-2xl font-bold">
                             <Icon icon="rupee" className="text-xl" />
-                            {data.original}
+                            {data?.useAPIPrice
+                              ? plans[0]?.base_price
+                              : data.original}
                           </span>
                         </div>
                       )}
                       <div className="flex items-baseline">
                         <span className="text-4xl font-bold">
                           <Icon icon="rupee" className="text-3xl" />
-                          {data.price}
+                          {data?.useAPIPrice
+                            ? plans[0]?.final_price
+                            : data.price}
                         </span>
                         <span>{data.duration}</span>
                       </div>
@@ -174,6 +178,7 @@ const staticValue = [
     price: "19",
     original: "59",
     duration: "/month",
+    useAPIPrice: true,
     static: [
       "AI based descriptive exam assesments.",
       "24/7 support.",

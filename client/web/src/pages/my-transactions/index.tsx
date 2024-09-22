@@ -14,7 +14,7 @@ const paymentStatusComponents: { [key: string]: JSX.Element } = {
     </Chip>
   ),
   AUTHORIZED: <Chip icon={"thumbs_up"}>Payment Authorized</Chip>,
-  CAPTURED: (
+  SUCCESS: (
     <Chip icon={"check_solid"} variant={"success"}>
       Payment Captured
     </Chip>
@@ -24,14 +24,14 @@ const paymentStatusComponents: { [key: string]: JSX.Element } = {
       Payment Failed
     </Chip>
   ),
-  REFUNDED: (
-    <Chip icon={"undo"} variant={"success"}>
-      Payment Refunded
+  VOID: (
+    <Chip icon={"target"} variant={"success"}>
+      Payment Void
     </Chip>
   ),
-  PARTIALLY_REFUNDED: (
+  NOT_ATTEMPTED: (
     <Chip icon={"undo_alt"} variant={"warning"}>
-      Payment Partially Refunded
+      Payment Not Attempted
     </Chip>
   ),
   PENDING: (
@@ -49,17 +49,17 @@ const paymentStatusComponents: { [key: string]: JSX.Element } = {
       Payment Cancelled
     </Chip>
   ),
-  DISPUTED: (
+  USER_DROPPED: (
     <Chip icon={"exclaimation_circle"} variant={"warning"}>
-      Payment Disputed
+      User Dropped
     </Chip>
   ),
 };
 
-const paymentMethod: { [key: string]: string } = {
-  upi: "UPI",
-  card: "CARD",
-};
+// const paymentMethod: { [key: string]: string } = {
+//   upi: "UPI",
+//   card: "CARD",
+// };
 const MyTransactions = () => {
   const [transactions, setTransactions] = useState<IMyTransactions[]>([]);
   const [loading, setLoading] = useState(false);
@@ -113,7 +113,7 @@ const MyTransactions = () => {
                           icon="rupee"
                           className="text-destructive text-base"
                         />{" "}
-                        {(item.amount / 100).toFixed(2)}
+                        {item.amount}
                       </p>
                       <div className="flex gap-2">
                         <p className="font-medium text-balance md:text-pretty text-black mb-2">
@@ -136,7 +136,7 @@ const MyTransactions = () => {
                       <div className="flex gap-2 flex-wrap ">
                         {paymentStatusComponents[item.payment_status]}
                         <Chip icon="bank" variant={"success"}>
-                          {paymentMethod[item.payment_method] || "Unknown"}
+                          {item.payment_method || "Unknown"}
                         </Chip>
                       </div>
                     </div>

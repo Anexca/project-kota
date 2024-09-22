@@ -114,6 +114,7 @@ const CashFreeButton = ({
           variant: "destructive",
         });
       }
+      setLoading(false);
     }
 
     if (cashfreeRes.paymentDetails) {
