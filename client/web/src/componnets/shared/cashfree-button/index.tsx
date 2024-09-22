@@ -6,16 +6,14 @@ import {
 } from "react";
 import { useToast } from "../../../hooks/use-toast";
 import { delay } from "../../../lib/utils";
-import {
-  alertBackendForSubscription,
-  buySubscription,
-} from "../../../services/payment.service";
+import { buySubscription } from "../../../services/payment.service";
 import useUserProfileStore from "../../../store/user-info-store";
 import { Button } from "../../base/button/button";
 import Loader from "../loder";
 ///@ts-ignore
 import { load } from "@cashfreepayments/cashfree-js";
 import { paths } from "../../../routes/route.constant";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   subscriptionId: string;
@@ -32,6 +30,7 @@ const CashFreeButton = ({
   const { isComplete, profile, getProfile } = useUserProfileStore();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const getSubscriptionId = async () => {
     try {
       const res = await buySubscription(
@@ -50,13 +49,17 @@ const CashFreeButton = ({
     }
   };
 
-  const handleRazorPay = async (e: { payment_id: number }) => {
+  const handleRazorPay = async () => {
     try {
-      await alertBackendForSubscription({
-        paymentId: e.payment_id,
-      });
       await delay(2000);
       await getProfile();
+      toast({
+        title: "Congratulations 🎉",
+        description:
+          "Your payment is successful. Your plan is active now. All the best for preparation.",
+        variant: "success",
+      });
+      navigate(`/${paths.HOMEPAGE}`);
     } catch (error) {
       toast({
         title: "Something went wrong",
@@ -119,7 +122,7 @@ const CashFreeButton = ({
 
     if (cashfreeRes.paymentDetails) {
       // This will be called whenever the payment is completed irrespective of transaction status
-      await handleRazorPay({ payment_id: res.id });
+      await handleRazorPay();
     }
     e.preventDefault();
   };
