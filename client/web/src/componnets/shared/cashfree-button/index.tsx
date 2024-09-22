@@ -5,6 +5,7 @@ import {
   useState,
 } from "react";
 import { useToast } from "../../../hooks/use-toast";
+import { delay } from "../../../lib/utils";
 import {
   alertBackendForSubscription,
   buySubscription,
@@ -12,9 +13,9 @@ import {
 import useUserProfileStore from "../../../store/user-info-store";
 import { Button } from "../../base/button/button";
 import Loader from "../loder";
-import { delay } from "../../../lib/utils";
 ///@ts-ignore
 import { load } from "@cashfreepayments/cashfree-js";
+import { paths } from "../../../routes/route.constant";
 
 type Props = {
   subscriptionId: string;
@@ -33,7 +34,10 @@ const CashFreeButton = ({
   const [loading, setLoading] = useState(false);
   const getSubscriptionId = async () => {
     try {
-      const res = await buySubscription(id);
+      const res = await buySubscription(
+        id,
+        `${import.meta.env.VITE_CASHFREE_REDIRECT_URL}/${paths.PRICING_PLAN}`
+      );
       return res.data;
     } catch (error) {
       toast({
@@ -46,17 +50,10 @@ const CashFreeButton = ({
     }
   };
 
-  const handleRazorPay = async (e: {
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-    razorpay_subscription_id: string;
-    id: string;
-  }) => {
+  const handleRazorPay = async (e: { payment_id: number }) => {
     try {
       await alertBackendForSubscription({
-        paymentId: e.razorpay_payment_id,
-        signature: e.razorpay_signature,
-        userSubsId: e.id,
+        paymentId: e.payment_id,
       });
       await delay(2000);
       await getProfile();
@@ -88,34 +85,41 @@ const CashFreeButton = ({
       setLoading(false);
       return;
     }
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY,
-      subscription_id: res.provider_subscription_id,
-      name: "PsuedoTest",
-      description: "Golden Pass",
-      handler: async (e: any) => await handleRazorPay({ ...e, id: res.id }),
-      redirect: false,
-      theme: {
-        color: "#7e22ce",
-      },
-      modal: {
-        ondismiss: function () {
-          setLoading(false);
-        },
-      },
-    };
 
     ///@ts-ignore
     const cashfree = await load({
-      mode: "sandbox", //or production
+      mode: import.meta.env.VITE_CASHFREE_PAYMENT_MODE, //or production
     });
 
     let checkoutOptions = {
-      paymentSessionId: "your-payment-session-id",
-      redirectTarget: "_self", //optional ( _self, _blank, or _top)
+      paymentSessionId: res.payment_session_id,
+      redirectTarget: "_modal", //optional ( _self, _blank, or _top)
     };
 
-    cashfree.checkout(checkoutOptions);
+    const cashfreeRes = await cashfree.checkout(checkoutOptions);
+
+    if (cashfreeRes.error) {
+      if (cashfreeRes.error.code == "payment_aborted") {
+        // This will be true whenever user clicks on close icon inside the modal or any error happens during the payment
+        toast({
+          title: "Payment Cancelled",
+          description: "Payment is cancelled by you.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Something went wrong",
+          description:
+            "There is some error on our side. Please raise a query to us at support@pueudotest.pro if your money is deducted.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    if (cashfreeRes.paymentDetails) {
+      // This will be called whenever the payment is completed irrespective of transaction status
+      await handleRazorPay({ payment_id: res.id });
+    }
     e.preventDefault();
   };
 

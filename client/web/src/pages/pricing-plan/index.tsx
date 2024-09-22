@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Chip from "../../componnets/base/chip";
 import Icon from "../../componnets/base/icon";
+import CashFreeButton from "../../componnets/shared/cashfree-button";
 import Header from "../../componnets/shared/header/header";
-import RazorpayButton from "../../componnets/shared/razorpay-button";
+import Loader from "../../componnets/shared/loder";
+import { useToast } from "../../hooks/use-toast";
 import { paths } from "../../routes/route.constant";
 import { getPlans } from "../../services/payment.service";
 import useSessionStore from "../../store/auth-store";
 import useUserProfileStore from "../../store/user-info-store";
-import Chip from "../../componnets/base/chip";
-import Loader from "../../componnets/shared/loder";
-import { useToast } from "../../hooks/use-toast";
-import CashFreeButton from "../../componnets/shared/cashfree-button";
 
 export default function PricingPlan() {
   const { session } = useSessionStore();
