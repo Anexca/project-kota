@@ -1,0 +1,47 @@
+version: 2
+
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/backend/server"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev"
+    labels:
+      - "server dependencies"
+      - "backend"
+
+  - package-ecosystem: "gomod"
+    directory: "/backend/ai-service"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev"
+    labels:
+      - "ai-service dependencies"
+      - "backend"
+
+  - package-ecosystem: "gomod"
+    directory: "/backend/common"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev"
+    labels:
+      - "common dependencies"
+      - "backend"
+
+  - package-ecosystem: "npm"
+    directory: "/client/web"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev"
+    labels:
+      - "web client dependencies"
+      - "client"
+
+  - package-ecosystem: "npm"
+    directory: "/client/roadmap"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev"
+    labels:
+      - "roadmap client dependencies"
+      - "client"
