@@ -19,8 +19,11 @@ import useSessionStore from "../../store/auth-store";
 import { supabase } from "../../supabase/client";
 import { LoginSchema, LoginType } from "../../validation-schema/auth";
 import useUserProfileStore from "../../store/user-info-store";
+import Loader from "../../componnets/shared/loder";
+import { useState } from "react";
 
 export function Login() {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { loadSession } = useSessionStore();
   const { getProfile } = useUserProfileStore();
@@ -35,7 +38,7 @@ export function Login() {
   const onSumbit = async (formData: LoginType) => {
     try {
       const { email, password } = formData;
-
+      setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -54,12 +57,14 @@ export function Login() {
         await getProfile();
         navigate(`/${paths.HOMEPAGE}`);
       }
+      setLoading(false);
     } catch (error) {
       toast({
         title: "Something went wrong.",
         variant: "destructive",
         description: "Sorry there is some problem in proccessing your request.",
       });
+      setLoading(false);
     }
   };
   const loginWithGoogle = async () => {
@@ -137,8 +142,8 @@ export function Login() {
                   name="password"
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? <Loader color={"secondary"} /> : "Login"}
               </Button>
               <Button
                 type="button"
