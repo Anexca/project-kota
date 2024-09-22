@@ -85,6 +85,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 	})
 
+	r.Route("/webhook", func(r chi.Router) {
+		r.Post("/subscription/payment-success", s.HandleSubscriptionPaymentSuccess)
+	})
+
 	r.Get("/subscriptions", s.GetAllSubscriptions)
 	r.Get("/categories/exams/{id}", s.GetExamById)
 	r.Get("/exams/banking/descriptive", s.GetBankingDescriptiveCategories)

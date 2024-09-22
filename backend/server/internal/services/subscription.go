@@ -83,17 +83,17 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, err
 	}
 
-	userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
-	if err != nil {
-		var notFoundError *ent.NotFoundError
-		if !errors.As(err, &notFoundError) {
-			return nil, err
-		}
-	}
+	// userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
+	// if err != nil {
+	// 	var notFoundError *ent.NotFoundError
+	// 	if !errors.As(err, &notFoundError) {
+	// 		return nil, err
+	// 	}
+	// }
 
-	if userHasSubscription {
-		return nil, fmt.Errorf("user already has active subscription")
-	}
+	// if userHasSubscription {
+	// 	return nil, fmt.Errorf("user already has active subscription")
+	// }
 
 	model := CreateOrderModel{
 		Amount:              subscription.FinalPrice,
