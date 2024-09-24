@@ -186,6 +186,36 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 			return fmt.Errorf("failed to generate DescriptiveExams : %w", err)
 		}
 
+	case models.MCQExamType:
+		var mcqExams []models.MCQExam
+
+		err := json.Unmarshal([]byte(cachedData), &mcqExams)
+		if err != nil {
+			return fmt.Errorf("failed to validate cached data for MCQ Exam: %w", err)
+		}
+
+		var exams []any
+
+		err = json.Unmarshal([]byte(cachedData), &exams)
+		if err != nil {
+			return fmt.Errorf("failed to generate MCQ Exam: %w", err)
+		}
+
+		_, err = e.generatedExamRepository.AddMany(ctx, exams, exam)
+		if err != nil {
+			return fmt.Errorf("failed to generate MCQ Exam : %w", err)
+		}
+
+		for _, exam := range mcqExams {
+			if contentStr, ok := exam.Content.(string); ok {
+				fmt.Println("Content is a string:", contentStr)
+			} else if contentObj, ok := exam.Content.(map[string]interface{}); ok {
+				fmt.Println("Content is an object:", contentObj)
+			} else {
+				fmt.Println("Content is of unknown type")
+			}
+		}
+
 	default:
 		return fmt.Errorf("unsupported exam model type")
 	}

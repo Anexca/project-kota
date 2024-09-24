@@ -6,6 +6,7 @@ type ExamModelType int
 
 const (
 	DescriptiveExamType       ExamModelType = iota
+	MCQExamType               ExamModelType = iota
 	GeneratedExamOverviewType ExamModelType = iota
 )
 
@@ -15,6 +16,16 @@ type DescriptiveExam struct {
 	Hints                   []string `json:"hints" validate:"required"`
 	MaxNumberOfWordsAllowed string   `json:"max_number_of_words" validate:"required"`
 	TotalMarks              string   `json:"total_marks" validate:"required"`
+}
+
+type MCQExam struct {
+	Note           string      `json:"note,omitempty"`
+	Content        interface{} `json:"content,omitempty"`
+	Question       string      `json:"question"`
+	QuestionNumber int         `json:"question_number"`
+	Answer         string      `json:"answer"`
+	Options        []string    `json:"options"`
+	Explanation    string      `json:"explanation"`
 }
 
 type GeneratedExamOverview struct {
