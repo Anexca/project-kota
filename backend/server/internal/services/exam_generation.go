@@ -3,6 +3,8 @@ package services
 import (
 	commonConstants "common/constants"
 	"common/ent"
+	"common/ent/exam"
+	"common/ent/examcategory"
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 	"context"
@@ -194,26 +196,24 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 			return fmt.Errorf("failed to validate cached data for MCQ Exam: %w", err)
 		}
 
-		var exams []any
-
-		err = json.Unmarshal([]byte(cachedData), &exams)
-		if err != nil {
-			return fmt.Errorf("failed to generate MCQ Exam: %w", err)
+		generatedMCQExam := models.GeneratedMCQExam{
+			ExamContent: mcqExams,
 		}
 
-		_, err = e.generatedExamRepository.AddMany(ctx, exams, exam)
+		jsonData, err := json.Marshal(generatedMCQExam)
+		if err != nil {
+			log.Fatalf("Failed to marshal struct to JSON: %v", err)
+		}
+
+		var result map[string]interface{}
+		err = json.Unmarshal(jsonData, &result)
+		if err != nil {
+			log.Fatalf("Failed to unmarshal JSON into map: %v", err)
+		}
+
+		_, err = e.generatedExamRepository.Add(ctx, result, exam.ID)
 		if err != nil {
 			return fmt.Errorf("failed to generate MCQ Exam : %w", err)
-		}
-
-		for _, exam := range mcqExams {
-			if contentStr, ok := exam.Content.(string); ok {
-				fmt.Println("Content is a string:", contentStr)
-			} else if contentObj, ok := exam.Content.(map[string]interface{}); ok {
-				fmt.Println("Content is an object:", contentObj)
-			} else {
-				fmt.Println("Content is of unknown type")
-			}
 		}
 
 	default:
@@ -223,13 +223,17 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, examId int, userId string) ([]*models.GeneratedExamOverview, error) {
-	exam, err := e.examRepository.GetActiveById(ctx, examId, true)
+func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, examCategory commonConstants.ExamCategoryName, examType commonConstants.ExamType, examId int, userId string) ([]*models.GeneratedExamOverview, error) {
+	examById, err := e.examRepository.GetActiveById(ctx, examId, true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, exam.ID, userId)
+	if examById.Edges.Category.Name != examcategory.NameBANKING || examById.Type != exam.Type(examType) {
+		return nil, &ent.NotFoundError{}
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, examById.ID, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check access: %w", err)
 	}
@@ -238,12 +242,12 @@ func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, e
 		return nil, errors.New("forbidden")
 	}
 
-	sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
+	sortedExams := e.sortExamsByUpdatedAt(examById.Edges.Generatedexams)
 
 	limit := min(26, len(sortedExams))
 	latestExams := sortedExams[:limit]
 
-	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
+	return e.buildGeneratedExamOverviewList(ctx, latestExams, examById, userId)
 }
 
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
@@ -306,7 +310,7 @@ func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam)
 	return exams
 }
 
-func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, exam *ent.Exam, userId string) ([]*models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, ex *ent.Exam, userId string) ([]*models.GeneratedExamOverview, error) {
 	generatedExamOverviewList := make([]*models.GeneratedExamOverview, 0, len(latestExams))
 
 	for _, generatedExam := range latestExams {
@@ -315,10 +319,14 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 			return nil, fmt.Errorf("failed to get user attempts: %w", err)
 		}
 
-		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting, userAttempts)
-		overview.ExamName = exam.Name
-		overview.ExamType = string(exam.Type)
+		overview := e.buildGeneratedExamOverview(generatedExam, ex.Edges.Setting, userAttempts)
+		overview.ExamName = ex.Name
+		overview.ExamType = string(ex.Type)
 		overview.UserAttempts = len(userAttempts)
+
+		if ex.Type == exam.TypeMCQ {
+			overview.RawExamData = nil
+		}
 
 		generatedExamOverviewList = append(generatedExamOverviewList, overview)
 	}
@@ -336,6 +344,7 @@ func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.Ge
 		MaxAttempts:       examSettings.MaxAttempts,
 		DurationSeconds:   examSettings.DurationSeconds,
 		NumberOfQuestions: examSettings.NumberOfQuestions,
+		NegativeMarking:   examSettings.NegativeMarking,
 	}
 }
 

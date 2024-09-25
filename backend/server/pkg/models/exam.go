@@ -18,6 +18,10 @@ type DescriptiveExam struct {
 	TotalMarks              string   `json:"total_marks" validate:"required"`
 }
 
+type GeneratedMCQExam struct {
+	ExamContent []MCQExam `json:"exam_content"`
+}
+
 type MCQExam struct {
 	Note           string      `json:"note,omitempty"`
 	Content        interface{} `json:"content,omitempty"`
@@ -32,11 +36,12 @@ type GeneratedExamOverview struct {
 	Id                int                    `json:"id"`
 	ExamType          string                 `json:"exam_type"`
 	ExamName          string                 `json:"exam_name"`
-	RawExamData       map[string]interface{} `json:"raw_exam_data"`
+	RawExamData       map[string]interface{} `json:"raw_exam_data,omitempty"`
 	UserAttempts      int                    `json:"user_attempts"`
 	MaxAttempts       int                    `json:"max_attempts"`
 	DurationSeconds   int                    `json:"duration_seconds"`
 	NumberOfQuestions int                    `json:"number_of_questions"`
+	NegativeMarking   float64                `json:"negative_marking,omitempty"`
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
 }
