@@ -24,6 +24,20 @@ func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.
 	s.WriteJson(w, http.StatusOK, &response)
 }
 
+func (s *Server) GetBankingMCQCategories(w http.ResponseWriter, r *http.Request) {
+	categories, err := s.examCategoryService.GetBankingMCQExamTypes(r.Context())
+	if err != nil {
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	response := Response{
+		Data: categories,
+	}
+
+	s.WriteJson(w, http.StatusOK, &response)
+}
+
 func (s *Server) GetExamById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	examId, err := strconv.Atoi(idParam)

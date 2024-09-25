@@ -49,6 +49,32 @@ func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Contex
 	return categoryExamTypes, nil
 }
 
+func (e *ExamCategoryService) GetBankingMCQExamTypes(ctx context.Context) ([]models.CategoryExamType, error) {
+	category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking, constants.ExamTypeMCQ)
+	if err != nil {
+		return nil, err
+	}
+
+	var categoryExamTypes []models.CategoryExamType
+
+	for _, exam := range category.Edges.Exams {
+		categoryExamType := models.CategoryExamType{
+			Id:           exam.ID,
+			ExamName:     exam.Name,
+			CategoryId:   category.ID,
+			IsActive:     exam.IsActive,
+			Description:  exam.Description,
+			TypeOfExam:   exam.Type.String(),
+			CategoryName: category.Name.String(),
+			LogoUrl:      exam.LogoURL,
+		}
+
+		categoryExamTypes = append(categoryExamTypes, categoryExamType)
+	}
+
+	return categoryExamTypes, nil
+}
+
 func (e *ExamCategoryService) GetCategoryExamById(ctx context.Context, examId int) (*models.CategoryExamType, error) {
 	exam, err := e.examRepository.GetById(ctx, examId)
 	if err != nil {
