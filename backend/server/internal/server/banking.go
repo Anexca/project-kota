@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	commonConstants "common/constants"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -27,7 +28,7 @@ func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r
 		return
 	}
 
-	cachedQuestions, err := s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
+	cachedQuestions, err := s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), commonConstants.ExamCategoryNameBanking, commonConstants.ExamTypeDescriptive, examId, userId)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "forbidden") {

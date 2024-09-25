@@ -4,6 +4,7 @@ import (
 	commonConstants "common/constants"
 	"common/ent"
 	"common/ent/exam"
+	"common/ent/examcategory"
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 	"context"
@@ -222,13 +223,17 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, examId int, userId string) ([]*models.GeneratedExamOverview, error) {
-	exam, err := e.examRepository.GetActiveById(ctx, examId, true)
+func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, examCategory commonConstants.ExamCategoryName, examType commonConstants.ExamType, examId int, userId string) ([]*models.GeneratedExamOverview, error) {
+	examById, err := e.examRepository.GetActiveById(ctx, examId, true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, exam.ID, userId)
+	if examById.Edges.Category.Name != examcategory.NameBANKING || examById.Type != exam.Type(examType) {
+		return nil, &ent.NotFoundError{}
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, examById.ID, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check access: %w", err)
 	}
@@ -237,12 +242,12 @@ func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, e
 		return nil, errors.New("forbidden")
 	}
 
-	sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
+	sortedExams := e.sortExamsByUpdatedAt(examById.Edges.Generatedexams)
 
 	limit := min(26, len(sortedExams))
 	latestExams := sortedExams[:limit]
 
-	return e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
+	return e.buildGeneratedExamOverviewList(ctx, latestExams, examById, userId)
 }
 
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
