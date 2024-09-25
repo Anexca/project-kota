@@ -3,6 +3,7 @@ package services
 import (
 	commonConstants "common/constants"
 	"common/ent"
+	"common/ent/exam"
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 	"context"
@@ -195,7 +196,7 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 		}
 
 		generatedMCQExam := models.GeneratedMCQExam{
-			ExamData: mcqExams,
+			ExamContent: mcqExams,
 		}
 
 		jsonData, err := json.Marshal(generatedMCQExam)
@@ -304,7 +305,7 @@ func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam)
 	return exams
 }
 
-func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, exam *ent.Exam, userId string) ([]*models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, ex *ent.Exam, userId string) ([]*models.GeneratedExamOverview, error) {
 	generatedExamOverviewList := make([]*models.GeneratedExamOverview, 0, len(latestExams))
 
 	for _, generatedExam := range latestExams {
@@ -313,10 +314,14 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 			return nil, fmt.Errorf("failed to get user attempts: %w", err)
 		}
 
-		overview := e.buildGeneratedExamOverview(generatedExam, exam.Edges.Setting, userAttempts)
-		overview.ExamName = exam.Name
-		overview.ExamType = string(exam.Type)
+		overview := e.buildGeneratedExamOverview(generatedExam, ex.Edges.Setting, userAttempts)
+		overview.ExamName = ex.Name
+		overview.ExamType = string(ex.Type)
 		overview.UserAttempts = len(userAttempts)
+
+		if ex.Type == exam.TypeMCQ {
+			overview.RawExamData = nil
+		}
 
 		generatedExamOverviewList = append(generatedExamOverviewList, overview)
 	}
@@ -334,6 +339,7 @@ func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.Ge
 		MaxAttempts:       examSettings.MaxAttempts,
 		DurationSeconds:   examSettings.DurationSeconds,
 		NumberOfQuestions: examSettings.NumberOfQuestions,
+		NegativeMarking:   examSettings.NegativeMarking,
 	}
 }
 
