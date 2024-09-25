@@ -18,6 +18,10 @@ type DescriptiveExam struct {
 	TotalMarks              string   `json:"total_marks" validate:"required"`
 }
 
+type GeneratedMCQExam struct {
+	ExamData []MCQExam `json:"exam_data"`
+}
+
 type MCQExam struct {
 	Note           string      `json:"note,omitempty"`
 	Content        interface{} `json:"content,omitempty"`

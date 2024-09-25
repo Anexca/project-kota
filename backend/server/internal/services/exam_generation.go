@@ -194,26 +194,24 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 			return fmt.Errorf("failed to validate cached data for MCQ Exam: %w", err)
 		}
 
-		var exams []any
-
-		err = json.Unmarshal([]byte(cachedData), &exams)
-		if err != nil {
-			return fmt.Errorf("failed to generate MCQ Exam: %w", err)
+		generatedMCQExam := models.GeneratedMCQExam{
+			ExamData: mcqExams,
 		}
 
-		_, err = e.generatedExamRepository.AddMany(ctx, exams, exam)
+		jsonData, err := json.Marshal(generatedMCQExam)
+		if err != nil {
+			log.Fatalf("Failed to marshal struct to JSON: %v", err)
+		}
+
+		var result map[string]interface{}
+		err = json.Unmarshal(jsonData, &result)
+		if err != nil {
+			log.Fatalf("Failed to unmarshal JSON into map: %v", err)
+		}
+
+		_, err = e.generatedExamRepository.Add(ctx, result, exam.ID)
 		if err != nil {
 			return fmt.Errorf("failed to generate MCQ Exam : %w", err)
-		}
-
-		for _, exam := range mcqExams {
-			if contentStr, ok := exam.Content.(string); ok {
-				fmt.Println("Content is a string:", contentStr)
-			} else if contentObj, ok := exam.Content.(map[string]interface{}); ok {
-				fmt.Println("Content is an object:", contentObj)
-			} else {
-				fmt.Println("Content is of unknown type")
-			}
 		}
 
 	default:
