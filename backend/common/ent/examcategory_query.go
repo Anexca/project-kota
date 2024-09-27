@@ -5,6 +5,7 @@ package ent
 import (
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/predicate"
 	"context"
 	"database/sql/driver"
@@ -25,6 +26,7 @@ type ExamCategoryQuery struct {
 	inters     []Interceptor
 	predicates []predicate.ExamCategory
 	withExams  *ExamQuery
+	withGroups *ExamGroupQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,28 @@ func (ecq *ExamCategoryQuery) QueryExams() *ExamQuery {
 			sqlgraph.From(examcategory.Table, examcategory.FieldID, selector),
 			sqlgraph.To(exam.Table, exam.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, examcategory.ExamsTable, examcategory.ExamsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ecq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGroups chains the current query on the "groups" edge.
+func (ecq *ExamCategoryQuery) QueryGroups() *ExamGroupQuery {
+	query := (&ExamGroupClient{config: ecq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ecq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ecq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examcategory.Table, examcategory.FieldID, selector),
+			sqlgraph.To(examgroup.Table, examgroup.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, examcategory.GroupsTable, examcategory.GroupsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ecq.driver.Dialect(), step)
 		return fromU, nil
@@ -276,6 +300,7 @@ func (ecq *ExamCategoryQuery) Clone() *ExamCategoryQuery {
 		inters:     append([]Interceptor{}, ecq.inters...),
 		predicates: append([]predicate.ExamCategory{}, ecq.predicates...),
 		withExams:  ecq.withExams.Clone(),
+		withGroups: ecq.withGroups.Clone(),
 		// clone intermediate query.
 		sql:  ecq.sql.Clone(),
 		path: ecq.path,
@@ -290,6 +315,17 @@ func (ecq *ExamCategoryQuery) WithExams(opts ...func(*ExamQuery)) *ExamCategoryQ
 		opt(query)
 	}
 	ecq.withExams = query
+	return ecq
+}
+
+// WithGroups tells the query-builder to eager-load the nodes that are connected to
+// the "groups" edge. The optional arguments are used to configure the query builder of the edge.
+func (ecq *ExamCategoryQuery) WithGroups(opts ...func(*ExamGroupQuery)) *ExamCategoryQuery {
+	query := (&ExamGroupClient{config: ecq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	ecq.withGroups = query
 	return ecq
 }
 
@@ -371,8 +407,9 @@ func (ecq *ExamCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	var (
 		nodes       = []*ExamCategory{}
 		_spec       = ecq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			ecq.withExams != nil,
+			ecq.withGroups != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -397,6 +434,13 @@ func (ecq *ExamCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		if err := ecq.loadExams(ctx, query, nodes,
 			func(n *ExamCategory) { n.Edges.Exams = []*Exam{} },
 			func(n *ExamCategory, e *Exam) { n.Edges.Exams = append(n.Edges.Exams, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := ecq.withGroups; query != nil {
+		if err := ecq.loadGroups(ctx, query, nodes,
+			func(n *ExamCategory) { n.Edges.Groups = []*ExamGroup{} },
+			func(n *ExamCategory, e *ExamGroup) { n.Edges.Groups = append(n.Edges.Groups, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -429,6 +473,37 @@ func (ecq *ExamCategoryQuery) loadExams(ctx context.Context, query *ExamQuery, n
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "exam_category_exams" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (ecq *ExamCategoryQuery) loadGroups(ctx context.Context, query *ExamGroupQuery, nodes []*ExamCategory, init func(*ExamCategory), assign func(*ExamCategory, *ExamGroup)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*ExamCategory)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ExamGroup(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(examcategory.GroupsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.exam_category_groups
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "exam_category_groups" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "exam_category_groups" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
