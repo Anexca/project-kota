@@ -128,6 +128,31 @@ var (
 		Columns:    ExamCategoriesColumns,
 		PrimaryKey: []*schema.Column{ExamCategoriesColumns[0]},
 	}
+	// ExamGroupsColumns holds the columns for the "exam_groups" table.
+	ExamGroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "logo_url", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_category_exam_groups", Type: field.TypeInt, Nullable: true},
+	}
+	// ExamGroupsTable holds the schema information for the "exam_groups" table.
+	ExamGroupsTable = &schema.Table{
+		Name:       "exam_groups",
+		Columns:    ExamGroupsColumns,
+		PrimaryKey: []*schema.Column{ExamGroupsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exam_groups_exam_categories_exam_groups",
+				Columns:    []*schema.Column{ExamGroupsColumns[7]},
+				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// ExamSettingsColumns holds the columns for the "exam_settings" table.
 	ExamSettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -317,6 +342,7 @@ var (
 		ExamAssesmentsTable,
 		ExamAttemptsTable,
 		ExamCategoriesTable,
+		ExamGroupsTable,
 		ExamSettingsTable,
 		GeneratedExamsTable,
 		PaymentsTable,
@@ -333,6 +359,7 @@ func init() {
 	ExamAssesmentsTable.ForeignKeys[0].RefTable = ExamAttemptsTable
 	ExamAttemptsTable.ForeignKeys[0].RefTable = GeneratedExamsTable
 	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable
+	ExamGroupsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable
 	GeneratedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 	PaymentsTable.ForeignKeys[0].RefTable = UsersTable

@@ -27,6 +27,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeExams holds the string denoting the exams edge name in mutations.
 	EdgeExams = "exams"
+	// EdgeExamGroups holds the string denoting the exam_groups edge name in mutations.
+	EdgeExamGroups = "exam_groups"
 	// Table holds the table name of the examcategory in the database.
 	Table = "exam_categories"
 	// ExamsTable is the table that holds the exams relation/edge.
@@ -36,6 +38,13 @@ const (
 	ExamsInverseTable = "exams"
 	// ExamsColumn is the table column denoting the exams relation/edge.
 	ExamsColumn = "exam_category_exams"
+	// ExamGroupsTable is the table that holds the exam_groups relation/edge.
+	ExamGroupsTable = "exam_groups"
+	// ExamGroupsInverseTable is the table name for the ExamGroup entity.
+	// It exists in this package in order to avoid circular dependency with the "examgroup" package.
+	ExamGroupsInverseTable = "exam_groups"
+	// ExamGroupsColumn is the table column denoting the exam_groups relation/edge.
+	ExamGroupsColumn = "exam_category_exam_groups"
 )
 
 // Columns holds all SQL columns for examcategory fields.
@@ -137,10 +146,31 @@ func ByExams(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newExamsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByExamGroupsCount orders the results by exam_groups count.
+func ByExamGroupsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newExamGroupsStep(), opts...)
+	}
+}
+
+// ByExamGroups orders the results by exam_groups terms.
+func ByExamGroups(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newExamGroupsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newExamsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ExamsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ExamsTable, ExamsColumn),
+	)
+}
+func newExamGroupsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ExamGroupsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ExamGroupsTable, ExamGroupsColumn),
 	)
 }

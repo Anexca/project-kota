@@ -22,6 +22,8 @@ type Tx struct {
 	ExamAttempt *ExamAttemptClient
 	// ExamCategory is the client for interacting with the ExamCategory builders.
 	ExamCategory *ExamCategoryClient
+	// ExamGroup is the client for interacting with the ExamGroup builders.
+	ExamGroup *ExamGroupClient
 	// ExamSetting is the client for interacting with the ExamSetting builders.
 	ExamSetting *ExamSettingClient
 	// GeneratedExam is the client for interacting with the GeneratedExam builders.
@@ -172,6 +174,7 @@ func (tx *Tx) init() {
 	tx.ExamAssesment = NewExamAssesmentClient(tx.config)
 	tx.ExamAttempt = NewExamAttemptClient(tx.config)
 	tx.ExamCategory = NewExamCategoryClient(tx.config)
+	tx.ExamGroup = NewExamGroupClient(tx.config)
 	tx.ExamSetting = NewExamSettingClient(tx.config)
 	tx.GeneratedExam = NewGeneratedExamClient(tx.config)
 	tx.Payment = NewPaymentClient(tx.config)
