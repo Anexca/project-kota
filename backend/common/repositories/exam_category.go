@@ -25,9 +25,11 @@ func (e *ExamCategoryRepository) Get(ctx context.Context) ([]*ent.ExamCategory, 
 
 func (e *ExamCategoryRepository) GetByName(ctx context.Context, categoryName constants.ExamCategoryName, examType constants.ExamType) (*ent.ExamCategory, error) {
 	return e.dbClient.ExamCategory.Query().
-		Where(examcategory.NameEQ(examcategory.Name(categoryName)), examcategory.HasExamsWith(exam.TypeEQ(exam.Type(examType)))).
+		Where(examcategory.NameEQ(examcategory.Name(categoryName))).
 		WithGroups(func(egq *ent.ExamGroupQuery) {
+			egq.Where(examgroup.HasExamsWith(exam.TypeEQ(exam.Type(examType))))
 			egq.Order(ent.Desc(examgroup.FieldIsActive), ent.Asc(examgroup.FieldID))
 		}).
+		WithExams().
 		Only(ctx)
 }
