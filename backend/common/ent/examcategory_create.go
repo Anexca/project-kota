@@ -91,19 +91,19 @@ func (ecc *ExamCategoryCreate) AddExams(e ...*Exam) *ExamCategoryCreate {
 	return ecc.AddExamIDs(ids...)
 }
 
-// AddExamGroupIDs adds the "exam_groups" edge to the ExamGroup entity by IDs.
-func (ecc *ExamCategoryCreate) AddExamGroupIDs(ids ...int) *ExamCategoryCreate {
-	ecc.mutation.AddExamGroupIDs(ids...)
+// AddGroupIDs adds the "groups" edge to the ExamGroup entity by IDs.
+func (ecc *ExamCategoryCreate) AddGroupIDs(ids ...int) *ExamCategoryCreate {
+	ecc.mutation.AddGroupIDs(ids...)
 	return ecc
 }
 
-// AddExamGroups adds the "exam_groups" edges to the ExamGroup entity.
-func (ecc *ExamCategoryCreate) AddExamGroups(e ...*ExamGroup) *ExamCategoryCreate {
+// AddGroups adds the "groups" edges to the ExamGroup entity.
+func (ecc *ExamCategoryCreate) AddGroups(e ...*ExamGroup) *ExamCategoryCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return ecc.AddExamGroupIDs(ids...)
+	return ecc.AddGroupIDs(ids...)
 }
 
 // Mutation returns the ExamCategoryMutation object of the builder.
@@ -239,12 +239,12 @@ func (ecc *ExamCategoryCreate) createSpec() (*ExamCategory, *sqlgraph.CreateSpec
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ecc.mutation.ExamGroupsIDs(); len(nodes) > 0 {
+	if nodes := ecc.mutation.GroupsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   examcategory.ExamGroupsTable,
-			Columns: []string{examcategory.ExamGroupsColumn},
+			Table:   examcategory.GroupsTable,
+			Columns: []string{examcategory.GroupsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examgroup.FieldID, field.TypeInt),

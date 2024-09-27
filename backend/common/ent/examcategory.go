@@ -37,8 +37,8 @@ type ExamCategory struct {
 type ExamCategoryEdges struct {
 	// Exams holds the value of the exams edge.
 	Exams []*Exam `json:"exams,omitempty"`
-	// ExamGroups holds the value of the exam_groups edge.
-	ExamGroups []*ExamGroup `json:"exam_groups,omitempty"`
+	// Groups holds the value of the groups edge.
+	Groups []*ExamGroup `json:"groups,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -53,13 +53,13 @@ func (e ExamCategoryEdges) ExamsOrErr() ([]*Exam, error) {
 	return nil, &NotLoadedError{edge: "exams"}
 }
 
-// ExamGroupsOrErr returns the ExamGroups value or an error if the edge
+// GroupsOrErr returns the Groups value or an error if the edge
 // was not loaded in eager-loading.
-func (e ExamCategoryEdges) ExamGroupsOrErr() ([]*ExamGroup, error) {
+func (e ExamCategoryEdges) GroupsOrErr() ([]*ExamGroup, error) {
 	if e.loadedTypes[1] {
-		return e.ExamGroups, nil
+		return e.Groups, nil
 	}
-	return nil, &NotLoadedError{edge: "exam_groups"}
+	return nil, &NotLoadedError{edge: "groups"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -144,9 +144,9 @@ func (ec *ExamCategory) QueryExams() *ExamQuery {
 	return NewExamCategoryClient(ec.config).QueryExams(ec)
 }
 
-// QueryExamGroups queries the "exam_groups" edge of the ExamCategory entity.
-func (ec *ExamCategory) QueryExamGroups() *ExamGroupQuery {
-	return NewExamCategoryClient(ec.config).QueryExamGroups(ec)
+// QueryGroups queries the "groups" edge of the ExamCategory entity.
+func (ec *ExamCategory) QueryGroups() *ExamGroupQuery {
+	return NewExamCategoryClient(ec.config).QueryGroups(ec)
 }
 
 // Update returns a builder for updating this ExamCategory.

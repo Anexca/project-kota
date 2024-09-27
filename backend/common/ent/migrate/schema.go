@@ -137,7 +137,7 @@ var (
 		{Name: "logo_url", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "exam_category_exam_groups", Type: field.TypeInt, Nullable: true},
+		{Name: "exam_category_groups", Type: field.TypeInt, Nullable: true},
 	}
 	// ExamGroupsTable holds the schema information for the "exam_groups" table.
 	ExamGroupsTable = &schema.Table{
@@ -146,7 +146,7 @@ var (
 		PrimaryKey: []*schema.Column{ExamGroupsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "exam_groups_exam_categories_exam_groups",
+				Symbol:     "exam_groups_exam_categories_groups",
 				Columns:    []*schema.Column{ExamGroupsColumns[7]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
 				OnDelete:   schema.SetNull,

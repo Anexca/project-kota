@@ -273,21 +273,21 @@ func HasExamsWith(preds ...predicate.Exam) predicate.ExamCategory {
 	})
 }
 
-// HasExamGroups applies the HasEdge predicate on the "exam_groups" edge.
-func HasExamGroups() predicate.ExamCategory {
+// HasGroups applies the HasEdge predicate on the "groups" edge.
+func HasGroups() predicate.ExamCategory {
 	return predicate.ExamCategory(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ExamGroupsTable, ExamGroupsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, GroupsTable, GroupsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasExamGroupsWith applies the HasEdge predicate on the "exam_groups" edge with a given conditions (other predicates).
-func HasExamGroupsWith(preds ...predicate.ExamGroup) predicate.ExamCategory {
+// HasGroupsWith applies the HasEdge predicate on the "groups" edge with a given conditions (other predicates).
+func HasGroupsWith(preds ...predicate.ExamGroup) predicate.ExamCategory {
 	return predicate.ExamCategory(func(s *sql.Selector) {
-		step := newExamGroupsStep()
+		step := newGroupsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

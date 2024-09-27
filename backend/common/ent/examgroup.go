@@ -32,9 +32,9 @@ type ExamGroup struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ExamGroupQuery when eager-loading is set.
-	Edges                     ExamGroupEdges `json:"edges"`
-	exam_category_exam_groups *int
-	selectValues              sql.SelectValues
+	Edges                ExamGroupEdges `json:"edges"`
+	exam_category_groups *int
+	selectValues         sql.SelectValues
 }
 
 // ExamGroupEdges holds the relations/edges for other nodes in the graph.
@@ -70,7 +70,7 @@ func (*ExamGroup) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case examgroup.FieldCreatedAt, examgroup.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case examgroup.ForeignKeys[0]: // exam_category_exam_groups
+		case examgroup.ForeignKeys[0]: // exam_category_groups
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -131,10 +131,10 @@ func (eg *ExamGroup) assignValues(columns []string, values []any) error {
 			}
 		case examgroup.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field exam_category_exam_groups", value)
+				return fmt.Errorf("unexpected type %T for edge-field exam_category_groups", value)
 			} else if value.Valid {
-				eg.exam_category_exam_groups = new(int)
-				*eg.exam_category_exam_groups = int(value.Int64)
+				eg.exam_category_groups = new(int)
+				*eg.exam_category_groups = int(value.Int64)
 			}
 		default:
 			eg.selectValues.Set(columns[i], values[i])

@@ -413,10 +413,10 @@ func (egq *ExamGroupQuery) loadCategory(ctx context.Context, query *ExamCategory
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*ExamGroup)
 	for i := range nodes {
-		if nodes[i].exam_category_exam_groups == nil {
+		if nodes[i].exam_category_groups == nil {
 			continue
 		}
-		fk := *nodes[i].exam_category_exam_groups
+		fk := *nodes[i].exam_category_groups
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -433,7 +433,7 @@ func (egq *ExamGroupQuery) loadCategory(ctx context.Context, query *ExamCategory
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "exam_category_exam_groups" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "exam_category_groups" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

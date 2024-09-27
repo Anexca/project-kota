@@ -238,7 +238,7 @@ func (egc *ExamGroupCreate) createSpec() (*ExamGroup, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.exam_category_exam_groups = &nodes[0]
+		_node.exam_category_groups = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

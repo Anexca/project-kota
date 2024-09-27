@@ -29,7 +29,7 @@ func (ExamGroup) Fields() []ent.Field {
 func (ExamGroup) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("category", ExamCategory.Type).
-			Ref("exam_groups").
+			Ref("groups").
 			Unique(), // Many Exams Group belong to one ExamCategory
 	}
 }

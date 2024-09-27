@@ -3162,24 +3162,24 @@ func (m *ExamAttemptMutation) ResetEdge(name string) error {
 // ExamCategoryMutation represents an operation that mutates the ExamCategory nodes in the graph.
 type ExamCategoryMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *int
-	name               *examcategory.Name
-	description        *string
-	is_active          *bool
-	created_at         *time.Time
-	updated_at         *time.Time
-	clearedFields      map[string]struct{}
-	exams              map[int]struct{}
-	removedexams       map[int]struct{}
-	clearedexams       bool
-	exam_groups        map[int]struct{}
-	removedexam_groups map[int]struct{}
-	clearedexam_groups bool
-	done               bool
-	oldValue           func(context.Context) (*ExamCategory, error)
-	predicates         []predicate.ExamCategory
+	op            Op
+	typ           string
+	id            *int
+	name          *examcategory.Name
+	description   *string
+	is_active     *bool
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	exams         map[int]struct{}
+	removedexams  map[int]struct{}
+	clearedexams  bool
+	groups        map[int]struct{}
+	removedgroups map[int]struct{}
+	clearedgroups bool
+	done          bool
+	oldValue      func(context.Context) (*ExamCategory, error)
+	predicates    []predicate.ExamCategory
 }
 
 var _ ent.Mutation = (*ExamCategoryMutation)(nil)
@@ -3514,58 +3514,58 @@ func (m *ExamCategoryMutation) ResetExams() {
 	m.removedexams = nil
 }
 
-// AddExamGroupIDs adds the "exam_groups" edge to the ExamGroup entity by ids.
-func (m *ExamCategoryMutation) AddExamGroupIDs(ids ...int) {
-	if m.exam_groups == nil {
-		m.exam_groups = make(map[int]struct{})
+// AddGroupIDs adds the "groups" edge to the ExamGroup entity by ids.
+func (m *ExamCategoryMutation) AddGroupIDs(ids ...int) {
+	if m.groups == nil {
+		m.groups = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.exam_groups[ids[i]] = struct{}{}
+		m.groups[ids[i]] = struct{}{}
 	}
 }
 
-// ClearExamGroups clears the "exam_groups" edge to the ExamGroup entity.
-func (m *ExamCategoryMutation) ClearExamGroups() {
-	m.clearedexam_groups = true
+// ClearGroups clears the "groups" edge to the ExamGroup entity.
+func (m *ExamCategoryMutation) ClearGroups() {
+	m.clearedgroups = true
 }
 
-// ExamGroupsCleared reports if the "exam_groups" edge to the ExamGroup entity was cleared.
-func (m *ExamCategoryMutation) ExamGroupsCleared() bool {
-	return m.clearedexam_groups
+// GroupsCleared reports if the "groups" edge to the ExamGroup entity was cleared.
+func (m *ExamCategoryMutation) GroupsCleared() bool {
+	return m.clearedgroups
 }
 
-// RemoveExamGroupIDs removes the "exam_groups" edge to the ExamGroup entity by IDs.
-func (m *ExamCategoryMutation) RemoveExamGroupIDs(ids ...int) {
-	if m.removedexam_groups == nil {
-		m.removedexam_groups = make(map[int]struct{})
+// RemoveGroupIDs removes the "groups" edge to the ExamGroup entity by IDs.
+func (m *ExamCategoryMutation) RemoveGroupIDs(ids ...int) {
+	if m.removedgroups == nil {
+		m.removedgroups = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.exam_groups, ids[i])
-		m.removedexam_groups[ids[i]] = struct{}{}
+		delete(m.groups, ids[i])
+		m.removedgroups[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedExamGroups returns the removed IDs of the "exam_groups" edge to the ExamGroup entity.
-func (m *ExamCategoryMutation) RemovedExamGroupsIDs() (ids []int) {
-	for id := range m.removedexam_groups {
+// RemovedGroups returns the removed IDs of the "groups" edge to the ExamGroup entity.
+func (m *ExamCategoryMutation) RemovedGroupsIDs() (ids []int) {
+	for id := range m.removedgroups {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ExamGroupsIDs returns the "exam_groups" edge IDs in the mutation.
-func (m *ExamCategoryMutation) ExamGroupsIDs() (ids []int) {
-	for id := range m.exam_groups {
+// GroupsIDs returns the "groups" edge IDs in the mutation.
+func (m *ExamCategoryMutation) GroupsIDs() (ids []int) {
+	for id := range m.groups {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetExamGroups resets all changes to the "exam_groups" edge.
-func (m *ExamCategoryMutation) ResetExamGroups() {
-	m.exam_groups = nil
-	m.clearedexam_groups = false
-	m.removedexam_groups = nil
+// ResetGroups resets all changes to the "groups" edge.
+func (m *ExamCategoryMutation) ResetGroups() {
+	m.groups = nil
+	m.clearedgroups = false
+	m.removedgroups = nil
 }
 
 // Where appends a list predicates to the ExamCategoryMutation builder.
@@ -3773,8 +3773,8 @@ func (m *ExamCategoryMutation) AddedEdges() []string {
 	if m.exams != nil {
 		edges = append(edges, examcategory.EdgeExams)
 	}
-	if m.exam_groups != nil {
-		edges = append(edges, examcategory.EdgeExamGroups)
+	if m.groups != nil {
+		edges = append(edges, examcategory.EdgeGroups)
 	}
 	return edges
 }
@@ -3789,9 +3789,9 @@ func (m *ExamCategoryMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case examcategory.EdgeExamGroups:
-		ids := make([]ent.Value, 0, len(m.exam_groups))
-		for id := range m.exam_groups {
+	case examcategory.EdgeGroups:
+		ids := make([]ent.Value, 0, len(m.groups))
+		for id := range m.groups {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3805,8 +3805,8 @@ func (m *ExamCategoryMutation) RemovedEdges() []string {
 	if m.removedexams != nil {
 		edges = append(edges, examcategory.EdgeExams)
 	}
-	if m.removedexam_groups != nil {
-		edges = append(edges, examcategory.EdgeExamGroups)
+	if m.removedgroups != nil {
+		edges = append(edges, examcategory.EdgeGroups)
 	}
 	return edges
 }
@@ -3821,9 +3821,9 @@ func (m *ExamCategoryMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case examcategory.EdgeExamGroups:
-		ids := make([]ent.Value, 0, len(m.removedexam_groups))
-		for id := range m.removedexam_groups {
+	case examcategory.EdgeGroups:
+		ids := make([]ent.Value, 0, len(m.removedgroups))
+		for id := range m.removedgroups {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3837,8 +3837,8 @@ func (m *ExamCategoryMutation) ClearedEdges() []string {
 	if m.clearedexams {
 		edges = append(edges, examcategory.EdgeExams)
 	}
-	if m.clearedexam_groups {
-		edges = append(edges, examcategory.EdgeExamGroups)
+	if m.clearedgroups {
+		edges = append(edges, examcategory.EdgeGroups)
 	}
 	return edges
 }
@@ -3849,8 +3849,8 @@ func (m *ExamCategoryMutation) EdgeCleared(name string) bool {
 	switch name {
 	case examcategory.EdgeExams:
 		return m.clearedexams
-	case examcategory.EdgeExamGroups:
-		return m.clearedexam_groups
+	case examcategory.EdgeGroups:
+		return m.clearedgroups
 	}
 	return false
 }
@@ -3870,8 +3870,8 @@ func (m *ExamCategoryMutation) ResetEdge(name string) error {
 	case examcategory.EdgeExams:
 		m.ResetExams()
 		return nil
-	case examcategory.EdgeExamGroups:
-		m.ResetExamGroups()
+	case examcategory.EdgeGroups:
+		m.ResetGroups()
 		return nil
 	}
 	return fmt.Errorf("unknown ExamCategory edge %s", name)

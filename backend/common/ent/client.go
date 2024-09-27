@@ -1123,15 +1123,15 @@ func (c *ExamCategoryClient) QueryExams(ec *ExamCategory) *ExamQuery {
 	return query
 }
 
-// QueryExamGroups queries the exam_groups edge of a ExamCategory.
-func (c *ExamCategoryClient) QueryExamGroups(ec *ExamCategory) *ExamGroupQuery {
+// QueryGroups queries the groups edge of a ExamCategory.
+func (c *ExamCategoryClient) QueryGroups(ec *ExamCategory) *ExamGroupQuery {
 	query := (&ExamGroupClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ec.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(examcategory.Table, examcategory.FieldID, id),
 			sqlgraph.To(examgroup.Table, examgroup.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, examcategory.ExamGroupsTable, examcategory.ExamGroupsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, examcategory.GroupsTable, examcategory.GroupsColumn),
 		)
 		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
 		return fromV, nil

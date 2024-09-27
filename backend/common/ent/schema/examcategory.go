@@ -32,6 +32,6 @@ func (ExamCategory) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("exams", Exam.Type), // One ExamCategory can have many Exams
 
-		edge.To("exam_groups", ExamGroup.Type), // One ExamCategory can have many Exams
+		edge.To("groups", ExamGroup.Type), // One ExamCategory can have many Exams
 	}
 }

@@ -36,7 +36,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "examcategory" package.
 	CategoryInverseTable = "exam_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
-	CategoryColumn = "exam_category_exam_groups"
+	CategoryColumn = "exam_category_groups"
 )
 
 // Columns holds all SQL columns for examgroup fields.
@@ -53,7 +53,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "exam_groups"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"exam_category_exam_groups",
+	"exam_category_groups",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
