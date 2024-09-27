@@ -10,20 +10,23 @@ import (
 
 type ExamCategoryService struct {
 	examRepository         *repositories.ExamRepository
+	examGroupRepository    *repositories.ExamGroupRepository
 	examCategoryRepository *repositories.ExamCategoryRepository
 }
 
 func NewExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
 	examRepository := repositories.NewExamRespository(dbClient)
+	examGroupRepository := repositories.NewExamGroupRepository(dbClient)
 	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
 
 	return &ExamCategoryService{
 		examRepository:         examRepository,
+		examGroupRepository:    examGroupRepository,
 		examCategoryRepository: examCategoryRepository,
 	}
 }
 
-func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Context) ([]models.CategoryExamGroup, error) {
+func (e *ExamCategoryService) GetBankingDescriptiveExamsGroups(ctx context.Context) ([]models.CategoryExamGroup, error) {
 	category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking, constants.ExamTypeDescriptive)
 	if err != nil {
 		return nil, err
@@ -48,7 +51,7 @@ func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Contex
 	return categoryExamTypes, nil
 }
 
-func (e *ExamCategoryService) GetBankingMCQExamTypes(ctx context.Context) ([]models.CategoryExamGroup, error) {
+func (e *ExamCategoryService) GetBankingMCQExamGroups(ctx context.Context) ([]models.CategoryExamGroup, error) {
 	category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking, constants.ExamTypeMCQ)
 	if err != nil {
 		return nil, err
@@ -73,8 +76,8 @@ func (e *ExamCategoryService) GetBankingMCQExamTypes(ctx context.Context) ([]mod
 	return categoryExamTypes, nil
 }
 
-func (e *ExamCategoryService) GetCategoryExamById(ctx context.Context, examId int) (*models.CategoryExamGroup, error) {
-	exam, err := e.examRepository.GetById(ctx, examId)
+func (e *ExamCategoryService) GetExamGroupById(ctx context.Context, examGroupId int) (*models.CategoryExamGroup, error) {
+	exam, err := e.examGroupRepository.GetById(ctx, examGroupId)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +87,6 @@ func (e *ExamCategoryService) GetCategoryExamById(ctx context.Context, examId in
 		ExamName:    exam.Name,
 		IsActive:    exam.IsActive,
 		Description: exam.Description,
-		TypeOfExam:  exam.Type.String(),
 		LogoUrl:     exam.LogoURL,
 	}
 
