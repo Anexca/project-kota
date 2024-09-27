@@ -85,9 +85,9 @@ type Attempt struct {
 	AttemptDate      time.Time `json:"attempt_date"`
 }
 
-type CategoryExamType struct {
-	Id           int    `json:"exam_type_id"`
-	ExamName     string `json:"exam_name"`
+type CategoryExamGroup struct {
+	Id           int    `json:"exam_group_id"`
+	ExamName     string `json:"exam_group_name"`
 	Description  string `json:"description"`
 	TypeOfExam   string `json:"type_of_exam,omitempty"`
 	IsActive     bool   `json:"is_active"`
