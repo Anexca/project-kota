@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examgroup"
 	"context"
@@ -106,6 +107,21 @@ func (egc *ExamGroupCreate) SetNillableCategoryID(id *int) *ExamGroupCreate {
 // SetCategory sets the "category" edge to the ExamCategory entity.
 func (egc *ExamGroupCreate) SetCategory(e *ExamCategory) *ExamGroupCreate {
 	return egc.SetCategoryID(e.ID)
+}
+
+// AddExamIDs adds the "exams" edge to the Exam entity by IDs.
+func (egc *ExamGroupCreate) AddExamIDs(ids ...int) *ExamGroupCreate {
+	egc.mutation.AddExamIDs(ids...)
+	return egc
+}
+
+// AddExams adds the "exams" edges to the Exam entity.
+func (egc *ExamGroupCreate) AddExams(e ...*Exam) *ExamGroupCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return egc.AddExamIDs(ids...)
 }
 
 // Mutation returns the ExamGroupMutation object of the builder.
@@ -239,6 +255,22 @@ func (egc *ExamGroupCreate) createSpec() (*ExamGroup, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.exam_category_groups = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := egc.mutation.ExamsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   examgroup.ExamsTable,
+			Columns: []string{examgroup.ExamsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

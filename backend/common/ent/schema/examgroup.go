@@ -31,5 +31,8 @@ func (ExamGroup) Edges() []ent.Edge {
 		edge.From("category", ExamCategory.Type).
 			Ref("groups").
 			Unique(), // Many Exams Group belong to one ExamCategory
+
+		edge.To("exams", Exam.Type), // One ExamGroup can have many Exams
+
 	}
 }

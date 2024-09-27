@@ -43,6 +43,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_category_exams", Type: field.TypeInt, Nullable: true},
+		{Name: "exam_group_exams", Type: field.TypeInt, Nullable: true},
 	}
 	// ExamsTable holds the schema information for the "exams" table.
 	ExamsTable = &schema.Table{
@@ -54,6 +55,12 @@ var (
 				Symbol:     "exams_exam_categories_exams",
 				Columns:    []*schema.Column{ExamsColumns[8]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "exams_exam_groups_exams",
+				Columns:    []*schema.Column{ExamsColumns[9]},
+				RefColumns: []*schema.Column{ExamGroupsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -356,6 +363,7 @@ var (
 func init() {
 	CachedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
+	ExamsTable.ForeignKeys[1].RefTable = ExamGroupsTable
 	ExamAssesmentsTable.ForeignKeys[0].RefTable = ExamAttemptsTable
 	ExamAttemptsTable.ForeignKeys[0].RefTable = GeneratedExamsTable
 	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable

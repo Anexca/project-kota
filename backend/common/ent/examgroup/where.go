@@ -403,6 +403,29 @@ func HasCategoryWith(preds ...predicate.ExamCategory) predicate.ExamGroup {
 	})
 }
 
+// HasExams applies the HasEdge predicate on the "exams" edge.
+func HasExams() predicate.ExamGroup {
+	return predicate.ExamGroup(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ExamsTable, ExamsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasExamsWith applies the HasEdge predicate on the "exams" edge with a given conditions (other predicates).
+func HasExamsWith(preds ...predicate.Exam) predicate.ExamGroup {
+	return predicate.ExamGroup(func(s *sql.Selector) {
+		step := newExamsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.ExamGroup) predicate.ExamGroup {
 	return predicate.ExamGroup(sql.AndPredicates(predicates...))

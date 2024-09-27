@@ -6,6 +6,7 @@ import (
 	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/subscriptionexam"
@@ -124,6 +125,25 @@ func (ec *ExamCreate) SetNillableCategoryID(id *int) *ExamCreate {
 // SetCategory sets the "category" edge to the ExamCategory entity.
 func (ec *ExamCreate) SetCategory(e *ExamCategory) *ExamCreate {
 	return ec.SetCategoryID(e.ID)
+}
+
+// SetGroupID sets the "group" edge to the ExamGroup entity by ID.
+func (ec *ExamCreate) SetGroupID(id int) *ExamCreate {
+	ec.mutation.SetGroupID(id)
+	return ec
+}
+
+// SetNillableGroupID sets the "group" edge to the ExamGroup entity by ID if the given value is not nil.
+func (ec *ExamCreate) SetNillableGroupID(id *int) *ExamCreate {
+	if id != nil {
+		ec = ec.SetGroupID(*id)
+	}
+	return ec
+}
+
+// SetGroup sets the "group" edge to the ExamGroup entity.
+func (ec *ExamCreate) SetGroup(e *ExamGroup) *ExamCreate {
+	return ec.SetGroupID(e.ID)
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by IDs.
@@ -337,6 +357,23 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.exam_category_exams = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   exam.GroupTable,
+			Columns: []string{exam.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examgroup.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.exam_group_exams = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.SubscriptionsIDs(); len(nodes) > 0 {

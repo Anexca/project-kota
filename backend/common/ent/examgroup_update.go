@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"common/ent/exam"
 	"common/ent/examcategory"
 	"common/ent/examgroup"
 	"common/ent/predicate"
@@ -116,6 +117,21 @@ func (egu *ExamGroupUpdate) SetCategory(e *ExamCategory) *ExamGroupUpdate {
 	return egu.SetCategoryID(e.ID)
 }
 
+// AddExamIDs adds the "exams" edge to the Exam entity by IDs.
+func (egu *ExamGroupUpdate) AddExamIDs(ids ...int) *ExamGroupUpdate {
+	egu.mutation.AddExamIDs(ids...)
+	return egu
+}
+
+// AddExams adds the "exams" edges to the Exam entity.
+func (egu *ExamGroupUpdate) AddExams(e ...*Exam) *ExamGroupUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return egu.AddExamIDs(ids...)
+}
+
 // Mutation returns the ExamGroupMutation object of the builder.
 func (egu *ExamGroupUpdate) Mutation() *ExamGroupMutation {
 	return egu.mutation
@@ -125,6 +141,27 @@ func (egu *ExamGroupUpdate) Mutation() *ExamGroupMutation {
 func (egu *ExamGroupUpdate) ClearCategory() *ExamGroupUpdate {
 	egu.mutation.ClearCategory()
 	return egu
+}
+
+// ClearExams clears all "exams" edges to the Exam entity.
+func (egu *ExamGroupUpdate) ClearExams() *ExamGroupUpdate {
+	egu.mutation.ClearExams()
+	return egu
+}
+
+// RemoveExamIDs removes the "exams" edge to Exam entities by IDs.
+func (egu *ExamGroupUpdate) RemoveExamIDs(ids ...int) *ExamGroupUpdate {
+	egu.mutation.RemoveExamIDs(ids...)
+	return egu
+}
+
+// RemoveExams removes "exams" edges to Exam entities.
+func (egu *ExamGroupUpdate) RemoveExams(e ...*Exam) *ExamGroupUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return egu.RemoveExamIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -212,6 +249,51 @@ func (egu *ExamGroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if egu.mutation.ExamsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   examgroup.ExamsTable,
+			Columns: []string{examgroup.ExamsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := egu.mutation.RemovedExamsIDs(); len(nodes) > 0 && !egu.mutation.ExamsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   examgroup.ExamsTable,
+			Columns: []string{examgroup.ExamsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := egu.mutation.ExamsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   examgroup.ExamsTable,
+			Columns: []string{examgroup.ExamsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -326,6 +408,21 @@ func (eguo *ExamGroupUpdateOne) SetCategory(e *ExamCategory) *ExamGroupUpdateOne
 	return eguo.SetCategoryID(e.ID)
 }
 
+// AddExamIDs adds the "exams" edge to the Exam entity by IDs.
+func (eguo *ExamGroupUpdateOne) AddExamIDs(ids ...int) *ExamGroupUpdateOne {
+	eguo.mutation.AddExamIDs(ids...)
+	return eguo
+}
+
+// AddExams adds the "exams" edges to the Exam entity.
+func (eguo *ExamGroupUpdateOne) AddExams(e ...*Exam) *ExamGroupUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return eguo.AddExamIDs(ids...)
+}
+
 // Mutation returns the ExamGroupMutation object of the builder.
 func (eguo *ExamGroupUpdateOne) Mutation() *ExamGroupMutation {
 	return eguo.mutation
@@ -335,6 +432,27 @@ func (eguo *ExamGroupUpdateOne) Mutation() *ExamGroupMutation {
 func (eguo *ExamGroupUpdateOne) ClearCategory() *ExamGroupUpdateOne {
 	eguo.mutation.ClearCategory()
 	return eguo
+}
+
+// ClearExams clears all "exams" edges to the Exam entity.
+func (eguo *ExamGroupUpdateOne) ClearExams() *ExamGroupUpdateOne {
+	eguo.mutation.ClearExams()
+	return eguo
+}
+
+// RemoveExamIDs removes the "exams" edge to Exam entities by IDs.
+func (eguo *ExamGroupUpdateOne) RemoveExamIDs(ids ...int) *ExamGroupUpdateOne {
+	eguo.mutation.RemoveExamIDs(ids...)
+	return eguo
+}
+
+// RemoveExams removes "exams" edges to Exam entities.
+func (eguo *ExamGroupUpdateOne) RemoveExams(e ...*Exam) *ExamGroupUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return eguo.RemoveExamIDs(ids...)
 }
 
 // Where appends a list predicates to the ExamGroupUpdate builder.
@@ -452,6 +570,51 @@ func (eguo *ExamGroupUpdateOne) sqlSave(ctx context.Context) (_node *ExamGroup, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eguo.mutation.ExamsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   examgroup.ExamsTable,
+			Columns: []string{examgroup.ExamsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eguo.mutation.RemovedExamsIDs(); len(nodes) > 0 && !eguo.mutation.ExamsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   examgroup.ExamsTable,
+			Columns: []string{examgroup.ExamsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eguo.mutation.ExamsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   examgroup.ExamsTable,
+			Columns: []string{examgroup.ExamsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(exam.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -677,6 +677,8 @@ type ExamMutation struct {
 	clearedFields         map[string]struct{}
 	category              *int
 	clearedcategory       bool
+	group                 *int
+	clearedgroup          bool
 	subscriptions         map[int]struct{}
 	removedsubscriptions  map[int]struct{}
 	clearedsubscriptions  bool
@@ -1093,6 +1095,45 @@ func (m *ExamMutation) CategoryIDs() (ids []int) {
 func (m *ExamMutation) ResetCategory() {
 	m.category = nil
 	m.clearedcategory = false
+}
+
+// SetGroupID sets the "group" edge to the ExamGroup entity by id.
+func (m *ExamMutation) SetGroupID(id int) {
+	m.group = &id
+}
+
+// ClearGroup clears the "group" edge to the ExamGroup entity.
+func (m *ExamMutation) ClearGroup() {
+	m.clearedgroup = true
+}
+
+// GroupCleared reports if the "group" edge to the ExamGroup entity was cleared.
+func (m *ExamMutation) GroupCleared() bool {
+	return m.clearedgroup
+}
+
+// GroupID returns the "group" edge ID in the mutation.
+func (m *ExamMutation) GroupID() (id int, exists bool) {
+	if m.group != nil {
+		return *m.group, true
+	}
+	return
+}
+
+// GroupIDs returns the "group" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// GroupID instead. It exists only for internal usage by the builders.
+func (m *ExamMutation) GroupIDs() (ids []int) {
+	if id := m.group; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetGroup resets all changes to the "group" edge.
+func (m *ExamMutation) ResetGroup() {
+	m.group = nil
+	m.clearedgroup = false
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by ids.
@@ -1540,9 +1581,12 @@ func (m *ExamMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ExamMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.category != nil {
 		edges = append(edges, exam.EdgeCategory)
+	}
+	if m.group != nil {
+		edges = append(edges, exam.EdgeGroup)
 	}
 	if m.subscriptions != nil {
 		edges = append(edges, exam.EdgeSubscriptions)
@@ -1565,6 +1609,10 @@ func (m *ExamMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case exam.EdgeCategory:
 		if id := m.category; id != nil {
+			return []ent.Value{*id}
+		}
+	case exam.EdgeGroup:
+		if id := m.group; id != nil {
 			return []ent.Value{*id}
 		}
 	case exam.EdgeSubscriptions:
@@ -1595,7 +1643,7 @@ func (m *ExamMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ExamMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.removedsubscriptions != nil {
 		edges = append(edges, exam.EdgeSubscriptions)
 	}
@@ -1636,9 +1684,12 @@ func (m *ExamMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ExamMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.clearedcategory {
 		edges = append(edges, exam.EdgeCategory)
+	}
+	if m.clearedgroup {
+		edges = append(edges, exam.EdgeGroup)
 	}
 	if m.clearedsubscriptions {
 		edges = append(edges, exam.EdgeSubscriptions)
@@ -1661,6 +1712,8 @@ func (m *ExamMutation) EdgeCleared(name string) bool {
 	switch name {
 	case exam.EdgeCategory:
 		return m.clearedcategory
+	case exam.EdgeGroup:
+		return m.clearedgroup
 	case exam.EdgeSubscriptions:
 		return m.clearedsubscriptions
 	case exam.EdgeSetting:
@@ -1680,6 +1733,9 @@ func (m *ExamMutation) ClearEdge(name string) error {
 	case exam.EdgeCategory:
 		m.ClearCategory()
 		return nil
+	case exam.EdgeGroup:
+		m.ClearGroup()
+		return nil
 	case exam.EdgeSetting:
 		m.ClearSetting()
 		return nil
@@ -1693,6 +1749,9 @@ func (m *ExamMutation) ResetEdge(name string) error {
 	switch name {
 	case exam.EdgeCategory:
 		m.ResetCategory()
+		return nil
+	case exam.EdgeGroup:
+		m.ResetGroup()
 		return nil
 	case exam.EdgeSubscriptions:
 		m.ResetSubscriptions()
@@ -3892,6 +3951,9 @@ type ExamGroupMutation struct {
 	clearedFields   map[string]struct{}
 	category        *int
 	clearedcategory bool
+	exams           map[int]struct{}
+	removedexams    map[int]struct{}
+	clearedexams    bool
 	done            bool
 	oldValue        func(context.Context) (*ExamGroup, error)
 	predicates      []predicate.ExamGroup
@@ -4263,6 +4325,60 @@ func (m *ExamGroupMutation) ResetCategory() {
 	m.clearedcategory = false
 }
 
+// AddExamIDs adds the "exams" edge to the Exam entity by ids.
+func (m *ExamGroupMutation) AddExamIDs(ids ...int) {
+	if m.exams == nil {
+		m.exams = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.exams[ids[i]] = struct{}{}
+	}
+}
+
+// ClearExams clears the "exams" edge to the Exam entity.
+func (m *ExamGroupMutation) ClearExams() {
+	m.clearedexams = true
+}
+
+// ExamsCleared reports if the "exams" edge to the Exam entity was cleared.
+func (m *ExamGroupMutation) ExamsCleared() bool {
+	return m.clearedexams
+}
+
+// RemoveExamIDs removes the "exams" edge to the Exam entity by IDs.
+func (m *ExamGroupMutation) RemoveExamIDs(ids ...int) {
+	if m.removedexams == nil {
+		m.removedexams = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.exams, ids[i])
+		m.removedexams[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedExams returns the removed IDs of the "exams" edge to the Exam entity.
+func (m *ExamGroupMutation) RemovedExamsIDs() (ids []int) {
+	for id := range m.removedexams {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ExamsIDs returns the "exams" edge IDs in the mutation.
+func (m *ExamGroupMutation) ExamsIDs() (ids []int) {
+	for id := range m.exams {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetExams resets all changes to the "exams" edge.
+func (m *ExamGroupMutation) ResetExams() {
+	m.exams = nil
+	m.clearedexams = false
+	m.removedexams = nil
+}
+
 // Where appends a list predicates to the ExamGroupMutation builder.
 func (m *ExamGroupMutation) Where(ps ...predicate.ExamGroup) {
 	m.predicates = append(m.predicates, ps...)
@@ -4490,9 +4606,12 @@ func (m *ExamGroupMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ExamGroupMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.category != nil {
 		edges = append(edges, examgroup.EdgeCategory)
+	}
+	if m.exams != nil {
+		edges = append(edges, examgroup.EdgeExams)
 	}
 	return edges
 }
@@ -4505,27 +4624,47 @@ func (m *ExamGroupMutation) AddedIDs(name string) []ent.Value {
 		if id := m.category; id != nil {
 			return []ent.Value{*id}
 		}
+	case examgroup.EdgeExams:
+		ids := make([]ent.Value, 0, len(m.exams))
+		for id := range m.exams {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ExamGroupMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.removedexams != nil {
+		edges = append(edges, examgroup.EdgeExams)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ExamGroupMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case examgroup.EdgeExams:
+		ids := make([]ent.Value, 0, len(m.removedexams))
+		for id := range m.removedexams {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ExamGroupMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedcategory {
 		edges = append(edges, examgroup.EdgeCategory)
+	}
+	if m.clearedexams {
+		edges = append(edges, examgroup.EdgeExams)
 	}
 	return edges
 }
@@ -4536,6 +4675,8 @@ func (m *ExamGroupMutation) EdgeCleared(name string) bool {
 	switch name {
 	case examgroup.EdgeCategory:
 		return m.clearedcategory
+	case examgroup.EdgeExams:
+		return m.clearedexams
 	}
 	return false
 }
@@ -4557,6 +4698,9 @@ func (m *ExamGroupMutation) ResetEdge(name string) error {
 	switch name {
 	case examgroup.EdgeCategory:
 		m.ResetCategory()
+		return nil
+	case examgroup.EdgeExams:
+		m.ResetExams()
 		return nil
 	}
 	return fmt.Errorf("unknown ExamGroup edge %s", name)

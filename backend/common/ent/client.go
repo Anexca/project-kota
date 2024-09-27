@@ -580,6 +580,22 @@ func (c *ExamClient) QueryCategory(e *Exam) *ExamCategoryQuery {
 	return query
 }
 
+// QueryGroup queries the group edge of a Exam.
+func (c *ExamClient) QueryGroup(e *Exam) *ExamGroupQuery {
+	query := (&ExamGroupClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, id),
+			sqlgraph.To(examgroup.Table, examgroup.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, exam.GroupTable, exam.GroupColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySubscriptions queries the subscriptions edge of a Exam.
 func (c *ExamClient) QuerySubscriptions(e *Exam) *SubscriptionExamQuery {
 	query := (&SubscriptionExamClient{config: c.config}).Query()
@@ -1281,6 +1297,22 @@ func (c *ExamGroupClient) QueryCategory(eg *ExamGroup) *ExamCategoryQuery {
 			sqlgraph.From(examgroup.Table, examgroup.FieldID, id),
 			sqlgraph.To(examcategory.Table, examcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, examgroup.CategoryTable, examgroup.CategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(eg.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryExams queries the exams edge of a ExamGroup.
+func (c *ExamGroupClient) QueryExams(eg *ExamGroup) *ExamQuery {
+	query := (&ExamClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := eg.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examgroup.Table, examgroup.FieldID, id),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, examgroup.ExamsTable, examgroup.ExamsColumn),
 		)
 		fromV = sqlgraph.Neighbors(eg.driver.Dialect(), step)
 		return fromV, nil

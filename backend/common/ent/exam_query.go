@@ -6,6 +6,7 @@ import (
 	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
@@ -29,6 +30,7 @@ type ExamQuery struct {
 	inters             []Interceptor
 	predicates         []predicate.Exam
 	withCategory       *ExamCategoryQuery
+	withGroup          *ExamGroupQuery
 	withSubscriptions  *SubscriptionExamQuery
 	withSetting        *ExamSettingQuery
 	withCachedExam     *CachedExamQuery
@@ -85,6 +87,28 @@ func (eq *ExamQuery) QueryCategory() *ExamCategoryQuery {
 			sqlgraph.From(exam.Table, exam.FieldID, selector),
 			sqlgraph.To(examcategory.Table, examcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, exam.CategoryTable, exam.CategoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGroup chains the current query on the "group" edge.
+func (eq *ExamQuery) QueryGroup() *ExamGroupQuery {
+	query := (&ExamGroupClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, selector),
+			sqlgraph.To(examgroup.Table, examgroup.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, exam.GroupTable, exam.GroupColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -373,6 +397,7 @@ func (eq *ExamQuery) Clone() *ExamQuery {
 		inters:             append([]Interceptor{}, eq.inters...),
 		predicates:         append([]predicate.Exam{}, eq.predicates...),
 		withCategory:       eq.withCategory.Clone(),
+		withGroup:          eq.withGroup.Clone(),
 		withSubscriptions:  eq.withSubscriptions.Clone(),
 		withSetting:        eq.withSetting.Clone(),
 		withCachedExam:     eq.withCachedExam.Clone(),
@@ -391,6 +416,17 @@ func (eq *ExamQuery) WithCategory(opts ...func(*ExamCategoryQuery)) *ExamQuery {
 		opt(query)
 	}
 	eq.withCategory = query
+	return eq
+}
+
+// WithGroup tells the query-builder to eager-load the nodes that are connected to
+// the "group" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *ExamQuery) WithGroup(opts ...func(*ExamGroupQuery)) *ExamQuery {
+	query := (&ExamGroupClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withGroup = query
 	return eq
 }
 
@@ -517,15 +553,16 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 		nodes       = []*Exam{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			eq.withCategory != nil,
+			eq.withGroup != nil,
 			eq.withSubscriptions != nil,
 			eq.withSetting != nil,
 			eq.withCachedExam != nil,
 			eq.withGeneratedexams != nil,
 		}
 	)
-	if eq.withCategory != nil {
+	if eq.withCategory != nil || eq.withGroup != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -552,6 +589,12 @@ func (eq *ExamQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exam, e
 	if query := eq.withCategory; query != nil {
 		if err := eq.loadCategory(ctx, query, nodes, nil,
 			func(n *Exam, e *ExamCategory) { n.Edges.Category = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withGroup; query != nil {
+		if err := eq.loadGroup(ctx, query, nodes, nil,
+			func(n *Exam, e *ExamGroup) { n.Edges.Group = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -610,6 +653,38 @@ func (eq *ExamQuery) loadCategory(ctx context.Context, query *ExamCategoryQuery,
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "exam_category_exams" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (eq *ExamQuery) loadGroup(ctx context.Context, query *ExamGroupQuery, nodes []*Exam, init func(*Exam), assign func(*Exam, *ExamGroup)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Exam)
+	for i := range nodes {
+		if nodes[i].exam_group_exams == nil {
+			continue
+		}
+		fk := *nodes[i].exam_group_exams
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(examgroup.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "exam_group_exams" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

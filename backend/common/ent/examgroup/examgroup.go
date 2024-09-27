@@ -28,6 +28,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
+	// EdgeExams holds the string denoting the exams edge name in mutations.
+	EdgeExams = "exams"
 	// Table holds the table name of the examgroup in the database.
 	Table = "exam_groups"
 	// CategoryTable is the table that holds the category relation/edge.
@@ -37,6 +39,13 @@ const (
 	CategoryInverseTable = "exam_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "exam_category_groups"
+	// ExamsTable is the table that holds the exams relation/edge.
+	ExamsTable = "exams"
+	// ExamsInverseTable is the table name for the Exam entity.
+	// It exists in this package in order to avoid circular dependency with the "exam" package.
+	ExamsInverseTable = "exams"
+	// ExamsColumn is the table column denoting the exams relation/edge.
+	ExamsColumn = "exam_group_exams"
 )
 
 // Columns holds all SQL columns for examgroup fields.
@@ -126,10 +135,31 @@ func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByExamsCount orders the results by exams count.
+func ByExamsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newExamsStep(), opts...)
+	}
+}
+
+// ByExams orders the results by exams terms.
+func ByExams(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newExamsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+	)
+}
+func newExamsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ExamsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ExamsTable, ExamsColumn),
 	)
 }
