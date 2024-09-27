@@ -31,16 +31,15 @@ func (e *ExamCategoryService) GetBankingDescriptiveExamsTypes(ctx context.Contex
 
 	var categoryExamTypes []models.CategoryExamType
 
-	for _, exam := range category.Edges.Exams {
+	for _, examGroup := range category.Edges.Groups {
 		categoryExamType := models.CategoryExamType{
-			Id:           exam.ID,
-			ExamName:     exam.Name,
+			Id:           examGroup.ID,
+			ExamName:     examGroup.Name,
 			CategoryId:   category.ID,
-			IsActive:     exam.IsActive,
-			Description:  exam.Description,
-			TypeOfExam:   exam.Type.String(),
+			IsActive:     examGroup.IsActive,
+			Description:  examGroup.Description,
 			CategoryName: category.Name.String(),
-			LogoUrl:      exam.LogoURL,
+			LogoUrl:      examGroup.LogoURL,
 		}
 
 		categoryExamTypes = append(categoryExamTypes, categoryExamType)
@@ -57,16 +56,15 @@ func (e *ExamCategoryService) GetBankingMCQExamTypes(ctx context.Context) ([]mod
 
 	var categoryExamTypes []models.CategoryExamType
 
-	for _, exam := range category.Edges.Exams {
+	for _, examGroup := range category.Edges.Groups {
 		categoryExamType := models.CategoryExamType{
-			Id:           exam.ID,
-			ExamName:     exam.Name,
+			Id:           examGroup.ID,
+			ExamName:     examGroup.Name,
 			CategoryId:   category.ID,
-			IsActive:     exam.IsActive,
-			Description:  exam.Description,
-			TypeOfExam:   exam.Type.String(),
+			IsActive:     examGroup.IsActive,
+			Description:  examGroup.Description,
 			CategoryName: category.Name.String(),
-			LogoUrl:      exam.LogoURL,
+			LogoUrl:      examGroup.LogoURL,
 		}
 
 		categoryExamTypes = append(categoryExamTypes, categoryExamType)

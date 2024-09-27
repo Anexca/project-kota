@@ -89,7 +89,7 @@ type CategoryExamType struct {
 	Id           int    `json:"exam_type_id"`
 	ExamName     string `json:"exam_name"`
 	Description  string `json:"description"`
-	TypeOfExam   string `json:"type_of_exam"`
+	TypeOfExam   string `json:"type_of_exam,omitempty"`
 	IsActive     bool   `json:"is_active"`
 	CategoryName string `json:"category_name,omitempty"`
 	CategoryId   int    `json:"category_id,omitempty"`
