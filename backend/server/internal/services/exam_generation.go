@@ -22,6 +22,7 @@ type ExamGenerationService struct {
 	accessService           *AccessService
 	redisService            *commonServices.RedisService
 	examRepository          *commonRepositories.ExamRepository
+	examGroupRepository     *commonRepositories.ExamGroupRepository
 	generatedExamRepository *commonRepositories.GeneratedExamRepository
 	examCategoryRepository  *commonRepositories.ExamCategoryRepository
 	examSettingRepository   *commonRepositories.ExamSettingRepository
@@ -33,6 +34,7 @@ func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *
 	redisService := commonServices.NewRedisService(redisClient)
 	accessService := NewAccessService(dbClient)
 	examRepository := commonRepositories.NewExamRespository(dbClient)
+	examGroupRepository := commonRepositories.NewExamGroupRepository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	cachedExamRepository := commonRepositories.NewCachedExamRepository(dbClient)
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
@@ -43,6 +45,7 @@ func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *
 		accessService:           accessService,
 		redisService:            redisService,
 		examRepository:          examRepository,
+		examGroupRepository:     examGroupRepository,
 		examCategoryRepository:  examCategoryRepository,
 		cachedExamRepository:    cachedExamRepository,
 		generatedExamRepository: generatedExamRepository,
@@ -221,6 +224,39 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	}
 
 	return nil
+}
+
+func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examCategory commonConstants.ExamCategoryName, examType commonConstants.ExamType, examGroupId int, userId string) ([]*models.GeneratedExamOverview, error) {
+	examGroup, err := e.examGroupRepository.GetActiveByIdWithExams(ctx, examGroupId, true, examCategory, examType)
+	if err != nil {
+		return nil, err
+	}
+
+	hasAccess, err := e.accessService.UserHasAccessToExams(ctx, examGroup.Edges.Exams, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check access: %w", err)
+	}
+
+	if !hasAccess {
+		return nil, errors.New("forbidden")
+	}
+
+	var generatedExamsOverview []*models.GeneratedExamOverview
+
+	for _, exam := range examGroup.Edges.Exams {
+		sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
+
+		limit := min(26, len(sortedExams))
+		latestExams := sortedExams[:limit]
+		list, err := e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		generatedExamsOverview = append(generatedExamsOverview, list...)
+	}
+
+	return generatedExamsOverview, nil
 }
 
 func (e *ExamGenerationService) GetGeneratedExamsByExamId(ctx context.Context, examCategory commonConstants.ExamCategoryName, examType commonConstants.ExamType, examId int, userId string) ([]*models.GeneratedExamOverview, error) {
