@@ -65,6 +65,11 @@ func Stage(v string) predicate.Exam {
 	return predicate.Exam(sql.FieldEQ(FieldStage, v))
 }
 
+// IsSectional applies equality check predicate on the "is_sectional" field. It's identical to IsSectionalEQ.
+func IsSectional(v bool) predicate.Exam {
+	return predicate.Exam(sql.FieldEQ(FieldIsSectional, v))
+}
+
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Exam {
 	return predicate.Exam(sql.FieldEQ(FieldDescription, v))
@@ -228,6 +233,26 @@ func StageEqualFold(v string) predicate.Exam {
 // StageContainsFold applies the ContainsFold predicate on the "stage" field.
 func StageContainsFold(v string) predicate.Exam {
 	return predicate.Exam(sql.FieldContainsFold(FieldStage, v))
+}
+
+// IsSectionalEQ applies the EQ predicate on the "is_sectional" field.
+func IsSectionalEQ(v bool) predicate.Exam {
+	return predicate.Exam(sql.FieldEQ(FieldIsSectional, v))
+}
+
+// IsSectionalNEQ applies the NEQ predicate on the "is_sectional" field.
+func IsSectionalNEQ(v bool) predicate.Exam {
+	return predicate.Exam(sql.FieldNEQ(FieldIsSectional, v))
+}
+
+// IsSectionalIsNil applies the IsNil predicate on the "is_sectional" field.
+func IsSectionalIsNil() predicate.Exam {
+	return predicate.Exam(sql.FieldIsNull(FieldIsSectional))
+}
+
+// IsSectionalNotNil applies the NotNil predicate on the "is_sectional" field.
+func IsSectionalNotNil() predicate.Exam {
+	return predicate.Exam(sql.FieldNotNull(FieldIsSectional))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

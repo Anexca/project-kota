@@ -42,16 +42,20 @@ func init() {
 	cachedexam.UpdateDefaultUpdatedAt = cachedexamDescUpdatedAt.UpdateDefault.(func() time.Time)
 	examFields := schema.Exam{}.Fields()
 	_ = examFields
+	// examDescIsSectional is the schema descriptor for is_sectional field.
+	examDescIsSectional := examFields[2].Descriptor()
+	// exam.DefaultIsSectional holds the default value on creation for the is_sectional field.
+	exam.DefaultIsSectional = examDescIsSectional.Default.(bool)
 	// examDescIsActive is the schema descriptor for is_active field.
-	examDescIsActive := examFields[4].Descriptor()
+	examDescIsActive := examFields[5].Descriptor()
 	// exam.DefaultIsActive holds the default value on creation for the is_active field.
 	exam.DefaultIsActive = examDescIsActive.Default.(bool)
 	// examDescCreatedAt is the schema descriptor for created_at field.
-	examDescCreatedAt := examFields[6].Descriptor()
+	examDescCreatedAt := examFields[7].Descriptor()
 	// exam.DefaultCreatedAt holds the default value on creation for the created_at field.
 	exam.DefaultCreatedAt = examDescCreatedAt.Default.(func() time.Time)
 	// examDescUpdatedAt is the schema descriptor for updated_at field.
-	examDescUpdatedAt := examFields[7].Descriptor()
+	examDescUpdatedAt := examFields[8].Descriptor()
 	// exam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	exam.DefaultUpdatedAt = examDescUpdatedAt.Default.(func() time.Time)
 	// exam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

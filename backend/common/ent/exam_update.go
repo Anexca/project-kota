@@ -68,6 +68,26 @@ func (eu *ExamUpdate) ClearStage() *ExamUpdate {
 	return eu
 }
 
+// SetIsSectional sets the "is_sectional" field.
+func (eu *ExamUpdate) SetIsSectional(b bool) *ExamUpdate {
+	eu.mutation.SetIsSectional(b)
+	return eu
+}
+
+// SetNillableIsSectional sets the "is_sectional" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableIsSectional(b *bool) *ExamUpdate {
+	if b != nil {
+		eu.SetIsSectional(*b)
+	}
+	return eu
+}
+
+// ClearIsSectional clears the value of the "is_sectional" field.
+func (eu *ExamUpdate) ClearIsSectional() *ExamUpdate {
+	eu.mutation.ClearIsSectional()
+	return eu
+}
+
 // SetDescription sets the "description" field.
 func (eu *ExamUpdate) SetDescription(s string) *ExamUpdate {
 	eu.mutation.SetDescription(s)
@@ -391,6 +411,12 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if eu.mutation.StageCleared() {
 		_spec.ClearField(exam.FieldStage, field.TypeString)
 	}
+	if value, ok := eu.mutation.IsSectional(); ok {
+		_spec.SetField(exam.FieldIsSectional, field.TypeBool, value)
+	}
+	if eu.mutation.IsSectionalCleared() {
+		_spec.ClearField(exam.FieldIsSectional, field.TypeBool)
+	}
 	if value, ok := eu.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 	}
@@ -682,6 +708,26 @@ func (euo *ExamUpdateOne) SetNillableStage(s *string) *ExamUpdateOne {
 // ClearStage clears the value of the "stage" field.
 func (euo *ExamUpdateOne) ClearStage() *ExamUpdateOne {
 	euo.mutation.ClearStage()
+	return euo
+}
+
+// SetIsSectional sets the "is_sectional" field.
+func (euo *ExamUpdateOne) SetIsSectional(b bool) *ExamUpdateOne {
+	euo.mutation.SetIsSectional(b)
+	return euo
+}
+
+// SetNillableIsSectional sets the "is_sectional" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableIsSectional(b *bool) *ExamUpdateOne {
+	if b != nil {
+		euo.SetIsSectional(*b)
+	}
+	return euo
+}
+
+// ClearIsSectional clears the value of the "is_sectional" field.
+func (euo *ExamUpdateOne) ClearIsSectional() *ExamUpdateOne {
+	euo.mutation.ClearIsSectional()
 	return euo
 }
 
@@ -1037,6 +1083,12 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if euo.mutation.StageCleared() {
 		_spec.ClearField(exam.FieldStage, field.TypeString)
+	}
+	if value, ok := euo.mutation.IsSectional(); ok {
+		_spec.SetField(exam.FieldIsSectional, field.TypeBool, value)
+	}
+	if euo.mutation.IsSectionalCleared() {
+		_spec.ClearField(exam.FieldIsSectional, field.TypeBool)
 	}
 	if value, ok := euo.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)

@@ -20,6 +20,7 @@ func (Exam) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("stage").Optional(),
+		field.Bool("is_sectional").Optional().Default(true),
 		field.String("description"),
 		field.Enum("type").
 			Values(

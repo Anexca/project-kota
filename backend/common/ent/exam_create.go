@@ -46,6 +46,20 @@ func (ec *ExamCreate) SetNillableStage(s *string) *ExamCreate {
 	return ec
 }
 
+// SetIsSectional sets the "is_sectional" field.
+func (ec *ExamCreate) SetIsSectional(b bool) *ExamCreate {
+	ec.mutation.SetIsSectional(b)
+	return ec
+}
+
+// SetNillableIsSectional sets the "is_sectional" field if the given value is not nil.
+func (ec *ExamCreate) SetNillableIsSectional(b *bool) *ExamCreate {
+	if b != nil {
+		ec.SetIsSectional(*b)
+	}
+	return ec
+}
+
 // SetDescription sets the "description" field.
 func (ec *ExamCreate) SetDescription(s string) *ExamCreate {
 	ec.mutation.SetDescription(s)
@@ -259,6 +273,10 @@ func (ec *ExamCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ec *ExamCreate) defaults() {
+	if _, ok := ec.mutation.IsSectional(); !ok {
+		v := exam.DefaultIsSectional
+		ec.mutation.SetIsSectional(v)
+	}
 	if _, ok := ec.mutation.GetType(); !ok {
 		v := exam.DefaultType
 		ec.mutation.SetType(v)
@@ -335,6 +353,10 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.Stage(); ok {
 		_spec.SetField(exam.FieldStage, field.TypeString, value)
 		_node.Stage = value
+	}
+	if value, ok := ec.mutation.IsSectional(); ok {
+		_spec.SetField(exam.FieldIsSectional, field.TypeBool, value)
+		_node.IsSectional = value
 	}
 	if value, ok := ec.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)

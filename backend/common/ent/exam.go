@@ -24,6 +24,8 @@ type Exam struct {
 	Name string `json:"name,omitempty"`
 	// Stage holds the value of the "stage" field.
 	Stage string `json:"stage,omitempty"`
+	// IsSectional holds the value of the "is_sectional" field.
+	IsSectional bool `json:"is_sectional,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Type holds the value of the "type" field.
@@ -130,7 +132,7 @@ func (*Exam) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case exam.FieldIsActive:
+		case exam.FieldIsSectional, exam.FieldIsActive:
 			values[i] = new(sql.NullBool)
 		case exam.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -174,6 +176,12 @@ func (e *Exam) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field stage", values[i])
 			} else if value.Valid {
 				e.Stage = value.String
+			}
+		case exam.FieldIsSectional:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_sectional", values[i])
+			} else if value.Valid {
+				e.IsSectional = value.Bool
 			}
 		case exam.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -296,6 +304,9 @@ func (e *Exam) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("stage=")
 	builder.WriteString(e.Stage)
+	builder.WriteString(", ")
+	builder.WriteString("is_sectional=")
+	builder.WriteString(fmt.Sprintf("%v", e.IsSectional))
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(e.Description)
