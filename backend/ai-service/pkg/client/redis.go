@@ -1,12 +1,13 @@
 package client
 
 import (
-	"ai-service/pkg/config"
 	"context"
 	"fmt"
 	"log"
 
 	"github.com/redis/go-redis/v9"
+
+	"ai-service/pkg/config"
 )
 
 func NewRedisClient(ctx context.Context) (*redis.Client, error) {

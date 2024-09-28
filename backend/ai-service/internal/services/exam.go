@@ -1,18 +1,19 @@
 package services
 
 import (
-	commonConstants "common/constants"
-	"common/ent"
-	commonRepositories "common/repositories"
-	commonService "common/services"
-	commonUtil "common/util"
 	"context"
 	"fmt"
 	"log"
 	"time"
 
 	"cloud.google.com/go/vertexai/genai"
+	"common/ent"
 	"github.com/redis/go-redis/v9"
+
+	commonConstants "common/constants"
+	commonRepositories "common/repositories"
+	commonService "common/services"
+	commonUtil "common/util"
 )
 
 type ExamService struct {

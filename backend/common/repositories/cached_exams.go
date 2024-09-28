@@ -1,11 +1,12 @@
 package repositories
 
 import (
+	"context"
+	"time"
+
 	"common/ent"
 	"common/ent/cachedexam"
 	"common/ent/exam"
-	"context"
-	"time"
 )
 
 type CachedExamRepository struct {

@@ -1,12 +1,13 @@
 package client
 
 import (
-	"ai-service/pkg/config"
 	"context"
 	"fmt"
 	"log"
 
 	"cloud.google.com/go/vertexai/genai"
+
+	"ai-service/pkg/config"
 )
 
 func NewGeminiClient(ctx context.Context) (*genai.Client, error) {

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	commonConstants "common/constants"
-
 	"cloud.google.com/go/vertexai/genai"
 	"google.golang.org/api/iterator"
+
+	commonConstants "common/constants"
 )
 
 type GenAIService struct {

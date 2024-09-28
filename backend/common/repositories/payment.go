@@ -1,14 +1,15 @@
 package repositories
 
 import (
-	"common/ent"
-	"common/ent/payment"
-	"common/ent/user"
 	"context"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
+
+	"common/ent"
+	"common/ent/payment"
+	"common/ent/user"
 )
 
 type PaymentRepository struct {

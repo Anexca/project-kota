@@ -1,6 +1,12 @@
 package repositories
 
 import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/google/uuid"
+
 	"common/ent"
 	"common/ent/exam"
 	"common/ent/examassesment"
@@ -8,11 +14,6 @@ import (
 	"common/ent/examcategory"
 	"common/ent/generatedexam"
 	"common/ent/user"
-	"context"
-	"fmt"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 type GeneratedExamRepository struct {
@@ -90,9 +91,9 @@ func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExam
 		Only(ctx)
 }
 
-func (q GeneratedExamRepository) GetActiveById(ctx context.Context, generatedExamId int, IsActive bool) (*ent.GeneratedExam, error) {
+func (q GeneratedExamRepository) GetActiveById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
-		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(IsActive)).
+		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(isActive)).
 		WithExam().
 		Only(ctx)
 }
@@ -161,6 +162,7 @@ func (q *GeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.E
 		Limit(limit).
 		All(ctx)
 }
+
 func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
@@ -185,11 +187,12 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 				attemptQuery.WithAssesment().
 					Order(ent.Desc(examattempt.FieldUpdatedAt))
 
-				if from != nil && to != nil {
+				switch {
+				case from != nil && to != nil:
 					attemptQuery.Where(examattempt.UpdatedAtGTE(*from), examattempt.UpdatedAtLTE(*to))
-				} else if from != nil {
+				case from != nil:
 					attemptQuery.Where(examattempt.UpdatedAtGTE(*from))
-				} else if to != nil {
+				case to != nil:
 					attemptQuery.Where(examattempt.UpdatedAtLTE(*to))
 				}
 			},
@@ -226,11 +229,12 @@ func (q *GeneratedExamRepository) GetCountOfFilteredExamsDataByUserAndDate(ctx c
 		query = query.Where(generatedexam.HasExamWith(exam.HasCategoryWith(examcategory.IDEQ(*categoryID))))
 	}
 
-	if from != nil && to != nil {
+	switch {
+	case from != nil && to != nil:
 		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtGTE(*from), examattempt.UpdatedAtLTE(*to)))
-	} else if from != nil {
+	case from != nil:
 		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtGTE(*from)))
-	} else if to != nil {
+	case to != nil:
 		query = query.Where(generatedexam.HasAttemptsWith(examattempt.UpdatedAtLTE(*to)))
 	}
 

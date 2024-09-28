@@ -1,12 +1,13 @@
 package schema
 
 import (
-	"common/constants"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"common/constants"
 )
 
 // ExamCategory holds the schema definition for the ExamCategory entity.

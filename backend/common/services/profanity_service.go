@@ -1,9 +1,9 @@
 package services
 
 import (
-	"common/constants"
-
 	goaway "github.com/TwiN/go-away"
+
+	"common/constants"
 )
 
 type ProfanityService struct {

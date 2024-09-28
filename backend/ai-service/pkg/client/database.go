@@ -1,17 +1,19 @@
 package client
 
 import (
-	"ai-service/pkg/config"
-	"common/ent"
 	"context"
 	"fmt"
 	"log"
 
+	"common/ent"
 	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
+
+	entsql "entgo.io/ent/dialect/sql"
+
+	"ai-service/pkg/config"
 )
 
 func NewDbClient(ctx context.Context) (*ent.Client, error) {

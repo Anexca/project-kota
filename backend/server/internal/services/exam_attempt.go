@@ -1,14 +1,17 @@
 package services
 
 import (
-	"common/ent"
-	commonRepositories "common/repositories"
 	"context"
 	"errors"
 	"fmt"
 	"math"
-	"server/pkg/models"
 	"time"
+
+	"common/ent"
+
+	commonRepositories "common/repositories"
+
+	"server/pkg/models"
 )
 
 type ExamAttemptService struct {

@@ -1,20 +1,22 @@
 package server
 
 import (
-	commonConfig "common/config"
-	commonService "common/services"
-
-	"common/ent"
 	"fmt"
 	"net/http"
 	"os"
-	"server/internal/services"
 	"strconv"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
+	"common/ent"
 	"github.com/nedpals/supabase-go"
 	"github.com/redis/go-redis/v9"
+
+	_ "github.com/joho/godotenv/autoload"
+
+	commonConfig "common/config"
+	commonService "common/services"
+
+	"server/internal/services"
 )
 
 type Server struct {

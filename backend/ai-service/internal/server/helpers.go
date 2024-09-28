@@ -146,3 +146,14 @@ func getErrorMessage(fieldError validator.FieldError) string {
 		return "Invalid value"
 	}
 }
+
+func (s *Server) HandleError(w http.ResponseWriter, err error, msg string, statusCode int) {
+	if err != nil {
+		log.Println(err)
+
+		responseError := s.ErrorJson(w, errors.New(msg), statusCode)
+		if responseError != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		}
+	}
+}

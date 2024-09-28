@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"server/internal/middlewares"
-	"server/pkg/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+
+	"server/internal/middlewares"
+	"server/pkg/config"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -106,7 +107,10 @@ func (s *Server) Sup(w http.ResponseWriter, r *http.Request) {
 		Message: "Sup",
 	}
 
-	s.WriteJson(w, http.StatusOK, &response)
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -114,6 +118,8 @@ func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	response := Response{
 		Data: string(jsonResp),
 	}
-	s.WriteJson(w, http.StatusOK, &response)
-
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+	}
 }
