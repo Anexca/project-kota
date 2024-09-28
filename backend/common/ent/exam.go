@@ -29,6 +29,8 @@ type Exam struct {
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
 	// LogoURL holds the value of the "logo_url" field.
+	//
+	// Deprecated: Field "logo_url" was marked as deprecated in the schema.
 	LogoURL string `json:"logo_url,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
