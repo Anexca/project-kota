@@ -11,10 +11,10 @@ const QuestionSelector = ({ questions, onQuestionNumberClick }: Props) => {
       {questions.map((_, index) => (
         <Button
           onClick={() => onQuestionNumberClick(index)}
-          className="p-2 shadow"
-          variant={"secondary"}
+          className="shadow !p-0"
+          variant={"ghost"}
         >
-          {index + 1}
+          <span className="p-2 bg-white w-full rounded">{index + 1}</span>
         </Button>
       ))}
     </div>

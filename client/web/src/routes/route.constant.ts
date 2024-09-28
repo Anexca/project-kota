@@ -20,3 +20,7 @@ export enum paths {
   PRICING_PLAN = "pricing-plan",
   MY_TRANSACTIONS = "my-transactions",
 }
+
+export enum ExamDomain {
+  banking = "banking",
+}

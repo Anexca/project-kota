@@ -4,7 +4,7 @@ import { Label } from "../../base/label/label";
 import { RadioGroup, RadioGroupItem } from "../../base/radio-group/radio-group";
 
 type Props = {
-  options: { label: string; value: string }[];
+  options: string[];
   selected: string | null;
   onChange: (data: string) => void;
   name: string;
@@ -21,13 +21,13 @@ const AnswerOptions = ({ options, selected, onChange, name }: Props) => {
       {options.map((item) => (
         <div
           className={cn(
-            "flex items-center space-x-2 px-4 py-2 rounded border shadow bg-white",
-            selected == item.value && "bg-slate-200"
+            "flex items-center space-x-2 px-4 py-2 rounded shadow bg-white",
+            selected == item && "bg-info/15 color-info"
           )}
         >
-          <RadioGroupItem value={item.value} id={item.value} />
-          <Label htmlFor={item.value}>
-            <MathJax>{item.label}</MathJax>
+          <RadioGroupItem value={item} id={item} />
+          <Label htmlFor={item}>
+            <MathJax>{item}</MathJax>
           </Label>
         </div>
       ))}

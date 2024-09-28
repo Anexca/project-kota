@@ -17,7 +17,7 @@ export interface IQuestion {
   updated_at: string;
 }
 
-export const typeOfExam = ["DESCRIPTIVE"] as const;
+export const typeOfExam = ["DESCRIPTIVE", "MCQ"] as const;
 export const categoryOfExam = ["BANKING"] as const;
 export interface ICategory {
   exam_type_id: number;
@@ -28,4 +28,42 @@ export interface ICategory {
   category_name: (typeof categoryOfExam)[number];
   category_id: number;
   logo_url: string;
+}
+
+export interface IMCQExam {
+  id: number;
+  exam_type: string;
+  exam_name: string;
+  user_attempts: number;
+  max_attempts: number;
+  duration_seconds: number;
+  number_of_questions: number;
+  negative_marking: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IMCQQuestionSet {
+  id: number;
+  exam_type: string;
+  exam_name: string;
+  raw_exam_data: {
+    exam_content: IMCQQuestion[];
+  };
+  user_attempts: number;
+  max_attempts: number;
+  duration_seconds: number;
+  number_of_questions: number;
+  negative_marking: number;
+  created_at: string;
+  updated_at: string;
+}
+export interface IMCQQuestion {
+  answer: string;
+  content: string;
+  explanation: string;
+  note: string;
+  options: string[];
+  question: string;
+  question_number: number;
 }
