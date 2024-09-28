@@ -280,7 +280,16 @@ func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examT
 		return nil, fmt.Errorf("failed to get exam by name: %w", err)
 	}
 
-	return e.buildGeneratedExamOverviewList(ctx, generatedExams, exam, userId)
+	exams, err := e.buildGeneratedExamOverviewList(ctx, generatedExams, exam, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, e := range exams {
+		e.UserHasAccessToExam = true // always true for open exams
+	}
+
+	return exams, nil
 }
 
 func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) {
@@ -313,6 +322,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	examOverview := e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts)
 	examOverview.ExamName = generatedExam.Edges.Exam.Name
 	examOverview.ExamType = generatedExam.Edges.Exam.Type.String()
+	examOverview.UserHasAccessToExam = true
 
 	return examOverview, nil
 }

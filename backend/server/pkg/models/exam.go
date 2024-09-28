@@ -42,7 +42,7 @@ type GeneratedExamOverview struct {
 	DurationSeconds     int                    `json:"duration_seconds"`
 	NumberOfQuestions   int                    `json:"number_of_questions"`
 	NegativeMarking     float64                `json:"negative_marking,omitempty"`
-	UserHasAccessToExam bool                   `json:"has_access"`
+	UserHasAccessToExam bool                   `json:"has_access,omitempty"`
 	CreatedAt           time.Time              `json:"created_at"`
 	UpdatedAt           time.Time              `json:"updated_at"`
 }
