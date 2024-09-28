@@ -3,23 +3,23 @@ repos:
     rev: v4.3.0
     hooks:
       - id: trailing-whitespace
-        files: "./backend/*"
+        files: "^backend/.*"
       - id: end-of-file-fixer
-        files: "./backend/*"
+        files: "^backend/.*"
       - id: check-yaml
-        files: "./backend/*"
+        files: "^backend/.*"
       - id: check-added-large-files
-        files: "./backend/*"
+        files: "^backend/.*"
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.0
     hooks:
       - id: go-fmt
-        files: "./backend/*"
+        files: "^backend/.*"
       - id: go-imports
-        files: "./backend/*"
+        files: "^backend/.*"
       - id: no-go-testing
-        files: "./backend/*"
+        files: "^backend/.*"
       - id: golangci-lint
-        files: "./backend/*"
+        files: "^backend/.*"
       - id: go-unit-tests
-        files: "./backend/*"
+        files: "^backend/.*"
