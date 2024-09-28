@@ -32,8 +32,8 @@ func InitWorkers(redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 }
 
 func (w *Worker) RegisterWorkers() {
-	_, err := w.cronHandler.AddFunc("*/1 * * * *", func() {
-		// _, err := w.cronHandler.AddFunc("0 4 * * *", func() {
+	// _, err := w.cronHandler.AddFunc("*/1 * * * *", func() {
+	_, err := w.cronHandler.AddFunc("0 4 * * *", func() {
 		log.Println("Starting Worker Job for Adding Descriptive Question in Database")
 
 		// err := w.AddDescriptiveQuestionsInDatabase()
