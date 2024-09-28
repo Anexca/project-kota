@@ -1,9 +1,6 @@
 package server
 
 import (
-	"ai-service/internal/services"
-	commonConfig "common/config"
-	commonService "common/services"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,8 +8,14 @@ import (
 	"time"
 
 	"cloud.google.com/go/vertexai/genai"
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/redis/go-redis/v9"
+
+	_ "github.com/joho/godotenv/autoload"
+
+	commonConfig "common/config"
+	commonService "common/services"
+
+	"ai-service/internal/services"
 )
 
 type Server struct {

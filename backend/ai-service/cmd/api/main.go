@@ -1,12 +1,13 @@
 package main
 
 import (
-	"ai-service/internal/server"
-	"ai-service/internal/workers"
-	"ai-service/pkg/client"
 	"context"
 	"fmt"
 	"log"
+
+	"ai-service/internal/server"
+	"ai-service/internal/workers"
+	"ai-service/pkg/client"
 )
 
 func main() {

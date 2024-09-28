@@ -1,12 +1,13 @@
 package server
 
 import (
-	"ai-service/internal/middlewares"
 	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	"ai-service/internal/middlewares"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {

@@ -1,13 +1,14 @@
 package services
 
 import (
-	commonConstants "common/constants"
+	"context"
 	"strings"
 
-	"ai-service/pkg/models"
-	"context"
-
 	"cloud.google.com/go/vertexai/genai"
+
+	commonConstants "common/constants"
+
+	"ai-service/pkg/models"
 )
 
 type PromptService struct {

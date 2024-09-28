@@ -1,14 +1,15 @@
 package workers
 
 import (
-	"ai-service/internal/services"
-	"common/ent"
 	"context"
 	"log"
 
 	"cloud.google.com/go/vertexai/genai"
+	"common/ent"
 	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
+
+	"ai-service/internal/services"
 )
 
 type Worker struct {
