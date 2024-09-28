@@ -34,7 +34,7 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient 
 }
 
 func (w *Worker) RegisterWorkers() {
-	// w.cronHandler.AddFunc("*/5 * * * *", func() {
+	// _, err := w.cronHandler.AddFunc("*/5 * * * *", func() {
 	_, err := w.cronHandler.AddFunc("0 3 * * *", func() {
 		log.Println("Starting Worker Job for Populating Exam Question Cache")
 		ctx := context.Background()

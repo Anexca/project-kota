@@ -19,17 +19,23 @@ type DescriptiveExam struct {
 }
 
 type GeneratedMCQExam struct {
-	ExamContent []MCQExam `json:"exam_content"`
+	Questions     []MCQExamQuestion     `json:"questions"`
+	ContentGroups []MCQExamContentGroup `json:"content_groups"`
 }
 
-type MCQExam struct {
-	Note           string      `json:"note,omitempty"`
-	Content        interface{} `json:"content,omitempty"`
-	Question       string      `json:"question"`
-	QuestionNumber int         `json:"question_number"`
-	Answer         string      `json:"answer"`
-	Options        []string    `json:"options"`
-	Explanation    string      `json:"explanation"`
+type MCQExamQuestion struct {
+	ContentReferenceId string   `json:"content_reference_id"`
+	Question           string   `json:"question"`
+	QuestionNumber     int      `json:"question_number"`
+	Answer             string   `json:"answer"`
+	Options            []string `json:"options"`
+	Explanation        string   `json:"explanation"`
+}
+
+type MCQExamContentGroup struct {
+	ContentId    string      `json:"content_id"`
+	Instructions string      `json:"instructions"`
+	Content      interface{} `json:"content"` // String or Object depending on the content type
 }
 
 type GeneratedExamOverview struct {

@@ -172,59 +172,73 @@ func (e *ExamGenerationService) FetchCachedExamData(ctx context.Context, exam *e
 }
 
 func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.Exam, modelType models.ExamModelType, cachedData string) error {
-	switch modelType {
-	case models.DescriptiveExamType:
-		var descriptiveExams []models.DescriptiveExam
+	log.Printf("Processing exam data for exam ID: %d, modelType: %v", exam.ID, modelType)
 
+	switch modelType {
+
+	case models.DescriptiveExamType:
+		log.Printf("Processing as DescriptiveExam for exam ID: %d", exam.ID)
+
+		var descriptiveExams []models.DescriptiveExam
 		err := json.Unmarshal([]byte(cachedData), &descriptiveExams)
 		if err != nil {
+			log.Printf("Failed to unmarshal descriptive exam data for exam ID: %d, error: %v", exam.ID, err)
 			return fmt.Errorf("failed to validate cached data for DescriptiveExam: %w", err)
 		}
+		log.Printf("Successfully unmarshalled descriptive exams for exam ID: %d", exam.ID)
 
 		var exams []any
-
 		err = json.Unmarshal([]byte(cachedData), &exams)
 		if err != nil {
+			log.Printf("Error generating descriptive exam from cached data for exam ID: %d, error: %v", exam.ID, err)
 			return fmt.Errorf("failed to generate DescriptiveExam: %w", err)
 		}
+		log.Printf("Successfully generated descriptive exams for exam ID: %d", exam.ID)
 
 		_, err = e.generatedExamRepository.AddMany(ctx, exams, exam)
 		if err != nil {
-			return fmt.Errorf("failed to generate DescriptiveExams : %w", err)
+			log.Printf("Failed to add descriptive exams to repository for exam ID: %d, error: %v", exam.ID, err)
+			return fmt.Errorf("failed to generate DescriptiveExams: %w", err)
 		}
+		log.Printf("Successfully added descriptive exams to the repository for exam ID: %d", exam.ID)
 
 	case models.MCQExamType:
-		var mcqExams []models.MCQExam
+		log.Printf("Processing as MCQExam for exam ID: %d", exam.ID)
 
+		var mcqExams models.GeneratedMCQExam
 		err := json.Unmarshal([]byte(cachedData), &mcqExams)
 		if err != nil {
+			log.Printf("Failed to unmarshal MCQ exam data for exam ID: %d, error: %v", exam.ID, err)
 			return fmt.Errorf("failed to validate cached data for MCQ Exam: %w", err)
 		}
+		log.Printf("Successfully unmarshalled MCQ exams for exam ID: %d", exam.ID)
 
-		generatedMCQExam := models.GeneratedMCQExam{
-			ExamContent: mcqExams,
-		}
-
-		jsonData, err := json.Marshal(generatedMCQExam)
+		jsonData, err := json.Marshal(mcqExams)
 		if err != nil {
-			log.Fatalf("Failed to marshal struct to JSON: %v", err)
+			log.Fatalf("Failed to marshal MCQ exams struct to JSON for exam ID: %d, error: %v", exam.ID, err)
 		}
+		log.Printf("Successfully marshalled MCQ exams to JSON for exam ID: %d", exam.ID)
 
 		var result map[string]interface{}
 		err = json.Unmarshal(jsonData, &result)
 		if err != nil {
-			log.Fatalf("Failed to unmarshal JSON into map: %v", err)
+			log.Fatalf("Failed to unmarshal JSON data for exam ID: %d into map, error: %v", exam.ID, err)
 		}
+		log.Printf("Successfully unmarshalled JSON into map for exam ID: %d", exam.ID)
 
 		_, err = e.generatedExamRepository.Add(ctx, result, exam.ID)
 		if err != nil {
-			return fmt.Errorf("failed to generate MCQ Exam : %w", err)
+			log.Printf("Failed to add MCQ exams to repository for exam ID: %d, error: %v", exam.ID, err)
+			return fmt.Errorf("failed to generate MCQ Exam: %w", err)
 		}
+		log.Printf("Successfully added MCQ exams to the repository for exam ID: %d", exam.ID)
 
 	default:
+		log.Printf("Unsupported exam model type for exam ID: %d", exam.ID)
 		return fmt.Errorf("unsupported exam model type")
 	}
 
+	log.Printf("Completed processing exam data for exam ID: %d", exam.ID)
 	return nil
 }
 
