@@ -1,17 +1,17 @@
 package client
 
 import (
-	"common/ent"
 	"context"
 	"fmt"
 	"log"
-	"server/pkg/config"
 
+	"common/ent"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
+	"server/pkg/config"
 )
 
 func NewDbClient(ctx context.Context) (*ent.Client, error) {

@@ -1,12 +1,13 @@
 package server
 
 import (
-	"common/ent"
 	"errors"
 	"net/http"
-	"server/pkg/constants"
 	"strconv"
 	"strings"
+
+	"common/ent"
+	"server/pkg/constants"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -35,12 +36,12 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if strings.Contains("user already has active subscription", err.Error()) {
+		if strings.Contains(err.Error(), "user already has active subscription") {
 			s.HandleError(w, err, "user already has active subscription", http.StatusBadRequest)
 			return
 		}
 
-		if strings.Contains("payment for subscription was not successful", err.Error()) {
+		if strings.Contains(err.Error(), "payment for subscription was not successful") {
 			s.HandleError(w, err, "payment for subscription was not successful", http.StatusBadRequest)
 			return
 		}

@@ -1,16 +1,15 @@
 package server
 
 import (
-	"common/ent"
 	"errors"
-	"server/internal/services"
-	"server/pkg/constants"
+	"net/http"
 	"strconv"
 	"strings"
 
-	"net/http"
-
+	"common/ent"
 	"github.com/go-chi/chi/v5"
+	"server/internal/services"
+	"server/pkg/constants"
 )
 
 func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.Request) {

@@ -1,14 +1,14 @@
 package services
 
 import (
-	"common/ent"
-	"common/repositories"
 	"context"
 	"fmt"
-	"server/pkg/models"
 	"time"
 
+	"common/ent"
+	"common/repositories"
 	"github.com/google/uuid"
+	"server/pkg/models"
 )
 
 type UserService struct {

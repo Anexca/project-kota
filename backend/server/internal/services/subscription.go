@@ -1,16 +1,17 @@
 package services
 
 import (
-	"common/ent"
-	"common/ent/usersubscription"
-	commonRepositories "common/repositories"
 	"context"
 	"errors"
 	"fmt"
 	"log"
+	"time"
+
+	"common/ent"
+	"common/ent/usersubscription"
+	commonRepositories "common/repositories"
 	"server/pkg/config"
 	"server/pkg/models"
-	"time"
 
 	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
 )
@@ -201,15 +202,17 @@ func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, t
 }
 
 func determinePaymentMethod(transaction *cashfree_pg.PaymentEntityPaymentMethod) string {
-	if transaction.PaymentMethodUPIInPaymentsEntity != nil {
+	switch {
+	case transaction.PaymentMethodUPIInPaymentsEntity != nil:
 		return "UPI"
-	} else if transaction.PaymentMethodCardInPaymentsEntity != nil {
+	case transaction.PaymentMethodCardInPaymentsEntity != nil:
 		return "Card"
-	} else if transaction.PaymentMethodNetBankingInPaymentsEntity != nil {
+	case transaction.PaymentMethodNetBankingInPaymentsEntity != nil:
 		return "Netbanking"
+	// Add more cases for other payment methods as needed
+	default:
+		return "Unknown"
 	}
-	// Add more checks for other payment methods as needed
-	return "Unknown"
 }
 
 func (s *SubscriptionService) UserHasActiveSubscription(ctx context.Context, subscription *ent.Subscription, user *ent.User) (bool, error) {

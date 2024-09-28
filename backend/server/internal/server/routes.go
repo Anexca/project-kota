@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"server/internal/middlewares"
-	"server/pkg/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"server/internal/middlewares"
+	"server/pkg/config"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {

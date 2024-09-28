@@ -1,12 +1,12 @@
 package workers
 
 import (
-	"common/ent"
 	"log"
-	"server/internal/services"
 
+	"common/ent"
 	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
+	"server/internal/services"
 )
 
 type Worker struct {

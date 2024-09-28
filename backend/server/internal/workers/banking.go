@@ -1,9 +1,10 @@
 package workers
 
 import (
-	commonConstants "common/constants"
 	"context"
 	"log"
+
+	commonConstants "common/constants"
 	"server/pkg/models"
 )
 

@@ -1,12 +1,13 @@
 package server
 
 import (
-	"common/ent"
 	"errors"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"common/ent"
 )
 
 func (s *Server) GetOpenQuestions(w http.ResponseWriter, r *http.Request) {

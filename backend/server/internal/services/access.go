@@ -1,10 +1,11 @@
 package services
 
 import (
-	"common/ent"
-	"common/repositories"
 	"context"
 	"time"
+
+	"common/ent"
+	"common/repositories"
 )
 
 type AccessService struct {

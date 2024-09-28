@@ -1,20 +1,20 @@
 package services
 
 import (
-	commonConstants "common/constants"
-	"common/ent"
-	"common/ent/exam"
-	commonRepositories "common/repositories"
-	commonServices "common/services"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"server/pkg/models"
 	"sort"
 
+	commonConstants "common/constants"
+	"common/ent"
+	"common/ent/exam"
+	commonRepositories "common/repositories"
+	commonServices "common/services"
 	"github.com/redis/go-redis/v9"
+	"server/pkg/models"
 )
 
 type ExamGenerationService struct {
