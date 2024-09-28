@@ -10,10 +10,12 @@ import (
 
 	"common/constants"
 	"common/ent"
+	"github.com/redis/go-redis/v9"
+
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 	goaway "github.com/TwiN/go-away"
-	"github.com/redis/go-redis/v9"
+
 	"server/pkg/models"
 )
 

@@ -8,12 +8,14 @@ import (
 	"log"
 	"sort"
 
-	commonConstants "common/constants"
 	"common/ent"
 	"common/ent/exam"
+	"github.com/redis/go-redis/v9"
+
+	commonConstants "common/constants"
 	commonRepositories "common/repositories"
 	commonServices "common/services"
-	"github.com/redis/go-redis/v9"
+
 	"server/pkg/models"
 )
 

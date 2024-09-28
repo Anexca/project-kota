@@ -7,12 +7,15 @@ import (
 	"strconv"
 	"time"
 
-	commonConfig "common/config"
 	"common/ent"
-	commonService "common/services"
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/nedpals/supabase-go"
 	"github.com/redis/go-redis/v9"
+
+	_ "github.com/joho/godotenv/autoload"
+
+	commonConfig "common/config"
+	commonService "common/services"
+
 	"server/internal/services"
 )
 

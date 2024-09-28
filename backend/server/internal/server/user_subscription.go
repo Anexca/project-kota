@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"common/ent"
-	"server/pkg/constants"
-
 	"github.com/go-chi/chi/v5"
+
+	"server/pkg/constants"
 )
 
 func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
