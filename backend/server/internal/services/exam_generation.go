@@ -10,6 +10,7 @@ import (
 
 	"common/ent"
 	"common/ent/exam"
+
 	"github.com/redis/go-redis/v9"
 
 	commonConstants "common/constants"
@@ -325,6 +326,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	examOverview.ExamName = generatedExam.Edges.Exam.Name
 	examOverview.ExamType = generatedExam.Edges.Exam.Type.String()
 	examOverview.UserHasAccessToExam = true
+	examOverview.ExamStage = generatedExam.Edges.Exam.Stage
 
 	return examOverview, nil
 }
@@ -353,6 +355,7 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 		overview.ExamName = ex.Name
 		overview.ExamType = string(ex.Type)
 		overview.UserAttempts = len(userAttempts)
+		overview.ExamStage = ex.Stage
 
 		if ex.Type == exam.TypeMCQ {
 			overview.RawExamData = nil

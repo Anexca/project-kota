@@ -36,6 +36,7 @@ type GeneratedExamOverview struct {
 	Id                  int                    `json:"exam_id"`
 	ExamType            string                 `json:"exam_type"`
 	ExamName            string                 `json:"exam_name"`
+	ExamStage           string                 `json:"exam_stage"`
 	RawExamData         map[string]interface{} `json:"raw_exam_data,omitempty"`
 	UserAttempts        int                    `json:"user_attempts"`
 	MaxAttempts         int                    `json:"max_attempts"`
