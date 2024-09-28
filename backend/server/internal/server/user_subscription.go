@@ -15,13 +15,14 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "subscriptionId")
 	subscriptionId, err := strconv.Atoi(idParam)
 	if err != nil {
-		s.ErrorJson(w, errors.New("invalid subscription id"), http.StatusBadRequest)
+		s.HandleError(w, err, "invalid subscription id", http.StatusBadRequest)
 		return
 	}
 
 	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
-		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+		s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+		return
 	}
 
 	returnUrl := r.URL.Query().Get("returnUrl")
@@ -30,21 +31,21 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
-			s.ErrorJson(w, errors.New("subscription not found"))
+			s.HandleError(w, err, "subscription not found", http.StatusBadRequest)
 			return
 		}
 
 		if strings.Contains("user already has active subscription", err.Error()) {
-			s.ErrorJson(w, err)
+			s.HandleError(w, err, "user already has active subscription", http.StatusBadRequest)
 			return
 		}
 
 		if strings.Contains("payment for subscription was not successful", err.Error()) {
-			s.ErrorJson(w, err)
+			s.HandleError(w, err, "payment for subscription was not successful", http.StatusBadRequest)
 			return
 		}
 
-		s.ErrorJson(w, err, http.StatusInternalServerError)
+		s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -52,5 +53,8 @@ func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) {
 		Data: userSubscription,
 	}
 
-	s.WriteJson(w, http.StatusCreated, &responsePayload)
+	err = s.WriteJson(w, http.StatusCreated, &responsePayload)
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }

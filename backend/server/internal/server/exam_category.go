@@ -13,7 +13,7 @@ import (
 func (s *Server) GetBankingExamGroups(w http.ResponseWriter, r *http.Request) {
 	categories, err := s.examCategoryService.GetBankingExamGroups(r.Context())
 	if err != nil {
-		s.ErrorJson(w, err, http.StatusInternalServerError)
+		s.HandleError(w, err, "failed to retrieve exam categories", http.StatusInternalServerError)
 		return
 	}
 
@@ -21,14 +21,17 @@ func (s *Server) GetBankingExamGroups(w http.ResponseWriter, r *http.Request) {
 		Data: categories,
 	}
 
-	s.WriteJson(w, http.StatusOK, &response)
+	err = s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "failed to write response", http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) GetExamById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	examId, err := strconv.Atoi(idParam)
 	if err != nil {
-		s.ErrorJson(w, errors.New("invalid exam id"), http.StatusBadRequest)
+		s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
 		return
 	}
 
@@ -36,18 +39,21 @@ func (s *Server) GetExamById(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
-			s.ErrorJson(w, errors.New("exam not found"))
+			s.HandleError(w, err, "exam not found", http.StatusNotFound)
 			return
 		}
 
 		if strings.Contains(err.Error(), "forbidden") {
-			s.ErrorJson(w, err, http.StatusForbidden)
+			s.HandleError(w, err, "forbidden", http.StatusForbidden)
 			return
 		}
 
-		s.ErrorJson(w, err, http.StatusInternalServerError)
+		s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	s.WriteJson(w, http.StatusOK, &Response{Data: categoryExam})
+	err = s.WriteJson(w, http.StatusOK, &Response{Data: categoryExam})
+	if err != nil {
+		s.HandleError(w, err, "Something went wrong while sending the response", http.StatusInternalServerError)
+	}
 }
