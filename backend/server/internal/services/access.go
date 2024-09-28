@@ -49,20 +49,21 @@ func (a *AccessService) UserHasAccessToExam(ctx context.Context, examId int, use
 	return false, nil
 }
 
-func (a *AccessService) UserHasAccessToExams(ctx context.Context, exams []*ent.Exam, userId string) (bool, error) {
+func (a *AccessService) GetAccessibleExamsForUser(ctx context.Context, exams []*ent.Exam, userId string) ([]*ent.Exam, error) {
 	userSubscriptions, err := a.userSubscriptionRepository.GetByUserId(ctx, userId)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	now := time.Now()
+	var accessibleExams []*ent.Exam
 
 	for _, userSubscription := range userSubscriptions {
 		if userSubscription.StartDate.Before(now) && userSubscription.EndDate.After(now) {
 
 			subscription, err := a.subscriptionRepository.GetById(ctx, userSubscription.Edges.Subscription.ID)
 			if err != nil {
-				return false, err
+				return nil, err
 			}
 
 			examMap := make(map[int]struct{})
@@ -70,19 +71,13 @@ func (a *AccessService) UserHasAccessToExams(ctx context.Context, exams []*ent.E
 				examMap[exam.Edges.Exam.ID] = struct{}{}
 			}
 
-			allExamsAccessible := true
 			for _, exam := range exams {
-				if _, found := examMap[exam.ID]; !found {
-					allExamsAccessible = false
-					break
+				if _, found := examMap[exam.ID]; found {
+					accessibleExams = append(accessibleExams, exam)
 				}
-			}
-
-			if allExamsAccessible {
-				return true, nil
 			}
 		}
 	}
 
-	return false, nil
+	return accessibleExams, nil
 }

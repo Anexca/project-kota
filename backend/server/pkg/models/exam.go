@@ -33,17 +33,18 @@ type MCQExam struct {
 }
 
 type GeneratedExamOverview struct {
-	Id                int                    `json:"exam_id"`
-	ExamType          string                 `json:"exam_type"`
-	ExamName          string                 `json:"exam_name"`
-	RawExamData       map[string]interface{} `json:"raw_exam_data,omitempty"`
-	UserAttempts      int                    `json:"user_attempts"`
-	MaxAttempts       int                    `json:"max_attempts"`
-	DurationSeconds   int                    `json:"duration_seconds"`
-	NumberOfQuestions int                    `json:"number_of_questions"`
-	NegativeMarking   float64                `json:"negative_marking,omitempty"`
-	CreatedAt         time.Time              `json:"created_at"`
-	UpdatedAt         time.Time              `json:"updated_at"`
+	Id                  int                    `json:"exam_id"`
+	ExamType            string                 `json:"exam_type"`
+	ExamName            string                 `json:"exam_name"`
+	RawExamData         map[string]interface{} `json:"raw_exam_data,omitempty"`
+	UserAttempts        int                    `json:"user_attempts"`
+	MaxAttempts         int                    `json:"max_attempts"`
+	DurationSeconds     int                    `json:"duration_seconds"`
+	NumberOfQuestions   int                    `json:"number_of_questions"`
+	NegativeMarking     float64                `json:"negative_marking,omitempty"`
+	UserHasAccessToExam bool                   `json:"has_access"`
+	CreatedAt           time.Time              `json:"created_at"`
+	UpdatedAt           time.Time              `json:"updated_at"`
 }
 
 type DescriptiveExamAssessmentResult struct {

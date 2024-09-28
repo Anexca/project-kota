@@ -103,7 +103,7 @@ func (s *Server) GetGeneratedExamsByExamGroupId(w http.ResponseWriter, r *http.R
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	generatedExam, err := s.examGenerationService.GetExamsByExamGroupIdAndExamType(r.Context(), examGroupId, userId)
+	exams, err := s.examGenerationService.GetExamsByExamGroupIdAndExamType(r.Context(), examGroupId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
@@ -121,7 +121,7 @@ func (s *Server) GetGeneratedExamsByExamGroupId(w http.ResponseWriter, r *http.R
 	}
 
 	responsePayload := Response{
-		Data: generatedExam,
+		Data: exams,
 	}
 
 	s.WriteJson(w, http.StatusOK, &responsePayload)

@@ -232,13 +232,14 @@ func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Con
 		return nil, err
 	}
 
-	hasAccess, err := e.accessService.UserHasAccessToExams(ctx, examGroup.Edges.Exams, userId)
+	accessibleExams, err := e.accessService.GetAccessibleExamsForUser(ctx, examGroup.Edges.Exams, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check access: %w", err)
 	}
 
-	if !hasAccess {
-		return nil, errors.New("forbidden")
+	accessibleExamMap := make(map[int]struct{})
+	for _, exam := range accessibleExams {
+		accessibleExamMap[exam.ID] = struct{}{}
 	}
 
 	var generatedExamsOverview []*models.GeneratedExamOverview
@@ -248,9 +249,18 @@ func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Con
 
 		limit := min(26, len(sortedExams))
 		latestExams := sortedExams[:limit]
+
 		list, err := e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
 		if err != nil {
 			return nil, err
+		}
+
+		for _, overview := range list {
+			if _, found := accessibleExamMap[exam.ID]; found {
+				overview.UserHasAccessToExam = true
+			} else {
+				overview.UserHasAccessToExam = false
+			}
 		}
 
 		generatedExamsOverview = append(generatedExamsOverview, list...)
