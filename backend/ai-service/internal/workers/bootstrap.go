@@ -4,8 +4,9 @@ import (
 	"context"
 	"log"
 
-	"cloud.google.com/go/vertexai/genai"
 	"common/ent"
+
+	"cloud.google.com/go/vertexai/genai"
 	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
 
@@ -34,7 +35,7 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient 
 
 func (w *Worker) RegisterWorkers() {
 	// w.cronHandler.AddFunc("*/5 * * * *", func() {
-	w.cronHandler.AddFunc("0 3 * * *", func() {
+	_, err := w.cronHandler.AddFunc("0 3 * * *", func() {
 		log.Println("Starting Worker Job for Populating Exam Question Cache")
 		ctx := context.Background()
 		err := w.examService.PopulateExamQuestionCache(ctx)
@@ -42,4 +43,8 @@ func (w *Worker) RegisterWorkers() {
 			log.Printf("Failed to generate questions: %v", err)
 		}
 	})
+
+	if err != nil {
+		log.Println(err)
+	}
 }

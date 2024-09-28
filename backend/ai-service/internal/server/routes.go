@@ -32,7 +32,10 @@ func (s *Server) SupHandler(w http.ResponseWriter, r *http.Request) {
 		Message: "Sup",
 	}
 
-	s.WriteJson(w, http.StatusOK, &response)
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -40,6 +43,8 @@ func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	response := Response{
 		Data: string(jsonResp),
 	}
-	s.WriteJson(w, http.StatusOK, &response)
-
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }
