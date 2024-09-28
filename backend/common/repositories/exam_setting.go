@@ -1,10 +1,11 @@
 package repositories
 
 import (
+	"context"
+
 	"common/ent"
 	"common/ent/exam"
 	"common/ent/examsetting"
-	"context"
 )
 
 type ExamSettingRepository struct {

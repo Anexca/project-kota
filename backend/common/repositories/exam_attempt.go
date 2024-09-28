@@ -1,13 +1,14 @@
 package repositories
 
 import (
+	"context"
+
+	"github.com/google/uuid"
+
 	"common/ent"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/user"
-	"context"
-
-	"github.com/google/uuid"
 )
 
 type ExamAttemptRepository struct {

@@ -1,15 +1,16 @@
 package repositories
 
 import (
+	"context"
+
+	"github.com/google/uuid"
+
 	"common/constants"
 	"common/ent"
 	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/user"
-	"context"
-
-	"github.com/google/uuid"
 )
 
 type ExamAssesmentRepository struct {

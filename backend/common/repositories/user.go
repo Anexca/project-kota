@@ -1,11 +1,12 @@
 package repositories
 
 import (
-	"common/ent"
-	"common/ent/user"
 	"context"
 
 	"github.com/google/uuid"
+
+	"common/ent"
+	"common/ent/user"
 )
 
 type UserRepository struct {

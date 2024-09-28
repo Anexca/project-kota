@@ -1,12 +1,13 @@
 package repositories
 
 import (
-	"common/ent"
-	"common/ent/user"
-	"common/ent/usersubscription"
 	"context"
 
 	"github.com/google/uuid"
+
+	"common/ent"
+	"common/ent/user"
+	"common/ent/usersubscription"
 )
 
 type UserSubscriptioRepository struct {
