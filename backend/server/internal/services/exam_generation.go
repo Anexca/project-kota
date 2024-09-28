@@ -261,6 +261,7 @@ func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Con
 			if _, found := accessibleExamMap[exam.ID]; found {
 				overview.UserHasAccessToExam = true
 			} else {
+				overview.RawExamData = nil
 				overview.UserHasAccessToExam = false
 			}
 		}
