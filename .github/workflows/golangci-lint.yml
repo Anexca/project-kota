@@ -24,7 +24,7 @@ jobs:
       - id: set-modules
         run: |
           # Detect Go modules in both ai-service and server
-          modules=$(find backend/ai-service backend/server -name 'go.mod' -exec dirname {} \;)
+          modules=$(find backend/ai-service backend/server backend/common -name 'go.mod' -exec dirname {} \;)
           echo "modules=$(echo "$modules" | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
 
   golangci-lint:
