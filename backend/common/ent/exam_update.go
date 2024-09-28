@@ -48,6 +48,26 @@ func (eu *ExamUpdate) SetNillableName(s *string) *ExamUpdate {
 	return eu
 }
 
+// SetStage sets the "stage" field.
+func (eu *ExamUpdate) SetStage(s string) *ExamUpdate {
+	eu.mutation.SetStage(s)
+	return eu
+}
+
+// SetNillableStage sets the "stage" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableStage(s *string) *ExamUpdate {
+	if s != nil {
+		eu.SetStage(*s)
+	}
+	return eu
+}
+
+// ClearStage clears the value of the "stage" field.
+func (eu *ExamUpdate) ClearStage() *ExamUpdate {
+	eu.mutation.ClearStage()
+	return eu
+}
+
 // SetDescription sets the "description" field.
 func (eu *ExamUpdate) SetDescription(s string) *ExamUpdate {
 	eu.mutation.SetDescription(s)
@@ -365,6 +385,12 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Name(); ok {
 		_spec.SetField(exam.FieldName, field.TypeString, value)
 	}
+	if value, ok := eu.mutation.Stage(); ok {
+		_spec.SetField(exam.FieldStage, field.TypeString, value)
+	}
+	if eu.mutation.StageCleared() {
+		_spec.ClearField(exam.FieldStage, field.TypeString)
+	}
 	if value, ok := eu.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 	}
@@ -636,6 +662,26 @@ func (euo *ExamUpdateOne) SetNillableName(s *string) *ExamUpdateOne {
 	if s != nil {
 		euo.SetName(*s)
 	}
+	return euo
+}
+
+// SetStage sets the "stage" field.
+func (euo *ExamUpdateOne) SetStage(s string) *ExamUpdateOne {
+	euo.mutation.SetStage(s)
+	return euo
+}
+
+// SetNillableStage sets the "stage" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableStage(s *string) *ExamUpdateOne {
+	if s != nil {
+		euo.SetStage(*s)
+	}
+	return euo
+}
+
+// ClearStage clears the value of the "stage" field.
+func (euo *ExamUpdateOne) ClearStage() *ExamUpdateOne {
+	euo.mutation.ClearStage()
 	return euo
 }
 
@@ -985,6 +1031,12 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	}
 	if value, ok := euo.mutation.Name(); ok {
 		_spec.SetField(exam.FieldName, field.TypeString, value)
+	}
+	if value, ok := euo.mutation.Stage(); ok {
+		_spec.SetField(exam.FieldStage, field.TypeString, value)
+	}
+	if euo.mutation.StageCleared() {
+		_spec.ClearField(exam.FieldStage, field.TypeString)
 	}
 	if value, ok := euo.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)

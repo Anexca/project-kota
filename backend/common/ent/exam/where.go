@@ -60,6 +60,11 @@ func Name(v string) predicate.Exam {
 	return predicate.Exam(sql.FieldEQ(FieldName, v))
 }
 
+// Stage applies equality check predicate on the "stage" field. It's identical to StageEQ.
+func Stage(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldEQ(FieldStage, v))
+}
+
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Exam {
 	return predicate.Exam(sql.FieldEQ(FieldDescription, v))
@@ -148,6 +153,81 @@ func NameEqualFold(v string) predicate.Exam {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Exam {
 	return predicate.Exam(sql.FieldContainsFold(FieldName, v))
+}
+
+// StageEQ applies the EQ predicate on the "stage" field.
+func StageEQ(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldEQ(FieldStage, v))
+}
+
+// StageNEQ applies the NEQ predicate on the "stage" field.
+func StageNEQ(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldNEQ(FieldStage, v))
+}
+
+// StageIn applies the In predicate on the "stage" field.
+func StageIn(vs ...string) predicate.Exam {
+	return predicate.Exam(sql.FieldIn(FieldStage, vs...))
+}
+
+// StageNotIn applies the NotIn predicate on the "stage" field.
+func StageNotIn(vs ...string) predicate.Exam {
+	return predicate.Exam(sql.FieldNotIn(FieldStage, vs...))
+}
+
+// StageGT applies the GT predicate on the "stage" field.
+func StageGT(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldGT(FieldStage, v))
+}
+
+// StageGTE applies the GTE predicate on the "stage" field.
+func StageGTE(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldGTE(FieldStage, v))
+}
+
+// StageLT applies the LT predicate on the "stage" field.
+func StageLT(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldLT(FieldStage, v))
+}
+
+// StageLTE applies the LTE predicate on the "stage" field.
+func StageLTE(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldLTE(FieldStage, v))
+}
+
+// StageContains applies the Contains predicate on the "stage" field.
+func StageContains(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldContains(FieldStage, v))
+}
+
+// StageHasPrefix applies the HasPrefix predicate on the "stage" field.
+func StageHasPrefix(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldHasPrefix(FieldStage, v))
+}
+
+// StageHasSuffix applies the HasSuffix predicate on the "stage" field.
+func StageHasSuffix(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldHasSuffix(FieldStage, v))
+}
+
+// StageIsNil applies the IsNil predicate on the "stage" field.
+func StageIsNil() predicate.Exam {
+	return predicate.Exam(sql.FieldIsNull(FieldStage))
+}
+
+// StageNotNil applies the NotNil predicate on the "stage" field.
+func StageNotNil() predicate.Exam {
+	return predicate.Exam(sql.FieldNotNull(FieldStage))
+}
+
+// StageEqualFold applies the EqualFold predicate on the "stage" field.
+func StageEqualFold(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldEqualFold(FieldStage, v))
+}
+
+// StageContainsFold applies the ContainsFold predicate on the "stage" field.
+func StageContainsFold(v string) predicate.Exam {
+	return predicate.Exam(sql.FieldContainsFold(FieldStage, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

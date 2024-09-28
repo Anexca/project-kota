@@ -32,6 +32,20 @@ func (ec *ExamCreate) SetName(s string) *ExamCreate {
 	return ec
 }
 
+// SetStage sets the "stage" field.
+func (ec *ExamCreate) SetStage(s string) *ExamCreate {
+	ec.mutation.SetStage(s)
+	return ec
+}
+
+// SetNillableStage sets the "stage" field if the given value is not nil.
+func (ec *ExamCreate) SetNillableStage(s *string) *ExamCreate {
+	if s != nil {
+		ec.SetStage(*s)
+	}
+	return ec
+}
+
 // SetDescription sets the "description" field.
 func (ec *ExamCreate) SetDescription(s string) *ExamCreate {
 	ec.mutation.SetDescription(s)
@@ -317,6 +331,10 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.Name(); ok {
 		_spec.SetField(exam.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := ec.mutation.Stage(); ok {
+		_spec.SetField(exam.FieldStage, field.TypeString, value)
+		_node.Stage = value
 	}
 	if value, ok := ec.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
