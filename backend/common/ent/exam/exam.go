@@ -94,7 +94,6 @@ var Columns = []string{
 	FieldDescription,
 	FieldType,
 	FieldIsActive,
-	FieldLogoURL,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -115,6 +114,11 @@ func ValidColumn(column string) bool {
 	}
 	for i := range ForeignKeys {
 		if column == ForeignKeys[i] {
+			return true
+		}
+	}
+	for _, f := range [...]string{FieldLogoURL} {
+		if column == f {
 			return true
 		}
 	}

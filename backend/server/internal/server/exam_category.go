@@ -10,22 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (s *Server) GetBankingDescriptiveCategories(w http.ResponseWriter, r *http.Request) {
-	categories, err := s.examCategoryService.GetBankingDescriptiveExamsTypes(r.Context())
-	if err != nil {
-		s.ErrorJson(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	response := Response{
-		Data: categories,
-	}
-
-	s.WriteJson(w, http.StatusOK, &response)
-}
-
-func (s *Server) GetBankingMCQCategories(w http.ResponseWriter, r *http.Request) {
-	categories, err := s.examCategoryService.GetBankingMCQExamTypes(r.Context())
+func (s *Server) GetBankingExamGroups(w http.ResponseWriter, r *http.Request) {
+	categories, err := s.examCategoryService.GetBankingExamGroups(r.Context())
 	if err != nil {
 		s.ErrorJson(w, err, http.StatusInternalServerError)
 		return
@@ -46,7 +32,7 @@ func (s *Server) GetExamById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	categoryExam, err := s.examCategoryService.GetCategoryExamById(r.Context(), examId)
+	categoryExam, err := s.examCategoryService.GetExamGroupById(r.Context(), examId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

@@ -33,17 +33,18 @@ type MCQExam struct {
 }
 
 type GeneratedExamOverview struct {
-	Id                int                    `json:"id"`
-	ExamType          string                 `json:"exam_type"`
-	ExamName          string                 `json:"exam_name"`
-	RawExamData       map[string]interface{} `json:"raw_exam_data,omitempty"`
-	UserAttempts      int                    `json:"user_attempts"`
-	MaxAttempts       int                    `json:"max_attempts"`
-	DurationSeconds   int                    `json:"duration_seconds"`
-	NumberOfQuestions int                    `json:"number_of_questions"`
-	NegativeMarking   float64                `json:"negative_marking,omitempty"`
-	CreatedAt         time.Time              `json:"created_at"`
-	UpdatedAt         time.Time              `json:"updated_at"`
+	Id                  int                    `json:"exam_id"`
+	ExamType            string                 `json:"exam_type"`
+	ExamName            string                 `json:"exam_name"`
+	RawExamData         map[string]interface{} `json:"raw_exam_data,omitempty"`
+	UserAttempts        int                    `json:"user_attempts"`
+	MaxAttempts         int                    `json:"max_attempts"`
+	DurationSeconds     int                    `json:"duration_seconds"`
+	NumberOfQuestions   int                    `json:"number_of_questions"`
+	NegativeMarking     float64                `json:"negative_marking,omitempty"`
+	UserHasAccessToExam bool                   `json:"has_access,omitempty"`
+	CreatedAt           time.Time              `json:"created_at"`
+	UpdatedAt           time.Time              `json:"updated_at"`
 }
 
 type DescriptiveExamAssessmentResult struct {
@@ -85,11 +86,11 @@ type Attempt struct {
 	AttemptDate      time.Time `json:"attempt_date"`
 }
 
-type CategoryExamType struct {
-	Id           int    `json:"exam_type_id"`
-	ExamName     string `json:"exam_name"`
+type CategoryExamGroup struct {
+	Id           int    `json:"exam_group_id"`
+	ExamName     string `json:"exam_group_name"`
 	Description  string `json:"description"`
-	TypeOfExam   string `json:"type_of_exam"`
+	TypeOfExam   string `json:"type_of_exam,omitempty"`
 	IsActive     bool   `json:"is_active"`
 	CategoryName string `json:"category_name,omitempty"`
 	CategoryId   int    `json:"category_id,omitempty"`
