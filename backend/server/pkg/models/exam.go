@@ -33,7 +33,7 @@ type MCQExam struct {
 }
 
 type GeneratedExamOverview struct {
-	Id                int                    `json:"id"`
+	Id                int                    `json:"exam_id"`
 	ExamType          string                 `json:"exam_type"`
 	ExamName          string                 `json:"exam_name"`
 	RawExamData       map[string]interface{} `json:"raw_exam_data,omitempty"`

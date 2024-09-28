@@ -1,10 +1,8 @@
 package repositories
 
 import (
-	"common/constants"
 	"common/ent"
 	"common/ent/exam"
-	"common/ent/examcategory"
 	"common/ent/examgroup"
 	"common/ent/generatedexam"
 	"context"
@@ -26,11 +24,11 @@ func (e *ExamGroupRepository) GetById(ctx context.Context, examGroupId int) (*en
 		Only(ctx)
 }
 
-func (e *ExamGroupRepository) GetActiveByIdWithExams(ctx context.Context, examGroupId int, isActive bool, examCategory constants.ExamCategoryName, examType constants.ExamType) (*ent.ExamGroup, error) {
+func (e *ExamGroupRepository) GetActiveByIdWithExams(ctx context.Context, examGroupId int, isActive bool) (*ent.ExamGroup, error) {
 	return e.dbClient.ExamGroup.Query().
 		Where(examgroup.IDEQ(examGroupId), examgroup.IsActiveEQ(isActive)).
 		WithExams(func(eq *ent.ExamQuery) {
-			eq.Where(exam.IsActiveEQ(isActive), exam.TypeEQ(exam.Type(examType)), exam.HasCategoryWith(examcategory.NameEQ(examcategory.Name(examCategory))))
+			eq.Where(exam.IsActiveEQ(isActive))
 			eq.WithSetting()
 			eq.WithCategory()
 			eq.WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {

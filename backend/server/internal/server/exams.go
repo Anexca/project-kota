@@ -66,7 +66,44 @@ func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) {
 		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
 	}
 
-	generatedExam, err := s.examGenerationService.GetExamsByExamGroupIdAndExamType(r.Context(), generatedExamId, userId)
+	generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId, userId, isOpen)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.ErrorJson(w, errors.New("exam not found"))
+			return
+		}
+
+		if strings.Contains(err.Error(), "forbidden") {
+			s.ErrorJson(w, err, http.StatusForbidden)
+			return
+		}
+
+		s.ErrorJson(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	responsePayload := Response{
+		Data: generatedExam,
+	}
+
+	s.WriteJson(w, http.StatusOK, &responsePayload)
+}
+
+func (s *Server) GetGeneratedExamsByExamGroupId(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	examGroupId, err := strconv.Atoi(idParam)
+	if err != nil {
+		s.ErrorJson(w, errors.New("invalid exam id"), http.StatusBadRequest)
+		return
+	}
+
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
+	}
+
+	generatedExam, err := s.examGenerationService.GetExamsByExamGroupIdAndExamType(r.Context(), examGroupId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

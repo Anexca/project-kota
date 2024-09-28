@@ -226,8 +226,8 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examCategory commonConstants.ExamCategoryName, examType commonConstants.ExamType, examGroupId int, userId string) ([]*models.GeneratedExamOverview, error) {
-	examGroup, err := e.examGroupRepository.GetActiveByIdWithExams(ctx, examGroupId, true, examCategory, examType)
+func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examGroupId int, userId string) ([]*models.GeneratedExamOverview, error) {
+	examGroup, err := e.examGroupRepository.GetActiveByIdWithExams(ctx, examGroupId, true)
 	if err != nil {
 		return nil, err
 	}

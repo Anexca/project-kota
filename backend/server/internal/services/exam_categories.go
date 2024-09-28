@@ -26,33 +26,8 @@ func NewExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
 	}
 }
 
-func (e *ExamCategoryService) GetBankingDescriptiveExamsGroups(ctx context.Context) ([]models.CategoryExamGroup, error) {
-	category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking, constants.ExamTypeDescriptive)
-	if err != nil {
-		return nil, err
-	}
-
-	var categoryExamTypes []models.CategoryExamGroup
-
-	for _, examGroup := range category.Edges.Groups {
-		categoryExamType := models.CategoryExamGroup{
-			Id:           examGroup.ID,
-			ExamName:     examGroup.Name,
-			CategoryId:   category.ID,
-			IsActive:     examGroup.IsActive,
-			Description:  examGroup.Description,
-			CategoryName: category.Name.String(),
-			LogoUrl:      examGroup.LogoURL,
-		}
-
-		categoryExamTypes = append(categoryExamTypes, categoryExamType)
-	}
-
-	return categoryExamTypes, nil
-}
-
-func (e *ExamCategoryService) GetBankingMCQExamGroups(ctx context.Context) ([]models.CategoryExamGroup, error) {
-	category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking, constants.ExamTypeMCQ)
+func (e *ExamCategoryService) GetBankingExamGroups(ctx context.Context) ([]models.CategoryExamGroup, error) {
+	category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking)
 	if err != nil {
 		return nil, err
 	}
