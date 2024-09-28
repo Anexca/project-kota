@@ -10,6 +10,7 @@ import (
 
 	"common/ent"
 	"common/ent/exam"
+
 	"github.com/redis/go-redis/v9"
 
 	commonConstants "common/constants"
@@ -227,7 +228,7 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examGroupId int, userId string) ([]*models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examGroupId int, userId string) (map[exam.Type][]*models.GeneratedExamOverview, error) {
 	examGroup, err := e.examGroupRepository.GetActiveByIdWithExams(ctx, examGroupId, true)
 	if err != nil {
 		return nil, err
@@ -243,7 +244,7 @@ func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Con
 		accessibleExamMap[exam.ID] = struct{}{}
 	}
 
-	var generatedExamsOverview []*models.GeneratedExamOverview
+	groupedExams := make(map[exam.Type][]*models.GeneratedExamOverview)
 
 	for _, exam := range examGroup.Edges.Exams {
 		sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
@@ -264,12 +265,12 @@ func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Con
 			}
 		}
 
-		generatedExamsOverview = append(generatedExamsOverview, list...)
+		examType := exam.Type
+		groupedExams[examType] = append(groupedExams[examType], list...)
 	}
 
-	return generatedExamsOverview, nil
+	return groupedExams, nil
 }
-
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
 	exam, err := e.examRepository.GetActiveById(ctx, 1, true)
 
@@ -325,6 +326,8 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	examOverview.ExamName = generatedExam.Edges.Exam.Name
 	examOverview.ExamType = generatedExam.Edges.Exam.Type.String()
 	examOverview.UserHasAccessToExam = true
+	examOverview.ExamStage = generatedExam.Edges.Exam.Stage
+	examOverview.IsSectional = generatedExam.Edges.Exam.IsSectional
 
 	return examOverview, nil
 }
@@ -353,6 +356,8 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 		overview.ExamName = ex.Name
 		overview.ExamType = string(ex.Type)
 		overview.UserAttempts = len(userAttempts)
+		overview.ExamStage = ex.Stage
+		overview.IsSectional = ex.IsSectional
 
 		if ex.Type == exam.TypeMCQ {
 			overview.RawExamData = nil

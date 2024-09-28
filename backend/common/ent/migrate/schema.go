@@ -36,6 +36,8 @@ var (
 	ExamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
+		{Name: "stage", Type: field.TypeString, Nullable: true},
+		{Name: "is_sectional", Type: field.TypeBool, Nullable: true, Default: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"MCQ", "DESCRIPTIVE"}, Default: "DESCRIPTIVE"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
@@ -53,13 +55,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exams_exam_categories_exams",
-				Columns:    []*schema.Column{ExamsColumns[8]},
+				Columns:    []*schema.Column{ExamsColumns[10]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "exams_exam_groups_exams",
-				Columns:    []*schema.Column{ExamsColumns[9]},
+				Columns:    []*schema.Column{ExamsColumns[11]},
 				RefColumns: []*schema.Column{ExamGroupsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

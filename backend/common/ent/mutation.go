@@ -668,6 +668,8 @@ type ExamMutation struct {
 	typ                   string
 	id                    *int
 	name                  *string
+	stage                 *string
+	is_sectional          *bool
 	description           *string
 	_type                 *exam.Type
 	is_active             *bool
@@ -827,6 +829,104 @@ func (m *ExamMutation) OldName(ctx context.Context) (v string, err error) {
 // ResetName resets all changes to the "name" field.
 func (m *ExamMutation) ResetName() {
 	m.name = nil
+}
+
+// SetStage sets the "stage" field.
+func (m *ExamMutation) SetStage(s string) {
+	m.stage = &s
+}
+
+// Stage returns the value of the "stage" field in the mutation.
+func (m *ExamMutation) Stage() (r string, exists bool) {
+	v := m.stage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStage returns the old "stage" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldStage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStage: %w", err)
+	}
+	return oldValue.Stage, nil
+}
+
+// ClearStage clears the value of the "stage" field.
+func (m *ExamMutation) ClearStage() {
+	m.stage = nil
+	m.clearedFields[exam.FieldStage] = struct{}{}
+}
+
+// StageCleared returns if the "stage" field was cleared in this mutation.
+func (m *ExamMutation) StageCleared() bool {
+	_, ok := m.clearedFields[exam.FieldStage]
+	return ok
+}
+
+// ResetStage resets all changes to the "stage" field.
+func (m *ExamMutation) ResetStage() {
+	m.stage = nil
+	delete(m.clearedFields, exam.FieldStage)
+}
+
+// SetIsSectional sets the "is_sectional" field.
+func (m *ExamMutation) SetIsSectional(b bool) {
+	m.is_sectional = &b
+}
+
+// IsSectional returns the value of the "is_sectional" field in the mutation.
+func (m *ExamMutation) IsSectional() (r bool, exists bool) {
+	v := m.is_sectional
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsSectional returns the old "is_sectional" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldIsSectional(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsSectional is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsSectional requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsSectional: %w", err)
+	}
+	return oldValue.IsSectional, nil
+}
+
+// ClearIsSectional clears the value of the "is_sectional" field.
+func (m *ExamMutation) ClearIsSectional() {
+	m.is_sectional = nil
+	m.clearedFields[exam.FieldIsSectional] = struct{}{}
+}
+
+// IsSectionalCleared returns if the "is_sectional" field was cleared in this mutation.
+func (m *ExamMutation) IsSectionalCleared() bool {
+	_, ok := m.clearedFields[exam.FieldIsSectional]
+	return ok
+}
+
+// ResetIsSectional resets all changes to the "is_sectional" field.
+func (m *ExamMutation) ResetIsSectional() {
+	m.is_sectional = nil
+	delete(m.clearedFields, exam.FieldIsSectional)
 }
 
 // SetDescription sets the "description" field.
@@ -1371,9 +1471,15 @@ func (m *ExamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.name != nil {
 		fields = append(fields, exam.FieldName)
+	}
+	if m.stage != nil {
+		fields = append(fields, exam.FieldStage)
+	}
+	if m.is_sectional != nil {
+		fields = append(fields, exam.FieldIsSectional)
 	}
 	if m.description != nil {
 		fields = append(fields, exam.FieldDescription)
@@ -1403,6 +1509,10 @@ func (m *ExamMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case exam.FieldName:
 		return m.Name()
+	case exam.FieldStage:
+		return m.Stage()
+	case exam.FieldIsSectional:
+		return m.IsSectional()
 	case exam.FieldDescription:
 		return m.Description()
 	case exam.FieldType:
@@ -1426,6 +1536,10 @@ func (m *ExamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case exam.FieldName:
 		return m.OldName(ctx)
+	case exam.FieldStage:
+		return m.OldStage(ctx)
+	case exam.FieldIsSectional:
+		return m.OldIsSectional(ctx)
 	case exam.FieldDescription:
 		return m.OldDescription(ctx)
 	case exam.FieldType:
@@ -1453,6 +1567,20 @@ func (m *ExamMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case exam.FieldStage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStage(v)
+		return nil
+	case exam.FieldIsSectional:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsSectional(v)
 		return nil
 	case exam.FieldDescription:
 		v, ok := value.(string)
@@ -1526,6 +1654,12 @@ func (m *ExamMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ExamMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(exam.FieldStage) {
+		fields = append(fields, exam.FieldStage)
+	}
+	if m.FieldCleared(exam.FieldIsSectional) {
+		fields = append(fields, exam.FieldIsSectional)
+	}
 	if m.FieldCleared(exam.FieldLogoURL) {
 		fields = append(fields, exam.FieldLogoURL)
 	}
@@ -1543,6 +1677,12 @@ func (m *ExamMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ExamMutation) ClearField(name string) error {
 	switch name {
+	case exam.FieldStage:
+		m.ClearStage()
+		return nil
+	case exam.FieldIsSectional:
+		m.ClearIsSectional()
+		return nil
 	case exam.FieldLogoURL:
 		m.ClearLogoURL()
 		return nil
@@ -1556,6 +1696,12 @@ func (m *ExamMutation) ResetField(name string) error {
 	switch name {
 	case exam.FieldName:
 		m.ResetName()
+		return nil
+	case exam.FieldStage:
+		m.ResetStage()
+		return nil
+	case exam.FieldIsSectional:
+		m.ResetIsSectional()
 		return nil
 	case exam.FieldDescription:
 		m.ResetDescription()
