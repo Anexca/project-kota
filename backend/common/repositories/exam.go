@@ -61,7 +61,7 @@ func (e *ExamRepository) GetByExamCategory(ctx context.Context, examCategory *en
 		Query().
 		Where(exam.HasCategoryWith(
 			examcategory.ID(examCategory.ID),
-		), exam.IsActiveEQ(true), exam.TypeEQ(exam.TypeMCQ)).
+		), exam.IsActiveEQ(true)).
 		All(ctx)
 }
 

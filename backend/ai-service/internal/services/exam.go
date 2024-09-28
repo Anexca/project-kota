@@ -92,13 +92,16 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 			log.Printf("AI content generated for exam %s (ID: %d)", exam.Name, exam.ID)
 
 			log.Printf("Validating AI response for exam %s (ID: %d)", exam.Name, exam.ID)
-			validationPrompt := fmt.Sprintf(`Ensure that the following string is a valid JSON string.
-											Requirements:
-											•	The string must be a valid JSON format.
-											•	When parsed as JSON, no errors should occur.
-											•	The output should be a single-line string without extra spaces, newlines, or formatting.
-											•	Ensure the string is JSON parsable.
-											"%s"`, response)
+			validationPrompt := fmt.Sprintf(`You are given a JSON string that may contain minor issues. Your task is to validate and correct it, ensuring the following:
+												1. **Check for Structural Integrity**: Ensure that all opening and closing brackets ('{}', '[]') are properly paired. Correct any missing or misplaced brackets to restore the structure, without adding unnecessary brackets or altering valid content.
+												2. **Do Not Add or Alter Backticks**: Ensure all string values are enclosed in double quotes ('"'), and preserve any backticks ('\'') **exactly as they are** inside the string content. **Do not** add, replace, or modify backticks in any way.
+												3. **Ensure Proper Commas**: Make sure all commas between key-value pairs, objects, and array elements are correctly placed. Correct any missing or misplaced commas without adding unnecessary ones.
+												4. **Preserve Data Content**: Keep all values, key names, and structure intact, except for the necessary corrections to formatting and structure. **Do not introduce new characters**, including backticks, unless they already exist in the content.
+												5. **Single-Line Output**: Return the corrected JSON as a single-line string. Remove any extra spaces, line breaks, or unnecessary characters, ensuring the output is compact and can be parsed by any standard JSON parser.
+												6. **Minor Fixes Only**: Apply only minimal necessary changes to fix errors. Do not introduce new keys, values, or objects unless essential for structural integrity.
+												7. **Valid JSON Output**: Ensure the final output is valid JSON and can be parsed without errors. The JSON should follow proper formatting and maintain any backticks in string values without alteration.
+												Here is the JSON string for you to validate:
+												"%s"`, response)
 
 			validationResponse, err := q.genAIService.GetContentStream(ctx, validationPrompt, commonConstants.PRO_15)
 			if err != nil {
