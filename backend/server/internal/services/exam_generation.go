@@ -96,7 +96,6 @@ func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examNam
 		return fmt.Errorf("failed to mark current open questions closed: %w", err)
 	}
 
-	generatedOldExams, err := e.generatedExamRepository.GetByWeekOffset(ctx, exam, 1, 2) // Get last weeks 2 questions
 	if err != nil {
 		return fmt.Errorf("failed to get exam by name: %w", err)
 	}
@@ -131,7 +130,6 @@ func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, ex
 	})
 
 	if len(generatedExams) > 30 {
-		for _, generatedExam := range generatedExams[30:] { // Skip the first 30 exams
 			generatedExam.IsActive = false
 		}
 
@@ -228,7 +226,7 @@ func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.E
 	return nil
 }
 
-func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examGroupId int, userId string) ([]*models.GeneratedExamOverview, error) {
+func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examGroupId int, userId string) (map[string][]*models.GeneratedExamOverview, error) {
 	examGroup, err := e.examGroupRepository.GetActiveByIdWithExams(ctx, examGroupId, true)
 	if err != nil {
 		return nil, err
@@ -244,7 +242,7 @@ func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Con
 		accessibleExamMap[exam.ID] = struct{}{}
 	}
 
-	var generatedExamsOverview []*models.GeneratedExamOverview
+	groupedExams := make(map[string][]*models.GeneratedExamOverview)
 
 	for _, exam := range examGroup.Edges.Exams {
 		sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
@@ -265,12 +263,12 @@ func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Con
 			}
 		}
 
-		generatedExamsOverview = append(generatedExamsOverview, list...)
+		examName := exam.Name
+		groupedExams[examName] = append(groupedExams[examName], list...)
 	}
 
-	return generatedExamsOverview, nil
+	return groupedExams, nil
 }
-
 func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) {
 	exam, err := e.examRepository.GetActiveById(ctx, 1, true)
 
@@ -289,7 +287,6 @@ func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examT
 	}
 
 	for _, e := range exams {
-		e.UserHasAccessToExam = true // always true for open exams
 	}
 
 	return exams, nil
