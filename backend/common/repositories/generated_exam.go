@@ -42,6 +42,13 @@ func (q *GeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *
 	return q.dbClient.GeneratedExam.CreateBulk(bulk...).Save(ctx)
 }
 
+func (q *GeneratedExamRepository) Add(ctx context.Context, exam map[string]interface{}, examId int) (*ent.GeneratedExam, error) {
+	return q.dbClient.GeneratedExam.Create().
+		SetRawExamData(exam).
+		SetExamID(examId).
+		Save(ctx)
+}
+
 func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error {
 	tx, err := q.dbClient.Tx(ctx)
 	if err != nil {

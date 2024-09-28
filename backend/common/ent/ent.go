@@ -8,6 +8,7 @@ import (
 	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/payment"
@@ -89,6 +90,7 @@ func checkColumn(table, column string) error {
 			examassesment.Table:    examassesment.ValidColumn,
 			examattempt.Table:      examattempt.ValidColumn,
 			examcategory.Table:     examcategory.ValidColumn,
+			examgroup.Table:        examgroup.ValidColumn,
 			examsetting.Table:      examsetting.ValidColumn,
 			generatedexam.Table:    generatedexam.ValidColumn,
 			payment.Table:          payment.ValidColumn,

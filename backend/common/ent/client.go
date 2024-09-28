@@ -16,6 +16,7 @@ import (
 	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/payment"
@@ -46,6 +47,8 @@ type Client struct {
 	ExamAttempt *ExamAttemptClient
 	// ExamCategory is the client for interacting with the ExamCategory builders.
 	ExamCategory *ExamCategoryClient
+	// ExamGroup is the client for interacting with the ExamGroup builders.
+	ExamGroup *ExamGroupClient
 	// ExamSetting is the client for interacting with the ExamSetting builders.
 	ExamSetting *ExamSettingClient
 	// GeneratedExam is the client for interacting with the GeneratedExam builders.
@@ -76,6 +79,7 @@ func (c *Client) init() {
 	c.ExamAssesment = NewExamAssesmentClient(c.config)
 	c.ExamAttempt = NewExamAttemptClient(c.config)
 	c.ExamCategory = NewExamCategoryClient(c.config)
+	c.ExamGroup = NewExamGroupClient(c.config)
 	c.ExamSetting = NewExamSettingClient(c.config)
 	c.GeneratedExam = NewGeneratedExamClient(c.config)
 	c.Payment = NewPaymentClient(c.config)
@@ -180,6 +184,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ExamAssesment:    NewExamAssesmentClient(cfg),
 		ExamAttempt:      NewExamAttemptClient(cfg),
 		ExamCategory:     NewExamCategoryClient(cfg),
+		ExamGroup:        NewExamGroupClient(cfg),
 		ExamSetting:      NewExamSettingClient(cfg),
 		GeneratedExam:    NewGeneratedExamClient(cfg),
 		Payment:          NewPaymentClient(cfg),
@@ -211,6 +216,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ExamAssesment:    NewExamAssesmentClient(cfg),
 		ExamAttempt:      NewExamAttemptClient(cfg),
 		ExamCategory:     NewExamCategoryClient(cfg),
+		ExamGroup:        NewExamGroupClient(cfg),
 		ExamSetting:      NewExamSettingClient(cfg),
 		GeneratedExam:    NewGeneratedExamClient(cfg),
 		Payment:          NewPaymentClient(cfg),
@@ -248,8 +254,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.CachedExam, c.Exam, c.ExamAssesment, c.ExamAttempt, c.ExamCategory,
-		c.ExamSetting, c.GeneratedExam, c.Payment, c.Subscription, c.SubscriptionExam,
-		c.User, c.UserSubscription,
+		c.ExamGroup, c.ExamSetting, c.GeneratedExam, c.Payment, c.Subscription,
+		c.SubscriptionExam, c.User, c.UserSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -260,8 +266,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.CachedExam, c.Exam, c.ExamAssesment, c.ExamAttempt, c.ExamCategory,
-		c.ExamSetting, c.GeneratedExam, c.Payment, c.Subscription, c.SubscriptionExam,
-		c.User, c.UserSubscription,
+		c.ExamGroup, c.ExamSetting, c.GeneratedExam, c.Payment, c.Subscription,
+		c.SubscriptionExam, c.User, c.UserSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -280,6 +286,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ExamAttempt.mutate(ctx, m)
 	case *ExamCategoryMutation:
 		return c.ExamCategory.mutate(ctx, m)
+	case *ExamGroupMutation:
+		return c.ExamGroup.mutate(ctx, m)
 	case *ExamSettingMutation:
 		return c.ExamSetting.mutate(ctx, m)
 	case *GeneratedExamMutation:
@@ -565,6 +573,22 @@ func (c *ExamClient) QueryCategory(e *Exam) *ExamCategoryQuery {
 			sqlgraph.From(exam.Table, exam.FieldID, id),
 			sqlgraph.To(examcategory.Table, examcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, exam.CategoryTable, exam.CategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryGroup queries the group edge of a Exam.
+func (c *ExamClient) QueryGroup(e *Exam) *ExamGroupQuery {
+	query := (&ExamGroupClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(exam.Table, exam.FieldID, id),
+			sqlgraph.To(examgroup.Table, examgroup.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, exam.GroupTable, exam.GroupColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1115,6 +1139,22 @@ func (c *ExamCategoryClient) QueryExams(ec *ExamCategory) *ExamQuery {
 	return query
 }
 
+// QueryGroups queries the groups edge of a ExamCategory.
+func (c *ExamCategoryClient) QueryGroups(ec *ExamCategory) *ExamGroupQuery {
+	query := (&ExamGroupClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examcategory.Table, examcategory.FieldID, id),
+			sqlgraph.To(examgroup.Table, examgroup.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, examcategory.GroupsTable, examcategory.GroupsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ExamCategoryClient) Hooks() []Hook {
 	return c.hooks.ExamCategory
@@ -1137,6 +1177,171 @@ func (c *ExamCategoryClient) mutate(ctx context.Context, m *ExamCategoryMutation
 		return (&ExamCategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ExamCategory mutation op: %q", m.Op())
+	}
+}
+
+// ExamGroupClient is a client for the ExamGroup schema.
+type ExamGroupClient struct {
+	config
+}
+
+// NewExamGroupClient returns a client for the ExamGroup from the given config.
+func NewExamGroupClient(c config) *ExamGroupClient {
+	return &ExamGroupClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `examgroup.Hooks(f(g(h())))`.
+func (c *ExamGroupClient) Use(hooks ...Hook) {
+	c.hooks.ExamGroup = append(c.hooks.ExamGroup, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `examgroup.Intercept(f(g(h())))`.
+func (c *ExamGroupClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ExamGroup = append(c.inters.ExamGroup, interceptors...)
+}
+
+// Create returns a builder for creating a ExamGroup entity.
+func (c *ExamGroupClient) Create() *ExamGroupCreate {
+	mutation := newExamGroupMutation(c.config, OpCreate)
+	return &ExamGroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ExamGroup entities.
+func (c *ExamGroupClient) CreateBulk(builders ...*ExamGroupCreate) *ExamGroupCreateBulk {
+	return &ExamGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ExamGroupClient) MapCreateBulk(slice any, setFunc func(*ExamGroupCreate, int)) *ExamGroupCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ExamGroupCreateBulk{err: fmt.Errorf("calling to ExamGroupClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ExamGroupCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ExamGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ExamGroup.
+func (c *ExamGroupClient) Update() *ExamGroupUpdate {
+	mutation := newExamGroupMutation(c.config, OpUpdate)
+	return &ExamGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ExamGroupClient) UpdateOne(eg *ExamGroup) *ExamGroupUpdateOne {
+	mutation := newExamGroupMutation(c.config, OpUpdateOne, withExamGroup(eg))
+	return &ExamGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ExamGroupClient) UpdateOneID(id int) *ExamGroupUpdateOne {
+	mutation := newExamGroupMutation(c.config, OpUpdateOne, withExamGroupID(id))
+	return &ExamGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ExamGroup.
+func (c *ExamGroupClient) Delete() *ExamGroupDelete {
+	mutation := newExamGroupMutation(c.config, OpDelete)
+	return &ExamGroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ExamGroupClient) DeleteOne(eg *ExamGroup) *ExamGroupDeleteOne {
+	return c.DeleteOneID(eg.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ExamGroupClient) DeleteOneID(id int) *ExamGroupDeleteOne {
+	builder := c.Delete().Where(examgroup.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ExamGroupDeleteOne{builder}
+}
+
+// Query returns a query builder for ExamGroup.
+func (c *ExamGroupClient) Query() *ExamGroupQuery {
+	return &ExamGroupQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeExamGroup},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ExamGroup entity by its id.
+func (c *ExamGroupClient) Get(ctx context.Context, id int) (*ExamGroup, error) {
+	return c.Query().Where(examgroup.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ExamGroupClient) GetX(ctx context.Context, id int) *ExamGroup {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCategory queries the category edge of a ExamGroup.
+func (c *ExamGroupClient) QueryCategory(eg *ExamGroup) *ExamCategoryQuery {
+	query := (&ExamCategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := eg.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examgroup.Table, examgroup.FieldID, id),
+			sqlgraph.To(examcategory.Table, examcategory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, examgroup.CategoryTable, examgroup.CategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(eg.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryExams queries the exams edge of a ExamGroup.
+func (c *ExamGroupClient) QueryExams(eg *ExamGroup) *ExamQuery {
+	query := (&ExamClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := eg.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(examgroup.Table, examgroup.FieldID, id),
+			sqlgraph.To(exam.Table, exam.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, examgroup.ExamsTable, examgroup.ExamsColumn),
+		)
+		fromV = sqlgraph.Neighbors(eg.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ExamGroupClient) Hooks() []Hook {
+	return c.hooks.ExamGroup
+}
+
+// Interceptors returns the client interceptors.
+func (c *ExamGroupClient) Interceptors() []Interceptor {
+	return c.inters.ExamGroup
+}
+
+func (c *ExamGroupClient) mutate(ctx context.Context, m *ExamGroupMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ExamGroupCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ExamGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ExamGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ExamGroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ExamGroup mutation op: %q", m.Op())
 	}
 }
 
@@ -2314,13 +2519,13 @@ func (c *UserSubscriptionClient) mutate(ctx context.Context, m *UserSubscription
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		CachedExam, Exam, ExamAssesment, ExamAttempt, ExamCategory, ExamSetting,
-		GeneratedExam, Payment, Subscription, SubscriptionExam, User,
+		CachedExam, Exam, ExamAssesment, ExamAttempt, ExamCategory, ExamGroup,
+		ExamSetting, GeneratedExam, Payment, Subscription, SubscriptionExam, User,
 		UserSubscription []ent.Hook
 	}
 	inters struct {
-		CachedExam, Exam, ExamAssesment, ExamAttempt, ExamCategory, ExamSetting,
-		GeneratedExam, Payment, Subscription, SubscriptionExam, User,
+		CachedExam, Exam, ExamAssesment, ExamAttempt, ExamCategory, ExamGroup,
+		ExamSetting, GeneratedExam, Payment, Subscription, SubscriptionExam, User,
 		UserSubscription []ent.Interceptor
 	}
 )

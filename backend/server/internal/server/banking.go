@@ -13,41 +13,6 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (s *Server) GetBankingDescriptiveQuestionsByExamId(w http.ResponseWriter, r *http.Request) {
-	idParam := chi.URLParam(r, "id")
-	examId, err := strconv.Atoi(idParam)
-	if err != nil {
-		s.ErrorJson(w, errors.New("invalid exam id"), http.StatusBadRequest)
-		return
-	}
-
-	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
-	if err != nil {
-		s.ErrorJson(w, errors.New("unauthorized"), http.StatusUnauthorized)
-		return
-	}
-
-	cachedQuestions, err := s.examGenerationService.GetGeneratedExamsByExamId(r.Context(), examId, userId)
-
-	if err != nil {
-		if strings.Contains(err.Error(), "forbidden") {
-			s.ErrorJson(w, err, http.StatusForbidden)
-			return
-		}
-
-		var notFoundError *ent.NotFoundError
-		if errors.As(err, &notFoundError) {
-			s.ErrorJson(w, errors.New("exam type not found"))
-			return
-		}
-
-		s.ErrorJson(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	s.WriteJson(w, http.StatusOK, &Response{Data: cachedQuestions})
-}
-
 func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	generatedExamId, err := strconv.Atoi(idParam)
