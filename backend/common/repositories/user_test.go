@@ -12,20 +12,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func setupTestDB(t *testing.T) *ent.Client {
-	// Create an in-memory SQLite database for testing
+func setupTestDB(t *testing.T) (*ent.Client, error) {
 	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
-	require.NoError(t, err)
+	if err != nil {
+		return nil, err
+	}
 
-	// Run the migration to create the schema
-	err = client.Schema.Create(context.Background())
-	require.NoError(t, err)
+	if err := client.Schema.Create(context.Background()); err != nil {
+		return nil, err
+	}
 
-	return client
+	return client, nil
 }
 
 func TestUserRepository_Get(t *testing.T) {
-	client := setupTestDB(t)
+	client, err := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
@@ -57,7 +58,7 @@ func TestUserRepository_Get(t *testing.T) {
 }
 
 func TestUserRepository_Get_NonExistentUser(t *testing.T) {
-	client := setupTestDB(t)
+	client, err := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
@@ -75,7 +76,7 @@ func TestUserRepository_Get_NonExistentUser(t *testing.T) {
 }
 
 func TestUserRepository_Get_EmptyUserID(t *testing.T) {
-	client := setupTestDB(t)
+	client, err := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
@@ -92,7 +93,7 @@ func TestUserRepository_Get_EmptyUserID(t *testing.T) {
 }
 
 func TestUserRepository_CreateMultipleUsers(t *testing.T) {
-	client := setupTestDB(t)
+	client, err := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
@@ -138,7 +139,7 @@ func TestUserRepository_CreateMultipleUsers(t *testing.T) {
 }
 
 func TestUserRepository_UpdateUser(t *testing.T) {
-	client := setupTestDB(t)
+	client, err := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
