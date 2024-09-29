@@ -75,6 +75,12 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 		return err
 	}
 
+	// Check if examCategories is nil or empty
+	if examCategories == nil || len(examCategories) == 0 {
+		log.Println("No exam categories found.")
+		return nil // or return an error, depending on your requirements
+	}
+
 	for _, examCategory := range examCategories {
 		log.Printf("Processing category: %s", examCategory.Name)
 
@@ -144,7 +150,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 			log.Printf("Cached metadata saved for exam %s (ID: %d), metadata ID: %d", exam.Name, exam.ID, cacheMetaData.ID)
 
 			// Sleep before processing the next exam
-			time.Sleep(1 * time.Minute)
+			time.Sleep(5 * time.Second)
 		}
 	}
 
