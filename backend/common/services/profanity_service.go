@@ -6,10 +6,17 @@ import (
 	"common/constants"
 )
 
+// ProfanityServiceInterface defines the contract for the profanity detection service
+type ProfanityServiceInterface interface {
+	IsProfane(s string) bool
+}
+
+// ProfanityService is an implementation of ProfanityServiceInterface
 type ProfanityService struct {
 	profanityDetector *goaway.ProfanityDetector
 }
 
+// NewProfanityService creates a new instance of ProfanityService
 func NewProfanityService() *ProfanityService {
 	profanityDetector := goaway.NewProfanityDetector().WithCustomDictionary(
 		constants.DefaultProfanities, constants.FalsePositiveProfanities, constants.FalseNegativeProfanities,
@@ -20,6 +27,7 @@ func NewProfanityService() *ProfanityService {
 	}
 }
 
+// IsProfane checks if the provided string contains any profane words
 func (p *ProfanityService) IsProfane(s string) bool {
 	return p.profanityDetector.IsProfane(s)
 }
