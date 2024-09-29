@@ -6,10 +6,18 @@ on:
     branches:
       - "main"
       - "dev"
+    paths:
+      - "backend/**"
+      - ".github/**"
 
 env:
   GO_VERSION: stable
   GOLANGCI_LINT_VERSION: v1.60
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
 
 jobs:
   detect-modules:
@@ -43,4 +51,4 @@ jobs:
         with:
           version: ${{ env.GOLANGCI_LINT_VERSION }}
           working-directory: ${{ matrix.module }}
-          args: "--timeout 5m --fix"
+          args: "--timeout 5m --fix -v"
