@@ -27,7 +27,8 @@ type ExamService struct {
 }
 
 func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *ExamService {
-	genAIService := NewGenAIService(genAIClient)
+	// Wrap the genAIClient with GenAIClientWrapper to fit the interface
+	genAIService := NewGenAIService(NewGenAIClientWrapper(genAIClient))
 	redisService := commonService.NewRedisService(redisClient)
 	examRepository := commonRepositories.NewExamRespository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)

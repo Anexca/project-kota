@@ -16,7 +16,7 @@ type PromptService struct {
 }
 
 func NewPromptService(genAiClient *genai.Client) *PromptService {
-	genAIService := NewGenAIService(genAiClient)
+	genAIService := NewGenAIService(NewGenAIClientWrapper(genAiClient))
 
 	return &PromptService{
 		genAIService: genAIService,
