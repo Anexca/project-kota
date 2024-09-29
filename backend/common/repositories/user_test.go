@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func setupTestDB(t *testing.T) (*ent.Client, error) {
+func setupTestDB(_ *testing.T) (*ent.Client, error) {
 	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func setupTestDB(t *testing.T) (*ent.Client, error) {
 }
 
 func TestUserRepository_Get(t *testing.T) {
-	client, err := setupTestDB(t)
+	client, _ := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
