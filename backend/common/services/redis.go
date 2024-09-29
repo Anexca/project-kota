@@ -11,7 +11,7 @@ import (
 
 // RedisServiceInterface defines the contract for interacting with Redis.
 type RedisServiceInterface interface {
-	Store(ctx context.Context, key string, value any, expiry time.Duration) error
+	Store(ctx context.Context, key string, value string, expiry time.Duration) error
 	Get(ctx context.Context, key string) (string, error)
 	Delete(ctx context.Context, key string) error
 	Health() map[string]string
@@ -31,7 +31,7 @@ func NewRedisService(redisClient *redis.Client) *RedisService {
 }
 
 // Store stores a key-value pair in Redis with a specified expiration time.
-func (r *RedisService) Store(ctx context.Context, key string, value any, expiry time.Duration) error {
+func (r *RedisService) Store(ctx context.Context, key string, value string, expiry time.Duration) error {
 	status := r.client.Set(ctx, key, value, expiry)
 	if err := status.Err(); err != nil {
 		return fmt.Errorf("failed to store key %s in Redis: %w", key, err)

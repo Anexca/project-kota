@@ -76,7 +76,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 	}
 
 	// Check if examCategories is nil or empty
-	if examCategories == nil || len(examCategories) == 0 {
+	if len(examCategories) == 0 {
 		log.Println("No exam categories found.")
 		return nil // or return an error, depending on your requirements
 	}

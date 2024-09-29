@@ -29,7 +29,7 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient 
 	examService := services.NewExamService(
 		services.NewGenAIService(services.NewGenAIClientWrapper(genAiClient)),
 		commonService.NewRedisService(redisClient),
-		repositories.NewExamRespository(dbClient),
+		repositories.NewExamRepository(dbClient),
 		repositories.NewExamCategoryRepository(dbClient),
 		repositories.NewExamSettingRepository(dbClient),
 		repositories.NewCachedExamRepository(dbClient),
