@@ -58,7 +58,7 @@ func TestUserRepository_Get(t *testing.T) {
 }
 
 func TestUserRepository_Get_NonExistentUser(t *testing.T) {
-	client, err := setupTestDB(t)
+	client, _ := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
@@ -76,7 +76,7 @@ func TestUserRepository_Get_NonExistentUser(t *testing.T) {
 }
 
 func TestUserRepository_Get_EmptyUserID(t *testing.T) {
-	client, err := setupTestDB(t)
+	client, _ := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
@@ -93,7 +93,7 @@ func TestUserRepository_Get_EmptyUserID(t *testing.T) {
 }
 
 func TestUserRepository_CreateMultipleUsers(t *testing.T) {
-	client, err := setupTestDB(t)
+	client, _ := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
@@ -139,7 +139,7 @@ func TestUserRepository_CreateMultipleUsers(t *testing.T) {
 }
 
 func TestUserRepository_UpdateUser(t *testing.T) {
-	client, err := setupTestDB(t)
+	client, _ := setupTestDB(t)
 	defer client.Close()
 
 	ctx := context.Background()
