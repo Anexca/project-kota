@@ -7,6 +7,7 @@ import (
 
 	"common/ent"
 	"common/repositories"
+
 	"github.com/google/uuid"
 
 	"server/pkg/models"
@@ -16,7 +17,7 @@ type UserService struct {
 	paymentService             *PaymentService
 	userRepository             *repositories.UserRepository
 	paymentRepositry           *repositories.PaymentRepository
-	userSubscriptionRepository *repositories.UserSubscriptioRepository
+	userSubscriptionRepository *repositories.UserSubscriptionRepository
 }
 
 type UpdateUserRequest struct {
@@ -38,7 +39,7 @@ func NewUserService(dbClient *ent.Client) *UserService {
 	paymentService := NewPaymentService()
 	paymentRepositry := repositories.NewPaymentRepository(dbClient)
 	userRepository := repositories.NewUserRepository(dbClient)
-	userSubscriptionRepository := repositories.NewUserSubscriptioRepository(dbClient)
+	userSubscriptionRepository := repositories.NewUserSubscriptionRepository(dbClient)
 
 	return &UserService{
 		paymentService:             paymentService,

@@ -17,7 +17,7 @@ type ExamCategoryService struct {
 }
 
 func NewExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
-	examRepository := repositories.NewExamRespository(dbClient)
+	examRepository := repositories.NewExamRepository(dbClient)
 	examGroupRepository := repositories.NewExamGroupRepository(dbClient)
 	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
 

@@ -26,7 +26,7 @@ func NewExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
 	accessService := NewAccessService(dbClient)
 	examAtemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
-	examRepository := commonRepositories.NewExamRespository(dbClient)
+	examRepository := commonRepositories.NewExamRepository(dbClient)
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
 
 	return &ExamAttemptService{

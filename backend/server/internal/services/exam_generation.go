@@ -35,7 +35,7 @@ type ExamGenerationService struct {
 func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *ExamGenerationService {
 	redisService := commonServices.NewRedisService(redisClient)
 	accessService := NewAccessService(dbClient)
-	examRepository := commonRepositories.NewExamRespository(dbClient)
+	examRepository := commonRepositories.NewExamRepository(dbClient)
 	examGroupRepository := commonRepositories.NewExamGroupRepository(dbClient)
 	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
 	cachedExamRepository := commonRepositories.NewCachedExamRepository(dbClient)

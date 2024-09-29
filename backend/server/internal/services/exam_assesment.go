@@ -10,10 +10,12 @@ import (
 
 	"common/constants"
 	"common/ent"
+
 	"github.com/redis/go-redis/v9"
 
 	commonRepositories "common/repositories"
 	commonServices "common/services"
+
 	goaway "github.com/TwiN/go-away"
 
 	"server/pkg/models"
@@ -26,7 +28,7 @@ type ExamAssesmentService struct {
 	profanityService        *commonServices.ProfanityService
 	generatedExamRepository *commonRepositories.GeneratedExamRepository
 	examAttemptRepository   *commonRepositories.ExamAttemptRepository
-	examAssesmentRepository *commonRepositories.ExamAssesmentRepository
+	examAssesmentRepository *commonRepositories.ExamAssessmentRepository
 }
 
 type DescriptiveExamAssesmentRequest struct {
@@ -41,7 +43,7 @@ func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *E
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
 	examGenerationService := NewExamGenerationService(redisClient, dbClient)
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
-	examAssesmentRepository := commonRepositories.NewExamAssesmentRepository(dbClient)
+	examAssesmentRepository := commonRepositories.NewExamAssessmentRepository(dbClient)
 
 	return &ExamAssesmentService{
 		accessService:           accessService,
@@ -75,7 +77,7 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 		"content": request.Content,
 	}
 
-	assesmentModel := commonRepositories.AssesmentModel{
+	assesmentModel := commonRepositories.AssessmentModel{
 		CompletedSeconds:  request.CompletedSeconds,
 		Status:            constants.ASSESSMENT_PENDING,
 		RawUserSubmission: userSubmission,
@@ -150,11 +152,11 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 }
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string, userId string, isOpen bool) {
-	assesmentModel := &commonRepositories.AssesmentModel{}
+	assesmentModel := &commonRepositories.AssessmentModel{}
 	generatedExamData, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		log.Println("error getting generated exam", err)
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting generated exam, %v", err)})
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting generated exam, %v", err)})
 		if err != nil {
 			log.Printf("Error updating status %v", err)
 		}
@@ -166,7 +168,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExamData.Edges.Exam.ID, userId)
 		if err != nil {
 			log.Println("error getting exam", err)
-			err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error checking exam, %v", err)})
+			err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error checking exam, %v", err)})
 			if err != nil {
 				log.Printf("Error updating status %v", err)
 			}
@@ -183,7 +185,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId, isOpen)
 	if err != nil {
 		log.Println("error getting exam", err)
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting exam, %v", err)})
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting exam, %v", err)})
 		if err != nil {
 			log.Printf("Error updating status %v", err)
 		}
@@ -194,7 +196,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	jsonData, err := json.Marshal(generatedExam.RawExamData)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
 		if err != nil {
 			log.Printf("Error updating status %v", err)
 		}
@@ -206,7 +208,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	err = json.Unmarshal(jsonData, &descriptiveExam)
 	if err != nil {
 		log.Println("error processing exam data", err)
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
 		if err != nil {
 			log.Printf("Error updating status %v", err)
 		}
@@ -215,7 +217,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	}
 
 	if e.profanityService.IsProfane(content) {
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
 			"profanity_check": "detected",
 			"profane_content": goaway.ExtractProfanity(content),
 		}, Remarks: fmt.Sprintf("profanities detected in content, %v", goaway.ExtractProfanity(content))})
@@ -256,7 +258,7 @@ Content to evaluate:
 
 	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.PRO_15)
 	if err != nil {
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting prompt results, %v", err)})
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting prompt results, %v", err)})
 		if err != nil {
 			log.Printf("Error updating status %v", err)
 		}
@@ -266,7 +268,7 @@ Content to evaluate:
 	}
 
 	if strings.Contains(response, "FinishReasonSafety") {
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
 			"profanity_check": "detected",
 		}, Remarks: "profanity detected by AI"})
 		if err != nil {
@@ -280,7 +282,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &rawJsonData)
 	if err != nil {
 		log.Println("error response from AI service", err)
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error response from AI Service, %v", err)})
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error response from AI Service, %v", err)})
 		if err != nil {
 			log.Printf("Error updating status %v", err)
 		}
@@ -292,7 +294,7 @@ Content to evaluate:
 	err = json.Unmarshal([]byte(response), &assessmentResult)
 	if err != nil {
 		log.Println("response from AI service does not match criteria", err)
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssesmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("response from AI service does not match criteria, %v", err)})
+		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("response from AI service does not match criteria, %v", err)})
 		if err != nil {
 			log.Printf("Error updating status %v", err)
 		}
@@ -310,6 +312,6 @@ Content to evaluate:
 	log.Println("Processed Assessment", assessmentId)
 }
 
-func (e *ExamAssesmentService) updateAssessment(ctx context.Context, assessmentId int, assesmentModel commonRepositories.AssesmentModel) error {
+func (e *ExamAssesmentService) updateAssessment(ctx context.Context, assessmentId int, assesmentModel commonRepositories.AssessmentModel) error {
 	return e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
 }

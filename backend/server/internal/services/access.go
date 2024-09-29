@@ -10,12 +10,12 @@ import (
 
 type AccessService struct {
 	subscriptionRepository     *repositories.SubscriptionRepository
-	userSubscriptionRepository *repositories.UserSubscriptioRepository
+	userSubscriptionRepository *repositories.UserSubscriptionRepository
 }
 
 func NewAccessService(dbClient *ent.Client) *AccessService {
 	subscriptionRepository := repositories.NewSubscriptionRepository(dbClient)
-	userSubscriptionRepository := repositories.NewUserSubscriptioRepository(dbClient)
+	userSubscriptionRepository := repositories.NewUserSubscriptionRepository(dbClient)
 
 	return &AccessService{
 		subscriptionRepository:     subscriptionRepository,
