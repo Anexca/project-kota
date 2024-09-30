@@ -11,24 +11,54 @@ import (
 	"common/constants"
 	"common/ent"
 
-	"github.com/redis/go-redis/v9"
-
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 
 	goaway "github.com/TwiN/go-away"
+	"github.com/redis/go-redis/v9"
 
 	"server/pkg/models"
 )
 
-type ExamAssesmentService struct {
-	accessService           *AccessService
-	promptService           *PromptService
-	examGenerationService   *ExamGenerationService
-	profanityService        *commonServices.ProfanityService
-	generatedExamRepository *commonRepositories.GeneratedExamRepository
-	examAttemptRepository   *commonRepositories.ExamAttemptRepository
-	examAssesmentRepository *commonRepositories.ExamAssessmentRepository
+// AccessServiceInterface defines the contract for AccessService
+type AccessServiceInterface interface {
+	UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error)
+}
+
+// PromptServiceInterface defines the contract for PromptService
+type PromptServiceInterface interface {
+	GetPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error)
+}
+
+// ExamGenerationServiceInterface defines the contract for ExamGenerationService
+type ExamGenerationServiceInterface interface {
+	GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error)
+}
+
+// ProfanityServiceInterface defines the contract for ProfanityService
+type ProfanityServiceInterface interface {
+	IsProfane(s string) bool
+}
+
+// GeneratedExamRepositoryInterface defines the contract for GeneratedExamRepository
+type GeneratedExamRepositoryInterface interface {
+	GetOpenById(ctx context.Context, id int, isOpen bool) (*ent.GeneratedExam, error)
+}
+
+// ExamAttemptRepositoryInterface defines the contract for ExamAttemptRepository
+type ExamAttemptRepositoryInterface interface {
+	GetById(ctx context.Context, attemptId int, userId string) (*ent.ExamAttempt, error)
+	GetByUserId(ctx context.Context, userId string) ([]*ent.ExamAttempt, error)
+	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error)
+	Create(ctx context.Context, currentAttempt int, generatedExamId int, userId string) (*ent.ExamAttempt, error)
+}
+
+// ExamAssessmentRepositoryInterface defines the contract for ExamAssessmentRepository
+type ExamAssessmentRepositoryInterface interface {
+	Create(ctx context.Context, attemptId int, model commonRepositories.AssessmentModel) (*ent.ExamAssesment, error)
+	Update(ctx context.Context, assessmentId int, model commonRepositories.AssessmentModel) error
+	GetById(ctx context.Context, assessmentId int, userId string) (*ent.ExamAssesment, error)
+	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error)
 }
 
 type DescriptiveExamAssesmentRequest struct {
@@ -36,15 +66,25 @@ type DescriptiveExamAssesmentRequest struct {
 	Content          string `json:"content" validate:"required"`
 }
 
-func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *ExamAssesmentService {
-	accessService := InitAccessService(dbClient)
-	promptService := NewPromptService()
-	profanityService := commonServices.NewProfanityService()
-	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
-	examGenerationService := NewExamGenerationService(redisClient, dbClient)
-	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
-	examAssesmentRepository := commonRepositories.NewExamAssessmentRepository(dbClient)
+type ExamAssesmentService struct {
+	accessService           AccessServiceInterface
+	promptService           PromptServiceInterface
+	examGenerationService   ExamGenerationServiceInterface
+	profanityService        ProfanityServiceInterface
+	generatedExamRepository GeneratedExamRepositoryInterface
+	examAttemptRepository   ExamAttemptRepositoryInterface
+	examAssesmentRepository ExamAssessmentRepositoryInterface
+}
 
+func NewExamAssesmentService(
+	accessService AccessServiceInterface,
+	promptService PromptServiceInterface,
+	profanityService ProfanityServiceInterface,
+	generatedExamRepository GeneratedExamRepositoryInterface,
+	examGenerationService ExamGenerationServiceInterface,
+	examAttemptRepository ExamAttemptRepositoryInterface,
+	examAssesmentRepository ExamAssessmentRepositoryInterface,
+) *ExamAssesmentService {
 	return &ExamAssesmentService{
 		accessService:           accessService,
 		promptService:           promptService,
@@ -56,10 +96,35 @@ func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *E
 	}
 }
 
+func InitExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *ExamAssesmentService {
+	accessService := InitAccessService(dbClient) // Assuming this is still using concrete implementations
+	promptService := NewPromptService()
+	profanityService := commonServices.NewProfanityService()
+	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
+	examGenerationService := NewExamGenerationService(redisClient, dbClient)
+	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
+	examAssesmentRepository := commonRepositories.NewExamAssessmentRepository(dbClient)
+
+	return NewExamAssesmentService(
+		accessService,
+		promptService,
+		profanityService,
+		generatedExamRepository,
+		examGenerationService,
+		examAttemptRepository,
+		examAssesmentRepository,
+	)
+}
+
 func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error) {
 	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
+		log.Printf("Error getting generated exam: %v", err)
 		return nil, err
+	}
+
+	if generatedExam == nil {
+		return nil, errors.New("generated exam not found") // Handle the case where no exam is found
 	}
 
 	if !isOpen {
