@@ -15,27 +15,6 @@ import (
 	"server/pkg/models"
 )
 
-// AccessServiceInterface defines the contract for AccessService
-type AccessServiceInterface interface {
-	UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error)
-}
-
-// ExamRepositoryInterface defines the contract for ExamRepository
-type ExamRepositoryInterface interface {
-	// Define methods needed from the ExamRepository
-}
-
-// ExamAttemptRepositoryInterface defines the contract for ExamAttemptRepository
-type ExamAttemptRepositoryInterface interface {
-	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error)
-	Create(ctx context.Context, currAttempts int, generatedExamId int, userId string) (*ent.ExamAttempt, error)
-}
-
-// ExamSettingRepositoryInterface defines the contract for ExamSettingRepository
-type ExamSettingRepositoryInterface interface {
-	GetByExam(ctx context.Context, examId int) (*ent.ExamSetting, error)
-}
-
 // ExamAttemptService is the service for handling exam attempts
 type ExamAttemptService struct {
 	accessService           interfaces.AccessServiceInterface

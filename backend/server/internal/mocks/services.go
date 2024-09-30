@@ -9,16 +9,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// Mock for AccessServiceInterface
-type MockAccessService struct {
-	mock.Mock
-}
-
-func (m *MockAccessService) UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error) {
-	args := m.Called(ctx, examId, userId)
-	return args.Bool(0), args.Error(1)
-}
-
 // Mock for PromptServiceInterface
 type MockPromptService struct {
 	mock.Mock
@@ -27,11 +17,6 @@ type MockPromptService struct {
 func (m *MockPromptService) GetPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error) {
 	args := m.Called(ctx, prompt, model)
 	return args.String(0), args.Error(1)
-}
-
-func (m *MockAccessService) GetAccessibleExamsForUser(ctx context.Context, exams []*ent.Exam, userId string) ([]*ent.Exam, error) {
-	args := m.Called(ctx, exams, userId)
-	return args.Get(0).([]*ent.Exam), args.Error(1)
 }
 
 // Mock for ExamGenerationServiceInterface
@@ -66,4 +51,21 @@ func (m *MockExamAssesmentService) GetExamAssessments(ctx context.Context, gener
 
 func (m *MockExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId int, assessmentId int, content string, userId string, isOpen bool) {
 	m.Called(ctx, generatedExamId, assessmentId, content, userId, isOpen)
+}
+
+// MockAccessService is a mock type for the AccessServiceInterface
+type MockAccessService struct {
+	mock.Mock
+}
+
+// UserHasAccessToExam mocks the UserHasAccessToExam method
+func (m *MockAccessService) UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error) {
+	args := m.Called(ctx, examId, userId)
+	return args.Bool(0), args.Error(1)
+}
+
+// GetAccessibleExamsForUser mocks the GetAccessibleExamsForUser method
+func (m *MockAccessService) GetAccessibleExamsForUser(ctx context.Context, exams []*ent.Exam, userId string) ([]*ent.Exam, error) {
+	args := m.Called(ctx, exams, userId)
+	return args.Get(0).([]*ent.Exam), args.Error(1)
 }

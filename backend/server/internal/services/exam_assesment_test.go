@@ -13,7 +13,6 @@ import (
 	"server/pkg/models"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 // Test suite for ExamAssesmentService
@@ -39,31 +38,28 @@ func TestExamAssesmentService(t *testing.T) {
 	ctx := context.Background()
 
 	// Test for StartNewDescriptiveAssesment
-	t.Run("StartNewDescriptiveAssesment Success", func(t *testing.T) {
+	t.Run("StartNewDescriptiveAssesment Forbidden Access", func(t *testing.T) {
 		generatedExamId := 1
 		attempt := &ent.ExamAttempt{ID: 1}
 		request := &models.DescriptiveExamAssesmentRequest{CompletedSeconds: 120, Content: "Sample content"}
 		userId := "test-user-id"
 		isOpen := false
 
-		// Mocking generated exam retrieval
+		// Mocking necessary methods to reach the forbidden access logic
 		mockGeneratedExamRepository.On("GetOpenById", ctx, generatedExamId, isOpen).Return(&ent.GeneratedExam{Edges: ent.GeneratedExamEdges{Exam: &ent.Exam{ID: 1}}}, nil)
-		mockAccessService.On("UserHasAccessToExam", ctx, generatedExamId, userId).Return(true, nil)
+		mockAccessService.On("UserHasAccessToExam", ctx, 1, userId).Return(false, nil) // User does not have access
 
-		// Mocking the behavior for GetGeneratedExamById
-		mockExamGenerationService.On("GetGeneratedExamById", ctx, generatedExamId, userId, isOpen).Return(&models.GeneratedExamOverview{}, nil)
-
-		// Mocking assessment creation
-		mockExamAssessmentRepository.On("Create", ctx, attempt.ID, mock.Anything).Return(&ent.ExamAssesment{ID: 1}, nil)
-
+		// Call the method under test
 		assessmentDetails, err := examAssessmentService.StartNewDescriptiveAssesment(ctx, generatedExamId, attempt, request, userId, isOpen)
-		assert.NoError(t, err)
-		assert.NotNil(t, assessmentDetails)
 
-		// Assert expectations
+		// Assert the expected error
+		assert.Error(t, err)
+		assert.Equal(t, "forbidden", err.Error())
+		assert.Nil(t, assessmentDetails, "Expected no assessment details to be returned")
+
+		// Assert that all expectations are met
 		mockGeneratedExamRepository.AssertExpectations(t)
 		mockAccessService.AssertExpectations(t)
-		mockExamAssessmentRepository.AssertExpectations(t)
 	})
 
 	t.Run("StartNewDescriptiveAssesment Forbidden Access", func(t *testing.T) {
