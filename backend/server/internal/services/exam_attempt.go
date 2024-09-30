@@ -23,7 +23,7 @@ type ExamAttemptService struct {
 }
 
 func NewExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
-	accessService := NewAccessService(dbClient)
+	accessService := InitAccessService(dbClient)
 	examAtemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
 	examRepository := commonRepositories.NewExamRepository(dbClient)

@@ -37,7 +37,7 @@ type DescriptiveExamAssesmentRequest struct {
 }
 
 func NewExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *ExamAssesmentService {
-	accessService := NewAccessService(dbClient)
+	accessService := InitAccessService(dbClient)
 	promptService := NewPromptService()
 	profanityService := commonServices.NewProfanityService()
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
