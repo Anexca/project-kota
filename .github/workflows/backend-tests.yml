@@ -33,7 +33,6 @@ jobs:
       # Run tests and collect coverage in backend/server
       - name: Run tests for server
         run: |
-          cd backend/server
           go mod tidy
           go test -coverprofile=coverage.out ./...
         working-directory: "backend/server"
@@ -41,7 +40,6 @@ jobs:
       # Run tests and collect coverage in backend/ai-service
       - name: Run tests for ai-service
         run: |
-          cd backend/ai-service
           go mod tidy
           go test -coverprofile=coverage.out ./...
         working-directory: "backend/ai-service"
@@ -49,7 +47,6 @@ jobs:
       # Run tests and collect coverage in backend/common
       - name: Run tests for common
         run: |
-          cd backend/common
           go mod tidy
           go test -coverprofile=coverage.out ./...
         working-directory: "backend/common"
