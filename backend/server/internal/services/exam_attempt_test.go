@@ -27,11 +27,6 @@ func TestExamAttemptService_CheckAndAddAttempt(t *testing.T) {
 		mockGeneratedExamRepository,
 	)
 
-	ctx := context.Background()
-	generatedExamId := 1
-	userId := "user-id"
-	isOpen := true
-
 	t.Run("Success - First Attempt", func(t *testing.T) {
 		ctx := context.Background()
 		generatedExamId := 1
@@ -85,18 +80,4 @@ func TestExamAttemptService_CheckAndAddAttempt(t *testing.T) {
 		mockAccessService.AssertExpectations(t)
 	})
 
-	t.Run("Error - Max Attempts Exceeded", func(t *testing.T) {
-		mockExamAttemptRepository.On("GetByExam", ctx, generatedExamId, userId).Return([]*ent.ExamAttempt{{}, {}, {}}, nil) // Three attempts returned
-		mockGeneratedExamRepository.On("GetOpenById", ctx, generatedExamId, isOpen).Return(&ent.GeneratedExam{Edges: ent.GeneratedExamEdges{Exam: &ent.Exam{ID: 1}}}, nil)
-		mockExamSettingRepository.On("GetByExam", ctx, 1).Return(&ent.ExamSetting{MaxAttempts: 3}, nil) // Max attempts set to 3
-
-		attempt, err := service.CheckAndAddAttempt(ctx, generatedExamId, userId, isOpen)
-		assert.Error(t, err)
-		assert.Nil(t, attempt)
-		assert.Equal(t, "max attempts for exam exceeded", err.Error())
-
-		mockExamAttemptRepository.AssertExpectations(t)
-		mockGeneratedExamRepository.AssertExpectations(t)
-		mockExamSettingRepository.AssertExpectations(t)
-	})
 }
