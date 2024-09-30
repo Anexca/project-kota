@@ -30,42 +30,35 @@ jobs:
         with:
           go-version: "1.23.0"
 
-      # Run tests in backend/server
-      - name: Install dependencies for server
-        run: go mod tidy
-        working-directory: "backend/server"
-
+      # Run tests and collect coverage in backend/server
       - name: Run tests for server
-        run: go test ./... -v
+        run: |
+          cd backend/server
+          go mod tidy
+          go test -coverprofile=coverage.out ./...
         working-directory: "backend/server"
 
-      # Run tests in backend/ai-service
-      - name: Install dependencies for ai-service
-        run: go mod tidy
-        working-directory: "backend/ai-service"
-
+      # Run tests and collect coverage in backend/ai-service
       - name: Run tests for ai-service
-        run: go test ./... -v
+        run: |
+          cd backend/ai-service
+          go mod tidy
+          go test -coverprofile=coverage.out ./...
         working-directory: "backend/ai-service"
 
-      # Run tests in backend/common
-      - name: Install dependencies for common
-        run: go mod tidy
-        working-directory: "backend/common"
-
+      # Run tests and collect coverage in backend/common
       - name: Run tests for common
-        run: go test ./... -v
+        run: |
+          cd backend/common
+          go mod tidy
+          go test -coverprofile=coverage.out ./...
         working-directory: "backend/common"
 
-      # Optionally report coverage for all services
-      - name: Report coverage for server
-        run: go test -cover ./...
-        working-directory: "backend/server"
-
-      - name: Report coverage for ai-service
-        run: go test -cover ./...
-        working-directory: "backend/ai-service"
-
-      - name: Report coverage for common
-        run: go test -cover ./...
-        working-directory: "backend/common"
+      # Generate coverage summary
+      - name: Code Coverage Summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: |
+            backend/server/coverage.out
+            backend/ai-service/coverage.out
+            backend/common/coverage.out
