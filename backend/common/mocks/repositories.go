@@ -3,6 +3,7 @@ package mocks
 import (
 	"common/constants"
 	"common/ent"
+	"common/repositories"
 	"context"
 	"time"
 
@@ -97,4 +98,163 @@ func (m *MockCachedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) 
 func (m *MockCachedExamRepository) MarkAsUsed(ctx context.Context, id int) error {
 	args := m.Called(ctx, id)
 	return args.Error(0)
+}
+
+// Mock for UserSubscriptionRepositoryInterface
+type MockUserSubscriptionRepository struct {
+	mock.Mock
+}
+
+func (m *MockUserSubscriptionRepository) Create(ctx context.Context, model repositories.UserSubscriptionModel) (*ent.UserSubscription, error) {
+	args := m.Called(ctx, model)
+	return args.Get(0).(*ent.UserSubscription), args.Error(1)
+}
+
+func (m *MockUserSubscriptionRepository) Update(ctx context.Context, updatedUserSubscription *ent.UserSubscription) error {
+	args := m.Called(ctx, updatedUserSubscription)
+	return args.Error(0)
+}
+
+func (m *MockUserSubscriptionRepository) GetById(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
+	args := m.Called(ctx, userSubscriptionId, userId)
+	return args.Get(0).(*ent.UserSubscription), args.Error(1)
+}
+
+func (m *MockUserSubscriptionRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.UserSubscription, error) {
+	args := m.Called(ctx, userId)
+	return args.Get(0).([]*ent.UserSubscription), args.Error(1)
+}
+
+func (m *MockUserSubscriptionRepository) GetByProviderSubscriptionId(ctx context.Context, providerSubscriptionId string, userId string) (*ent.UserSubscription, error) {
+	args := m.Called(ctx, providerSubscriptionId, userId)
+	return args.Get(0).(*ent.UserSubscription), args.Error(1)
+}
+
+type MockSubscriptionRepository struct {
+	mock.Mock
+}
+
+func (m *MockSubscriptionRepository) GetById(ctx context.Context, id int) (*ent.Subscription, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(*ent.Subscription), args.Error(1)
+}
+
+func (m *MockSubscriptionRepository) GetAll(ctx context.Context) ([]*ent.Subscription, error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]*ent.Subscription), args.Error(1)
+}
+
+// Mock for GeneratedExamRepositoryInterface
+type MockGeneratedExamRepository struct {
+	mock.Mock
+}
+
+func (m *MockGeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, exams, ex)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) Add(ctx context.Context, exam map[string]interface{}, examId int) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, exam, examId)
+	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error {
+	args := m.Called(ctx, generatedExams)
+	return args.Error(0)
+}
+
+func (m *MockGeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, generatedExamId)
+	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, generatedExamId, isOpen)
+	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetActiveById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, generatedExamId, isActive)
+	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, ex)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, examId)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.Exam, monthOffset, limit int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, ex, monthOffset, limit)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, ex, weekOffset, limit)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, userId, page, limit, from, to, examTypeId, categoryID)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error) {
+	args := m.Called(ctx, userId, from, to, examTypeId, categoryID)
+	return args.Int(0), args.Error(1)
+}
+
+// Mock for ExamAttemptRepositoryInterface
+type MockExamAttemptRepository struct {
+	mock.Mock
+}
+
+func (m *MockExamAttemptRepository) GetById(ctx context.Context, attemptId int, userId string) (*ent.ExamAttempt, error) {
+	args := m.Called(ctx, attemptId, userId)
+	return args.Get(0).(*ent.ExamAttempt), args.Error(1)
+}
+
+func (m *MockExamAttemptRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.ExamAttempt, error) {
+	args := m.Called(ctx, userId)
+	return args.Get(0).([]*ent.ExamAttempt), args.Error(1)
+}
+
+func (m *MockExamAttemptRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error) {
+	args := m.Called(ctx, generatedExamId, userId)
+	return args.Get(0).([]*ent.ExamAttempt), args.Error(1)
+}
+
+func (m *MockExamAttemptRepository) Create(ctx context.Context, currentAttempt int, generatedExamId int, userId string) (*ent.ExamAttempt, error) {
+	args := m.Called(ctx, currentAttempt, generatedExamId, userId)
+	return args.Get(0).(*ent.ExamAttempt), args.Error(1)
+}
+
+// Mock for ExamAssessmentRepositoryInterface
+type MockExamAssessmentRepository struct {
+	mock.Mock
+}
+
+func (m *MockExamAssessmentRepository) Create(ctx context.Context, attemptId int, model repositories.AssessmentModel) (*ent.ExamAssesment, error) {
+	args := m.Called(ctx, attemptId, model)
+	return args.Get(0).(*ent.ExamAssesment), args.Error(1)
+}
+
+func (m *MockExamAssessmentRepository) Update(ctx context.Context, assessmentId int, model repositories.AssessmentModel) error {
+	args := m.Called(ctx, assessmentId, model)
+	return args.Error(0)
+}
+
+func (m *MockExamAssessmentRepository) GetById(ctx context.Context, assessmentId int, userId string) (*ent.ExamAssesment, error) {
+	args := m.Called(ctx, assessmentId, userId)
+	return args.Get(0).(*ent.ExamAssesment), args.Error(1)
+}
+
+func (m *MockExamAssessmentRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error) {
+	args := m.Called(ctx, generatedExamId, userId)
+	return args.Get(0).([]*ent.ExamAssesment), args.Error(1)
 }

@@ -52,3 +52,13 @@ func (m *MockRedisService) CheckRedisHealth(ctx context.Context, stats map[strin
 	args := m.Called(ctx, stats)
 	return args.Get(0).(map[string]string)
 }
+
+// Mock for ProfanityServiceInterface
+type MockProfanityService struct {
+	mock.Mock
+}
+
+func (m *MockProfanityService) IsProfane(s string) bool {
+	args := m.Called(s)
+	return args.Bool(0)
+}

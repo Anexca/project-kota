@@ -12,29 +12,16 @@ import (
 	"common/constants"
 	"common/ent"
 
+	commonInterfaces "common/interfaces"
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 
 	goaway "github.com/TwiN/go-away"
 	"github.com/redis/go-redis/v9"
 
+	"server/internal/interfaces"
 	"server/pkg/models"
 )
-
-// PromptServiceInterface defines the contract for PromptService
-type PromptServiceInterface interface {
-	GetPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error)
-}
-
-// ExamGenerationServiceInterface defines the contract for ExamGenerationService
-type ExamGenerationServiceInterface interface {
-	GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error)
-}
-
-// ProfanityServiceInterface defines the contract for ProfanityService
-type ProfanityServiceInterface interface {
-	IsProfane(s string) bool
-}
 
 // GeneratedExamRepositoryInterface defines the contract for GeneratedExamRepository
 type GeneratedExamRepositoryInterface interface {
@@ -67,22 +54,22 @@ type DescriptiveExamAssesmentRequest struct {
 
 type ExamAssesmentService struct {
 	accessService           AccessServiceInterface
-	promptService           PromptServiceInterface
-	examGenerationService   ExamGenerationServiceInterface
-	profanityService        ProfanityServiceInterface
-	generatedExamRepository GeneratedExamRepositoryInterface
-	examAttemptRepository   ExamAttemptRepositoryInterface
-	examAssesmentRepository ExamAssessmentRepositoryInterface
+	promptService           interfaces.PromptServiceInterface
+	examGenerationService   interfaces.ExamGenerationServiceInterface
+	profanityService        commonInterfaces.ProfanityServiceInterface
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
+	examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+	examAssesmentRepository commonInterfaces.ExamAssessmentRepositoryInterface
 }
 
 func NewExamAssesmentService(
 	accessService AccessServiceInterface,
-	promptService PromptServiceInterface,
-	profanityService ProfanityServiceInterface,
-	generatedExamRepository GeneratedExamRepositoryInterface,
-	examGenerationService ExamGenerationServiceInterface,
-	examAttemptRepository ExamAttemptRepositoryInterface,
-	examAssesmentRepository ExamAssessmentRepositoryInterface,
+	promptService interfaces.PromptServiceInterface,
+	profanityService commonInterfaces.ProfanityServiceInterface,
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
+	examGenerationService interfaces.ExamGenerationServiceInterface,
+	examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+	examAssesmentRepository commonInterfaces.ExamAssessmentRepositoryInterface,
 ) *ExamAssesmentService {
 	return &ExamAssesmentService{
 		accessService:           accessService,

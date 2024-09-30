@@ -8,58 +8,14 @@ import (
 	"time"
 
 	"common/ent"
-	"common/repositories"
+	"common/mocks"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-type MockSubscriptionRepository struct {
-	mock.Mock
-}
-
-func (m *MockSubscriptionRepository) GetById(ctx context.Context, id int) (*ent.Subscription, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(*ent.Subscription), args.Error(1)
-}
-
-func (m *MockSubscriptionRepository) GetAll(ctx context.Context) ([]*ent.Subscription, error) {
-	args := m.Called(ctx)
-	return args.Get(0).([]*ent.Subscription), args.Error(1)
-}
-
-// Mock for UserSubscriptionRepositoryInterface
-type MockUserSubscriptionRepository struct {
-	mock.Mock
-}
-
-func (m *MockUserSubscriptionRepository) Create(ctx context.Context, model repositories.UserSubscriptionModel) (*ent.UserSubscription, error) {
-	args := m.Called(ctx, model)
-	return args.Get(0).(*ent.UserSubscription), args.Error(1)
-}
-
-func (m *MockUserSubscriptionRepository) Update(ctx context.Context, updatedUserSubscription *ent.UserSubscription) error {
-	args := m.Called(ctx, updatedUserSubscription)
-	return args.Error(0)
-}
-
-func (m *MockUserSubscriptionRepository) GetById(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error) {
-	args := m.Called(ctx, userSubscriptionId, userId)
-	return args.Get(0).(*ent.UserSubscription), args.Error(1)
-}
-
-func (m *MockUserSubscriptionRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.UserSubscription, error) {
-	args := m.Called(ctx, userId)
-	return args.Get(0).([]*ent.UserSubscription), args.Error(1)
-}
-
-func (m *MockUserSubscriptionRepository) GetByProviderSubscriptionId(ctx context.Context, providerSubscriptionId string, userId string) (*ent.UserSubscription, error) {
-	args := m.Called(ctx, providerSubscriptionId, userId)
-	return args.Get(0).(*ent.UserSubscription), args.Error(1)
-}
 func TestUserHasAccessToExam_Success(t *testing.T) {
-	mockSubscriptionRepo := new(MockSubscriptionRepository)
-	mockUserSubscriptionRepo := new(MockUserSubscriptionRepository)
+	mockSubscriptionRepo := new(mocks.MockSubscriptionRepository)
+	mockUserSubscriptionRepo := new(mocks.MockUserSubscriptionRepository)
 
 	accessService := services.NewAccessService(mockSubscriptionRepo, mockUserSubscriptionRepo)
 
@@ -102,8 +58,8 @@ func TestUserHasAccessToExam_Success(t *testing.T) {
 }
 
 func TestUserHasAccessToExam_NoAccess(t *testing.T) {
-	mockSubscriptionRepo := new(MockSubscriptionRepository)
-	mockUserSubscriptionRepo := new(MockUserSubscriptionRepository)
+	mockSubscriptionRepo := new(mocks.MockSubscriptionRepository)
+	mockUserSubscriptionRepo := new(mocks.MockUserSubscriptionRepository)
 
 	accessService := services.NewAccessService(mockSubscriptionRepo, mockUserSubscriptionRepo)
 
@@ -147,8 +103,8 @@ func TestUserHasAccessToExam_NoAccess(t *testing.T) {
 }
 
 func TestGetAccessibleExamsForUser_Success(t *testing.T) {
-	mockSubscriptionRepo := new(MockSubscriptionRepository)
-	mockUserSubscriptionRepo := new(MockUserSubscriptionRepository)
+	mockSubscriptionRepo := new(mocks.MockSubscriptionRepository)
+	mockUserSubscriptionRepo := new(mocks.MockUserSubscriptionRepository)
 
 	accessService := services.NewAccessService(mockSubscriptionRepo, mockUserSubscriptionRepo)
 
@@ -202,8 +158,8 @@ func TestGetAccessibleExamsForUser_Success(t *testing.T) {
 }
 
 func TestGetAccessibleExamsForUser_NoAccessibleExams(t *testing.T) {
-	mockSubscriptionRepo := new(MockSubscriptionRepository)
-	mockUserSubscriptionRepo := new(MockUserSubscriptionRepository)
+	mockSubscriptionRepo := new(mocks.MockSubscriptionRepository)
+	mockUserSubscriptionRepo := new(mocks.MockUserSubscriptionRepository)
 
 	accessService := services.NewAccessService(mockSubscriptionRepo, mockUserSubscriptionRepo)
 
@@ -252,8 +208,8 @@ func TestGetAccessibleExamsForUser_NoAccessibleExams(t *testing.T) {
 }
 
 func TestUserHasAccessToExam_ErrorFetchingSubscriptions(t *testing.T) {
-	mockSubscriptionRepo := new(MockSubscriptionRepository)
-	mockUserSubscriptionRepo := new(MockUserSubscriptionRepository)
+	mockSubscriptionRepo := new(mocks.MockSubscriptionRepository)
+	mockUserSubscriptionRepo := new(mocks.MockUserSubscriptionRepository)
 
 	accessService := services.NewAccessService(mockSubscriptionRepo, mockUserSubscriptionRepo)
 
@@ -274,8 +230,8 @@ func TestUserHasAccessToExam_ErrorFetchingSubscriptions(t *testing.T) {
 }
 
 func TestGetAccessibleExamsForUser_ErrorFetchingSubscriptions(t *testing.T) {
-	mockSubscriptionRepo := new(MockSubscriptionRepository)
-	mockUserSubscriptionRepo := new(MockUserSubscriptionRepository)
+	mockSubscriptionRepo := new(mocks.MockSubscriptionRepository)
+	mockUserSubscriptionRepo := new(mocks.MockUserSubscriptionRepository)
 
 	accessService := services.NewAccessService(mockSubscriptionRepo, mockUserSubscriptionRepo)
 
@@ -296,8 +252,8 @@ func TestGetAccessibleExamsForUser_ErrorFetchingSubscriptions(t *testing.T) {
 }
 
 func TestUserHasAccessToExam_ErrorFetchingSubscription(t *testing.T) {
-	mockSubscriptionRepo := new(MockSubscriptionRepository)
-	mockUserSubscriptionRepo := new(MockUserSubscriptionRepository)
+	mockSubscriptionRepo := new(mocks.MockSubscriptionRepository)
+	mockUserSubscriptionRepo := new(mocks.MockUserSubscriptionRepository)
 
 	accessService := services.NewAccessService(mockSubscriptionRepo, mockUserSubscriptionRepo)
 
