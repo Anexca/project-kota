@@ -7,50 +7,27 @@ import (
 	"time"
 
 	commonConstants "common/constants"
-	"common/ent"
+	commonInterfaces "common/interfaces"
 	commonUtil "common/util"
 )
 
-// Define interfaces for dependencies to make them mockable
-
-type RedisServiceInterface interface {
-	Store(ctx context.Context, key string, value string, expiration time.Duration) error
-}
-
-type ExamRepositoryInterface interface {
-	GetByExamCategory(ctx context.Context, category *ent.ExamCategory) ([]*ent.Exam, error)
-}
-
-type ExamCategoryRepositoryInterface interface {
-	Get(ctx context.Context) ([]*ent.ExamCategory, error)
-}
-
-type ExamSettingRepositoryInterface interface {
-	GetByExam(ctx context.Context, examID int) (*ent.ExamSetting, error)
-}
-
-type CachedExamRepositoryInterface interface {
-	Create(ctx context.Context, uid string, expiration time.Duration, exam *ent.Exam) (*ent.CachedExam, error)
-}
-
-// ExamService uses interfaces to allow testability
 type ExamService struct {
 	genAIService                     GenAIServiceInterface
-	redisService                     RedisServiceInterface
-	examRepository                   ExamRepositoryInterface
-	examCategoryRepository           ExamCategoryRepositoryInterface
-	examSettingRepository            ExamSettingRepositoryInterface
-	cachedQuestionMetaDataRepository CachedExamRepositoryInterface
+	redisService                     commonInterfaces.RedisServiceInterface
+	examRepository                   commonInterfaces.ExamRepositoryInterface
+	examCategoryRepository           commonInterfaces.ExamCategoryRepositoryInterface
+	examSettingRepository            commonInterfaces.ExamSettingRepositoryInterface
+	cachedQuestionMetaDataRepository commonInterfaces.CachedExamRepositoryInterface
 }
 
 // NewExamService constructor with dependencies for both production and test usage
 func NewExamService(
 	genAIService GenAIServiceInterface,
-	redisService RedisServiceInterface,
-	examRepository ExamRepositoryInterface,
-	examCategoryRepository ExamCategoryRepositoryInterface,
-	examSettingRepository ExamSettingRepositoryInterface,
-	cachedQuestionMetaDataRepository CachedExamRepositoryInterface,
+	redisService commonInterfaces.RedisServiceInterface,
+	examRepository commonInterfaces.ExamRepositoryInterface,
+	examCategoryRepository commonInterfaces.ExamCategoryRepositoryInterface,
+	examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
+	cachedQuestionMetaDataRepository commonInterfaces.CachedExamRepositoryInterface,
 ) *ExamService {
 	return &ExamService{
 		genAIService:                     genAIService,
