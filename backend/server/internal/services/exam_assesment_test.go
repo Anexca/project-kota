@@ -3,6 +3,7 @@ package services_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"common/constants"
 	"common/ent"
@@ -60,9 +61,64 @@ type MockGeneratedExamRepository struct {
 	mock.Mock
 }
 
-func (m *MockGeneratedExamRepository) GetOpenById(ctx context.Context, id int, isOpen bool) (*ent.GeneratedExam, error) {
-	args := m.Called(ctx, id, isOpen)
+func (m *MockGeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, exams, ex)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) Add(ctx context.Context, exam map[string]interface{}, examId int) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, exam, examId)
 	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error {
+	args := m.Called(ctx, generatedExams)
+	return args.Error(0)
+}
+
+func (m *MockGeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, generatedExamId)
+	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, generatedExamId, isOpen)
+	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetActiveById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error) {
+	args := m.Called(ctx, generatedExamId, isActive)
+	return args.Get(0).(*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, ex)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, examId)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.Exam, monthOffset, limit int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, ex, monthOffset, limit)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, ex, weekOffset, limit)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
+	args := m.Called(ctx, userId, page, limit, from, to, examTypeId, categoryID)
+	return args.Get(0).([]*ent.GeneratedExam), args.Error(1)
+}
+
+func (m *MockGeneratedExamRepository) GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error) {
+	args := m.Called(ctx, userId, from, to, examTypeId, categoryID)
+	return args.Int(0), args.Error(1)
 }
 
 // Mock for ExamAttemptRepositoryInterface
@@ -147,7 +203,10 @@ func TestExamAssesmentService(t *testing.T) {
 
 		// Mocking generated exam retrieval
 		mockGeneratedExamRepository.On("GetOpenById", ctx, generatedExamId, isOpen).Return(&ent.GeneratedExam{Edges: ent.GeneratedExamEdges{Exam: &ent.Exam{ID: 1}}}, nil)
-		mockAccessService.On("UserHasAccessToExam", ctx, 1, userId).Return(true, nil)
+		mockAccessService.On("UserHasAccessToExam", ctx, generatedExamId, userId).Return(true, nil)
+
+		// Mocking the behavior for GetGeneratedExamById
+		mockExamGenerationService.On("GetGeneratedExamById", ctx, generatedExamId, userId, isOpen).Return(&models.GeneratedExamOverview{}, nil)
 
 		// Mocking assessment creation
 		mockExamAssessmentRepository.On("Create", ctx, attempt.ID, mock.Anything).Return(&ent.ExamAssesment{ID: 1}, nil)
@@ -160,6 +219,7 @@ func TestExamAssesmentService(t *testing.T) {
 		mockGeneratedExamRepository.AssertExpectations(t)
 		mockAccessService.AssertExpectations(t)
 		mockExamAssessmentRepository.AssertExpectations(t)
+		mockExamGenerationService.AssertExpectations(t) // Assert expectations for the ExamGenerationService
 	})
 
 	t.Run("StartNewDescriptiveAssesment Forbidden Access", func(t *testing.T) {
@@ -170,7 +230,7 @@ func TestExamAssesmentService(t *testing.T) {
 		isOpen := false
 
 		mockGeneratedExamRepository.On("GetOpenById", ctx, generatedExamId, isOpen).Return(&ent.GeneratedExam{Edges: ent.GeneratedExamEdges{Exam: &ent.Exam{ID: 1}}}, nil)
-		mockAccessService.On("UserHasAccessToExam", ctx, 1, userId).Return(false, nil)
+		mockAccessService.On("UserHasAccessToExam", ctx, generatedExamId, userId).Return(false, nil)
 
 		assessmentDetails, err := examAssessmentService.StartNewDescriptiveAssesment(ctx, generatedExamId, attempt, request, userId, isOpen)
 		assert.Error(t, err)
@@ -182,7 +242,6 @@ func TestExamAssesmentService(t *testing.T) {
 		mockAccessService.AssertExpectations(t)
 	})
 
-	// Test for GetAssesmentById
 	t.Run("GetAssesmentById Success", func(t *testing.T) {
 		assessmentId := 1
 		userId := "test-user-id"
@@ -202,7 +261,6 @@ func TestExamAssesmentService(t *testing.T) {
 		mockExamAssessmentRepository.AssertExpectations(t)
 	})
 
-	// Test for GetExamAssessments
 	t.Run("GetExamAssessments Success", func(t *testing.T) {
 		generatedExamId := 1
 		userId := "test-user-id"
@@ -220,5 +278,4 @@ func TestExamAssesmentService(t *testing.T) {
 		// Assert expectations
 		mockExamAssessmentRepository.AssertExpectations(t)
 	})
-
 }
