@@ -2,6 +2,9 @@ name: golangci-lint
 
 on:
   pull_request:
+    paths:
+      - "backend/**"
+      - ".github/**"
   push:
     branches:
       - "main"
