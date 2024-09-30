@@ -11,16 +11,6 @@ import (
 	"common/ent/generatedexam"
 )
 
-// ExamRepositoryInterface defines the contract for the exam repository.
-type ExamRepositoryInterface interface {
-	GetById(ctx context.Context, examId int) (*ent.Exam, error)
-	GetActiveByExamsGroupId(ctx context.Context, examGroupId int, isActive bool) ([]*ent.Exam, error)
-	GetActiveById(ctx context.Context, examId int, isActive bool) (*ent.Exam, error)
-	GetByExamCategory(ctx context.Context, examCategory *ent.ExamCategory) ([]*ent.Exam, error)
-	GetActiveByType(ctx context.Context, examType constants.ExamType) ([]*ent.Exam, error)
-	GetByName(ctx context.Context, examName string) (*ent.Exam, error)
-}
-
 // ExamRepository is a concrete implementation of ExamRepositoryInterface.
 type ExamRepository struct {
 	dbClient *ent.Client

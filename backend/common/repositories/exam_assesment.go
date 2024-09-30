@@ -13,14 +13,6 @@ import (
 	"common/ent/user"
 )
 
-// ExamAssessmentRepositoryInterface defines the contract for interacting with exam assessments.
-type ExamAssessmentRepositoryInterface interface {
-	Create(ctx context.Context, attemptId int, model AssessmentModel) (*ent.ExamAssesment, error)
-	Update(ctx context.Context, assessmentId int, model AssessmentModel) error
-	GetById(ctx context.Context, assessmentId int, userId string) (*ent.ExamAssesment, error)
-	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error)
-}
-
 // ExamAssessmentRepository is a concrete implementation of ExamAssessmentRepositoryInterface.
 type ExamAssessmentRepository struct {
 	dbClient *ent.Client

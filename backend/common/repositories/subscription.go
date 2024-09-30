@@ -7,12 +7,6 @@ import (
 	"common/ent/subscription"
 )
 
-// SubscriptionRepositoryInterface defines the contract for the Subscription repository.
-type SubscriptionRepositoryInterface interface {
-	GetAll(ctx context.Context) ([]*ent.Subscription, error)
-	GetById(ctx context.Context, subscriptionId int) (*ent.Subscription, error)
-}
-
 // SubscriptionRepository is a concrete implementation of SubscriptionRepositoryInterface.
 type SubscriptionRepository struct {
 	dbClient *ent.Client

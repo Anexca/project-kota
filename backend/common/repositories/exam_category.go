@@ -9,12 +9,6 @@ import (
 	"common/ent/examgroup"
 )
 
-// ExamCategoryRepositoryInterface defines the contract for the exam category repository.
-type ExamCategoryRepositoryInterface interface {
-	Get(ctx context.Context) ([]*ent.ExamCategory, error)
-	GetByName(ctx context.Context, categoryName constants.ExamCategoryName) (*ent.ExamCategory, error)
-}
-
 // ExamCategoryRepository is a concrete implementation of ExamCategoryRepositoryInterface.
 type ExamCategoryRepository struct {
 	dbClient *ent.Client
