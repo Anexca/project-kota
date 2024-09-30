@@ -30,3 +30,9 @@ type ExamAssesmentServiceInterface interface {
 	GetExamAssessments(ctx context.Context, generatedExamId int, userId string) ([]models.AssessmentDetails, error)
 	AssessDescriptiveExam(ctx context.Context, generatedExamId int, assessmentId int, content string, userId string, isOpen bool)
 }
+
+// ExamCategoryServiceInterface defines the operations available for an exam category service.
+type ExamCategoryServiceInterface interface {
+	GetBankingExamGroups(ctx context.Context) ([]models.CategoryExamGroup, error)
+	GetExamGroupById(ctx context.Context, examGroupId int) (*models.CategoryExamGroup, error)
+}

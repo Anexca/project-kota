@@ -258,3 +258,20 @@ func (m *MockExamAssessmentRepository) GetByExam(ctx context.Context, generatedE
 	args := m.Called(ctx, generatedExamId, userId)
 	return args.Get(0).([]*ent.ExamAssesment), args.Error(1)
 }
+
+// MockExamGroupRepository is a mock type for the ExamGroupRepositoryInterface
+type MockExamGroupRepository struct {
+	mock.Mock
+}
+
+// GetById mocks the GetById method
+func (m *MockExamGroupRepository) GetById(ctx context.Context, examGroupId int) (*ent.ExamGroup, error) {
+	args := m.Called(ctx, examGroupId)
+	return args.Get(0).(*ent.ExamGroup), args.Error(1)
+}
+
+// GetActiveByIdWithExams mocks the GetActiveByIdWithExams method
+func (m *MockExamGroupRepository) GetActiveByIdWithExams(ctx context.Context, examGroupId int, isActive bool) (*ent.ExamGroup, error) {
+	args := m.Called(ctx, examGroupId, isActive)
+	return args.Get(0).(*ent.ExamGroup), args.Error(1)
+}

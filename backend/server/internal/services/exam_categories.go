@@ -4,27 +4,22 @@ import (
 	"context"
 
 	"common/constants"
-	"common/ent"
-	"common/repositories"
+	commonInterfaces "common/interfaces" // Assume interfaces are defined here for repositories
 
 	"server/pkg/models"
 )
 
 type ExamCategoryService struct {
-	examRepository         *repositories.ExamRepository
-	examGroupRepository    *repositories.ExamGroupRepository
-	examCategoryRepository *repositories.ExamCategoryRepository
+	examRepository         commonInterfaces.ExamRepositoryInterface
+	examGroupRepository    commonInterfaces.ExamGroupRepositoryInterface
+	examCategoryRepository commonInterfaces.ExamCategoryRepositoryInterface
 }
 
-func NewExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
-	examRepository := repositories.NewExamRepository(dbClient)
-	examGroupRepository := repositories.NewExamGroupRepository(dbClient)
-	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
-
+func NewExamCategoryService(examRepo commonInterfaces.ExamRepositoryInterface, examGroupRepo commonInterfaces.ExamGroupRepositoryInterface, examCategoryRepo commonInterfaces.ExamCategoryRepositoryInterface) *ExamCategoryService {
 	return &ExamCategoryService{
-		examRepository:         examRepository,
-		examGroupRepository:    examGroupRepository,
-		examCategoryRepository: examCategoryRepository,
+		examRepository:         examRepo,
+		examGroupRepository:    examGroupRepo,
+		examCategoryRepository: examCategoryRepo,
 	}
 }
 
@@ -34,10 +29,9 @@ func (e *ExamCategoryService) GetBankingExamGroups(ctx context.Context) ([]model
 		return nil, err
 	}
 
-	var categoryExamTypes []models.CategoryExamGroup
-
+	var categoryExamGroups []models.CategoryExamGroup
 	for _, examGroup := range category.Edges.Groups {
-		categoryExamType := models.CategoryExamGroup{
+		examGroupModel := models.CategoryExamGroup{
 			Id:           examGroup.ID,
 			ExamName:     examGroup.Name,
 			CategoryId:   category.ID,
@@ -46,26 +40,25 @@ func (e *ExamCategoryService) GetBankingExamGroups(ctx context.Context) ([]model
 			CategoryName: category.Name.String(),
 			LogoUrl:      examGroup.LogoURL,
 		}
-
-		categoryExamTypes = append(categoryExamTypes, categoryExamType)
+		categoryExamGroups = append(categoryExamGroups, examGroupModel)
 	}
 
-	return categoryExamTypes, nil
+	return categoryExamGroups, nil
 }
 
 func (e *ExamCategoryService) GetExamGroupById(ctx context.Context, examGroupId int) (*models.CategoryExamGroup, error) {
-	exam, err := e.examGroupRepository.GetById(ctx, examGroupId)
+	examGroup, err := e.examGroupRepository.GetById(ctx, examGroupId)
 	if err != nil {
 		return nil, err
 	}
 
-	categoryExamType := models.CategoryExamGroup{
-		Id:          exam.ID,
-		ExamName:    exam.Name,
-		IsActive:    exam.IsActive,
-		Description: exam.Description,
-		LogoUrl:     exam.LogoURL,
+	examGroupModel := models.CategoryExamGroup{
+		Id:          examGroup.ID,
+		ExamName:    examGroup.Name,
+		IsActive:    examGroup.IsActive,
+		Description: examGroup.Description,
+		LogoUrl:     examGroup.LogoURL,
 	}
 
-	return &categoryExamType, nil
+	return &examGroupModel, nil
 }
