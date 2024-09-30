@@ -10,16 +10,77 @@ import (
 	commonConstants "common/constants"
 )
 
-type GenAIService struct {
+// Define the interfaces to abstract the external dependencies
+
+// GenAIClient is the interface for the GenAI Client
+type GenAIClient interface {
+	GenerativeModel(modelName string) GenAIGenerativeModel
+}
+
+// GenAIGenerativeModel is the interface for the generative model
+type GenAIGenerativeModel interface {
+	GenerateContentStream(ctx context.Context, text genai.Text) GenAIContentIterator
+}
+
+// GenAIContentIterator is the interface for the content stream iterator
+type GenAIContentIterator interface {
+	Next() (*genai.GenerateContentResponse, error)
+}
+
+// Wrapper for the genai.Client to implement the GenAIClient interface
+type GenAIClientWrapper struct {
 	client *genai.Client
 }
 
-func NewGenAIService(client *genai.Client) *GenAIService {
+// NewGenAIClientWrapper returns a new wrapper for the genai.Client
+func NewGenAIClientWrapper(client *genai.Client) *GenAIClientWrapper {
+	return &GenAIClientWrapper{
+		client: client,
+	}
+}
+
+// Implement the GenerativeModel method for the wrapper
+func (g *GenAIClientWrapper) GenerativeModel(modelName string) GenAIGenerativeModel {
+	return &GenAIGenerativeModelWrapper{
+		model: g.client.GenerativeModel(modelName),
+	}
+}
+
+// Wrapper for genai.GenerativeModel to implement GenAIGenerativeModel interface
+type GenAIGenerativeModelWrapper struct {
+	model *genai.GenerativeModel
+}
+
+// Implement the GenerateContentStream method
+func (g *GenAIGenerativeModelWrapper) GenerateContentStream(ctx context.Context, text genai.Text) GenAIContentIterator {
+	return &GenAIContentIteratorWrapper{
+		iter: g.model.GenerateContentStream(ctx, text),
+	}
+}
+
+// Wrapper for genai.ContentStreamIterator to implement GenAIContentIterator interface
+type GenAIContentIteratorWrapper struct {
+	iter *genai.GenerateContentResponseIterator
+}
+
+// Implement the Next method for the content iterator
+func (g *GenAIContentIteratorWrapper) Next() (*genai.GenerateContentResponse, error) {
+	return g.iter.Next()
+}
+
+// GenAIService struct with the client as an interface
+type GenAIService struct {
+	client GenAIClient
+}
+
+// NewGenAIService constructor using the interface
+func NewGenAIService(client GenAIClient) *GenAIService {
 	return &GenAIService{
 		client: client,
 	}
 }
 
+// GetContentStream method uses the GenAIClient interface for generating the content stream
 func (g *GenAIService) GetContentStream(ctx context.Context, prompt string, modelName commonConstants.GenAiModel) (string, error) {
 	if prompt == "" {
 		return "", fmt.Errorf("prompt cannot be empty")

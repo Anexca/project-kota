@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"common/ent"
+
 	"github.com/nedpals/supabase-go"
 	"github.com/redis/go-redis/v9"
 
@@ -40,10 +41,10 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 	authService := services.NewAuthService(supabaseClient)
 	redisService := commonService.NewRedisService(redisClient)
 	paymentService := services.NewPaymentService()
-	examAttemptService := services.NewExamAttemptService(dbClient)
+	examAttemptService := services.InitExamAttemptService(dbClient)
 	userService := services.NewUserService(dbClient)
 	examCategoryService := services.NewExamCategoryService(dbClient)
-	examAssesmentService := services.NewExamAssesmentService(redisClient, dbClient)
+	examAssesmentService := services.InitExamAssesmentService(redisClient, dbClient)
 	subscriptionService := services.NewSubscriptionService(dbClient)
 	examGenerationService := services.NewExamGenerationService(redisClient, dbClient)
 

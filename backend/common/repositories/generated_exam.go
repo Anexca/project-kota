@@ -16,16 +16,35 @@ import (
 	"common/ent/user"
 )
 
+// GeneratedExamRepositoryInterface defines the contract for the GeneratedExam repository.
+type GeneratedExamRepositoryInterface interface {
+	AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error)
+	Add(ctx context.Context, exam map[string]interface{}, examId int) (*ent.GeneratedExam, error)
+	UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error
+	GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error)
+	GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error)
+	GetActiveById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error)
+	GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error)
+	GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error)
+	GetByMonthOffset(ctx context.Context, ex *ent.Exam, monthOffset, limit int) ([]*ent.GeneratedExam, error)
+	GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error)
+	GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error)
+	GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error)
+}
+
+// GeneratedExamRepository is a concrete implementation of GeneratedExamRepositoryInterface.
 type GeneratedExamRepository struct {
 	dbClient *ent.Client
 }
 
+// NewGeneratedExamRepository creates a new instance of GeneratedExamRepository.
 func NewGeneratedExamRepository(dbClient *ent.Client) *GeneratedExamRepository {
 	return &GeneratedExamRepository{
 		dbClient: dbClient,
 	}
 }
 
+// AddMany adds multiple generated exams to the database.
 func (q *GeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
 	bulk := make([]*ent.GeneratedExamCreate, len(exams))
 
@@ -43,6 +62,7 @@ func (q *GeneratedExamRepository) AddMany(ctx context.Context, exams []any, ex *
 	return q.dbClient.GeneratedExam.CreateBulk(bulk...).Save(ctx)
 }
 
+// Add adds a generated exam to the database.
 func (q *GeneratedExamRepository) Add(ctx context.Context, exam map[string]interface{}, examId int) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Create().
 		SetRawExamData(exam).
@@ -50,6 +70,7 @@ func (q *GeneratedExamRepository) Add(ctx context.Context, exam map[string]inter
 		Save(ctx)
 }
 
+// UpdateMany updates multiple generated exams in a transaction.
 func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error {
 	tx, err := q.dbClient.Tx(ctx)
 	if err != nil {
@@ -77,6 +98,7 @@ func (q *GeneratedExamRepository) UpdateMany(ctx context.Context, generatedExams
 	return nil
 }
 
+// GetById retrieves a generated exam by its ID.
 func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.IDEQ(generatedExamId)).
@@ -84,6 +106,7 @@ func (q *GeneratedExamRepository) GetById(ctx context.Context, generatedExamId i
 		Only(ctx)
 }
 
+// GetOpenById retrieves a generated exam by its ID and open status.
 func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen), generatedexam.IsActive(!isOpen)).
@@ -91,6 +114,7 @@ func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExam
 		Only(ctx)
 }
 
+// GetActiveById retrieves a generated exam by its ID and active status.
 func (q GeneratedExamRepository) GetActiveById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsActiveEQ(isActive)).
@@ -98,6 +122,7 @@ func (q GeneratedExamRepository) GetActiveById(ctx context.Context, generatedExa
 		Only(ctx)
 }
 
+// GetByExam retrieves all generated exams for a given exam.
 func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.HasExamWith(exam.ID(ex.ID)), generatedexam.IsActive(true)).
@@ -107,6 +132,7 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 		All(ctx)
 }
 
+// GetByOpenFlag retrieves generated exams for a specific exam ID with an open flag.
 func (q *GeneratedExamRepository) GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.IsOpenEQ(true), generatedexam.HasExamWith(exam.ID(examId))).
@@ -114,6 +140,7 @@ func (q *GeneratedExamRepository) GetByOpenFlag(ctx context.Context, examId int)
 		All(ctx)
 }
 
+// GetByMonthOffset retrieves generated exams for a specific month offset.
 func (q *GeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.Exam, monthOffset, limit int) ([]*ent.GeneratedExam, error) {
 	now := time.Now()
 
@@ -135,6 +162,7 @@ func (q *GeneratedExamRepository) GetByMonthOffset(ctx context.Context, ex *ent.
 		All(ctx)
 }
 
+// GetByWeekOffset retrieves generated exams for a specific week offset.
 func (q *GeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error) {
 	now := time.Now()
 
@@ -163,6 +191,7 @@ func (q *GeneratedExamRepository) GetByWeekOffset(ctx context.Context, ex *ent.E
 		All(ctx)
 }
 
+// GetPaginatedExamsByUserAndDate retrieves paginated exams based on user and date filters.
 func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
@@ -212,6 +241,7 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 	return query.All(ctx)
 }
 
+// GetCountOfFilteredExamsDataByUserAndDate retrieves the count of exams based on user and date filters.
 func (q *GeneratedExamRepository) GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {

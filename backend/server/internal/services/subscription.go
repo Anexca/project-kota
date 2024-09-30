@@ -11,6 +11,7 @@ import (
 	"common/ent/usersubscription"
 
 	commonRepositories "common/repositories"
+
 	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
 
 	"server/pkg/config"
@@ -22,7 +23,7 @@ type SubscriptionService struct {
 	paymentService             *PaymentService
 	userRepository             *commonRepositories.UserRepository
 	subscriptionRepository     *commonRepositories.SubscriptionRepository
-	userSubscriptionRepository *commonRepositories.UserSubscriptioRepository
+	userSubscriptionRepository *commonRepositories.UserSubscriptionRepository
 	paymentrepository          *commonRepositories.PaymentRepository
 }
 
@@ -31,7 +32,7 @@ func NewSubscriptionService(dbClient *ent.Client) *SubscriptionService {
 	paymentService := NewPaymentService()
 	userRepository := commonRepositories.NewUserRepository(dbClient)
 	subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
-	userSubscriptionRepository := commonRepositories.NewUserSubscriptioRepository(dbClient)
+	userSubscriptionRepository := commonRepositories.NewUserSubscriptionRepository(dbClient)
 	paymentrepository := commonRepositories.NewPaymentRepository(dbClient)
 
 	return &SubscriptionService{

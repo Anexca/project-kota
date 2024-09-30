@@ -12,10 +12,14 @@ import (
 	"common/ent/user"
 )
 
-type PaymentRepository struct {
-	dbClient *ent.Client
+// PaymentRepositoryInterface defines the contract for the Payment repository.
+type PaymentRepositoryInterface interface {
+	GetByUserId(ctx context.Context, userId string) ([]*ent.Payment, error)
+	Create(ctx context.Context, model CreatePaymentModel, userId string) (*ent.Payment, error)
+	GetByProviderPaymentId(ctx context.Context, paymentProviderId string) (*ent.Payment, error)
 }
 
+// CreatePaymentModel represents the data needed to create a payment record.
 type CreatePaymentModel struct {
 	UserSubscriptionId int
 	Amount             float64
@@ -25,12 +29,19 @@ type CreatePaymentModel struct {
 	ProviderPaymentId  string
 }
 
+// PaymentRepository is a concrete implementation of PaymentRepositoryInterface.
+type PaymentRepository struct {
+	dbClient *ent.Client
+}
+
+// NewPaymentRepository creates a new instance of PaymentRepository.
 func NewPaymentRepository(dbClient *ent.Client) *PaymentRepository {
 	return &PaymentRepository{
 		dbClient: dbClient,
 	}
 }
 
+// GetByUserId retrieves all payments for a specific user by their ID.
 func (p *PaymentRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.Payment, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
@@ -44,6 +55,7 @@ func (p *PaymentRepository) GetByUserId(ctx context.Context, userId string) ([]*
 		All(ctx)
 }
 
+// Create adds a new payment record to the database.
 func (p *PaymentRepository) Create(ctx context.Context, model CreatePaymentModel, userId string) (*ent.Payment, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
@@ -61,6 +73,7 @@ func (p *PaymentRepository) Create(ctx context.Context, model CreatePaymentModel
 		Save(ctx)
 }
 
+// GetByProviderPaymentId retrieves a payment by the provider's payment ID.
 func (p *PaymentRepository) GetByProviderPaymentId(ctx context.Context, paymentProviderId string) (*ent.Payment, error) {
 	return p.dbClient.Payment.Query().
 		Where(payment.ProviderPaymentIDEQ(paymentProviderId)).

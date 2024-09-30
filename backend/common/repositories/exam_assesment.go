@@ -13,11 +13,21 @@ import (
 	"common/ent/user"
 )
 
-type ExamAssesmentRepository struct {
+// ExamAssessmentRepositoryInterface defines the contract for interacting with exam assessments.
+type ExamAssessmentRepositoryInterface interface {
+	Create(ctx context.Context, attemptId int, model AssessmentModel) (*ent.ExamAssesment, error)
+	Update(ctx context.Context, assessmentId int, model AssessmentModel) error
+	GetById(ctx context.Context, assessmentId int, userId string) (*ent.ExamAssesment, error)
+	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error)
+}
+
+// ExamAssessmentRepository is a concrete implementation of ExamAssessmentRepositoryInterface.
+type ExamAssessmentRepository struct {
 	dbClient *ent.Client
 }
 
-type AssesmentModel struct {
+// AssessmentModel is used to pass data for creating or updating assessments.
+type AssessmentModel struct {
 	CompletedSeconds  int
 	Status            constants.AssessmentStatusType
 	RawAssessmentData map[string]interface{}
@@ -25,13 +35,15 @@ type AssesmentModel struct {
 	Remarks           string
 }
 
-func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
-	return &ExamAssesmentRepository{
+// NewExamAssessmentRepository creates a new instance of ExamAssessmentRepository.
+func NewExamAssessmentRepository(dbClient *ent.Client) *ExamAssessmentRepository {
+	return &ExamAssessmentRepository{
 		dbClient: dbClient,
 	}
 }
 
-func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, model AssesmentModel) (*ent.ExamAssesment, error) {
+// Create creates a new exam assessment for a given attempt.
+func (e *ExamAssessmentRepository) Create(ctx context.Context, attemptId int, model AssessmentModel) (*ent.ExamAssesment, error) {
 	query := e.dbClient.ExamAssesment.Create().
 		SetAttemptID(attemptId).
 		SetCompletedSeconds(model.CompletedSeconds).
@@ -45,7 +57,8 @@ func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, mod
 	return query.Save(ctx)
 }
 
-func (e *ExamAssesmentRepository) Update(ctx context.Context, assessmentId int, model AssesmentModel) error {
+// Update updates an existing exam assessment by ID.
+func (e *ExamAssessmentRepository) Update(ctx context.Context, assessmentId int, model AssessmentModel) error {
 	query := e.dbClient.ExamAssesment.Update().
 		Where(examassesment.ID(assessmentId)).
 		SetStatus(examassesment.Status(model.Status))
@@ -62,7 +75,8 @@ func (e *ExamAssesmentRepository) Update(ctx context.Context, assessmentId int, 
 	return err
 }
 
-func (e *ExamAssesmentRepository) GetById(ctx context.Context, assesmentId int, userId string) (*ent.ExamAssesment, error) {
+// GetById retrieves a specific exam assessment by its ID and the user's UUID.
+func (e *ExamAssessmentRepository) GetById(ctx context.Context, assessmentId int, userId string) (*ent.ExamAssesment, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
@@ -71,13 +85,14 @@ func (e *ExamAssesmentRepository) GetById(ctx context.Context, assesmentId int, 
 	return e.dbClient.ExamAssesment.Query().
 		Where(
 			examassesment.HasAttemptWith(examattempt.HasUserWith(user.ID(userUid))),
-			examassesment.ID(assesmentId),
+			examassesment.ID(assessmentId),
 		).
 		WithAttempt().
 		Only(ctx)
 }
 
-func (e *ExamAssesmentRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error) {
+// GetByExam retrieves all exam assessments for a specific generated exam and user.
+func (e *ExamAssessmentRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err

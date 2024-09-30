@@ -11,12 +11,18 @@ import (
 	"ai-service/pkg/models"
 )
 
-type PromptService struct {
-	genAIService *GenAIService
+// Define an interface for GenAIService to make it mockable
+type GenAIServiceInterface interface {
+	GetContentStream(ctx context.Context, prompt string, model commonConstants.GenAiModel) (string, error)
 }
 
+type PromptService struct {
+	genAIService GenAIServiceInterface
+}
+
+// Factory method for production use, using *genai.Client
 func NewPromptService(genAiClient *genai.Client) *PromptService {
-	genAIService := NewGenAIService(genAiClient)
+	genAIService := NewGenAIService(NewGenAIClientWrapper(genAiClient))
 
 	return &PromptService{
 		genAIService: genAIService,
