@@ -1,4 +1,4 @@
-package services_test
+package models
 
 type DescriptiveExamAssesmentRequest struct {
 	CompletedSeconds int    `json:"completed_seconds" validate:"required"`

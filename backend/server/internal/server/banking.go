@@ -10,8 +10,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"server/internal/services"
 	"server/pkg/constants"
+	"server/pkg/models"
 )
 
 func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +39,7 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	var request services.DescriptiveExamAssesmentRequest
+	var request models.DescriptiveExamAssesmentRequest
 	if err := s.ReadJson(w, r, &request); err != nil {
 		s.HandleError(w, err, "invalid json request body", http.StatusBadRequest)
 		return

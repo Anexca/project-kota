@@ -42,7 +42,7 @@ func TestExamAssesmentService(t *testing.T) {
 	t.Run("StartNewDescriptiveAssesment Success", func(t *testing.T) {
 		generatedExamId := 1
 		attempt := &ent.ExamAttempt{ID: 1}
-		request := &services.DescriptiveExamAssesmentRequest{CompletedSeconds: 120, Content: "Sample content"}
+		request := &models.DescriptiveExamAssesmentRequest{CompletedSeconds: 120, Content: "Sample content"}
 		userId := "test-user-id"
 		isOpen := false
 
@@ -69,7 +69,7 @@ func TestExamAssesmentService(t *testing.T) {
 	t.Run("StartNewDescriptiveAssesment Forbidden Access", func(t *testing.T) {
 		generatedExamId := 1
 		attempt := &ent.ExamAttempt{ID: 1}
-		request := &services.DescriptiveExamAssesmentRequest{CompletedSeconds: 120, Content: "Sample content"}
+		request := &models.DescriptiveExamAssesmentRequest{CompletedSeconds: 120, Content: "Sample content"}
 		userId := "test-user-id"
 		isOpen := false
 
