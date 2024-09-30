@@ -10,39 +10,42 @@ import (
 
 	"common/ent"
 	"common/ent/exam"
-
-	"github.com/redis/go-redis/v9"
+	"common/repositories"
+	"common/services"
 
 	commonConstants "common/constants"
-	commonRepositories "common/repositories"
-	commonServices "common/services"
+	commonInterfaces "common/interfaces"
 
+	"server/internal/interfaces"
 	"server/pkg/models"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type ExamGenerationService struct {
-	accessService           *AccessService
-	redisService            *commonServices.RedisService
-	examRepository          *commonRepositories.ExamRepository
-	examGroupRepository     *commonRepositories.ExamGroupRepository
-	generatedExamRepository *commonRepositories.GeneratedExamRepository
-	examCategoryRepository  *commonRepositories.ExamCategoryRepository
-	examSettingRepository   *commonRepositories.ExamSettingRepository
-	examAttemptRepository   *commonRepositories.ExamAttemptRepository
-	cachedExamRepository    *commonRepositories.CachedExamRepository
+	accessService           interfaces.AccessServiceInterface
+	redisService            commonInterfaces.RedisServiceInterface
+	examRepository          commonInterfaces.ExamRepositoryInterface
+	examGroupRepository     commonInterfaces.ExamGroupRepositoryInterface
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
+	examCategoryRepository  commonInterfaces.ExamCategoryRepositoryInterface
+	examSettingRepository   commonInterfaces.ExamSettingRepositoryInterface
+	examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+	cachedExamRepository    commonInterfaces.CachedExamRepositoryInterface
 }
 
-func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *ExamGenerationService {
-	redisService := commonServices.NewRedisService(redisClient)
-	accessService := InitAccessService(dbClient)
-	examRepository := commonRepositories.NewExamRepository(dbClient)
-	examGroupRepository := commonRepositories.NewExamGroupRepository(dbClient)
-	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
-	cachedExamRepository := commonRepositories.NewCachedExamRepository(dbClient)
-	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
-	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
-	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
-
+// Constructor function that uses interfaces for dependency injection
+func NewExamGenerationService(
+	accessService interfaces.AccessServiceInterface,
+	redisService commonInterfaces.RedisServiceInterface,
+	examRepository commonInterfaces.ExamRepositoryInterface,
+	examGroupRepository commonInterfaces.ExamGroupRepositoryInterface,
+	examCategoryRepository commonInterfaces.ExamCategoryRepositoryInterface,
+	cachedExamRepository commonInterfaces.CachedExamRepositoryInterface,
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
+	examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
+	examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+) *ExamGenerationService {
 	return &ExamGenerationService{
 		accessService:           accessService,
 		redisService:            redisService,
@@ -54,6 +57,31 @@ func NewExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *
 		examSettingRepository:   examSettingRepository,
 		examAttemptRepository:   examAttemptRepository,
 	}
+}
+
+// InitExamGenerationService initializes the ExamGenerationService with dependencies for production use
+func InitExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *ExamGenerationService {
+	redisService := services.NewRedisService(redisClient)
+	accessService := InitAccessService(dbClient)
+	examRepository := repositories.NewExamRepository(dbClient)
+	examGroupRepository := repositories.NewExamGroupRepository(dbClient)
+	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
+	cachedExamRepository := repositories.NewCachedExamRepository(dbClient)
+	generatedExamRepository := repositories.NewGeneratedExamRepository(dbClient)
+	examSettingRepository := repositories.NewExamSettingRepository(dbClient)
+	examAttemptRepository := repositories.NewExamAttemptRepository(dbClient)
+
+	return NewExamGenerationService(
+		accessService,
+		redisService,
+		examRepository,
+		examGroupRepository,
+		examCategoryRepository,
+		cachedExamRepository,
+		generatedExamRepository,
+		examSettingRepository,
+		examAttemptRepository,
+	)
 }
 
 func (e *ExamGenerationService) GenerateExams(ctx context.Context, examId int, modelType models.ExamModelType) error {
@@ -314,6 +342,11 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get generated exam: %w", err)
+	}
+
+	// Check if generatedExam.Edges is nil before accessing
+	if generatedExam.Edges.Exam == nil {
+		return nil, errors.New("exam details not found")
 	}
 
 	if !isOpen {

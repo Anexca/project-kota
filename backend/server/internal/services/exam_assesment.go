@@ -57,7 +57,7 @@ func InitExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *
 	promptService := NewPromptService()
 	profanityService := commonServices.NewProfanityService()
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
-	examGenerationService := NewExamGenerationService(redisClient, dbClient)
+	examGenerationService := InitExamGenerationService(redisClient, dbClient)
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examAssesmentRepository := commonRepositories.NewExamAssessmentRepository(dbClient)
 
