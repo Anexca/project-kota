@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"common/constants"
-	commonInterfaces "common/interfaces" // Assume interfaces are defined here for repositories
+	"common/ent"
+	commonInterfaces "common/interfaces"
+	"common/repositories"
 
 	"server/pkg/models"
 )
@@ -21,6 +23,14 @@ func NewExamCategoryService(examRepo commonInterfaces.ExamRepositoryInterface, e
 		examGroupRepository:    examGroupRepo,
 		examCategoryRepository: examCategoryRepo,
 	}
+}
+
+func InitExamCategoryService(dbClient *ent.Client) *ExamCategoryService {
+	examRepository := repositories.NewExamRepository(dbClient)
+	examGroupRepository := repositories.NewExamGroupRepository(dbClient)
+	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
+
+	return NewExamCategoryService(examRepository, examGroupRepository, examCategoryRepository)
 }
 
 func (e *ExamCategoryService) GetBankingExamGroups(ctx context.Context) ([]models.CategoryExamGroup, error) {

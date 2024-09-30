@@ -42,11 +42,11 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 	redisService := commonService.NewRedisService(redisClient)
 	paymentService := services.NewPaymentService()
 	examAttemptService := services.InitExamAttemptService(dbClient)
-	userService := services.NewUserService(dbClient)
-	examCategoryService := services.NewExamCategoryService(dbClient)
+	userService := services.InitUserService(dbClient)
+	examCategoryService := services.InitExamCategoryService(dbClient)
 	examAssesmentService := services.InitExamAssesmentService(redisClient, dbClient)
-	subscriptionService := services.NewSubscriptionService(dbClient)
-	examGenerationService := services.NewExamGenerationService(redisClient, dbClient)
+	subscriptionService := services.InitSubscriptionService(dbClient)
+	examGenerationService := services.InitExamGenerationService(redisClient, dbClient)
 
 	NewServer := &Server{
 		port:                  port,

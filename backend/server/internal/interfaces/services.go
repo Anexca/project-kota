@@ -5,6 +5,8 @@ import (
 	"common/ent"
 	"context"
 	"server/pkg/models"
+
+	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
 )
 
 // PromptServiceInterface defines the contract for PromptService
@@ -35,4 +37,27 @@ type ExamAssesmentServiceInterface interface {
 type ExamCategoryServiceInterface interface {
 	GetBankingExamGroups(ctx context.Context) ([]models.CategoryExamGroup, error)
 	GetExamGroupById(ctx context.Context, examGroupId int) (*models.CategoryExamGroup, error)
+}
+
+// PaymentServiceInterface defines the methods for the PaymentService.
+type PaymentServiceInterface interface {
+	CreateCustomer(model models.UpsertPaymentProviderCustomerModel) (*cashfree_pg.CustomerEntity, error)
+	CreateOrder(model models.CreateOrderModel) (*cashfree_pg.OrderEntity, error)
+	IsOrderSuccessful(orderId string) (bool, *cashfree_pg.PaymentEntity, error)
+	VerifyWebhookSignature(signature, timestamp, body string) (*cashfree_pg.PGWebhookEvent, error)
+}
+
+// SubscriptionServiceInterface defines the methods for the subscription service.
+type SubscriptionServiceInterface interface {
+	GetAll(ctx context.Context) ([]models.SubscriptionOverview, error)
+	StartUserSubscription(ctx context.Context, subscriptionId int, returnUrl *string, userId string) (*models.SubscriptionToActivate, error)
+	ActivateUserSubscription(ctx context.Context, providerSubscriptionId string, userEmail string) (*models.ActivatedSubscription, error)
+	UserHasActiveSubscription(ctx context.Context, subscription *ent.Subscription, user *ent.User) (bool, error)
+}
+
+// UserServiceInterface defines the methods for the UserService.
+type UserServiceInterface interface {
+	GetUserProfile(ctx context.Context, userId string) (models.UserProfileResponse, error)
+	UpdateUser(ctx context.Context, userId string, request models.UpdateUserRequest) (*ent.User, error)
+	GetUserTransactions(ctx context.Context, userId string) ([]models.SubscriptionPaymentDetails, error)
 }

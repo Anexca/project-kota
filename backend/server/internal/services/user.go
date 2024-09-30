@@ -8,56 +8,47 @@ import (
 	"common/ent"
 	"common/repositories"
 
-	"github.com/google/uuid"
-
+	commonInterfaces "common/interfaces"
+	"server/internal/interfaces"
 	"server/pkg/models"
 )
 
 type UserService struct {
-	paymentService             *PaymentService
-	userRepository             *repositories.UserRepository
-	paymentRepositry           *repositories.PaymentRepository
-	userSubscriptionRepository *repositories.UserSubscriptionRepository
+	paymentService             interfaces.PaymentServiceInterface
+	userRepository             commonInterfaces.UserRepositoryInterface
+	paymentRepository          commonInterfaces.PaymentRepositoryInterface
+	userSubscriptionRepository commonInterfaces.UserSubscriptionRepositoryInterface
 }
 
-type UpdateUserRequest struct {
-	FirstName   string `json:"first_name,omitempty"`
-	LastName    string `json:"last_name,omitempty"`
-	PhoneNumber string `json:"phone,omitempty"`
-}
-
-type UserProfileResponse struct {
-	Id                  uuid.UUID                        `json:"id"`
-	Email               string                           `json:"email"`
-	FirstName           string                           `json:"first_name"`
-	LastName            string                           `json:"last_name"`
-	PhoneNumber         string                           `json:"phone_number"`
-	ActiveSubscriptions []models.UserSubscriptionDetails `json:"active_subscriptions"`
-}
-
-func NewUserService(dbClient *ent.Client) *UserService {
-	paymentService := NewPaymentService()
-	paymentRepositry := repositories.NewPaymentRepository(dbClient)
-	userRepository := repositories.NewUserRepository(dbClient)
-	userSubscriptionRepository := repositories.NewUserSubscriptionRepository(dbClient)
-
+// NewUserService creates a new UserService with the provided dependencies.
+func NewUserService(paymentService interfaces.PaymentServiceInterface, userRepo commonInterfaces.UserRepositoryInterface, paymentRepo commonInterfaces.PaymentRepositoryInterface, userSubscriptionRepo commonInterfaces.UserSubscriptionRepositoryInterface) *UserService {
 	return &UserService{
 		paymentService:             paymentService,
-		userRepository:             userRepository,
-		paymentRepositry:           paymentRepositry,
-		userSubscriptionRepository: userSubscriptionRepository,
+		userRepository:             userRepo,
+		paymentRepository:          paymentRepo,
+		userSubscriptionRepository: userSubscriptionRepo,
 	}
 }
 
-func (u *UserService) GetUserProfile(ctx context.Context, userId string) (UserProfileResponse, error) {
+// InitUserService initializes the UserService for production use.
+func InitUserService(dbClient *ent.Client) *UserService {
+	paymentService := NewPaymentService() // Assume NewPaymentService creates the service
+	userRepository := repositories.NewUserRepository(dbClient)
+	paymentRepository := repositories.NewPaymentRepository(dbClient)
+	userSubscriptionRepository := repositories.NewUserSubscriptionRepository(dbClient)
+
+	return NewUserService(paymentService, userRepository, paymentRepository, userSubscriptionRepository)
+}
+
+func (u *UserService) GetUserProfile(ctx context.Context, userId string) (models.UserProfileResponse, error) {
 	user, err := u.userRepository.Get(ctx, userId)
 	if err != nil {
-		return UserProfileResponse{}, err
+		return models.UserProfileResponse{}, err
 	}
 
 	userSubscriptions, err := u.userSubscriptionRepository.GetByUserId(ctx, userId)
 	if err != nil {
-		return UserProfileResponse{}, err
+		return models.UserProfileResponse{}, err
 	}
 
 	var activeSubscriptions []models.UserSubscriptionDetails
@@ -89,7 +80,7 @@ func (u *UserService) GetUserProfile(ctx context.Context, userId string) (UserPr
 	}
 
 	// Step 4: Create the response model
-	responseModel := UserProfileResponse{
+	responseModel := models.UserProfileResponse{
 		Id:                  user.ID,
 		Email:               user.Email,
 		FirstName:           user.FirstName,
@@ -100,7 +91,7 @@ func (u *UserService) GetUserProfile(ctx context.Context, userId string) (UserPr
 	return responseModel, nil
 }
 
-func (u *UserService) UpdateUser(ctx context.Context, userId string, request UpdateUserRequest) (*ent.User, error) {
+func (u *UserService) UpdateUser(ctx context.Context, userId string, request models.UpdateUserRequest) (*ent.User, error) {
 	userToUpdate, err := u.userRepository.Get(ctx, userId)
 	if err != nil {
 		return nil, err
@@ -133,7 +124,7 @@ func (u *UserService) UpdateUser(ctx context.Context, userId string, request Upd
 func (u *UserService) GetUserTransactions(ctx context.Context, userId string) ([]models.SubscriptionPaymentDetails, error) {
 	var subscriptionPayments []models.SubscriptionPaymentDetails
 
-	payments, err := u.paymentRepositry.GetByUserId(ctx, userId)
+	payments, err := u.paymentRepository.GetByUserId(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +144,7 @@ func (u *UserService) GetUserTransactions(ctx context.Context, userId string) ([
 }
 
 func (u *UserService) updatePaymentProviderCustomer(user *ent.User) error {
-	model := UpsertPaymentProviderCustomerModel{
+	model := models.UpsertPaymentProviderCustomerModel{
 		Name:  fmt.Sprintf("%s %s", user.FirstName, user.LastName),
 		Phone: user.PhoneNumber,
 		Email: user.Email,
