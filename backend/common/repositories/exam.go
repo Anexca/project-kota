@@ -5,6 +5,7 @@ import (
 	"common/ent"
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/generatedexam"
 	"context"
 )
@@ -27,10 +28,26 @@ func (e *ExamRepository) GetById(ctx context.Context, examId int) (*ent.Exam, er
 		Only(ctx)
 }
 
+func (e *ExamRepository) GetActiveByExamsGroupId(ctx context.Context, examGroupId int, isActive bool) ([]*ent.Exam, error) {
+	return e.dbClient.Exam.Query().
+		Where(exam.IsActiveEQ(isActive), exam.HasGeneratedexamsWith(generatedexam.IsActiveEQ(isActive))).
+		WithSetting().
+		WithCategory().
+		WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
+			geq.Where(generatedexam.IsActiveEQ(isActive))
+		}).
+		WithGroup(func(egq *ent.ExamGroupQuery) {
+			egq.Where(examgroup.IDEQ(examGroupId), examgroup.IsActiveEQ(isActive))
+		}).
+		Order(ent.Desc(exam.FieldUpdatedAt)).
+		All(ctx)
+}
+
 func (e *ExamRepository) GetActiveById(ctx context.Context, examId int, isActive bool) (*ent.Exam, error) {
 	return e.dbClient.Exam.Query().
 		Where(exam.IDEQ(examId), exam.IsActiveEQ(isActive), exam.HasGeneratedexamsWith(generatedexam.IsActiveEQ(isActive))).
 		WithSetting().
+		WithCategory().
 		WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
 			geq.Where(generatedexam.IsActiveEQ(isActive))
 		}).

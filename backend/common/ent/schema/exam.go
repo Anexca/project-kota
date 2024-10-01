@@ -25,7 +25,7 @@ func (Exam) Fields() []ent.Field {
 				string(constants.ExamTypeDescriptive),
 			).Default(string(constants.ExamTypeDescriptive)),
 		field.Bool("is_active").Default(true),
-		field.String("logo_url").Optional(),
+		field.String("logo_url").Optional().Deprecated(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
@@ -35,6 +35,10 @@ func (Exam) Fields() []ent.Field {
 func (Exam) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("category", ExamCategory.Type).
+			Ref("exams").
+			Unique(), // Many Exams belong to one ExamCategory
+
+		edge.From("group", ExamGroup.Type).
 			Ref("exams").
 			Unique(), // Many Exams belong to one ExamCategory
 

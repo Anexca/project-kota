@@ -31,6 +31,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
+	// EdgeGroup holds the string denoting the group edge name in mutations.
+	EdgeGroup = "group"
 	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
 	EdgeSubscriptions = "subscriptions"
 	// EdgeSetting holds the string denoting the setting edge name in mutations.
@@ -48,6 +50,13 @@ const (
 	CategoryInverseTable = "exam_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "exam_category_exams"
+	// GroupTable is the table that holds the group relation/edge.
+	GroupTable = "exams"
+	// GroupInverseTable is the table name for the ExamGroup entity.
+	// It exists in this package in order to avoid circular dependency with the "examgroup" package.
+	GroupInverseTable = "exam_groups"
+	// GroupColumn is the table column denoting the group relation/edge.
+	GroupColumn = "exam_group_exams"
 	// SubscriptionsTable is the table that holds the subscriptions relation/edge.
 	SubscriptionsTable = "subscription_exams"
 	// SubscriptionsInverseTable is the table name for the SubscriptionExam entity.
@@ -85,7 +94,6 @@ var Columns = []string{
 	FieldDescription,
 	FieldType,
 	FieldIsActive,
-	FieldLogoURL,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -94,6 +102,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"exam_category_exams",
+	"exam_group_exams",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -105,6 +114,11 @@ func ValidColumn(column string) bool {
 	}
 	for i := range ForeignKeys {
 		if column == ForeignKeys[i] {
+			return true
+		}
+	}
+	for _, f := range [...]string{FieldLogoURL} {
+		if column == f {
 			return true
 		}
 	}
@@ -198,6 +212,13 @@ func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByGroupField orders the results by group field.
+func ByGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGroupStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // BySubscriptionsCount orders the results by subscriptions count.
 func BySubscriptionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -251,6 +272,13 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+	)
+}
+func newGroupStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GroupInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
 	)
 }
 func newSubscriptionsStep() *sqlgraph.Step {
