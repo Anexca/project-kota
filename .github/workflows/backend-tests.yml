@@ -20,6 +20,9 @@ on:
 jobs:
   run_backend_unit_tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
 
     steps:
       - name: Checkout code
@@ -32,21 +35,33 @@ jobs:
         with:
           go-version: "1.23.0" # Specify the Go version you want to use
 
-      - name: Install dependencies and run tests
-        working-directory: backend
+      - name: Install dependencies
         run: |
-          cd server
-          go mod tidy
-          go test -coverprofile=server-coverage.out ./...
-          cd ../ai-service
-          go mod tidy
-          go test -coverprofile=ai-service-coverage.out ./...
-          cd ../common
-          go mod tidy
-          go test -coverprofile=common-coverage.out ./...
+          cd server && go mod tidy
+          cd ../ai-service && go mod tidy
+          cd ../common && go mod tidy
+
+      - name: Run tests in Server
+        run: go test -coverprofile=server-coverage.out ./...
+        working-directory: backend/server
+
+      - name: Run tests in AI Service
+        run: go test -coverprofile=ai-service-coverage.out ./...
+        working-directory: backend/ai-service
+
+      - name: Run tests in Common
+        run: go test -coverprofile=common-coverage.out ./...
+        working-directory: backend/common
+
+      - name: Combine coverage reports
+        run: |
           echo "Combining coverage reports"
           cat server/server-coverage.out ai-service/ai-service-coverage.out common/common-coverage.out > combined-coverage.out
-          go tool cover -func=combined-coverage.out -o lcov.info
+        working-directory: backend
+
+      - name: Generate LCOV report
+        run: go tool cover -func=combined-coverage.out -o lcov.info
+        working-directory: backend
 
       - name: Report LCOV coverage
         uses: romeovs/lcov-reporter-action@v0.2.16
