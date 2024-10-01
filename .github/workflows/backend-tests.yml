@@ -38,42 +38,40 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.23.0" # Specify the Go version you want to use
+          go-version: "1.23.0"
 
-      - name: Install dependencies
+      - name: Install dependencies and Run tests
         run: |
-          cd server && go mod tidy
-          cd ../ai-service && go mod tidy
-          cd ../common && go mod tidy
+          cd server && go mod tidy && go test -coverprofile=server-coverage.out ./...
+          cd ../ai-service && go mod tidy && go test -coverprofile=ai-service-coverage.out ./...
+          cd ../common && go mod tidy && go test -coverprofile=common-coverage.out ./...
 
-      - name: Run tests in Server
-        run: go test -coverprofile=server-coverage.out ./...
+      - name: Generate LCOV report for Server
+        run: go tool cover -func=server-coverage.out -o server-lcov.info
         working-directory: backend/server
 
-      - name: Run tests in AI Service
-        run: go test -coverprofile=ai-service-coverage.out ./...
+      - name: Generate LCOV report for AI Service
+        run: go tool cover -func=ai-service-coverage.out -o ai-service-lcov.info
         working-directory: backend/ai-service
 
-      - name: Run tests in Common
-        run: go test -coverprofile=common-coverage.out ./...
+      - name: Generate LCOV report for Common
+        run: go tool cover -func=common-coverage.out -o common-lcov.info
         working-directory: backend/common
 
-      - name: Combine coverage reports
-        run: |
-          echo "Combining coverage reports"
-          echo "$(head -n 1 server/server-coverage.out)" > combined-coverage.out  # Take the mode line from the first file
-          tail -n +2 -q server/server-coverage.out ai-service/ai-service-coverage.out common/common-coverage.out >> combined-coverage.out
-        working-directory: backend
-
-      - name: Install gcov2lcov
-        run: go install github.com/jandelgado/gcov2lcov@latest
-
-      - name: Convert to LCOV
-        run: gcov2lcov -infile=combined-coverage.out -outfile=lcov.info
-        working-directory: backend
-
-      - name: Report LCOV coverage
+      - name: Post Coverage Comment for Server
         uses: romeovs/lcov-reporter-action@v0.2.16
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: backend/lcov.info
+          lcov-file: backend/server/server-lcov.info
+
+      - name: Post Coverage Comment for AI Service
+        uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: backend/ai-service/ai-service-lcov.info
+
+      - name: Post Coverage Comment for Common
+        uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: backend/common/common-lcov.info
