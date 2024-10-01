@@ -47,15 +47,15 @@ jobs:
 
       - name: Generate LCOV report for Server
         run: gcov2lcov -infile=server-coverage.out -outfile=server-lcov.info
-        working-directory: server
+        working-directory: backend/server
 
       - name: Generate LCOV report for AI Service
         run: gcov2lcov -infile=ai-service-coverage.out -outfile=ai-service-lcov.info
-        working-directory: ai-service
+        working-directory: backend/ai-service
 
       - name: Generate LCOV report for Common
         run: gcov2lcov -infile=common-coverage.out -outfile=common-lcov.info
-        working-directory: common
+        working-directory: backend/common
 
       - name: Post Coverage Comment for Server
         run: |
