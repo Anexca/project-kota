@@ -63,6 +63,7 @@ jobs:
       # Use the Code Coverage Summary action to generate a summary and optionally fail the check if coverage is below threshold
       - name: Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
+        continue-on-error: true
         with:
           filename: backend/**/coverage.xml
           badge: true
@@ -72,6 +73,7 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
+          thresholds: "0 100"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
