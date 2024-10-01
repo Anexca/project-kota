@@ -28,7 +28,7 @@ type ExamAssesmentService struct {
 }
 
 type DescriptiveExamAssesmentRequest struct {
-	CompletedSeconds int    `json:"completed_seconds" validate:"required"`
+	CompletedSeconds int    `json:"completed_seconds" validate:"gte=0"`
 	Content          string `json:"content" validate:"required"`
 }
 
