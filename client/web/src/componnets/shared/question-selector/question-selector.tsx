@@ -1,21 +1,28 @@
-import { Button } from "../../base/button/button";
+import clsx from "clsx";
+import { MCQFormModal } from "../../../interface/mcq-exam";
+import MCQButtons from "../../../pages/mcq-exam-center/mcq-buttons";
 
-type Props = {
-  questions: any[];
+export type QuestionSelectorProps = {
   onQuestionNumberClick: (data: number) => void;
-};
+} & MCQFormModal;
 
-const QuestionSelector = ({ questions, onQuestionNumberClick }: Props) => {
+const QuestionSelector = ({
+  answers,
+  onQuestionNumberClick,
+  activeQuestionIndex,
+}: QuestionSelectorProps) => {
   return (
     <div className="grid grid-cols-5 gap-2">
-      {questions.map((_, index) => (
-        <Button
+      {answers.map((item, index) => (
+        <MCQButtons
           onClick={() => onQuestionNumberClick(index)}
-          className="shadow !p-0"
-          variant={"ghost"}
+          variant={item.state}
+          className={clsx(
+            activeQuestionIndex == index && "border-info border-4"
+          )}
         >
-          <span className="p-2 bg-white w-full rounded">{index + 1}</span>
-        </Button>
+          {index + 1}
+        </MCQButtons>
       ))}
     </div>
   );

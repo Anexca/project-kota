@@ -11,6 +11,7 @@ export const getQuestionsCategories = async (isOpenExam?: boolean) => {
   });
   return response.data;
 };
+
 export const getQuestions = async ({
   categoryId,
 }: {

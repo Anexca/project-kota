@@ -50,7 +50,7 @@ const PreviousSubmissions = ({
   const fetchPastSubmissions = async () => {
     setLoading(true);
     try {
-      const res = await getPastSubmission(question.id);
+      const res = await getPastSubmission(question.exam_id);
       setSubmissionList(res.data);
     } catch (error) {
       toast({
@@ -63,8 +63,8 @@ const PreviousSubmissions = ({
   };
   const viewSubmission = (id: number) => {
     const path = isOpenExam
-      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/${question.id}/${paths.SUBMISSION}/${id}`
-      : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${param.categoryId}/${question.id}/${paths.SUBMISSION}/${id}`;
+      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/${question.exam_id}/${paths.SUBMISSION}/${id}`
+      : `/${paths.EXAMS}/banking/${param.categoryId}/${paths.DISCRIPTIVE}/${question.exam_id}/${paths.SUBMISSION}/${id}`;
     navigate(path);
   };
   useEffect(() => {

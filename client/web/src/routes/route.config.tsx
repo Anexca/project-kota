@@ -4,7 +4,7 @@ import HomePage from "../pages/homepage/homepage";
 import { Login } from "../pages/login/login";
 import { RegisterPage } from "../pages/register/register";
 import ProtectedRoute from "./protected-route";
-import { paths } from "./route.constant";
+import { ExamDomain, paths } from "./route.constant";
 
 import GeneralLayout from "../layouts/general-layout";
 import DescriptiveQuestion from "../pages/descriptive-questions";
@@ -20,10 +20,11 @@ import ContactUs from "../pages/contact-us";
 import PreviousSubmissionPage from "../pages/previous-submissions";
 import ViewPastSubmission from "../pages/view-past-submission";
 import MyTransactions from "../pages/my-transactions";
-import DescriptiveQuestionCategories from "../pages/descriptive-questions-categories";
 import ErrorBoundary from "./error-boundary";
 import { mcqRoutes } from "./route/mcq-routes";
 import MCQExamCenter from "../pages/mcq-exam-center/mcq-exam-center";
+import QuestionCategories from "../pages/questions-categories";
+import QuestionSetPage from "../pages/questions-set-page";
 
 const routes: RouteObject[] = [
   {
@@ -94,15 +95,15 @@ const routes: RouteObject[] = [
             element: <GeneralLayout />,
             children: [
               {
-                path: `banking/${paths.DISCRIPTIVE}`,
-                element: <DescriptiveQuestionCategories />,
+                path: ExamDomain.banking,
+                element: <QuestionCategories />,
               },
               {
-                path: `banking/${paths.DISCRIPTIVE}/:categoryId`,
-                element: <DescriptiveQuestion />,
+                path: `${ExamDomain.banking}/:categoryId`,
+                element: <QuestionSetPage />,
               },
               {
-                path: `banking/${paths.DISCRIPTIVE}/:categoryId/:questionId/${paths.SUBMISSION}/:assesmentId`,
+                path: `banking/:categoryId/${paths.DISCRIPTIVE}/:questionId/${paths.SUBMISSION}/:assesmentId`,
                 element: <DescriptiveSubmission />,
               },
               {
@@ -136,7 +137,7 @@ const routes: RouteObject[] = [
             ],
           },
           {
-            path: `${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/:categoryId/:questionId`,
+            path: `${paths.EXAMS}/banking/:categoryId/${paths.DISCRIPTIVE}/:questionId`,
             element: <DiscriptiveExam />,
           },
           {
@@ -144,7 +145,7 @@ const routes: RouteObject[] = [
             element: <DiscriptiveExam isOpenMode />,
           },
           {
-            path: `${paths.EXAMS}/banking/${paths.MCQ}/:categoryId/:questionId`,
+            path: `${paths.EXAMS}/banking/:categoryId/${paths.MCQ}/:questionId`,
             element: <MCQExamCenter />,
           },
         ],

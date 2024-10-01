@@ -256,7 +256,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     const timeTaken = question!.duration_seconds - examTime;
     try {
       const response = await sendAnswerForAssesment({
-        questionId: question!.id,
+        questionId: question!.exam_id,
         answer: value.answer,
         completedTime: timeTaken,
         isOpen: isOpenMode,
@@ -317,7 +317,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
 
   const endExamNavigatePath = isOpenMode
     ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`
-    : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${param.categoryId}`;
+    : `/${paths.EXAMS}/banking/${param.categoryId}`;
   const exitExam = () => {
     interval.stop();
     navigate(endExamNavigatePath);
