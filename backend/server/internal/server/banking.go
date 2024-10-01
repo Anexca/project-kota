@@ -86,3 +86,34 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 		s.HandleError(w, err, "Something went wrong", http.StatusInternalServerError)
 	}
 }
+
+func (s *Server) EvaluateBankingMCQExam(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	_, err := strconv.Atoi(idParam)
+	if err != nil {
+		s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
+		return
+	}
+
+	_, err = GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var request models.MCQExamAssessmentRequest
+	if err := s.ReadJson(w, r, &request); err != nil {
+		s.HandleError(w, err, "invalid json request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := ValidateInput(&request); err != nil {
+		s.HandleError(w, err, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = s.WriteJson(w, http.StatusOK, &Response{Data: request})
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
+}

@@ -7,6 +7,15 @@ type DescriptiveExamAssesmentRequest struct {
 	Content          string `json:"content" validate:"required"`
 }
 
+type MCQExamAssessmentRequestModel struct {
+	QuestionNumber          int `json:"question_number" validate:"required"`
+	UserSelectedOptionIndex int `json:"user_selected_option_index" validate:"gte=0"`
+}
+
+type MCQExamAssessmentRequest struct {
+	AttemptedQuestions []MCQExamAssessmentRequestModel `json:"attempted_questions" validate:"required"`
+}
+
 type UpsertPaymentProviderCustomerModel struct {
 	Name  string
 	Email string

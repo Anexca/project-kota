@@ -66,7 +66,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 				})
 
 				r.Route("/mcq", func(r chi.Router) {
-					// ToDo: Add assessment and open questions
+					r.Post("/{id}/evaluate", s.EvaluateBankingMCQExam)
 				})
 
 				r.Route("/{id}", func(r chi.Router) {
