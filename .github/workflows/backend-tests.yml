@@ -18,40 +18,46 @@ on:
       - ".github/**"
 
 jobs:
-  run_backend_unit_tests:
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
 
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.23.0"
+          go-version: "1.23.0" # Specify the Go version you want to use
 
-      - name: Install dependencies and Run tests
+      - name: Install dependencies and Run tests in ai-service
         run: |
-          for dir in backend/server backend/ai-service backend/common; do
-            echo "Testing in $dir"
-            cd $dir
-            go mod tidy
-            go test -coverprofile=coverage.out -covermode=atomic ./...
-            mv coverage.out "../../coverage-$dir.out"  # Move and rename coverage file to avoid overwriting
-            cd -
-          done
+          cd backend/ai-service
+          go mod tidy
+          go test -coverprofile=coverage.out ./...
+          mv coverage.out ../../ai-service-coverage.out
+
+      - name: Install dependencies and Run tests in common
+        run: |
+          cd backend/common
+          go mod tidy
+          go test -coverprofile=coverage.out ./...
+          mv coverage.out ../../common-coverage.out
+
+      - name: Install dependencies and Run tests in server
+        run: |
+          cd backend/server
+          go mod tidy
+          go test -coverprofile=coverage.out ./...
+          mv coverage.out ../../server-coverage.out
 
       - name: Combine coverage reports
         run: |
           echo "Combining coverage reports"
-          cat backend/coverage-backend*.out > combined-coverage.out
-          goveralls -service=github -coverprofile=combined-coverage.out -repotoken ${{ secrets.GITHUB_TOKEN }}
+          cat backend/*-coverage.out > backend/combined-coverage.out
 
       - name: Generate LCOV report
-        run: genhtml -o coverage-report combined-coverage.out
-        working-directory: backend
+        run: genhtml -o coverage-report backend/combined-coverage.out
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v3
@@ -59,15 +65,12 @@ jobs:
           name: coverage-report
           path: backend/coverage-report
 
-  coverage_report:
-    name: Generate coverage report comment
-    needs: run_backend_unit_tests
+  coverage_report_comment:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Fetch all history for all branches and tags
 
       - name: Download coverage report
         uses: actions/download-artifact@v3
