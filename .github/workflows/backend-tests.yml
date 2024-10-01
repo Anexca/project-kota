@@ -50,28 +50,32 @@ jobs:
         run: go tool cover -func=server-coverage.out -o server-lcov.info
         working-directory: backend/server
 
-      - name: Generate LCOV report for AI Service
-        run: go tool cover -func=ai-service-coverage.out -o ai-service-lcov.info
-        working-directory: backend/ai-service
+      - name: Display LCOV report content
+        run: cat server-lcov.info
+        working-directory: backend/server
 
-      - name: Generate LCOV report for Common
-        run: go tool cover -func=common-coverage.out -o common-lcov.info
-        working-directory: backend/common
+      # - name: Generate LCOV report for AI Service
+      #   run: go tool cover -func=ai-service-coverage.out -o ai-service-lcov.info
+      #   working-directory: backend/ai-service
 
-      - name: Post Coverage Comment for Server
-        uses: romeovs/lcov-reporter-action@v0.2.16
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: backend/server/server-lcov.info
+      # - name: Generate LCOV report for Common
+      #   run: go tool cover -func=common-coverage.out -o common-lcov.info
+      #   working-directory: backend/common
 
-      - name: Post Coverage Comment for AI Service
-        uses: romeovs/lcov-reporter-action@v0.2.16
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: backend/ai-service/ai-service-lcov.info
+      # - name: Post Coverage Comment for Server
+      #   uses: romeovs/lcov-reporter-action@v0.2.16
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     lcov-file: backend/server/server-lcov.info
 
-      - name: Post Coverage Comment for Common
-        uses: romeovs/lcov-reporter-action@v0.2.16
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: backend/common/common-lcov.info
+      # - name: Post Coverage Comment for AI Service
+      #   uses: romeovs/lcov-reporter-action@v0.2.16
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     lcov-file: backend/ai-service/ai-service-lcov.info
+
+      # - name: Post Coverage Comment for Common
+      #   uses: romeovs/lcov-reporter-action@v0.2.16
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     lcov-file: backend/common/common-lcov.info
