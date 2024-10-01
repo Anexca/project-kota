@@ -56,7 +56,8 @@ jobs:
       - name: Combine coverage reports
         run: |
           echo "Combining coverage reports"
-          cat server/server-coverage.out ai-service/ai-service-coverage.out common/common-coverage.out > combined-coverage.out
+          echo "$(head -n 1 server/server-coverage.out)" > combined-coverage.out  # Take the mode line from the first file
+          tail -n +2 -q server/server-coverage.out ai-service/ai-service-coverage.out common/common-coverage.out >> combined-coverage.out
         working-directory: backend
 
       - name: Generate LCOV report
