@@ -107,7 +107,7 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
 
   const attempQuestion = (index: number) => {
     const path = isOpenMode
-      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`
+      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/${index}`
       : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${params.categoryId}/${index}`;
     navigate(path);
   };
