@@ -18,50 +18,38 @@ on:
       - ".github/**"
 
 jobs:
-  test:
+  run_backend_unit_tests:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
 
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: "1.23.0" # Specify the Go version you want to use
 
-      - name: Install LCOV
-        run: sudo apt-get install lcov
-
-      - name: Run tests in ai-service
+      - name: Install dependencies and run tests
+        working-directory: backend
         run: |
-          cd backend/ai-service
-          go mod tidy
-          go test -coverprofile=ai-service-coverage.out ./...
-
-      - name: Run tests in common
-        run: |
-          cd backend/common
-          go mod tidy
-          go test -coverprofile=common-coverage.out ./...
-
-      - name: Run tests in server
-        run: |
-          cd backend/server
+          cd server
           go mod tidy
           go test -coverprofile=server-coverage.out ./...
-
-      - name: Combine coverage reports
-        run: |
+          cd ../ai-service
+          go mod tidy
+          go test -coverprofile=ai-service-coverage.out ./...
+          cd ../common
+          go mod tidy
+          go test -coverprofile=common-coverage.out ./...
           echo "Combining coverage reports"
-          cat backend/ai-service/ai-service-coverage.out backend/common/common-coverage.out backend/server/server-coverage.out > backend/combined-coverage.out
+          cat server/server-coverage.out ai-service/ai-service-coverage.out common/common-coverage.out > combined-coverage.out
+          go tool cover -func=combined-coverage.out -o lcov.info
 
-      - name: Generate LCOV report
-        run: |
-          genhtml -o coverage-report backend/combined-coverage.out --output-directory coverage-report
-
-      - name: Upload coverage report as artifact
-        uses: actions/upload-artifact@v3
+      - name: Report LCOV coverage
+        uses: romeovs/lcov-reporter-action@v0.2.16
         with:
-          name: coverage-report
-          path: coverage-report
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./backend/lcov.info
