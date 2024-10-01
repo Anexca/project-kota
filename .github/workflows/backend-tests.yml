@@ -30,6 +30,9 @@ jobs:
         with:
           go-version: "1.23.0" # Specify the Go version you want to use
 
+      - name: Install LCOV
+        run: sudo apt-get install lcov
+
       - name: Run tests in ai-service
         run: |
           cd backend/ai-service
@@ -54,7 +57,8 @@ jobs:
           cat backend/ai-service/ai-service-coverage.out backend/common/common-coverage.out backend/server/server-coverage.out > backend/combined-coverage.out
 
       - name: Generate LCOV report
-        run: genhtml -o coverage-report backend/combined-coverage.out
+        run: |
+          genhtml -o coverage-report backend/combined-coverage.out --output-directory coverage-report
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v3
