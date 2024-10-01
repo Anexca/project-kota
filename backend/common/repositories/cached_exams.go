@@ -9,13 +9,6 @@ import (
 	"common/ent/exam"
 )
 
-// CachedExamRepositoryInterface defines the contract for the cached exam repository.
-type CachedExamRepositoryInterface interface {
-	Create(ctx context.Context, cacheUID string, expiry time.Duration, exam *ent.Exam) (*ent.CachedExam, error)
-	GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.CachedExam, error)
-	MarkAsUsed(ctx context.Context, id int) error
-}
-
 // CachedExamRepository is the concrete implementation of the CachedExamRepositoryInterface.
 type CachedExamRepository struct {
 	dbClient *ent.Client

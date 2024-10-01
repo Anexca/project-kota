@@ -12,13 +12,6 @@ import (
 	"common/ent/user"
 )
 
-// PaymentRepositoryInterface defines the contract for the Payment repository.
-type PaymentRepositoryInterface interface {
-	GetByUserId(ctx context.Context, userId string) ([]*ent.Payment, error)
-	Create(ctx context.Context, model CreatePaymentModel, userId string) (*ent.Payment, error)
-	GetByProviderPaymentId(ctx context.Context, paymentProviderId string) (*ent.Payment, error)
-}
-
 // CreatePaymentModel represents the data needed to create a payment record.
 type CreatePaymentModel struct {
 	UserSubscriptionId int

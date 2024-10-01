@@ -6,8 +6,8 @@ import (
 
 	"common/ent"
 
-	"server/internal/services"
 	"server/pkg/constants"
+	"server/pkg/models"
 )
 
 func (s *Server) GetUserProfile(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +76,7 @@ func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request services.UpdateUserRequest
+	var request models.UpdateUserRequest
 
 	if err := s.ReadJson(w, r, &request); err != nil {
 		s.HandleError(w, err, "invalid json request body", http.StatusBadRequest)

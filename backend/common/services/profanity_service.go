@@ -6,11 +6,6 @@ import (
 	"common/constants"
 )
 
-// ProfanityServiceInterface defines the contract for the profanity detection service
-type ProfanityServiceInterface interface {
-	IsProfane(s string) bool
-}
-
 // ProfanityService is an implementation of ProfanityServiceInterface
 type ProfanityService struct {
 	profanityDetector *goaway.ProfanityDetector

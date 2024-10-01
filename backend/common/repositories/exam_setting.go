@@ -8,11 +8,6 @@ import (
 	"common/ent/examsetting"
 )
 
-// ExamSettingRepositoryInterface defines the contract for the exam setting repository.
-type ExamSettingRepositoryInterface interface {
-	GetByExam(ctx context.Context, examId int) (*ent.ExamSetting, error)
-}
-
 // ExamSettingRepository is a concrete implementation of ExamSettingRepositoryInterface.
 type ExamSettingRepository struct {
 	dbClient *ent.Client

@@ -5,25 +5,16 @@ import (
 	"time"
 
 	"common/ent"
+	commonInterfaces "common/interfaces"
 	"common/repositories"
 )
 
-// SubscriptionRepositoryInterface defines the contract for SubscriptionRepository
-type SubscriptionRepositoryInterface interface {
-	GetById(ctx context.Context, id int) (*ent.Subscription, error)
-}
-
-// UserSubscriptionRepositoryInterface defines the contract for UserSubscriptionRepository
-type UserSubscriptionRepositoryInterface interface {
-	GetByUserId(ctx context.Context, userId string) ([]*ent.UserSubscription, error)
-}
-
 type AccessService struct {
-	subscriptionRepository     repositories.SubscriptionRepositoryInterface
-	userSubscriptionRepository repositories.UserSubscriptionRepositoryInterface
+	subscriptionRepository     commonInterfaces.SubscriptionRepositoryInterface
+	userSubscriptionRepository commonInterfaces.UserSubscriptionRepositoryInterface
 }
 
-func NewAccessService(subscriptionRepo repositories.SubscriptionRepositoryInterface, userSubscriptionRepo repositories.UserSubscriptionRepositoryInterface) *AccessService {
+func NewAccessService(subscriptionRepo commonInterfaces.SubscriptionRepositoryInterface, userSubscriptionRepo commonInterfaces.UserSubscriptionRepositoryInterface) *AccessService {
 	return &AccessService{
 		subscriptionRepository:     subscriptionRepo,
 		userSubscriptionRepository: userSubscriptionRepo,

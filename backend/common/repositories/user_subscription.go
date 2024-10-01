@@ -10,15 +10,6 @@ import (
 	"common/ent/usersubscription"
 )
 
-// UserSubscriptionRepositoryInterface defines the contract for the UserSubscription repository.
-type UserSubscriptionRepositoryInterface interface {
-	Create(ctx context.Context, model UserSubscriptionModel) (*ent.UserSubscription, error)
-	Update(ctx context.Context, updatedUserSubscription *ent.UserSubscription) error
-	GetById(ctx context.Context, userSubscriptionId int, userId string) (*ent.UserSubscription, error)
-	GetByUserId(ctx context.Context, userId string) ([]*ent.UserSubscription, error)
-	GetByProviderSubscriptionId(ctx context.Context, providerSubscriptionId string, userId string) (*ent.UserSubscription, error)
-}
-
 // UserSubscriptionModel is the model to create a new user subscription.
 type UserSubscriptionModel struct {
 	SubscriptionId         int

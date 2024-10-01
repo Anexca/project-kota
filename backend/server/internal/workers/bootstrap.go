@@ -19,7 +19,7 @@ type Worker struct {
 func InitWorkers(redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 	c := cron.New()
 
-	examService := services.NewExamGenerationService(redisClient, dbClient)
+	examService := services.InitExamGenerationService(redisClient, dbClient)
 
 	worker := &Worker{
 		cronHandler: c,

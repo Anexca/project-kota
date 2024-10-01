@@ -9,15 +9,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// RedisServiceInterface defines the contract for interacting with Redis.
-type RedisServiceInterface interface {
-	Store(ctx context.Context, key string, value string, expiry time.Duration) error
-	Get(ctx context.Context, key string) (string, error)
-	Delete(ctx context.Context, key string) error
-	Health() map[string]string
-	CheckRedisHealth(ctx context.Context, stats map[string]string) map[string]string
-}
-
 // RedisService is an implementation of RedisServiceInterface, which interacts with a Redis server.
 type RedisService struct {
 	client *redis.Client

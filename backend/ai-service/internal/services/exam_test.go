@@ -5,82 +5,22 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
 	"common/constants"
 	"common/ent"
+	"common/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-// Mock for GenAIServiceInterface
-type MockGenAIService struct {
-	mock.Mock
-}
-
-func (m *MockGenAIService) GetContentStream(ctx context.Context, prompt string, model constants.GenAiModel) (string, error) {
-	args := m.Called(ctx, prompt, model)
-	return args.String(0), args.Error(1)
-}
-
-// Mock for RedisServiceInterface
-type MockRedisService struct {
-	mock.Mock
-}
-
-func (m *MockRedisService) Store(ctx context.Context, key string, value string, expiration time.Duration) error {
-	args := m.Called(ctx, key, value, expiration)
-	return args.Error(0)
-}
-
-// Mock for ExamRepositoryInterface
-type MockExamRepository struct {
-	mock.Mock
-}
-
-func (m *MockExamRepository) GetByExamCategory(ctx context.Context, category *ent.ExamCategory) ([]*ent.Exam, error) {
-	args := m.Called(ctx, category)
-	return args.Get(0).([]*ent.Exam), args.Error(1)
-}
-
-// Mock for ExamCategoryRepositoryInterface
-type MockExamCategoryRepository struct {
-	mock.Mock
-}
-
-func (m *MockExamCategoryRepository) Get(ctx context.Context) ([]*ent.ExamCategory, error) {
-	args := m.Called(ctx)
-	return args.Get(0).([]*ent.ExamCategory), args.Error(1)
-}
-
-// Mock for ExamSettingRepositoryInterface
-type MockExamSettingRepository struct {
-	mock.Mock
-}
-
-func (m *MockExamSettingRepository) GetByExam(ctx context.Context, examID int) (*ent.ExamSetting, error) {
-	args := m.Called(ctx, examID)
-	return args.Get(0).(*ent.ExamSetting), args.Error(1)
-}
-
-// Mock for CachedExamRepositoryInterface
-type MockCachedExamRepository struct {
-	mock.Mock
-}
-
-func (m *MockCachedExamRepository) Create(ctx context.Context, uid string, expiration time.Duration, exam *ent.Exam) (*ent.CachedExam, error) {
-	args := m.Called(ctx, uid, expiration, exam)
-	return args.Get(0).(*ent.CachedExam), args.Error(1)
-}
-
 func TestPopulateExamQuestionCache_Success(t *testing.T) {
-	mockGenAIService := new(MockGenAIService)
-	mockRedisService := new(MockRedisService)
-	mockExamRepository := new(MockExamRepository)
-	mockExamCategoryRepository := new(MockExamCategoryRepository)
-	mockExamSettingRepository := new(MockExamSettingRepository)
-	mockCachedExamRepository := new(MockCachedExamRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamCategoryRepository := new(mocks.MockExamCategoryRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockCachedExamRepository := new(mocks.MockCachedExamRepository)
 
 	examService := services.NewExamService(
 		mockGenAIService,
@@ -130,12 +70,12 @@ func TestPopulateExamQuestionCache_Success(t *testing.T) {
 }
 
 func TestPopulateExamQuestionCache_ErrorFetchingCategories(t *testing.T) {
-	mockGenAIService := new(MockGenAIService)
-	mockRedisService := new(MockRedisService)
-	mockExamRepository := new(MockExamRepository)
-	mockExamCategoryRepository := new(MockExamCategoryRepository)
-	mockExamSettingRepository := new(MockExamSettingRepository)
-	mockCachedExamRepository := new(MockCachedExamRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamCategoryRepository := new(mocks.MockExamCategoryRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockCachedExamRepository := new(mocks.MockCachedExamRepository)
 
 	examService := services.NewExamService(
 		mockGenAIService,
@@ -157,12 +97,12 @@ func TestPopulateExamQuestionCache_ErrorFetchingCategories(t *testing.T) {
 }
 
 func TestPopulateExamQuestionCache_ErrorFetchingExams(t *testing.T) {
-	mockGenAIService := new(MockGenAIService)
-	mockRedisService := new(MockRedisService)
-	mockExamRepository := new(MockExamRepository)
-	mockExamCategoryRepository := new(MockExamCategoryRepository)
-	mockExamSettingRepository := new(MockExamSettingRepository)
-	mockCachedExamRepository := new(MockCachedExamRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamCategoryRepository := new(mocks.MockExamCategoryRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockCachedExamRepository := new(mocks.MockCachedExamRepository)
 
 	examService := services.NewExamService(
 		mockGenAIService,
@@ -187,12 +127,12 @@ func TestPopulateExamQuestionCache_ErrorFetchingExams(t *testing.T) {
 }
 
 func TestPopulateExamQuestionCache_ErrorFetchingExamSetting(t *testing.T) {
-	mockGenAIService := new(MockGenAIService)
-	mockRedisService := new(MockRedisService)
-	mockExamRepository := new(MockExamRepository)
-	mockExamCategoryRepository := new(MockExamCategoryRepository)
-	mockExamSettingRepository := new(MockExamSettingRepository)
-	mockCachedExamRepository := new(MockCachedExamRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamCategoryRepository := new(mocks.MockExamCategoryRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockCachedExamRepository := new(mocks.MockCachedExamRepository)
 
 	examService := services.NewExamService(
 		mockGenAIService,
@@ -220,12 +160,12 @@ func TestPopulateExamQuestionCache_ErrorFetchingExamSetting(t *testing.T) {
 }
 
 func TestPopulateExamQuestionCache_ErrorGeneratingContent(t *testing.T) {
-	mockGenAIService := new(MockGenAIService)
-	mockRedisService := new(MockRedisService)
-	mockExamRepository := new(MockExamRepository)
-	mockExamCategoryRepository := new(MockExamCategoryRepository)
-	mockExamSettingRepository := new(MockExamSettingRepository)
-	mockCachedExamRepository := new(MockCachedExamRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamCategoryRepository := new(mocks.MockExamCategoryRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockCachedExamRepository := new(mocks.MockCachedExamRepository)
 
 	examService := services.NewExamService(
 		mockGenAIService,
@@ -256,12 +196,12 @@ func TestPopulateExamQuestionCache_ErrorGeneratingContent(t *testing.T) {
 }
 
 func TestPopulateExamQuestionCache_ErrorStoringInRedis(t *testing.T) {
-	mockGenAIService := new(MockGenAIService)
-	mockRedisService := new(MockRedisService)
-	mockExamRepository := new(MockExamRepository)
-	mockExamCategoryRepository := new(MockExamCategoryRepository)
-	mockExamSettingRepository := new(MockExamSettingRepository)
-	mockCachedExamRepository := new(MockCachedExamRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamCategoryRepository := new(mocks.MockExamCategoryRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockCachedExamRepository := new(mocks.MockCachedExamRepository)
 
 	examService := services.NewExamService(
 		mockGenAIService,
@@ -298,12 +238,12 @@ func TestPopulateExamQuestionCache_ErrorStoringInRedis(t *testing.T) {
 }
 
 func TestPopulateExamQuestionCache_ErrorSavingCachedMetadata(t *testing.T) {
-	mockGenAIService := new(MockGenAIService)
-	mockRedisService := new(MockRedisService)
-	mockExamRepository := new(MockExamRepository)
-	mockExamCategoryRepository := new(MockExamCategoryRepository)
-	mockExamSettingRepository := new(MockExamSettingRepository)
-	mockCachedExamRepository := new(MockCachedExamRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamCategoryRepository := new(mocks.MockExamCategoryRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockCachedExamRepository := new(mocks.MockCachedExamRepository)
 
 	examService := services.NewExamService(
 		mockGenAIService,

@@ -9,13 +9,6 @@ import (
 	"common/ent/user"
 )
 
-// UserRepositoryInterface defines the contract for the User repository.
-type UserRepositoryInterface interface {
-	Get(ctx context.Context, userId string) (*ent.User, error)
-	GetByEmail(ctx context.Context, userEmail string) (*ent.User, error)
-	Update(ctx context.Context, updatedUser *ent.User) (*ent.User, error)
-}
-
 // UpdateUserModel represents the model for updating a user's details.
 type UpdateUserModel struct {
 	FirstName                 string

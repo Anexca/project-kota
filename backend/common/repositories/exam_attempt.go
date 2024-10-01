@@ -11,14 +11,6 @@ import (
 	"common/ent/user"
 )
 
-// ExamAttemptRepositoryInterface defines the contract for the exam attempt repository.
-type ExamAttemptRepositoryInterface interface {
-	GetById(ctx context.Context, attemptId int, userId string) (*ent.ExamAttempt, error)
-	GetByUserId(ctx context.Context, userId string) ([]*ent.ExamAttempt, error)
-	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error)
-	Create(ctx context.Context, currentAttempt int, generatedExamId int, userId string) (*ent.ExamAttempt, error)
-}
-
 // ExamAttemptRepository is a concrete implementation of ExamAttemptRepositoryInterface.
 type ExamAttemptRepository struct {
 	dbClient *ent.Client

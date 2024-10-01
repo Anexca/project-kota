@@ -16,22 +16,6 @@ import (
 	"common/ent/user"
 )
 
-// GeneratedExamRepositoryInterface defines the contract for the GeneratedExam repository.
-type GeneratedExamRepositoryInterface interface {
-	AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error)
-	Add(ctx context.Context, exam map[string]interface{}, examId int) (*ent.GeneratedExam, error)
-	UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error
-	GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error)
-	GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error)
-	GetActiveById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error)
-	GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error)
-	GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error)
-	GetByMonthOffset(ctx context.Context, ex *ent.Exam, monthOffset, limit int) ([]*ent.GeneratedExam, error)
-	GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error)
-	GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error)
-	GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error)
-}
-
 // GeneratedExamRepository is a concrete implementation of GeneratedExamRepositoryInterface.
 type GeneratedExamRepository struct {
 	dbClient *ent.Client

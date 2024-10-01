@@ -9,40 +9,56 @@ import (
 
 	"common/ent"
 	"common/ent/usersubscription"
+	commonInterfaces "common/interfaces"
 
 	commonRepositories "common/repositories"
 
 	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
 
+	"server/internal/interfaces"
 	"server/pkg/config"
 	"server/pkg/models"
 )
 
+// SubscriptionService defines the service for managing subscriptions.
 type SubscriptionService struct {
 	environment                *config.Environment
-	paymentService             *PaymentService
-	userRepository             *commonRepositories.UserRepository
-	subscriptionRepository     *commonRepositories.SubscriptionRepository
-	userSubscriptionRepository *commonRepositories.UserSubscriptionRepository
-	paymentrepository          *commonRepositories.PaymentRepository
+	paymentService             interfaces.PaymentServiceInterface // Use interface for better testability
+	userRepository             commonInterfaces.UserRepositoryInterface
+	subscriptionRepository     commonInterfaces.SubscriptionRepositoryInterface
+	userSubscriptionRepository commonInterfaces.UserSubscriptionRepositoryInterface
+	paymentrepository          commonInterfaces.PaymentRepositoryInterface
 }
 
-func NewSubscriptionService(dbClient *ent.Client) *SubscriptionService {
-	environment, _ := config.LoadEnvironment()
+// NewSubscriptionService creates a new SubscriptionService with the provided dependencies.
+func NewSubscriptionService(paymentService interfaces.PaymentServiceInterface, userRepo commonInterfaces.UserRepositoryInterface, subscriptionRepo commonInterfaces.SubscriptionRepositoryInterface, userSubscriptionRepo commonInterfaces.UserSubscriptionRepositoryInterface, paymentRepo commonInterfaces.PaymentRepositoryInterface) *SubscriptionService {
+	return &SubscriptionService{
+		environment:                nil, // To be set in Init method
+		paymentService:             paymentService,
+		userRepository:             userRepo,
+		subscriptionRepository:     subscriptionRepo,
+		userSubscriptionRepository: userSubscriptionRepo,
+		paymentrepository:          paymentRepo,
+	}
+}
+
+// InitSubscriptionService initializes the SubscriptionService for production use.
+func InitSubscriptionService(dbClient *ent.Client) *SubscriptionService {
+	environment, err := config.LoadEnvironment()
+	if err != nil {
+		log.Fatalf("error loading environment: %v", err)
+	}
+
 	paymentService := NewPaymentService()
 	userRepository := commonRepositories.NewUserRepository(dbClient)
 	subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
 	userSubscriptionRepository := commonRepositories.NewUserSubscriptionRepository(dbClient)
 	paymentrepository := commonRepositories.NewPaymentRepository(dbClient)
 
-	return &SubscriptionService{
-		environment:                environment,
-		paymentService:             paymentService,
-		userRepository:             userRepository,
-		subscriptionRepository:     subscriptionRepository,
-		userSubscriptionRepository: userSubscriptionRepository,
-		paymentrepository:          paymentrepository,
-	}
+	service := NewSubscriptionService(paymentService, userRepository, subscriptionRepository, userSubscriptionRepository, paymentrepository)
+	service.environment = environment
+
+	return service
 }
 
 func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.SubscriptionOverview, error) {
@@ -98,7 +114,7 @@ func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscri
 		return nil, fmt.Errorf("user already has active subscription")
 	}
 
-	model := CreateOrderModel{
+	model := models.CreateOrderModel{
 		Amount:              subscription.FinalPrice,
 		CustomerId:          user.PaymentProviderCustomerID,
 		CustomerPhoneNumber: user.PhoneNumber,
@@ -138,8 +154,8 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, prov
 	user, err := s.userRepository.GetByEmail(ctx, userEmail)
 	if err != nil {
 		return nil, err
-
 	}
+
 	userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetByProviderSubscriptionId(ctx, providerSubscriptionId, user.ID.String())
 	if err != nil {
 		return nil, err
@@ -182,7 +198,6 @@ func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, prov
 }
 
 func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, transaction *cashfree_pg.PaymentEntity, userSubscriptionId int, userId string) (*ent.Payment, error) {
-
 	const layout = time.RFC3339
 
 	paymentDate, err := time.Parse(layout, *transaction.PaymentCompletionTime)
@@ -200,7 +215,6 @@ func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, t
 	}
 
 	return s.paymentrepository.Create(ctx, paymentModel, userId)
-
 }
 
 func determinePaymentMethod(transaction *cashfree_pg.PaymentEntityPaymentMethod) string {
@@ -211,7 +225,6 @@ func determinePaymentMethod(transaction *cashfree_pg.PaymentEntityPaymentMethod)
 		return "Card"
 	case transaction.PaymentMethodNetBankingInPaymentsEntity != nil:
 		return "Netbanking"
-	// Add more cases for other payment methods as needed
 	default:
 		return "Unknown"
 	}
@@ -226,9 +239,7 @@ func (s *SubscriptionService) UserHasActiveSubscription(ctx context.Context, sub
 	now := time.Now()
 
 	for _, userSubscription := range userSubscriptions {
-		if userSubscription.StartDate.Before(now) &&
-			userSubscription.EndDate.After(now) &&
-			userSubscription.Edges.Subscription.ID == subscription.ID {
+		if userSubscription.StartDate.Before(now) && userSubscription.EndDate.After(now) && userSubscription.Edges.Subscription.ID == subscription.ID {
 			return true, nil
 		}
 	}

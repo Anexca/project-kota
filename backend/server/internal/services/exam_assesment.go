@@ -7,82 +7,39 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	"common/constants"
 	"common/ent"
 
+	commonInterfaces "common/interfaces"
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 
 	goaway "github.com/TwiN/go-away"
 	"github.com/redis/go-redis/v9"
 
+	"server/internal/interfaces"
 	"server/pkg/models"
 )
 
-// PromptServiceInterface defines the contract for PromptService
-type PromptServiceInterface interface {
-	GetPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error)
-}
-
-// ExamGenerationServiceInterface defines the contract for ExamGenerationService
-type ExamGenerationServiceInterface interface {
-	GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error)
-}
-
-// ProfanityServiceInterface defines the contract for ProfanityService
-type ProfanityServiceInterface interface {
-	IsProfane(s string) bool
-}
-
-// GeneratedExamRepositoryInterface defines the contract for GeneratedExamRepository
-type GeneratedExamRepositoryInterface interface {
-	AddMany(ctx context.Context, exams []any, ex *ent.Exam) ([]*ent.GeneratedExam, error)
-	Add(ctx context.Context, exam map[string]interface{}, examId int) (*ent.GeneratedExam, error)
-	UpdateMany(ctx context.Context, generatedExams []*ent.GeneratedExam) error
-	GetById(ctx context.Context, generatedExamId int) (*ent.GeneratedExam, error)
-	GetOpenById(ctx context.Context, generatedExamId int, isOpen bool) (*ent.GeneratedExam, error)
-	GetActiveById(ctx context.Context, generatedExamId int, isActive bool) (*ent.GeneratedExam, error)
-	GetByExam(ctx context.Context, ex *ent.Exam) ([]*ent.GeneratedExam, error)
-	GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error)
-	GetByMonthOffset(ctx context.Context, ex *ent.Exam, monthOffset, limit int) ([]*ent.GeneratedExam, error)
-	GetByWeekOffset(ctx context.Context, ex *ent.Exam, weekOffset, limit int) ([]*ent.GeneratedExam, error)
-	GetPaginatedExamsByUserAndDate(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryID *int) ([]*ent.GeneratedExam, error)
-	GetCountOfFilteredExamsDataByUserAndDate(ctx context.Context, userId string, from, to *time.Time, examTypeId, categoryID *int) (int, error)
-}
-
-// ExamAssessmentRepositoryInterface defines the contract for ExamAssessmentRepository
-type ExamAssessmentRepositoryInterface interface {
-	Create(ctx context.Context, attemptId int, model commonRepositories.AssessmentModel) (*ent.ExamAssesment, error)
-	Update(ctx context.Context, assessmentId int, model commonRepositories.AssessmentModel) error
-	GetById(ctx context.Context, assessmentId int, userId string) (*ent.ExamAssesment, error)
-	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error)
-}
-
-type DescriptiveExamAssesmentRequest struct {
-	CompletedSeconds int    `json:"completed_seconds" validate:"required"`
-	Content          string `json:"content" validate:"required"`
-}
-
 type ExamAssesmentService struct {
-	accessService           AccessServiceInterface
-	promptService           PromptServiceInterface
-	examGenerationService   ExamGenerationServiceInterface
-	profanityService        ProfanityServiceInterface
-	generatedExamRepository GeneratedExamRepositoryInterface
-	examAttemptRepository   ExamAttemptRepositoryInterface
-	examAssesmentRepository ExamAssessmentRepositoryInterface
+	accessService           interfaces.AccessServiceInterface
+	promptService           interfaces.PromptServiceInterface
+	examGenerationService   interfaces.ExamGenerationServiceInterface
+	profanityService        commonInterfaces.ProfanityServiceInterface
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
+	examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+	examAssesmentRepository commonInterfaces.ExamAssessmentRepositoryInterface
 }
 
 func NewExamAssesmentService(
-	accessService AccessServiceInterface,
-	promptService PromptServiceInterface,
-	profanityService ProfanityServiceInterface,
-	generatedExamRepository GeneratedExamRepositoryInterface,
-	examGenerationService ExamGenerationServiceInterface,
-	examAttemptRepository ExamAttemptRepositoryInterface,
-	examAssesmentRepository ExamAssessmentRepositoryInterface,
+	accessService interfaces.AccessServiceInterface,
+	promptService interfaces.PromptServiceInterface,
+	profanityService commonInterfaces.ProfanityServiceInterface,
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
+	examGenerationService interfaces.ExamGenerationServiceInterface,
+	examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+	examAssesmentRepository commonInterfaces.ExamAssessmentRepositoryInterface,
 ) *ExamAssesmentService {
 	return &ExamAssesmentService{
 		accessService:           accessService,
@@ -100,7 +57,7 @@ func InitExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *
 	promptService := NewPromptService()
 	profanityService := commonServices.NewProfanityService()
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
-	examGenerationService := NewExamGenerationService(redisClient, dbClient)
+	examGenerationService := InitExamGenerationService(redisClient, dbClient)
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examAssesmentRepository := commonRepositories.NewExamAssessmentRepository(dbClient)
 
@@ -115,7 +72,7 @@ func InitExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *
 	)
 }
 
-func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *DescriptiveExamAssesmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error) {
+func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *models.DescriptiveExamAssesmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error) {
 	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
 	if err != nil {
 		log.Printf("Error getting generated exam: %v", err)

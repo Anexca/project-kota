@@ -8,48 +8,29 @@ import (
 	"time"
 
 	"common/ent"
+	commonInterfaces "common/interfaces"
 	commonRepositories "common/repositories"
 
+	"server/internal/interfaces"
 	"server/pkg/models"
 )
 
-// AccessServiceInterface defines the contract for AccessService
-type AccessServiceInterface interface {
-	UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error)
-}
-
-// ExamRepositoryInterface defines the contract for ExamRepository
-type ExamRepositoryInterface interface {
-	// Define methods needed from the ExamRepository
-}
-
-// ExamAttemptRepositoryInterface defines the contract for ExamAttemptRepository
-type ExamAttemptRepositoryInterface interface {
-	GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error)
-	Create(ctx context.Context, currAttempts int, generatedExamId int, userId string) (*ent.ExamAttempt, error)
-}
-
-// ExamSettingRepositoryInterface defines the contract for ExamSettingRepository
-type ExamSettingRepositoryInterface interface {
-	GetByExam(ctx context.Context, examId int) (*ent.ExamSetting, error)
-}
-
 // ExamAttemptService is the service for handling exam attempts
 type ExamAttemptService struct {
-	accessService           AccessServiceInterface
-	examRepository          ExamRepositoryInterface
-	examAttemptRepository   ExamAttemptRepositoryInterface
-	examSettingRepository   ExamSettingRepositoryInterface
-	generatedExamRepository GeneratedExamRepositoryInterface
+	accessService           interfaces.AccessServiceInterface
+	examRepository          commonInterfaces.ExamRepositoryInterface
+	examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+	examSettingRepository   commonInterfaces.ExamSettingRepositoryInterface
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
 }
 
 // NewExamAttemptService initializes a new ExamAttemptService
 func NewExamAttemptService(
-	accessService AccessServiceInterface,
-	examRepository ExamRepositoryInterface,
-	examAttemptRepository ExamAttemptRepositoryInterface,
-	examSettingRepository ExamSettingRepositoryInterface,
-	generatedExamRepository GeneratedExamRepositoryInterface,
+	accessService interfaces.AccessServiceInterface,
+	examRepository commonInterfaces.ExamRepositoryInterface,
+	examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+	examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
 ) *ExamAttemptService {
 	return &ExamAttemptService{
 		accessService:           accessService,
@@ -61,14 +42,12 @@ func NewExamAttemptService(
 }
 
 func InitExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
-	// Initialize concrete implementations of the dependencies
 	accessService := InitAccessService(dbClient)
 	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
 	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
 	examRepository := commonRepositories.NewExamRepository(dbClient)
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
 
-	// Return a new ExamAttemptService with the concrete implementations
 	return NewExamAttemptService(
 		accessService,
 		examRepository,
@@ -78,7 +57,6 @@ func InitExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
 	)
 }
 
-// CheckAndAddAttempt checks if the user can add an attempt and adds it if possible
 func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*ent.ExamAttempt, error) {
 	userExamAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExamId, userId)
 	if err != nil {
