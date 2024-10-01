@@ -20,7 +20,6 @@ on:
 permissions:
   contents: read
   pull-requests: write
-  checks: write
 
 jobs:
   run_backend_unit_tests:
@@ -40,9 +39,6 @@ jobs:
         with:
           go-version: "1.23.0"
 
-      - name: Install gcov2lcov
-        run: go install github.com/jandelgado/gcov2lcov@latest
-
       - name: Install dependencies and Run tests
         run: |
           cd server && go mod tidy && go test -coverprofile=server-coverage.out ./...
@@ -51,30 +47,30 @@ jobs:
 
       - name: Generate LCOV report for Server
         run: gcov2lcov -infile=server-coverage.out -outfile=server-lcov.info
-        working-directory: backend/server
+        working-directory: server
 
       - name: Generate LCOV report for AI Service
         run: gcov2lcov -infile=ai-service-coverage.out -outfile=ai-service-lcov.info
-        working-directory: backend/ai-service
+        working-directory: ai-service
 
       - name: Generate LCOV report for Common
         run: gcov2lcov -infile=common-coverage.out -outfile=common-lcov.info
-        working-directory: backend/common
+        working-directory: common
 
       - name: Post Coverage Comment for Server
-        uses: romeovs/lcov-reporter-action@v0.2.16
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: backend/server/server-lcov.info
+        run: |
+          coverage=$(grep -Po '^\S+\s+\S+\s+\S+\s+\S+\s+\K\S+' server/server-lcov.info)
+          echo "Server Coverage: $coverage%" > server-coverage-summary.txt
+          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d '{"body":"'"$(<server-coverage-summary.txt)"'"}' "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
 
       - name: Post Coverage Comment for AI Service
-        uses: romeovs/lcov-reporter-action@v0.2.16
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: backend/ai-service/ai-service-lcov.info
+        run: |
+          coverage=$(grep -Po '^\S+\s+\S+\s+\S+\s+\S+\s+\K\S+' ai-service/ai-service-lcov.info)
+          echo "AI Service Coverage: $coverage%" > ai-service-coverage-summary.txt
+          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d '{"body":"'"$(<ai-service-coverage-summary.txt)"'"}' "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
 
       - name: Post Coverage Comment for Common
-        uses: romeovs/lcov-reporter-action@v0.2.16
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: backend/common/common-lcov.info
+        run: |
+          coverage=$(grep -Po '^\S+\s+\S+\s+\S+\s+\S+\s+\K\S+' common/common-lcov.info)
+          echo "Common Coverage: $coverage%" > common-coverage-summary.txt
+          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d '{"body":"'"$(<common-coverage-summary.txt)"'"}' "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
