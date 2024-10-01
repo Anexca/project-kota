@@ -30,59 +30,34 @@ jobs:
         with:
           go-version: "1.23.0" # Specify the Go version you want to use
 
-      - name: Install dependencies and Run tests in ai-service
+      - name: Run tests in ai-service
         run: |
           cd backend/ai-service
           go mod tidy
-          go test -coverprofile=coverage.out ./...
-          mv coverage.out ../../ai-service-coverage.out
+          go test -coverprofile=ai-service-coverage.out ./...
 
-      - name: Install dependencies and Run tests in common
+      - name: Run tests in common
         run: |
           cd backend/common
           go mod tidy
-          go test -coverprofile=coverage.out ./...
-          mv coverage.out ../../common-coverage.out
+          go test -coverprofile=common-coverage.out ./...
 
-      - name: Install dependencies and Run tests in server
+      - name: Run tests in server
         run: |
           cd backend/server
           go mod tidy
-          go test -coverprofile=coverage.out ./...
-          mv coverage.out ../../server-coverage.out
+          go test -coverprofile=server-coverage.out ./...
 
       - name: Combine coverage reports
         run: |
-          cd backend
           echo "Combining coverage reports"
-          cat ai-service-coverage.out common-coverage.out server-coverage.out > combined-coverage.out
+          cat backend/ai-service/ai-service-coverage.out backend/common/common-coverage.out backend/server/server-coverage.out > backend/combined-coverage.out
 
       - name: Generate LCOV report
-        run: genhtml -o coverage-report combined-coverage.out
+        run: genhtml -o coverage-report backend/combined-coverage.out
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v3
         with:
           name: coverage-report
-          path: backend/coverage-report
-
-  coverage_report_comment:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Download coverage report
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage-report
           path: coverage-report
-
-      - name: Comment coverage report on PR
-        uses: romeovs/lcov-reporter-action@v0.3.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./coverage-report/combined-coverage.info
-          delete-old-comments: true
-          title: "Code Coverage Report"
