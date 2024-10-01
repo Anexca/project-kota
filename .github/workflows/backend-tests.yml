@@ -53,11 +53,12 @@ jobs:
 
       - name: Combine coverage reports
         run: |
+          cd backend
           echo "Combining coverage reports"
-          cat backend/*-coverage.out > backend/combined-coverage.out
+          cat ai-service-coverage.out common-coverage.out server-coverage.out > combined-coverage.out
 
       - name: Generate LCOV report
-        run: genhtml -o coverage-report backend/combined-coverage.out
+        run: genhtml -o coverage-report combined-coverage.out
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v3
