@@ -6,6 +6,7 @@ import (
 	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/subscriptionexam"
@@ -28,6 +29,34 @@ type ExamCreate struct {
 // SetName sets the "name" field.
 func (ec *ExamCreate) SetName(s string) *ExamCreate {
 	ec.mutation.SetName(s)
+	return ec
+}
+
+// SetStage sets the "stage" field.
+func (ec *ExamCreate) SetStage(s string) *ExamCreate {
+	ec.mutation.SetStage(s)
+	return ec
+}
+
+// SetNillableStage sets the "stage" field if the given value is not nil.
+func (ec *ExamCreate) SetNillableStage(s *string) *ExamCreate {
+	if s != nil {
+		ec.SetStage(*s)
+	}
+	return ec
+}
+
+// SetIsSectional sets the "is_sectional" field.
+func (ec *ExamCreate) SetIsSectional(b bool) *ExamCreate {
+	ec.mutation.SetIsSectional(b)
+	return ec
+}
+
+// SetNillableIsSectional sets the "is_sectional" field if the given value is not nil.
+func (ec *ExamCreate) SetNillableIsSectional(b *bool) *ExamCreate {
+	if b != nil {
+		ec.SetIsSectional(*b)
+	}
 	return ec
 }
 
@@ -124,6 +153,25 @@ func (ec *ExamCreate) SetNillableCategoryID(id *int) *ExamCreate {
 // SetCategory sets the "category" edge to the ExamCategory entity.
 func (ec *ExamCreate) SetCategory(e *ExamCategory) *ExamCreate {
 	return ec.SetCategoryID(e.ID)
+}
+
+// SetGroupID sets the "group" edge to the ExamGroup entity by ID.
+func (ec *ExamCreate) SetGroupID(id int) *ExamCreate {
+	ec.mutation.SetGroupID(id)
+	return ec
+}
+
+// SetNillableGroupID sets the "group" edge to the ExamGroup entity by ID if the given value is not nil.
+func (ec *ExamCreate) SetNillableGroupID(id *int) *ExamCreate {
+	if id != nil {
+		ec = ec.SetGroupID(*id)
+	}
+	return ec
+}
+
+// SetGroup sets the "group" edge to the ExamGroup entity.
+func (ec *ExamCreate) SetGroup(e *ExamGroup) *ExamCreate {
+	return ec.SetGroupID(e.ID)
 }
 
 // AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by IDs.
@@ -225,6 +273,10 @@ func (ec *ExamCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ec *ExamCreate) defaults() {
+	if _, ok := ec.mutation.IsSectional(); !ok {
+		v := exam.DefaultIsSectional
+		ec.mutation.SetIsSectional(v)
+	}
 	if _, ok := ec.mutation.GetType(); !ok {
 		v := exam.DefaultType
 		ec.mutation.SetType(v)
@@ -298,6 +350,14 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 		_spec.SetField(exam.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := ec.mutation.Stage(); ok {
+		_spec.SetField(exam.FieldStage, field.TypeString, value)
+		_node.Stage = value
+	}
+	if value, ok := ec.mutation.IsSectional(); ok {
+		_spec.SetField(exam.FieldIsSectional, field.TypeBool, value)
+		_node.IsSectional = value
+	}
 	if value, ok := ec.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 		_node.Description = value
@@ -337,6 +397,23 @@ func (ec *ExamCreate) createSpec() (*Exam, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.exam_category_exams = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   exam.GroupTable,
+			Columns: []string{exam.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examgroup.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.exam_group_exams = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.SubscriptionsIDs(); len(nodes) > 0 {

@@ -21,6 +21,9 @@ type ExamAttempt func(*sql.Selector)
 // ExamCategory is the predicate function for examcategory builders.
 type ExamCategory func(*sql.Selector)
 
+// ExamGroup is the predicate function for examgroup builders.
+type ExamGroup func(*sql.Selector)
+
 // ExamSetting is the predicate function for examsetting builders.
 type ExamSetting func(*sql.Selector)
 

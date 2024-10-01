@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -17,7 +16,7 @@ func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http
 
 	webhookSignature, err := s.paymentService.VerifyWebhookSignature(signature, timestamp, string(body))
 	if err != nil {
-		s.ErrorJson(w, err)
+		s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -26,13 +25,13 @@ func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http
 	switch v := webhookSignature.Object.(type) {
 	case string:
 		if err := json.Unmarshal([]byte(v), &webhookData); err != nil {
-			s.ErrorJson(w, errors.New("failed to unmarshal webhook object"))
+			s.HandleError(w, err, "failed to unmarshal webhook object", http.StatusBadRequest)
 			return
 		}
 	case map[string]interface{}:
 		webhookData = v
 	default:
-		s.ErrorJson(w, errors.New("invalid webhook object type"))
+		s.HandleError(w, err, "invalid webhook object type", http.StatusInternalServerError)
 		return
 	}
 
@@ -63,5 +62,8 @@ func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http
 		log.Println("subscription created with id", activatedSubscription.Id)
 	}()
 
-	s.WriteJson(w, http.StatusOK, &Response{})
+	err = s.WriteJson(w, http.StatusOK, &Response{})
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }

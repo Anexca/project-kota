@@ -1,12 +1,13 @@
 package schema
 
 import (
-	"common/constants"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"common/constants"
 )
 
 // ExamCategory holds the schema definition for the ExamCategory entity.
@@ -31,5 +32,7 @@ func (ExamCategory) Fields() []ent.Field {
 func (ExamCategory) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("exams", Exam.Type), // One ExamCategory can have many Exams
+
+		edge.To("groups", ExamGroup.Type), // One ExamCategory can have many Exams
 	}
 }

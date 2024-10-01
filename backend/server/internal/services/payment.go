@@ -1,31 +1,18 @@
 package services
 
 import (
-	"common/util"
 	"log"
-	"server/pkg/config"
+
+	"common/util"
 
 	cashfree_pg "github.com/cashfree/cashfree-pg/v4"
+
+	"server/pkg/config"
+	"server/pkg/models"
 )
 
 type PaymentService struct {
 	environment *config.Environment
-}
-
-type UpsertPaymentProviderCustomerModel struct {
-	Name  string
-	Email string
-	Phone string
-}
-
-type CreateOrderModel struct {
-	Amount              float64
-	UserId              string
-	CustomerId          string
-	CustomerPhoneNumber string
-	CustomerName        string
-	CustomerEmail       string
-	ReturnUrl           *string
 }
 
 var xAPIVersion = "2023-08-01"
@@ -49,7 +36,7 @@ func NewPaymentService() *PaymentService {
 	}
 }
 
-func (p *PaymentService) CreateCustomer(model UpsertPaymentProviderCustomerModel) (*cashfree_pg.CustomerEntity, error) {
+func (p *PaymentService) CreateCustomer(model models.UpsertPaymentProviderCustomerModel) (*cashfree_pg.CustomerEntity, error) {
 
 	createCustomerRequest := cashfree_pg.CreateCustomerRequest{
 		CustomerPhone: model.Phone,
@@ -64,7 +51,7 @@ func (p *PaymentService) CreateCustomer(model UpsertPaymentProviderCustomerModel
 	return resp, err
 }
 
-func (p *PaymentService) CreateOrder(model CreateOrderModel) (*cashfree_pg.OrderEntity, error) {
+func (p *PaymentService) CreateOrder(model models.CreateOrderModel) (*cashfree_pg.OrderEntity, error) {
 	request := cashfree_pg.CreateOrderRequest{
 		OrderAmount: model.Amount,
 		CustomerDetails: cashfree_pg.CustomerDetails{

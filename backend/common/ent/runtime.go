@@ -8,6 +8,7 @@ import (
 	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/payment"
@@ -41,16 +42,20 @@ func init() {
 	cachedexam.UpdateDefaultUpdatedAt = cachedexamDescUpdatedAt.UpdateDefault.(func() time.Time)
 	examFields := schema.Exam{}.Fields()
 	_ = examFields
+	// examDescIsSectional is the schema descriptor for is_sectional field.
+	examDescIsSectional := examFields[2].Descriptor()
+	// exam.DefaultIsSectional holds the default value on creation for the is_sectional field.
+	exam.DefaultIsSectional = examDescIsSectional.Default.(bool)
 	// examDescIsActive is the schema descriptor for is_active field.
-	examDescIsActive := examFields[3].Descriptor()
+	examDescIsActive := examFields[5].Descriptor()
 	// exam.DefaultIsActive holds the default value on creation for the is_active field.
 	exam.DefaultIsActive = examDescIsActive.Default.(bool)
 	// examDescCreatedAt is the schema descriptor for created_at field.
-	examDescCreatedAt := examFields[5].Descriptor()
+	examDescCreatedAt := examFields[7].Descriptor()
 	// exam.DefaultCreatedAt holds the default value on creation for the created_at field.
 	exam.DefaultCreatedAt = examDescCreatedAt.Default.(func() time.Time)
 	// examDescUpdatedAt is the schema descriptor for updated_at field.
-	examDescUpdatedAt := examFields[6].Descriptor()
+	examDescUpdatedAt := examFields[8].Descriptor()
 	// exam.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	exam.DefaultUpdatedAt = examDescUpdatedAt.Default.(func() time.Time)
 	// exam.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -95,6 +100,22 @@ func init() {
 	examcategory.DefaultUpdatedAt = examcategoryDescUpdatedAt.Default.(func() time.Time)
 	// examcategory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	examcategory.UpdateDefaultUpdatedAt = examcategoryDescUpdatedAt.UpdateDefault.(func() time.Time)
+	examgroupFields := schema.ExamGroup{}.Fields()
+	_ = examgroupFields
+	// examgroupDescIsActive is the schema descriptor for is_active field.
+	examgroupDescIsActive := examgroupFields[2].Descriptor()
+	// examgroup.DefaultIsActive holds the default value on creation for the is_active field.
+	examgroup.DefaultIsActive = examgroupDescIsActive.Default.(bool)
+	// examgroupDescCreatedAt is the schema descriptor for created_at field.
+	examgroupDescCreatedAt := examgroupFields[4].Descriptor()
+	// examgroup.DefaultCreatedAt holds the default value on creation for the created_at field.
+	examgroup.DefaultCreatedAt = examgroupDescCreatedAt.Default.(func() time.Time)
+	// examgroupDescUpdatedAt is the schema descriptor for updated_at field.
+	examgroupDescUpdatedAt := examgroupFields[5].Descriptor()
+	// examgroup.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	examgroup.DefaultUpdatedAt = examgroupDescUpdatedAt.Default.(func() time.Time)
+	// examgroup.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	examgroup.UpdateDefaultUpdatedAt = examgroupDescUpdatedAt.UpdateDefault.(func() time.Time)
 	examsettingFields := schema.ExamSetting{}.Fields()
 	_ = examsettingFields
 	// examsettingDescMaxAttempts is the schema descriptor for max_attempts field.

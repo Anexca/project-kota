@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { paths } from "../../../routes/route.constant";
+import { ExamDomain, paths } from "../../../routes/route.constant";
 import useUserProfileStore from "../../../store/user-info-store";
 import { Button } from "../../base/button/button";
 import Chip from "../../base/chip";
@@ -29,9 +29,9 @@ const exams = [
   {
     title: "Banking MCQ Exams",
     desc: "Practice Banking MCQs to boost your knowledge and exam readiness with detailed solutions and explanations.",
-    link: `/${paths.EXAMS}/banking/${paths.MCQ}`,
+    link: `/${paths.EXAMS}/${ExamDomain.banking}/${paths.MCQ}`,
     type: "MCQ",
-    isActive: false,
+    isActive: true,
   },
   {
     title: "Ranked MCQ Exams",

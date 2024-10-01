@@ -2,15 +2,17 @@ package services
 
 import (
 	"bytes"
-	commonConstants "common/constants"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"server/pkg/config"
 	"time"
+
+	commonConstants "common/constants"
+
+	"server/pkg/config"
 )
 
 type PromptService struct {

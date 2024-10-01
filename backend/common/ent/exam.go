@@ -5,6 +5,7 @@ package ent
 import (
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"fmt"
 	"strings"
@@ -21,6 +22,10 @@ type Exam struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Stage holds the value of the "stage" field.
+	Stage string `json:"stage,omitempty"`
+	// IsSectional holds the value of the "is_sectional" field.
+	IsSectional bool `json:"is_sectional,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// Type holds the value of the "type" field.
@@ -28,6 +33,8 @@ type Exam struct {
 	// IsActive holds the value of the "is_active" field.
 	IsActive bool `json:"is_active,omitempty"`
 	// LogoURL holds the value of the "logo_url" field.
+	//
+	// Deprecated: Field "logo_url" was marked as deprecated in the schema.
 	LogoURL string `json:"logo_url,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
@@ -37,6 +44,7 @@ type Exam struct {
 	// The values are being populated by the ExamQuery when eager-loading is set.
 	Edges               ExamEdges `json:"edges"`
 	exam_category_exams *int
+	exam_group_exams    *int
 	selectValues        sql.SelectValues
 }
 
@@ -44,6 +52,8 @@ type Exam struct {
 type ExamEdges struct {
 	// Category holds the value of the category edge.
 	Category *ExamCategory `json:"category,omitempty"`
+	// Group holds the value of the group edge.
+	Group *ExamGroup `json:"group,omitempty"`
 	// Subscriptions holds the value of the subscriptions edge.
 	Subscriptions []*SubscriptionExam `json:"subscriptions,omitempty"`
 	// Setting holds the value of the setting edge.
@@ -54,7 +64,7 @@ type ExamEdges struct {
 	Generatedexams []*GeneratedExam `json:"generatedexams,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // CategoryOrErr returns the Category value or an error if the edge
@@ -68,10 +78,21 @@ func (e ExamEdges) CategoryOrErr() (*ExamCategory, error) {
 	return nil, &NotLoadedError{edge: "category"}
 }
 
+// GroupOrErr returns the Group value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ExamEdges) GroupOrErr() (*ExamGroup, error) {
+	if e.Group != nil {
+		return e.Group, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: examgroup.Label}
+	}
+	return nil, &NotLoadedError{edge: "group"}
+}
+
 // SubscriptionsOrErr returns the Subscriptions value or an error if the edge
 // was not loaded in eager-loading.
 func (e ExamEdges) SubscriptionsOrErr() ([]*SubscriptionExam, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Subscriptions, nil
 	}
 	return nil, &NotLoadedError{edge: "subscriptions"}
@@ -82,7 +103,7 @@ func (e ExamEdges) SubscriptionsOrErr() ([]*SubscriptionExam, error) {
 func (e ExamEdges) SettingOrErr() (*ExamSetting, error) {
 	if e.Setting != nil {
 		return e.Setting, nil
-	} else if e.loadedTypes[2] {
+	} else if e.loadedTypes[3] {
 		return nil, &NotFoundError{label: examsetting.Label}
 	}
 	return nil, &NotLoadedError{edge: "setting"}
@@ -91,7 +112,7 @@ func (e ExamEdges) SettingOrErr() (*ExamSetting, error) {
 // CachedExamOrErr returns the CachedExam value or an error if the edge
 // was not loaded in eager-loading.
 func (e ExamEdges) CachedExamOrErr() ([]*CachedExam, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.CachedExam, nil
 	}
 	return nil, &NotLoadedError{edge: "cached_exam"}
@@ -100,7 +121,7 @@ func (e ExamEdges) CachedExamOrErr() ([]*CachedExam, error) {
 // GeneratedexamsOrErr returns the Generatedexams value or an error if the edge
 // was not loaded in eager-loading.
 func (e ExamEdges) GeneratedexamsOrErr() ([]*GeneratedExam, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		return e.Generatedexams, nil
 	}
 	return nil, &NotLoadedError{edge: "generatedexams"}
@@ -111,15 +132,17 @@ func (*Exam) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case exam.FieldIsActive:
+		case exam.FieldIsSectional, exam.FieldIsActive:
 			values[i] = new(sql.NullBool)
 		case exam.FieldID:
 			values[i] = new(sql.NullInt64)
-		case exam.FieldName, exam.FieldDescription, exam.FieldType, exam.FieldLogoURL:
+		case exam.FieldName, exam.FieldStage, exam.FieldDescription, exam.FieldType, exam.FieldLogoURL:
 			values[i] = new(sql.NullString)
 		case exam.FieldCreatedAt, exam.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case exam.ForeignKeys[0]: // exam_category_exams
+			values[i] = new(sql.NullInt64)
+		case exam.ForeignKeys[1]: // exam_group_exams
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -147,6 +170,18 @@ func (e *Exam) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				e.Name = value.String
+			}
+		case exam.FieldStage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field stage", values[i])
+			} else if value.Valid {
+				e.Stage = value.String
+			}
+		case exam.FieldIsSectional:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_sectional", values[i])
+			} else if value.Valid {
+				e.IsSectional = value.Bool
 			}
 		case exam.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -191,6 +226,13 @@ func (e *Exam) assignValues(columns []string, values []any) error {
 				e.exam_category_exams = new(int)
 				*e.exam_category_exams = int(value.Int64)
 			}
+		case exam.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field exam_group_exams", value)
+			} else if value.Valid {
+				e.exam_group_exams = new(int)
+				*e.exam_group_exams = int(value.Int64)
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -207,6 +249,11 @@ func (e *Exam) Value(name string) (ent.Value, error) {
 // QueryCategory queries the "category" edge of the Exam entity.
 func (e *Exam) QueryCategory() *ExamCategoryQuery {
 	return NewExamClient(e.config).QueryCategory(e)
+}
+
+// QueryGroup queries the "group" edge of the Exam entity.
+func (e *Exam) QueryGroup() *ExamGroupQuery {
+	return NewExamClient(e.config).QueryGroup(e)
 }
 
 // QuerySubscriptions queries the "subscriptions" edge of the Exam entity.
@@ -254,6 +301,12 @@ func (e *Exam) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", e.ID))
 	builder.WriteString("name=")
 	builder.WriteString(e.Name)
+	builder.WriteString(", ")
+	builder.WriteString("stage=")
+	builder.WriteString(e.Stage)
+	builder.WriteString(", ")
+	builder.WriteString("is_sectional=")
+	builder.WriteString(fmt.Sprintf("%v", e.IsSectional))
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(e.Description)

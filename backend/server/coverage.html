@@ -1,0 +1,3647 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>api: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">server/cmd/api/main.go (0.0%)</option>
+				
+				<option value="file1">server/internal/middlewares/rate_limiter.go (0.0%)</option>
+				
+				<option value="file2">server/internal/middlewares/require_auth.go (0.0%)</option>
+				
+				<option value="file3">server/internal/middlewares/set_open_context.go (0.0%)</option>
+				
+				<option value="file4">server/internal/mocks/services.go (8.7%)</option>
+				
+				<option value="file5">server/internal/server/banking.go (0.0%)</option>
+				
+				<option value="file6">server/internal/server/bootstrap.go (0.0%)</option>
+				
+				<option value="file7">server/internal/server/exam_category.go (0.0%)</option>
+				
+				<option value="file8">server/internal/server/exams.go (0.0%)</option>
+				
+				<option value="file9">server/internal/server/helper.go (0.0%)</option>
+				
+				<option value="file10">server/internal/server/routes.go (0.0%)</option>
+				
+				<option value="file11">server/internal/server/subscription.go (0.0%)</option>
+				
+				<option value="file12">server/internal/server/user.go (0.0%)</option>
+				
+				<option value="file13">server/internal/server/user_subscription.go (0.0%)</option>
+				
+				<option value="file14">server/internal/server/webhook.go (0.0%)</option>
+				
+				<option value="file15">server/internal/services/access.go (86.8%)</option>
+				
+				<option value="file16">server/internal/services/auth.go (0.0%)</option>
+				
+				<option value="file17">server/internal/services/exam_assesment.go (16.3%)</option>
+				
+				<option value="file18">server/internal/services/exam_attempt.go (34.7%)</option>
+				
+				<option value="file19">server/internal/services/exam_categories.go (66.7%)</option>
+				
+				<option value="file20">server/internal/services/exam_generation.go (10.6%)</option>
+				
+				<option value="file21">server/internal/services/payment.go (0.0%)</option>
+				
+				<option value="file22">server/internal/services/prompt.go (0.0%)</option>
+				
+				<option value="file23">server/internal/services/subscription.go (0.0%)</option>
+				
+				<option value="file24">server/internal/services/user.go (0.0%)</option>
+				
+				<option value="file25">server/internal/workers/banking.go (0.0%)</option>
+				
+				<option value="file26">server/internal/workers/bootstrap.go (0.0%)</option>
+				
+				<option value="file27">server/pkg/client/database.go (0.0%)</option>
+				
+				<option value="file28">server/pkg/client/redis.go (0.0%)</option>
+				
+				<option value="file29">server/pkg/client/supabase.go (0.0%)</option>
+				
+				<option value="file30">server/pkg/config/environment.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "context"
+        "log"
+
+        "server/internal/server"
+        "server/internal/workers"
+        "server/pkg/client"
+)
+
+func main() <span class="cov0" title="0">{
+        ctx := context.Background()
+
+        redisClient, err := client.NewRedisClient(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("cannot connect to redis", err)
+        }</span>
+        <span class="cov0" title="0">defer redisClient.Close()
+
+        dbClient, err := client.NewDbClient(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("cannot connect to database", err)
+        }</span>
+        <span class="cov0" title="0">defer dbClient.Close()
+
+        supabaseClient, err := client.NewSupabaseClient()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("cannot connect to supabase", err)
+        }</span>
+
+        <span class="cov0" title="0">workers := workers.InitWorkers(redisClient, dbClient)
+        defer workers.Stop()
+
+        server := server.InitServer(redisClient, dbClient, supabaseClient)
+
+        log.Println("Starting server on address", server.Addr)
+        err = server.ListenAndServe()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("cannot start server: %s", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package middlewares
+
+import (
+        "net/http"
+        "sync"
+        "time"
+
+        "go.uber.org/ratelimit"
+)
+
+type RateLimiterEntry struct {
+        limiter    ratelimit.Limiter
+        lastAccess time.Time
+}
+
+var limiters = sync.Map{}
+
+var globalLimiter = ratelimit.New(15)
+
+const cleanupInterval = time.Minute * 5
+const expirationDuration = time.Minute * 10
+
+func GetRateLimiter(ip string) ratelimit.Limiter <span class="cov0" title="0">{
+        now := time.Now()
+        entry, ok := limiters.Load(ip)
+        if !ok </span><span class="cov0" title="0">{
+                newLimiter := ratelimit.New(5) // Set per-IP limit here
+                limiters.Store(ip, RateLimiterEntry{limiter: newLimiter, lastAccess: now})
+                return newLimiter
+        }</span>
+        <span class="cov0" title="0">limiterEntry := entry.(RateLimiterEntry)
+        limiterEntry.lastAccess = now
+        limiters.Store(ip, limiterEntry)
+        return limiterEntry.limiter</span>
+}
+
+func StartCleanupRoutine() <span class="cov0" title="0">{
+        ticker := time.NewTicker(cleanupInterval)
+        go func() </span><span class="cov0" title="0">{
+                for range ticker.C </span><span class="cov0" title="0">{
+                        now := time.Now()
+                        limiters.Range(func(key, value interface{}) bool </span><span class="cov0" title="0">{
+                                limiterEntry := value.(RateLimiterEntry)
+                                if now.Sub(limiterEntry.lastAccess) &gt; expirationDuration </span><span class="cov0" title="0">{
+                                        // Remove limiter if it's older than the expiration duration
+                                        limiters.Delete(key)
+                                }</span>
+                                <span class="cov0" title="0">return true</span>
+                        })
+                }
+        }()
+}
+
+func RateLimiterMiddleware(next http.Handler) http.Handler <span class="cov0" title="0">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                globalLimiter.Take() // Wait until the global rate limit allows this request
+
+                // Extract the client's IP address
+                ip := r.RemoteAddr
+                limiter := GetRateLimiter(ip)
+                limiter.Take()
+                next.ServeHTTP(w, r)
+        }</span>)
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package middlewares
+
+import (
+        "context"
+        "fmt"
+        "net/http"
+        "strings"
+
+        "server/internal/services"
+        "server/pkg/constants"
+)
+
+func RequireAuthMiddleware(authService *services.AuthService) func(http.Handler) http.Handler <span class="cov0" title="0">{
+        return func(next http.Handler) http.Handler </span><span class="cov0" title="0">{
+                return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                        userToken, err := extractTokenFromHeader(r)
+                        if err != nil </span><span class="cov0" title="0">{
+                                http.Error(w, err.Error(), http.StatusBadRequest)
+                                return
+                        }</span>
+
+                        <span class="cov0" title="0">user, err := authService.VerifyUserToken(r.Context(), userToken)
+                        if err != nil </span><span class="cov0" title="0">{
+                                http.Error(w, "unauthorized", http.StatusUnauthorized)
+                                return
+                        }</span>
+
+                        <span class="cov0" title="0">ctx := context.WithValue(r.Context(), constants.UserIDKey, user.ID)
+                        next.ServeHTTP(w, r.WithContext(ctx))</span>
+                })
+        }
+}
+
+func extractTokenFromHeader(r *http.Request) (string, error) <span class="cov0" title="0">{
+        authHeader := r.Header.Get("Authorization")
+        if authHeader == "" </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("authorization header missing")
+        }</span>
+
+        // Expected format: "Bearer &lt;token&gt;"
+        <span class="cov0" title="0">parts := strings.Split(authHeader, " ")
+        if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("authorization header format must be Bearer &lt;token&gt;")
+        }</span>
+
+        <span class="cov0" title="0">token := parts[1]
+        return token, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package middlewares
+
+import (
+        "context"
+        "fmt"
+        "net/http"
+
+        "server/pkg/constants"
+)
+
+func SetOpenExamContext(isOpen bool) func(http.Handler) http.Handler <span class="cov0" title="0">{
+        return func(next http.Handler) http.Handler </span><span class="cov0" title="0">{
+
+                return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                        ctx := context.WithValue(r.Context(), constants.OpenExamKey, fmt.Sprintf("%t", isOpen))
+                        next.ServeHTTP(w, r.WithContext(ctx))
+                }</span>)
+        }
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package mocks
+
+import (
+        "common/constants"
+        "common/ent"
+        "context"
+        "server/pkg/models"
+
+        cashfree_pg "github.com/cashfree/cashfree-pg/v4"
+
+        "github.com/stretchr/testify/mock"
+)
+
+// Mock for PromptServiceInterface
+type MockPromptService struct {
+        mock.Mock
+}
+
+func (m *MockPromptService) GetPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, prompt, model)
+        return args.String(0), args.Error(1)
+}</span>
+
+// Mock for ExamGenerationServiceInterface
+type MockExamGenerationService struct {
+        mock.Mock
+}
+
+func (m *MockExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, generatedExamId, userId, isOpen)
+        return args.Get(0).(*models.GeneratedExamOverview), args.Error(1)
+}</span>
+
+// MockExamAssesmentService is a mock implementation of ExamAssesmentServiceInterface
+type MockExamAssesmentService struct {
+        mock.Mock
+}
+
+func (m *MockExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *models.DescriptiveExamAssesmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, generatedExamId, attempt, request, userId, isOpen)
+        return args.Get(0).(*models.AssessmentDetails), args.Error(1)
+}</span>
+
+func (m *MockExamAssesmentService) GetAssesmentById(ctx context.Context, assessmentId int, userId string) (*models.AssessmentDetails, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, assessmentId, userId)
+        return args.Get(0).(*models.AssessmentDetails), args.Error(1)
+}</span>
+
+func (m *MockExamAssesmentService) GetExamAssessments(ctx context.Context, generatedExamId int, userId string) ([]models.AssessmentDetails, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, generatedExamId, userId)
+        return args.Get(0).([]models.AssessmentDetails), args.Error(1)
+}</span>
+
+func (m *MockExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId int, assessmentId int, content string, userId string, isOpen bool) <span class="cov0" title="0">{
+        m.Called(ctx, generatedExamId, assessmentId, content, userId, isOpen)
+}</span>
+
+// MockAccessService is a mock type for the AccessServiceInterface
+type MockAccessService struct {
+        mock.Mock
+}
+
+// UserHasAccessToExam mocks the UserHasAccessToExam method
+func (m *MockAccessService) UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error) <span class="cov8" title="1">{
+        args := m.Called(ctx, examId, userId)
+        return args.Bool(0), args.Error(1)
+}</span>
+
+// GetAccessibleExamsForUser mocks the GetAccessibleExamsForUser method
+func (m *MockAccessService) GetAccessibleExamsForUser(ctx context.Context, exams []*ent.Exam, userId string) ([]*ent.Exam, error) <span class="cov0" title="0">{
+        args := m.Called(ctx, exams, userId)
+        return args.Get(0).([]*ent.Exam), args.Error(1)
+}</span>
+
+// MockPaymentService is an autogenerated mock type for the PaymentServiceInterface
+type MockPaymentService struct {
+        mock.Mock
+}
+
+// CreateCustomer provides a mock function with given fields: model
+func (m *MockPaymentService) CreateCustomer(model models.UpsertPaymentProviderCustomerModel) (*cashfree_pg.CustomerEntity, error) <span class="cov0" title="0">{
+        args := m.Called(model)
+        return args.Get(0).(*cashfree_pg.CustomerEntity), args.Error(1)
+}</span>
+
+// CreateOrder provides a mock function with given fields: model
+func (m *MockPaymentService) CreateOrder(model models.CreateOrderModel) (*cashfree_pg.OrderEntity, error) <span class="cov0" title="0">{
+        args := m.Called(model)
+        return args.Get(0).(*cashfree_pg.OrderEntity), args.Error(1)
+}</span>
+
+// IsOrderSuccessful provides a mock function with given fields: orderId
+func (m *MockPaymentService) IsOrderSuccessful(orderId string) (bool, *cashfree_pg.PaymentEntity, error) <span class="cov0" title="0">{
+        args := m.Called(orderId)
+        return args.Bool(0), args.Get(1).(*cashfree_pg.PaymentEntity), args.Error(2)
+}</span>
+
+// VerifyWebhookSignature provides a mock function with given fields: signature, timestamp, body
+func (m *MockPaymentService) VerifyWebhookSignature(signature, timestamp, body string) (*cashfree_pg.PGWebhookEvent, error) <span class="cov0" title="0">{
+        args := m.Called(signature, timestamp, body)
+        return args.Get(0).(*cashfree_pg.PGWebhookEvent), args.Error(1)
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package server
+
+import (
+        "errors"
+        "net/http"
+        "strconv"
+        "strings"
+
+        "common/ent"
+
+        "github.com/go-chi/chi/v5"
+
+        "server/pkg/constants"
+        "server/pkg/models"
+)
+
+func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+
+        idParam := chi.URLParam(r, "id")
+        generatedExamId, err := strconv.Atoi(idParam)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">isOpenStr := r.URL.Query().Get("isopen")
+        isOpen := false
+        if isOpenStr != "" </span><span class="cov0" title="0">{
+                isOpen, err = strconv.ParseBool(isOpenStr)
+                if err != nil </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "invalid isopen query param, should be either true or false", http.StatusBadRequest)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">var request models.DescriptiveExamAssesmentRequest
+        if err := s.ReadJson(w, r, &amp;request); err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid json request body", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := ValidateInput(&amp;request); err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">switch </span>{
+                case strings.Contains(err.Error(), "max attempts for exam exceeded"):<span class="cov0" title="0">
+                        s.HandleError(w, err, err.Error(), http.StatusBadRequest)</span>
+                case strings.Contains(err.Error(), "forbidden"):<span class="cov0" title="0">
+                        s.HandleError(w, err, err.Error(), http.StatusForbidden)</span>
+                default:<span class="cov0" title="0">
+                        s.HandleError(w, err, err.Error(), http.StatusInternalServerError)</span>
+                }
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">assesment, err := s.examAssesmentService.StartNewDescriptiveAssesment(r.Context(), generatedExamId, attempt, &amp;request, userId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">responsePayload := Response{Data: assesment}
+        if err := s.WriteJson(w, http.StatusAccepted, &amp;responsePayload); err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package server
+
+import (
+        "fmt"
+        "net/http"
+        "os"
+        "strconv"
+        "time"
+
+        "common/ent"
+
+        "github.com/nedpals/supabase-go"
+        "github.com/redis/go-redis/v9"
+
+        _ "github.com/joho/godotenv/autoload"
+
+        commonConfig "common/config"
+        commonService "common/services"
+
+        "server/internal/services"
+)
+
+type Server struct {
+        port int
+
+        authService           *services.AuthService
+        userService           *services.UserService
+        redisService          *commonService.RedisService
+        paymentService        *services.PaymentService
+        examCategoryService   *services.ExamCategoryService
+        subscriptionService   *services.SubscriptionService
+        examAttemptService    *services.ExamAttemptService
+        examAssesmentService  *services.ExamAssesmentService
+        examGenerationService *services.ExamGenerationService
+}
+
+func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient *supabase.Client) *http.Server <span class="cov0" title="0">{
+        logger := commonConfig.SetupLogger()
+        port, _ := strconv.Atoi(os.Getenv("PORT"))
+
+        authService := services.NewAuthService(supabaseClient)
+        redisService := commonService.NewRedisService(redisClient)
+        paymentService := services.NewPaymentService()
+        examAttemptService := services.InitExamAttemptService(dbClient)
+        userService := services.InitUserService(dbClient)
+        examCategoryService := services.InitExamCategoryService(dbClient)
+        examAssesmentService := services.InitExamAssesmentService(redisClient, dbClient)
+        subscriptionService := services.InitSubscriptionService(dbClient)
+        examGenerationService := services.InitExamGenerationService(redisClient, dbClient)
+
+        NewServer := &amp;Server{
+                port:                  port,
+                userService:           userService,
+                authService:           authService,
+                redisService:          redisService,
+                paymentService:        paymentService,
+                examAttemptService:    examAttemptService,
+                examAssesmentService:  examAssesmentService,
+                examGenerationService: examGenerationService,
+                subscriptionService:   subscriptionService,
+                examCategoryService:   examCategoryService,
+        }
+
+        // Declare Server config
+        server := &amp;http.Server{
+                Addr:         fmt.Sprintf(":%d", NewServer.port),
+                Handler:      NewServer.RegisterRoutes(),
+                IdleTimeout:  time.Minute,
+                ReadTimeout:  10 * time.Second,
+                WriteTimeout: 30 * time.Second,
+                ErrorLog:     logger,
+        }
+
+        return server
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package server
+
+import (
+        "errors"
+        "net/http"
+        "strconv"
+        "strings"
+
+        "common/ent"
+        "github.com/go-chi/chi/v5"
+)
+
+func (s *Server) GetBankingExamGroups(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        categories, err := s.examCategoryService.GetBankingExamGroups(r.Context())
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "failed to retrieve exam categories", http.StatusInternalServerError)
+                return
+        }</span>
+
+        <span class="cov0" title="0">response := Response{
+                Data: categories,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "failed to write response", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) GetExamById(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        idParam := chi.URLParam(r, "id")
+        examId, err := strconv.Atoi(idParam)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">categoryExam, err := s.examCategoryService.GetExamGroupById(r.Context(), examId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "forbidden") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "forbidden", http.StatusForbidden)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">err = s.WriteJson(w, http.StatusOK, &amp;Response{Data: categoryExam})
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while sending the response", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package server
+
+import (
+        "errors"
+        "net/http"
+        "strconv"
+        "strings"
+        "time"
+
+        "common/ent"
+)
+
+func (s *Server) GetOpenQuestions(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        userId, err := s.GetUserIdFromRequest(r)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">cachedQuestions, err := s.examGenerationService.GetOpenGeneratedExams(r.Context(), "descriptive", userId)
+        if err != nil </span><span class="cov0" title="0">{
+                if strings.Contains(err.Error(), "forbidden") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "forbidden", http.StatusForbidden)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam type not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">err = s.WriteJson(w, http.StatusOK, &amp;Response{Data: cachedQuestions})
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) GetGeneratedExamById(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        generatedExamId, err := ParseIDParam(r, "id")
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">isOpenStr := r.URL.Query().Get("isopen")
+        isOpen := false
+        if isOpenStr != "" </span><span class="cov0" title="0">{
+                isOpen, err = strconv.ParseBool(isOpenStr)
+                if err != nil </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "invalid isopen query param, should be either true or false", http.StatusBadRequest)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">userId, err := s.GetUserIdFromRequest(r)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">generatedExam, err := s.examGenerationService.GetGeneratedExamById(r.Context(), generatedExamId, userId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "forbidden") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "forbidden", http.StatusForbidden)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">responsePayload := Response{
+                Data: generatedExam,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, &amp;responsePayload)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) GetGeneratedExamsByExamGroupId(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        examGroupId, err := ParseIDParam(r, "id")
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid exam group id", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">userId, err := s.GetUserIdFromRequest(r)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">exams, err := s.examGenerationService.GetExamsByExamGroupIdAndExamType(r.Context(), examGroupId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam group not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "forbidden") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "forbidden", http.StatusForbidden)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">responsePayload := Response{
+                Data: exams,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, &amp;responsePayload)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) GetAssesmentById(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        assesmentId, err := ParseIDParam(r, "id")
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid assesment id", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">userId, err := s.GetUserIdFromRequest(r)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">assesment, err := s.examAssesmentService.GetAssesmentById(r.Context(), assesmentId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "assesment not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "forbidden") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "forbidden", http.StatusForbidden)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">responsePayload := Response{
+                Data: assesment,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, &amp;responsePayload)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) GetExamAssessments(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        generatedExamId, err := ParseIDParam(r, "id")
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">userId, err := s.GetUserIdFromRequest(r)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">assessments, err := s.examAssesmentService.GetExamAssessments(r.Context(), generatedExamId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "forbidden") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "forbidden", http.StatusForbidden)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">response := &amp;Response{
+                Data: assessments,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) GetExamAttempts(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        userId, err := s.GetUserIdFromRequest(r)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">pageStr := r.URL.Query().Get("page")
+        limitStr := r.URL.Query().Get("limit")
+
+        page := 1
+        limit := 10
+
+        if pageStr != "" </span><span class="cov0" title="0">{
+                if p, err := strconv.Atoi(pageStr); err == nil &amp;&amp; p &gt; 0 </span><span class="cov0" title="0">{
+                        page = p
+                }</span>
+        }
+
+        <span class="cov0" title="0">if limitStr != "" </span><span class="cov0" title="0">{
+                if l, err := strconv.Atoi(limitStr); err == nil &amp;&amp; l &gt; 0 </span><span class="cov0" title="0">{
+                        limit = l
+                }</span>
+        }
+
+        <span class="cov0" title="0">fromStr := r.URL.Query().Get("from")
+        toStr := r.URL.Query().Get("to")
+
+        var from, to *time.Time
+
+        if fromStr != "" </span><span class="cov0" title="0">{
+                if fromParsed, err := time.Parse(time.RFC3339, fromStr); err == nil </span><span class="cov0" title="0">{
+                        from = &amp;fromParsed
+                }</span> else<span class="cov0" title="0"> {
+                        s.HandleError(w, err, "invalid 'from' date format, expected RFC3339", http.StatusBadRequest)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">if toStr != "" </span><span class="cov0" title="0">{
+                if toParsed, err := time.Parse(time.RFC3339, toStr); err == nil </span><span class="cov0" title="0">{
+                        to = &amp;toParsed
+                }</span> else<span class="cov0" title="0"> {
+                        s.HandleError(w, err, "invalid 'to' date format, expected RFC3339", http.StatusBadRequest)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">examTypeIdStr := r.URL.Query().Get("examTypeId")
+        categoryIdStr := r.URL.Query().Get("categoryID")
+
+        var examTypeId, categoryID *int
+
+        if examTypeIdStr != "" </span><span class="cov0" title="0">{
+                if examTypeParsed, err := strconv.Atoi(examTypeIdStr); err == nil &amp;&amp; examTypeParsed &gt; 0 </span><span class="cov0" title="0">{
+                        examTypeId = &amp;examTypeParsed
+                }</span> else<span class="cov0" title="0"> {
+                        s.HandleError(w, err, "invalid 'examTypeId' format, expected positive integer", http.StatusBadRequest)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">if categoryIdStr != "" </span><span class="cov0" title="0">{
+                if categoryParsed, err := strconv.Atoi(categoryIdStr); err == nil &amp;&amp; categoryParsed &gt; 0 </span><span class="cov0" title="0">{
+                        categoryID = &amp;categoryParsed
+                }</span> else<span class="cov0" title="0"> {
+                        s.HandleError(w, err, "invalid 'categoryID' format, expected positive integer", http.StatusBadRequest)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">paginatedAttempts, err := s.examAttemptService.GetAttempts(r.Context(), userId, page, limit, from, to, examTypeId, categoryID)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "exam not found", http.StatusNotFound)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "forbidden") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "forbidden", http.StatusForbidden)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, "internal server error", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">response := &amp;Response{
+                Data: paginatedAttempts.Data,
+                Pagination: ResponsePagination{
+                        CurrentPage: paginatedAttempts.CurrentPage,
+                        TotalPages:  paginatedAttempts.TotalPages,
+                        PerPage:     paginatedAttempts.PerPage,
+                        TotalItems:  paginatedAttempts.TotalItems,
+                },
+        }
+
+        err = s.WriteJson(w, http.StatusOK, response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package server
+
+import (
+        "encoding/json"
+        "errors"
+        "fmt"
+        "io"
+        "log"
+        "net/http"
+        "strconv"
+        "time"
+
+        "github.com/go-chi/chi/v5"
+        "github.com/go-playground/validator/v10"
+
+        "server/pkg/constants"
+)
+
+type ValidationError struct {
+        Errors map[string]string
+}
+
+func (v *ValidationError) Error() string <span class="cov0" title="0">{
+        return fmt.Sprintf("Validation failed for %d fields", len(v.Errors))
+}</span>
+
+type ResponsePagination struct {
+        CurrentPage int `json:"current_page,omitempty"`
+        TotalPages  int `json:"total_pages,omitempty"`
+        PerPage     int `json:"per_page,omitempty"`
+        TotalItems  int `json:"total_items,omitempty"`
+}
+
+type Response struct {
+        Error      bool               `json:"error"`
+        Message    string             `json:"message,omitempty"`
+        Data       any                `json:"data,omitempty"`
+        Pagination ResponsePagination `json:"pagination,omitempty"`
+}
+
+func (app *Server) ReadJson(w http.ResponseWriter, r *http.Request, data any) error <span class="cov0" title="0">{
+        maxSize := 1048576 // 1MB
+
+        r.Body = http.MaxBytesReader(w, r.Body, int64(maxSize))
+
+        dec := json.NewDecoder(r.Body)
+        if err := dec.Decode(data); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">if err := dec.Decode(&amp;struct{}{}); err != io.EOF </span><span class="cov0" title="0">{
+                return errors.New("body must have single JSON object")
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (app *Server) WriteJson(w http.ResponseWriter, status int, data *Response, headers ...http.Header) error <span class="cov0" title="0">{
+        out, err := json.Marshal(data)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">if len(headers) &gt; 0 </span><span class="cov0" title="0">{
+                for k, v := range headers[0] </span><span class="cov0" title="0">{
+                        w.Header()[k] = v
+                }</span>
+        }
+
+        <span class="cov0" title="0">w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(status)
+
+        _, err = w.Write(out)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (app *Server) ErrorJson(w http.ResponseWriter, err error, status ...int) error <span class="cov0" title="0">{
+        statusCode := http.StatusBadRequest
+
+        if len(status) &gt; 0 </span><span class="cov0" title="0">{
+                statusCode = status[0]
+        }</span>
+
+        <span class="cov0" title="0">var payload Response
+        payload.Error = true
+        payload.Message = err.Error()
+
+        fmt.Println("Error: ", payload.Message)
+
+        return app.WriteJson(w, statusCode, &amp;payload)</span>
+}
+
+func (app *Server) SetCookie(w http.ResponseWriter, cookieName, cookieValue string, expiry time.Time) <span class="cov0" title="0">{
+        cookie := &amp;http.Cookie{
+                Name:     cookieName,
+                Value:    cookieValue,
+                Expires:  expiry,
+                HttpOnly: true, // Prevents access to the cookie via JavaScript
+                Secure:   true, // Ensures the cookie is sent only over HTTPS
+                Path:     "/",
+                SameSite: http.SameSiteNoneMode, // Allows cross-site cookies
+        }
+
+        http.SetCookie(w, cookie)
+}</span>
+
+func ValidateInput(data interface{}) error <span class="cov0" title="0">{
+        validate := validator.New()
+        err := validate.Struct(data)
+        if err == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">if validationErrors, ok := err.(validator.ValidationErrors); ok </span><span class="cov0" title="0">{
+                errors := make(map[string]string)
+                for _, fieldError := range validationErrors </span><span class="cov0" title="0">{
+                        errors[fieldError.Field()] = getErrorMessage(fieldError)
+                }</span>
+                <span class="cov0" title="0">return &amp;ValidationError{Errors: errors}</span>
+        }
+
+        <span class="cov0" title="0">return err</span>
+}
+
+func GetHttpRequestContextValue(r *http.Request, key any) (string, error) <span class="cov0" title="0">{
+        value := r.Context().Value(key)
+        if value == nil </span><span class="cov0" title="0">{
+                return "", errors.New("value for key not found in context")
+        }</span>
+
+        <span class="cov0" title="0">stringValue, ok := value.(string)
+        if !ok </span><span class="cov0" title="0">{
+                return "", errors.New("value is not a string")
+        }</span>
+
+        <span class="cov0" title="0">return stringValue, nil</span>
+}
+
+func getErrorMessage(fieldError validator.FieldError) string <span class="cov0" title="0">{
+        switch fieldError.Tag() </span>{
+        case "required":<span class="cov0" title="0">
+                return "This field is required"</span>
+        case "email":<span class="cov0" title="0">
+                return "Invalid email format"</span>
+        case "min":<span class="cov0" title="0">
+                return fmt.Sprintf("Value is too short, minimum is %s", fieldError.Param())</span>
+        case "max":<span class="cov0" title="0">
+                return fmt.Sprintf("Value is too long, maximum is %s", fieldError.Param())</span>
+        case "gte":<span class="cov0" title="0">
+                return fmt.Sprintf("Value is too small, minimum is %s", fieldError.Param())</span>
+        case "lte":<span class="cov0" title="0">
+                return fmt.Sprintf("Value is too large, maximum is %s", fieldError.Param())</span>
+        default:<span class="cov0" title="0">
+                return "Invalid value"</span>
+        }
+}
+
+func (s *Server) HandleError(w http.ResponseWriter, err error, msg string, statusCode int) <span class="cov0" title="0">{
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println(err)
+
+                responseError := s.ErrorJson(w, errors.New(msg), statusCode)
+                if responseError != nil </span><span class="cov0" title="0">{
+                        http.Error(w, "Something went wrong", http.StatusInternalServerError)
+                }</span>
+        }
+}
+
+func ParseIDParam(r *http.Request, paramName string) (int, error) <span class="cov0" title="0">{
+        idParam := chi.URLParam(r, paramName)
+        id, err := strconv.Atoi(idParam)
+        if err != nil || id &lt;= 0 </span><span class="cov0" title="0">{
+                return 0, errors.New("invalid id parameter")
+        }</span>
+        <span class="cov0" title="0">return id, nil</span>
+}
+
+func (s *Server) GetUserIdFromRequest(r *http.Request) (string, error) <span class="cov0" title="0">{
+        userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", errors.New("unauthorized")
+        }</span>
+        <span class="cov0" title="0">return userId, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package server
+
+import (
+        "encoding/json"
+        "log"
+        "net/http"
+
+        "github.com/go-chi/chi/v5"
+        "github.com/go-chi/chi/v5/middleware"
+        "github.com/go-chi/cors"
+
+        "server/internal/middlewares"
+        "server/pkg/config"
+)
+
+func (s *Server) RegisterRoutes() http.Handler <span class="cov0" title="0">{
+        env, err := config.LoadEnvironment()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalln(err)
+        }</span>
+
+        // Start the rate limiter cleanup routine
+        <span class="cov0" title="0">middlewares.StartCleanupRoutine()
+
+        r := chi.NewRouter()
+        r.Use(middleware.Logger)
+        r.Use(middleware.Recoverer)
+        r.Use(middleware.RedirectSlashes)
+
+        var allowedOrigins []string
+        if env.IsProduction </span><span class="cov0" title="0">{
+                allowedOrigins = []string{env.CorsAllowedOrigin}
+        }</span> else<span class="cov0" title="0"> {
+                allowedOrigins = []string{"*"}
+        }</span>
+
+        <span class="cov0" title="0">r.Use(cors.Handler(cors.Options{
+                AllowedOrigins:   allowedOrigins,
+                AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+                AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+                ExposedHeaders:   []string{"Link"},
+                AllowCredentials: true,
+                MaxAge:           300,
+        }))
+
+        r.Use(middleware.Heartbeat("/ping"))
+        r.Use(middlewares.RateLimiterMiddleware)
+
+        r.Get("/sup", s.Sup)
+        r.Get("/health", s.HealthCheck)
+
+        r.Group(func(r chi.Router) </span><span class="cov0" title="0">{
+                r.Use(middlewares.RequireAuthMiddleware(s.authService))
+
+                r.Route("/user", func(r chi.Router) </span><span class="cov0" title="0">{
+                        r.Get("/", s.GetUserProfile)
+                        r.Put("/", s.UpdateUser)
+                        r.Get("/transactions", s.GetUserTransactions)
+                }</span>)
+
+                <span class="cov0" title="0">r.Route("/exams", func(r chi.Router) </span><span class="cov0" title="0">{
+                        r.Route("/banking", func(r chi.Router) </span><span class="cov0" title="0">{
+                                r.Route("/descriptive", func(r chi.Router) </span><span class="cov0" title="0">{
+                                        r.Get("/open", s.GetOpenQuestions)
+                                        r.Post("/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
+                                }</span>)
+
+                                <span class="cov0" title="0">r.Route("/mcq", func(r chi.Router) </span>{<span class="cov0" title="0">
+                                        // ToDo: Add assessment and open questions
+                                }</span>)
+
+                                <span class="cov0" title="0">r.Route("/{id}", func(r chi.Router) </span><span class="cov0" title="0">{
+                                        r.Get("/", s.GetGeneratedExamsByExamGroupId)
+                                }</span>)
+                        })
+
+                        <span class="cov0" title="0">r.Route("/assesments", func(r chi.Router) </span><span class="cov0" title="0">{
+                                r.Get("/{id}", s.GetAssesmentById)
+                        }</span>)
+
+                        <span class="cov0" title="0">r.Route("/history", func(r chi.Router) </span><span class="cov0" title="0">{
+                                r.Get("/", s.GetExamAttempts)
+                        }</span>)
+
+                        <span class="cov0" title="0">r.Get("/{id}", s.GetGeneratedExamById)
+                        r.Get("/{id}/assessments", s.GetExamAssessments)</span>
+                })
+
+                <span class="cov0" title="0">r.Route("/subscriptions", func(r chi.Router) </span><span class="cov0" title="0">{
+                        r.Post("/{subscriptionId}/buy", s.StartSubscription)
+                }</span>)
+        })
+
+        <span class="cov0" title="0">r.Route("/webhook", func(r chi.Router) </span><span class="cov0" title="0">{
+                r.Post("/subscription/payment-success", s.HandleSubscriptionPaymentSuccess)
+        }</span>)
+
+        <span class="cov0" title="0">r.Get("/subscriptions", s.GetAllSubscriptions)
+        r.Get("/categories/exams/{id}", s.GetExamById)
+        r.Get("/exams/banking", s.GetBankingExamGroups)
+
+        return r</span>
+}
+
+func (s *Server) Sup(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        response := Response{
+                Message: "Sup",
+        }
+
+        err := s.WriteJson(w, http.StatusOK, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        jsonResp, _ := json.Marshal(s.redisService.Health())
+        response := Response{
+                Data: string(jsonResp),
+        }
+        err := s.WriteJson(w, http.StatusOK, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package server
+
+import (
+        "net/http"
+)
+
+func (s *Server) GetAllSubscriptions(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        subscriptions, err := s.subscriptionService.GetAll(r.Context())
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+                return
+        }</span>
+
+        <span class="cov0" title="0">responsePayload := &amp;Response{
+                Data: subscriptions,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, responsePayload)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package server
+
+import (
+        "errors"
+        "net/http"
+
+        "common/ent"
+
+        "server/pkg/constants"
+        "server/pkg/models"
+)
+
+func (s *Server) GetUserProfile(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">user, err := s.userService.GetUserProfile(r.Context(), userId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "user not found", http.StatusBadRequest)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">response := Response{
+                Data: user,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) GetUserTransactions(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">user, err := s.userService.GetUserTransactions(r.Context(), userId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "user not found", http.StatusBadRequest)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">response := Response{
+                Data: user,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+        }</span>
+}
+
+func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+
+        userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">var request models.UpdateUserRequest
+
+        if err := s.ReadJson(w, r, &amp;request); err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid json request body", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">user, err := s.userService.UpdateUser(r.Context(), userId, request)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "user not found", http.StatusBadRequest)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">response := Response{
+                Data: user,
+        }
+
+        err = s.WriteJson(w, http.StatusOK, &amp;response)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package server
+
+import (
+        "errors"
+        "net/http"
+        "strconv"
+        "strings"
+
+        "common/ent"
+        "github.com/go-chi/chi/v5"
+
+        "server/pkg/constants"
+)
+
+func (s *Server) StartSubscription(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        idParam := chi.URLParam(r, "subscriptionId")
+        subscriptionId, err := strconv.Atoi(idParam)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "invalid subscription id", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov0" title="0">userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">returnUrl := r.URL.Query().Get("returnUrl")
+
+        userSubscription, err := s.subscriptionService.StartUserSubscription(r.Context(), subscriptionId, &amp;returnUrl, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "subscription not found", http.StatusBadRequest)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "user already has active subscription") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "user already has active subscription", http.StatusBadRequest)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if strings.Contains(err.Error(), "payment for subscription was not successful") </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "payment for subscription was not successful", http.StatusBadRequest)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">responsePayload := Response{
+                Data: userSubscription,
+        }
+
+        err = s.WriteJson(w, http.StatusCreated, &amp;responsePayload)
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package server
+
+import (
+        "context"
+        "encoding/json"
+        "io"
+        "log"
+        "net/http"
+)
+
+func (s *Server) HandleSubscriptionPaymentSuccess(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        signature := r.Header.Get("x-webhook-signature")
+        timestamp := r.Header.Get("x-webhook-timestamp")
+
+        body, _ := io.ReadAll(r.Body)
+
+        webhookSignature, err := s.paymentService.VerifyWebhookSignature(signature, timestamp, string(body))
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+                return
+        }</span>
+
+        <span class="cov0" title="0">var webhookData map[string]interface{}
+
+        switch v := webhookSignature.Object.(type) </span>{
+        case string:<span class="cov0" title="0">
+                if err := json.Unmarshal([]byte(v), &amp;webhookData); err != nil </span><span class="cov0" title="0">{
+                        s.HandleError(w, err, "failed to unmarshal webhook object", http.StatusBadRequest)
+                        return
+                }</span>
+        case map[string]interface{}:<span class="cov0" title="0">
+                webhookData = v</span>
+        default:<span class="cov0" title="0">
+                s.HandleError(w, err, "invalid webhook object type", http.StatusInternalServerError)
+                return</span>
+        }
+
+        <span class="cov0" title="0">var orderId, userEmail string
+        if data, ok := webhookData["data"].(map[string]interface{}); ok </span><span class="cov0" title="0">{
+                if order, ok := data["order"].(map[string]interface{}); ok </span><span class="cov0" title="0">{
+                        if orderID, ok := order["order_id"].(string); ok </span><span class="cov0" title="0">{
+                                orderId = orderID
+                        }</span>
+                }
+
+                <span class="cov0" title="0">if customerDetails, ok := data["customer_details"].(map[string]interface{}); ok </span><span class="cov0" title="0">{
+                        if email, ok := customerDetails["customer_email"].(string); ok </span><span class="cov0" title="0">{
+                                userEmail = email
+                        }</span>
+                }
+        }
+
+        <span class="cov0" title="0">go func() </span><span class="cov0" title="0">{
+                bgCtx := context.Background()
+
+                activatedSubscription, err := s.subscriptionService.ActivateUserSubscription(bgCtx, orderId, userEmail)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Println(err.Error())
+                        return
+                }</span>
+
+                <span class="cov0" title="0">log.Println("subscription created with id", activatedSubscription.Id)</span>
+        }()
+
+        <span class="cov0" title="0">err = s.WriteJson(w, http.StatusOK, &amp;Response{})
+        if err != nil </span><span class="cov0" title="0">{
+                s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package services
+
+import (
+        "context"
+        "time"
+
+        "common/ent"
+        commonInterfaces "common/interfaces"
+        "common/repositories"
+)
+
+type AccessService struct {
+        subscriptionRepository     commonInterfaces.SubscriptionRepositoryInterface
+        userSubscriptionRepository commonInterfaces.UserSubscriptionRepositoryInterface
+}
+
+func NewAccessService(subscriptionRepo commonInterfaces.SubscriptionRepositoryInterface, userSubscriptionRepo commonInterfaces.UserSubscriptionRepositoryInterface) *AccessService <span class="cov8" title="1">{
+        return &amp;AccessService{
+                subscriptionRepository:     subscriptionRepo,
+                userSubscriptionRepository: userSubscriptionRepo,
+        }
+}</span>
+
+func InitAccessService(dbClient *ent.Client) *AccessService <span class="cov0" title="0">{
+        subscriptionRepository := repositories.NewSubscriptionRepository(dbClient)
+        userSubscriptionRepository := repositories.NewUserSubscriptionRepository(dbClient)
+
+        return NewAccessService(subscriptionRepository, userSubscriptionRepository)
+}</span>
+
+func (a *AccessService) UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error) <span class="cov8" title="1">{
+        userSubscriptions, err := a.userSubscriptionRepository.GetByUserId(ctx, userId)
+        if err != nil </span><span class="cov8" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov8" title="1">if len(userSubscriptions) == 0 </span><span class="cov8" title="1">{
+                return false, nil // No subscriptions found
+        }</span>
+
+        <span class="cov8" title="1">now := time.Now()
+
+        for _, userSubscription := range userSubscriptions </span><span class="cov8" title="1">{
+                if userSubscription.StartDate.Before(now) &amp;&amp; userSubscription.EndDate.After(now) </span><span class="cov8" title="1">{
+                        subscription, err := a.subscriptionRepository.GetById(ctx, userSubscription.Edges.Subscription.ID)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return false, err
+                        }</span>
+
+                        // Create a map of exam IDs for quick lookup
+                        <span class="cov8" title="1">examMap := make(map[int]struct{})
+                        for _, exam := range subscription.Edges.Exams </span><span class="cov8" title="1">{
+                                examMap[exam.Edges.Exam.ID] = struct{}{}
+                        }</span>
+
+                        // Check if the requested examId exists in the subscription exams
+                        <span class="cov8" title="1">if _, exists := examMap[examId]; exists </span><span class="cov8" title="1">{
+                                return true, nil
+                        }</span>
+                }
+        }
+
+        <span class="cov8" title="1">return false, nil</span>
+}
+
+func (a *AccessService) GetAccessibleExamsForUser(ctx context.Context, exams []*ent.Exam, userId string) ([]*ent.Exam, error) <span class="cov8" title="1">{
+        userSubscriptions, err := a.userSubscriptionRepository.GetByUserId(ctx, userId)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">now := time.Now()
+        var accessibleExams []*ent.Exam
+
+        for _, userSubscription := range userSubscriptions </span><span class="cov8" title="1">{
+                if userSubscription.StartDate.Before(now) &amp;&amp; userSubscription.EndDate.After(now) </span><span class="cov8" title="1">{
+
+                        subscription, err := a.subscriptionRepository.GetById(ctx, userSubscription.Edges.Subscription.ID)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return nil, err
+                        }</span>
+
+                        <span class="cov8" title="1">examMap := make(map[int]struct{})
+                        for _, exam := range subscription.Edges.Exams </span><span class="cov8" title="1">{
+                                examMap[exam.Edges.Exam.ID] = struct{}{}
+                        }</span>
+
+                        <span class="cov8" title="1">for _, exam := range exams </span><span class="cov8" title="1">{
+                                if _, found := examMap[exam.ID]; found </span><span class="cov8" title="1">{
+                                        accessibleExams = append(accessibleExams, exam)
+                                }</span>
+                        }
+                }
+        }
+
+        <span class="cov8" title="1">return accessibleExams, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package services
+
+import (
+        "context"
+
+        "github.com/nedpals/supabase-go"
+)
+
+type AuthService struct {
+        supabaseClient *supabase.Client
+}
+
+func NewAuthService(supabaseClient *supabase.Client) *AuthService <span class="cov0" title="0">{
+        return &amp;AuthService{
+                supabaseClient: supabaseClient,
+        }
+}</span>
+
+func (a *AuthService) VerifyUserToken(ctx context.Context, userToken string) (*supabase.User, error) <span class="cov0" title="0">{
+        return a.supabaseClient.Auth.User(ctx, userToken)
+}</span>
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package services
+
+import (
+        "context"
+        "encoding/json"
+        "errors"
+        "fmt"
+        "log"
+        "strings"
+
+        "common/constants"
+        "common/ent"
+
+        commonInterfaces "common/interfaces"
+        commonRepositories "common/repositories"
+        commonServices "common/services"
+
+        goaway "github.com/TwiN/go-away"
+        "github.com/redis/go-redis/v9"
+
+        "server/internal/interfaces"
+        "server/pkg/models"
+)
+
+type ExamAssesmentService struct {
+        accessService           interfaces.AccessServiceInterface
+        promptService           interfaces.PromptServiceInterface
+        examGenerationService   interfaces.ExamGenerationServiceInterface
+        profanityService        commonInterfaces.ProfanityServiceInterface
+        generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
+        examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+        examAssesmentRepository commonInterfaces.ExamAssessmentRepositoryInterface
+}
+
+func NewExamAssesmentService(
+        accessService interfaces.AccessServiceInterface,
+        promptService interfaces.PromptServiceInterface,
+        profanityService commonInterfaces.ProfanityServiceInterface,
+        generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
+        examGenerationService interfaces.ExamGenerationServiceInterface,
+        examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+        examAssesmentRepository commonInterfaces.ExamAssessmentRepositoryInterface,
+) *ExamAssesmentService <span class="cov8" title="1">{
+        return &amp;ExamAssesmentService{
+                accessService:           accessService,
+                promptService:           promptService,
+                profanityService:        profanityService,
+                generatedExamRepository: generatedExamRepository,
+                examGenerationService:   examGenerationService,
+                examAttemptRepository:   examAttemptRepository,
+                examAssesmentRepository: examAssesmentRepository,
+        }
+}</span>
+
+func InitExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *ExamAssesmentService <span class="cov0" title="0">{
+        accessService := InitAccessService(dbClient) // Assuming this is still using concrete implementations
+        promptService := NewPromptService()
+        profanityService := commonServices.NewProfanityService()
+        generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
+        examGenerationService := InitExamGenerationService(redisClient, dbClient)
+        examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
+        examAssesmentRepository := commonRepositories.NewExamAssessmentRepository(dbClient)
+
+        return NewExamAssesmentService(
+                accessService,
+                promptService,
+                profanityService,
+                generatedExamRepository,
+                examGenerationService,
+                examAttemptRepository,
+                examAssesmentRepository,
+        )
+}</span>
+
+func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *models.DescriptiveExamAssesmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error) <span class="cov8" title="1">{
+        generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error getting generated exam: %v", err)
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if generatedExam == nil </span><span class="cov0" title="0">{
+                return nil, errors.New("generated exam not found") // Handle the case where no exam is found
+        }</span>
+
+        <span class="cov8" title="1">if !isOpen </span><span class="cov8" title="1">{
+                hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to check access: %w", err)
+                }</span>
+
+                <span class="cov8" title="1">if !hasAccess </span><span class="cov8" title="1">{
+                        return nil, errors.New("forbidden")
+                }</span>
+        }
+
+        <span class="cov0" title="0">userSubmission := map[string]interface{}{
+                "content": request.Content,
+        }
+
+        assesmentModel := commonRepositories.AssessmentModel{
+                CompletedSeconds:  request.CompletedSeconds,
+                Status:            constants.ASSESSMENT_PENDING,
+                RawUserSubmission: userSubmission,
+        }
+
+        assessment, err := e.examAssesmentRepository.Create(ctx, attempt.ID, assesmentModel)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">go func() </span><span class="cov0" title="0">{
+                bgCtx := context.Background()
+                e.AssessDescriptiveExam(bgCtx, generatedExamId, assessment.ID, request.Content, userId, isOpen)
+        }</span>()
+
+        <span class="cov0" title="0">assessmentModel := &amp;models.AssessmentDetails{
+                Id:               assessment.ID,
+                CompletedSeconds: assessment.CompletedSeconds,
+                Status:           assessment.Status.String(),
+                CreatedAt:        assessment.CreatedAt,
+                UpdatedAt:        assessment.UpdatedAt,
+        }
+
+        return assessmentModel, nil</span>
+}
+
+func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) <span class="cov8" title="1">{
+        assessment, err := e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">assessmentModel := &amp;models.AssessmentDetails{
+                Id:                assessment.ID,
+                CompletedSeconds:  assessment.CompletedSeconds,
+                Status:            assessment.Status.String(),
+                RawUserSubmission: assessment.RawUserSubmission,
+                CreatedAt:         assessment.CreatedAt,
+                UpdatedAt:         assessment.UpdatedAt,
+        }
+
+        if assessment.RawAssesmentData == nil </span><span class="cov8" title="1">{
+                return assessmentModel, nil
+        }</span>
+
+        <span class="cov0" title="0">assessmentModel.RawAssesmentData = assessment.RawAssesmentData
+
+        return assessmentModel, nil</span>
+}
+
+func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generatedExamId int, userId string) ([]models.AssessmentDetails, error) <span class="cov8" title="1">{
+        assessments, err := e.examAssesmentRepository.GetByExam(ctx, generatedExamId, userId)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">assessmentsList := make([]models.AssessmentDetails, 0, len(assessments))
+
+        for _, assessment := range assessments </span><span class="cov8" title="1">{
+                assessmentModel := models.AssessmentDetails{
+                        Id:               assessment.ID,
+                        CompletedSeconds: assessment.CompletedSeconds,
+                        Status:           assessment.Status.String(),
+                        CreatedAt:        assessment.CreatedAt,
+                        UpdatedAt:        assessment.UpdatedAt,
+                }
+
+                assessmentsList = append(assessmentsList, assessmentModel)
+        }</span>
+        <span class="cov8" title="1">return assessmentsList, nil</span>
+}
+
+func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string, userId string, isOpen bool) <span class="cov0" title="0">{
+        assesmentModel := &amp;commonRepositories.AssessmentModel{}
+        generatedExamData, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("error getting generated exam", err)
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting generated exam, %v", err)})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">if !isOpen </span><span class="cov0" title="0">{
+                hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExamData.Edges.Exam.ID, userId)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Println("error getting exam", err)
+                        err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error checking exam, %v", err)})
+                        if err != nil </span><span class="cov0" title="0">{
+                                log.Printf("Error updating status %v", err)
+                        }</span>
+
+                        <span class="cov0" title="0">return</span>
+                }
+
+                <span class="cov0" title="0">if !hasAccess </span><span class="cov0" title="0">{
+                        log.Println("user does not have access to assess exam", err)
+                        return
+                }</span>
+        }
+
+        <span class="cov0" title="0">generatedExam, err := e.examGenerationService.GetGeneratedExamById(ctx, generatedExamId, userId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("error getting exam", err)
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting exam, %v", err)})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">jsonData, err := json.Marshal(generatedExam.RawExamData)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("error processing exam data", err)
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">var descriptiveExam models.DescriptiveExam
+        err = json.Unmarshal(jsonData, &amp;descriptiveExam)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("error processing exam data", err)
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error processing exam data, %v", err)})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">if e.profanityService.IsProfane(content) </span><span class="cov0" title="0">{
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
+                        "profanity_check": "detected",
+                        "profane_content": goaway.ExtractProfanity(content),
+                }, Remarks: fmt.Sprintf("profanities detected in content, %v", goaway.ExtractProfanity(content))})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">prompt := fmt.Sprintf(`
+Evaluate the following "%s" based on the topic: “%s”.
+Criteria to consider for evaluation:
+        •        Grammar accuracy.
+        •        Proper use of punctuation.
+        •        Relevance to the given topic.
+        •        Check for structure if evaluating "essay", formatting if evaluating "error"
+        •        Word count in content provided should not exceed "%s" words (only count words, exclude special characters, spaces and formatting characters like "\n, \t, \r" etc).
+        •        Do Not visit any URLs provided in Content.
+        •        Make sure rating is based only on content provided, and use the provided criteria to calculate it
+
+Scoring: 
+        •        Provide a rating out of "%s" marks based on the above criteria. 
+        •        The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
+
+Output Requirements:
+        •        Return a valid JSON object with the following keys:
+        •        "rating": A string representing the rating. 
+        •        "strengths": An array of strings highlighting the content’s strengths.
+        •        "weaknesses": An array of strings pointing out the content’s weaknesses.
+        •        "corrected_version": Generate a single-line string with the corrected version of the content. There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+        •        The entire output should be a single-line string with no extra spaces, newlines, or formatting, ensuring it can be parsed as valid JSON.
+
+Content to evaluate:
+
+        “%s”
+`, descriptiveExam.Type, descriptiveExam.Topic, descriptiveExam.MaxNumberOfWordsAllowed, descriptiveExam.TotalMarks, content)
+
+        response, err := e.promptService.GetPromptResult(ctx, prompt, constants.PRO_15)
+        if err != nil </span><span class="cov0" title="0">{
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting prompt results, %v", err)})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">log.Printf("Error getting prompt result: %v", err)
+                return</span>
+        }
+
+        <span class="cov0" title="0">if strings.Contains(response, "FinishReasonSafety") </span><span class="cov0" title="0">{
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
+                        "profanity_check": "detected",
+                }, Remarks: "profanity detected by AI"})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">var rawJsonData map[string]interface{}
+        err = json.Unmarshal([]byte(response), &amp;rawJsonData)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("error response from AI service", err)
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error response from AI Service, %v", err)})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">var assessmentResult models.DescriptiveExamAssessmentResult
+        err = json.Unmarshal([]byte(response), &amp;assessmentResult)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("response from AI service does not match criteria", err)
+                err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("response from AI service does not match criteria, %v", err)})
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error updating status %v", err)
+                }</span>
+
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">assesmentModel.Status = constants.ASSESSMENT_COMPLETED
+        assesmentModel.RawAssessmentData = rawJsonData
+        err = e.examAssesmentRepository.Update(ctx, assessmentId, *assesmentModel)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error updating status %v", err)
+        }</span>
+
+        <span class="cov0" title="0">log.Println("Processed Assessment", assessmentId)</span>
+}
+
+func (e *ExamAssesmentService) updateAssessment(ctx context.Context, assessmentId int, assesmentModel commonRepositories.AssessmentModel) error <span class="cov0" title="0">{
+        return e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
+}</span>
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package services
+
+import (
+        "context"
+        "errors"
+        "fmt"
+        "math"
+        "time"
+
+        "common/ent"
+        commonInterfaces "common/interfaces"
+        commonRepositories "common/repositories"
+
+        "server/internal/interfaces"
+        "server/pkg/models"
+)
+
+// ExamAttemptService is the service for handling exam attempts
+type ExamAttemptService struct {
+        accessService           interfaces.AccessServiceInterface
+        examRepository          commonInterfaces.ExamRepositoryInterface
+        examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+        examSettingRepository   commonInterfaces.ExamSettingRepositoryInterface
+        generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
+}
+
+// NewExamAttemptService initializes a new ExamAttemptService
+func NewExamAttemptService(
+        accessService interfaces.AccessServiceInterface,
+        examRepository commonInterfaces.ExamRepositoryInterface,
+        examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+        examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
+        generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
+) *ExamAttemptService <span class="cov8" title="1">{
+        return &amp;ExamAttemptService{
+                accessService:           accessService,
+                examRepository:          examRepository,
+                examAttemptRepository:   examAttemptRepository,
+                examSettingRepository:   examSettingRepository,
+                generatedExamRepository: generatedExamRepository,
+        }
+}</span>
+
+func InitExamAttemptService(dbClient *ent.Client) *ExamAttemptService <span class="cov0" title="0">{
+        accessService := InitAccessService(dbClient)
+        examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
+        examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
+        examRepository := commonRepositories.NewExamRepository(dbClient)
+        generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
+
+        return NewExamAttemptService(
+                accessService,
+                examRepository,
+                examAttemptRepository,
+                examSettingRepository,
+                generatedExamRepository,
+        )
+}</span>
+
+func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*ent.ExamAttempt, error) <span class="cov8" title="1">{
+        userExamAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExamId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if !errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+
+        <span class="cov8" title="1">generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if !isOpen </span><span class="cov8" title="1">{
+                hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to check access: %w", err)
+                }</span>
+
+                <span class="cov8" title="1">if !hasAccess </span><span class="cov8" title="1">{
+                        return nil, errors.New("forbidden")
+                }</span>
+        }
+
+        <span class="cov8" title="1">currAttempts := len(userExamAttempts)
+
+        examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if examSettings.MaxAttempts &lt;= currAttempts </span><span class="cov0" title="0">{
+                return nil, errors.New("max attempts for exam exceeded")
+        }</span>
+
+        <span class="cov8" title="1">currentAttempt, err := e.examAttemptRepository.Create(ctx, currAttempts, generatedExamId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return currentAttempt, nil</span>
+}
+
+// GetAttempts retrieves exam attempts for the user with pagination
+func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) (*models.PaginatedData, error) <span class="cov0" title="0">{
+        examWithAttempts, err := e.generatedExamRepository.GetPaginatedExamsByUserAndDate(ctx, userId, page, limit, from, to, examTypeId, categoryId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var userExamAttempts []*models.UserExamAttempt
+
+        for _, generatedExam := range examWithAttempts </span><span class="cov0" title="0">{
+                userExamAttempt := &amp;models.UserExamAttempt{
+                        AttemptedExamId: generatedExam.ID,
+                        IsActive:        generatedExam.IsActive,
+                        ExamName:        generatedExam.Edges.Exam.Name,
+                        ExamType:        generatedExam.Edges.Exam.Type.String(),
+                        ExamTypeId:      generatedExam.Edges.Exam.ID,
+                        ExamCategory:    string(generatedExam.Edges.Exam.Edges.Category.Name),
+                        ExamCategoryId:  generatedExam.Edges.Exam.Edges.Category.ID,
+                        Topic:           generatedExam.RawExamData["topic"].(string),
+                        Type:            generatedExam.RawExamData["type"].(string),
+                        Attempts:        []models.Attempt{},
+                }
+
+                for i, attempt := range generatedExam.Edges.Attempts </span><span class="cov0" title="0">{
+                        attemptModel := models.Attempt{
+                                AttemptId:     attempt.ID,
+                                AttemptNumber: i + 1,
+                                AttemptDate:   attempt.UpdatedAt,
+                        }
+
+                        if attempt.Edges.Assesment != nil </span><span class="cov0" title="0">{
+                                attemptModel.AssessmentId = attempt.Edges.Assesment.ID
+                                attemptModel.AssessmentStatus = string(attempt.Edges.Assesment.Status)
+                        }</span>
+
+                        <span class="cov0" title="0">userExamAttempt.Attempts = append(userExamAttempt.Attempts, attemptModel)</span>
+                }
+
+                <span class="cov0" title="0">userExamAttempts = append(userExamAttempts, userExamAttempt)</span>
+        }
+
+        <span class="cov0" title="0">totalCount, err := e.generatedExamRepository.GetCountOfFilteredExamsDataByUserAndDate(ctx, userId, from, to, examTypeId, categoryId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">paginatedData := &amp;models.PaginatedData{
+                CurrentPage: page,
+                TotalItems:  totalCount,
+                TotalPages:  int(math.Ceil(float64(totalCount) / float64(limit))),
+                Data:        userExamAttempts,
+                PerPage:     limit,
+        }
+
+        return paginatedData, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package services
+
+import (
+        "context"
+
+        "common/constants"
+        "common/ent"
+        commonInterfaces "common/interfaces"
+        "common/repositories"
+
+        "server/pkg/models"
+)
+
+type ExamCategoryService struct {
+        examRepository         commonInterfaces.ExamRepositoryInterface
+        examGroupRepository    commonInterfaces.ExamGroupRepositoryInterface
+        examCategoryRepository commonInterfaces.ExamCategoryRepositoryInterface
+}
+
+func NewExamCategoryService(examRepo commonInterfaces.ExamRepositoryInterface, examGroupRepo commonInterfaces.ExamGroupRepositoryInterface, examCategoryRepo commonInterfaces.ExamCategoryRepositoryInterface) *ExamCategoryService <span class="cov8" title="1">{
+        return &amp;ExamCategoryService{
+                examRepository:         examRepo,
+                examGroupRepository:    examGroupRepo,
+                examCategoryRepository: examCategoryRepo,
+        }
+}</span>
+
+func InitExamCategoryService(dbClient *ent.Client) *ExamCategoryService <span class="cov0" title="0">{
+        examRepository := repositories.NewExamRepository(dbClient)
+        examGroupRepository := repositories.NewExamGroupRepository(dbClient)
+        examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
+
+        return NewExamCategoryService(examRepository, examGroupRepository, examCategoryRepository)
+}</span>
+
+func (e *ExamCategoryService) GetBankingExamGroups(ctx context.Context) ([]models.CategoryExamGroup, error) <span class="cov8" title="1">{
+        category, err := e.examCategoryRepository.GetByName(ctx, constants.ExamCategoryNameBanking)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">var categoryExamGroups []models.CategoryExamGroup
+        for _, examGroup := range category.Edges.Groups </span><span class="cov8" title="1">{
+                examGroupModel := models.CategoryExamGroup{
+                        Id:           examGroup.ID,
+                        ExamName:     examGroup.Name,
+                        CategoryId:   category.ID,
+                        IsActive:     examGroup.IsActive,
+                        Description:  examGroup.Description,
+                        CategoryName: category.Name.String(),
+                        LogoUrl:      examGroup.LogoURL,
+                }
+                categoryExamGroups = append(categoryExamGroups, examGroupModel)
+        }</span>
+
+        <span class="cov8" title="1">return categoryExamGroups, nil</span>
+}
+
+func (e *ExamCategoryService) GetExamGroupById(ctx context.Context, examGroupId int) (*models.CategoryExamGroup, error) <span class="cov8" title="1">{
+        examGroup, err := e.examGroupRepository.GetById(ctx, examGroupId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">examGroupModel := models.CategoryExamGroup{
+                Id:          examGroup.ID,
+                ExamName:    examGroup.Name,
+                IsActive:    examGroup.IsActive,
+                Description: examGroup.Description,
+                LogoUrl:     examGroup.LogoURL,
+        }
+
+        return &amp;examGroupModel, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package services
+
+import (
+        "context"
+        "encoding/json"
+        "errors"
+        "fmt"
+        "log"
+        "sort"
+
+        "common/ent"
+        "common/ent/exam"
+        "common/repositories"
+        "common/services"
+
+        commonConstants "common/constants"
+        commonInterfaces "common/interfaces"
+
+        "server/internal/interfaces"
+        "server/pkg/models"
+
+        "github.com/redis/go-redis/v9"
+)
+
+type ExamGenerationService struct {
+        accessService           interfaces.AccessServiceInterface
+        redisService            commonInterfaces.RedisServiceInterface
+        examRepository          commonInterfaces.ExamRepositoryInterface
+        examGroupRepository     commonInterfaces.ExamGroupRepositoryInterface
+        generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
+        examCategoryRepository  commonInterfaces.ExamCategoryRepositoryInterface
+        examSettingRepository   commonInterfaces.ExamSettingRepositoryInterface
+        examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+        cachedExamRepository    commonInterfaces.CachedExamRepositoryInterface
+}
+
+// Constructor function that uses interfaces for dependency injection
+func NewExamGenerationService(
+        accessService interfaces.AccessServiceInterface,
+        redisService commonInterfaces.RedisServiceInterface,
+        examRepository commonInterfaces.ExamRepositoryInterface,
+        examGroupRepository commonInterfaces.ExamGroupRepositoryInterface,
+        examCategoryRepository commonInterfaces.ExamCategoryRepositoryInterface,
+        cachedExamRepository commonInterfaces.CachedExamRepositoryInterface,
+        generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
+        examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
+        examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+) *ExamGenerationService <span class="cov8" title="1">{
+        return &amp;ExamGenerationService{
+                accessService:           accessService,
+                redisService:            redisService,
+                examRepository:          examRepository,
+                examGroupRepository:     examGroupRepository,
+                examCategoryRepository:  examCategoryRepository,
+                cachedExamRepository:    cachedExamRepository,
+                generatedExamRepository: generatedExamRepository,
+                examSettingRepository:   examSettingRepository,
+                examAttemptRepository:   examAttemptRepository,
+        }
+}</span>
+
+// InitExamGenerationService initializes the ExamGenerationService with dependencies for production use
+func InitExamGenerationService(redisClient *redis.Client, dbClient *ent.Client) *ExamGenerationService <span class="cov0" title="0">{
+        redisService := services.NewRedisService(redisClient)
+        accessService := InitAccessService(dbClient)
+        examRepository := repositories.NewExamRepository(dbClient)
+        examGroupRepository := repositories.NewExamGroupRepository(dbClient)
+        examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
+        cachedExamRepository := repositories.NewCachedExamRepository(dbClient)
+        generatedExamRepository := repositories.NewGeneratedExamRepository(dbClient)
+        examSettingRepository := repositories.NewExamSettingRepository(dbClient)
+        examAttemptRepository := repositories.NewExamAttemptRepository(dbClient)
+
+        return NewExamGenerationService(
+                accessService,
+                redisService,
+                examRepository,
+                examGroupRepository,
+                examCategoryRepository,
+                cachedExamRepository,
+                generatedExamRepository,
+                examSettingRepository,
+                examAttemptRepository,
+        )
+}</span>
+
+func (e *ExamGenerationService) GenerateExams(ctx context.Context, examId int, modelType models.ExamModelType) error <span class="cov0" title="0">{
+
+        exam, err := e.examRepository.GetById(ctx, examId)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">cachedData, err := e.FetchCachedExamData(ctx, exam)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">err = e.ProcessExamData(ctx, exam, modelType, cachedData)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (e *ExamGenerationService) MarkQuestionsAsOpen(ctx context.Context, examName string) error <span class="cov8" title="1">{
+        exam, err := e.examRepository.GetByName(ctx, examName)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to get exam by name: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">currentOpenQuestions, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to get currentOpenQuestions: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">for _, coe := range currentOpenQuestions </span><span class="cov8" title="1">{
+                coe.IsOpen = false
+        }</span>
+
+        <span class="cov8" title="1">err = e.generatedExamRepository.UpdateMany(ctx, currentOpenQuestions)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to mark current open questions closed: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">generatedOldExams, err := e.generatedExamRepository.GetByWeekOffset(ctx, exam, 1, 2) // Get last weeks 2 questions
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to get exam by name: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">for _, goe := range generatedOldExams </span><span class="cov8" title="1">{
+                goe.IsOpen = true
+        }</span>
+
+        <span class="cov8" title="1">err = e.generatedExamRepository.UpdateMany(ctx, generatedOldExams)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create new open exams: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">log.Printf("Marked %d open questions for %s exam", len(generatedOldExams), exam.Name)
+
+        return nil</span>
+}
+
+func (e *ExamGenerationService) MarkExpiredExamsInactive(ctx context.Context, examId int) error <span class="cov0" title="0">{
+        exam, err := e.examRepository.GetById(ctx, examId)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">generatedExams, err := e.generatedExamRepository.GetByExam(ctx, exam)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">sort.SliceStable(generatedExams, func(i, j int) bool </span><span class="cov0" title="0">{
+                return generatedExams[i].UpdatedAt.After(generatedExams[j].UpdatedAt)
+        }</span>)
+
+        <span class="cov0" title="0">if len(generatedExams) &gt; 30 </span><span class="cov0" title="0">{
+                for _, generatedExam := range generatedExams[30:] </span><span class="cov0" title="0">{ // Skip the first 30 exams
+                        generatedExam.IsActive = false
+                }</span>
+
+                <span class="cov0" title="0">if err := e.generatedExamRepository.UpdateMany(ctx, generatedExams[30:]); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (e *ExamGenerationService) FetchCachedExamData(ctx context.Context, exam *ent.Exam) (string, error) <span class="cov8" title="1">{
+        cachedMetaData, err := e.cachedExamRepository.GetByExam(ctx, exam)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("failed to retrieve cached metadata for exam '%s': %w", exam.Name, err)
+        }</span>
+
+        <span class="cov8" title="1">if len(cachedMetaData) == 0 </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("no cached metadata found for exam: %s", exam.Name)
+        }</span>
+
+        <span class="cov0" title="0">sort.Slice(cachedMetaData, func(i, j int) bool </span><span class="cov0" title="0">{
+                return cachedMetaData[i].UpdatedAt.After(cachedMetaData[j].UpdatedAt)
+        }</span>)
+
+        <span class="cov0" title="0">latestCachedMeta := cachedMetaData[0]
+
+        cachedData, err := e.redisService.Get(ctx, latestCachedMeta.CacheUID)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("failed to fetch cached data from Redis: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">if err := e.cachedExamRepository.MarkAsUsed(ctx, latestCachedMeta.ID); err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("failed to mark cached metadata as used: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return cachedData, nil</span>
+}
+
+func (e *ExamGenerationService) ProcessExamData(ctx context.Context, exam *ent.Exam, modelType models.ExamModelType, cachedData string) error <span class="cov0" title="0">{
+        log.Printf("Processing exam data for exam ID: %d, modelType: %v", exam.ID, modelType)
+
+        switch modelType </span>{
+
+        case models.DescriptiveExamType:<span class="cov0" title="0">
+                log.Printf("Processing as DescriptiveExam for exam ID: %d", exam.ID)
+
+                var descriptiveExams []models.DescriptiveExam
+                err := json.Unmarshal([]byte(cachedData), &amp;descriptiveExams)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to unmarshal descriptive exam data for exam ID: %d, error: %v", exam.ID, err)
+                        return fmt.Errorf("failed to validate cached data for DescriptiveExam: %w", err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("Successfully unmarshalled descriptive exams for exam ID: %d", exam.ID)
+
+                var exams []any
+                err = json.Unmarshal([]byte(cachedData), &amp;exams)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error generating descriptive exam from cached data for exam ID: %d, error: %v", exam.ID, err)
+                        return fmt.Errorf("failed to generate DescriptiveExam: %w", err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("Successfully generated descriptive exams for exam ID: %d", exam.ID)
+
+                _, err = e.generatedExamRepository.AddMany(ctx, exams, exam)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to add descriptive exams to repository for exam ID: %d, error: %v", exam.ID, err)
+                        return fmt.Errorf("failed to generate DescriptiveExams: %w", err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("Successfully added descriptive exams to the repository for exam ID: %d", exam.ID)</span>
+
+        case models.MCQExamType:<span class="cov0" title="0">
+                log.Printf("Processing as MCQExam for exam ID: %d", exam.ID)
+
+                var mcqExams models.GeneratedMCQExam
+                err := json.Unmarshal([]byte(cachedData), &amp;mcqExams)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to unmarshal MCQ exam data for exam ID: %d, error: %v", exam.ID, err)
+                        return fmt.Errorf("failed to validate cached data for MCQ Exam: %w", err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("Successfully unmarshalled MCQ exams for exam ID: %d", exam.ID)
+
+                jsonData, err := json.Marshal(mcqExams)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Fatalf("Failed to marshal MCQ exams struct to JSON for exam ID: %d, error: %v", exam.ID, err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("Successfully marshalled MCQ exams to JSON for exam ID: %d", exam.ID)
+
+                var result map[string]interface{}
+                err = json.Unmarshal(jsonData, &amp;result)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Fatalf("Failed to unmarshal JSON data for exam ID: %d into map, error: %v", exam.ID, err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("Successfully unmarshalled JSON into map for exam ID: %d", exam.ID)
+
+                _, err = e.generatedExamRepository.Add(ctx, result, exam.ID)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to add MCQ exams to repository for exam ID: %d, error: %v", exam.ID, err)
+                        return fmt.Errorf("failed to generate MCQ Exam: %w", err)
+                }</span>
+                <span class="cov0" title="0">log.Printf("Successfully added MCQ exams to the repository for exam ID: %d", exam.ID)</span>
+
+        default:<span class="cov0" title="0">
+                log.Printf("Unsupported exam model type for exam ID: %d", exam.ID)
+                return fmt.Errorf("unsupported exam model type")</span>
+        }
+
+        <span class="cov0" title="0">log.Printf("Completed processing exam data for exam ID: %d", exam.ID)
+        return nil</span>
+}
+
+func (e *ExamGenerationService) GetExamsByExamGroupIdAndExamType(ctx context.Context, examGroupId int, userId string) (map[exam.Type][]*models.GeneratedExamOverview, error) <span class="cov0" title="0">{
+        examGroup, err := e.examGroupRepository.GetActiveByIdWithExams(ctx, examGroupId, true)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">accessibleExams, err := e.accessService.GetAccessibleExamsForUser(ctx, examGroup.Edges.Exams, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to check access: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">accessibleExamMap := make(map[int]struct{})
+        for _, exam := range accessibleExams </span><span class="cov0" title="0">{
+                accessibleExamMap[exam.ID] = struct{}{}
+        }</span>
+
+        <span class="cov0" title="0">groupedExams := make(map[exam.Type][]*models.GeneratedExamOverview)
+
+        for _, exam := range examGroup.Edges.Exams </span><span class="cov0" title="0">{
+                sortedExams := e.sortExamsByUpdatedAt(exam.Edges.Generatedexams)
+
+                limit := min(26, len(sortedExams))
+                latestExams := sortedExams[:limit]
+
+                list, err := e.buildGeneratedExamOverviewList(ctx, latestExams, exam, userId)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">for _, overview := range list </span><span class="cov0" title="0">{
+                        if _, found := accessibleExamMap[exam.ID]; found </span><span class="cov0" title="0">{
+                                overview.UserHasAccessToExam = true
+                        }</span> else<span class="cov0" title="0"> {
+                                overview.RawExamData = nil
+                                overview.UserHasAccessToExam = false
+                        }</span>
+                }
+
+                <span class="cov0" title="0">examType := exam.Type
+                groupedExams[examType] = append(groupedExams[examType], list...)</span>
+        }
+
+        <span class="cov0" title="0">return groupedExams, nil</span>
+}
+func (e *ExamGenerationService) GetOpenGeneratedExams(ctx context.Context, examType commonConstants.ExamType, userId string) ([]*models.GeneratedExamOverview, error) <span class="cov0" title="0">{
+        exam, err := e.examRepository.GetActiveById(ctx, 1, true)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get exam by name: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">generatedExams, err := e.generatedExamRepository.GetByOpenFlag(ctx, exam.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get exam by name: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">exams, err := e.buildGeneratedExamOverviewList(ctx, generatedExams, exam, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">for _, e := range exams </span><span class="cov0" title="0">{
+                e.UserHasAccessToExam = true // always true for open exams
+        }</span>
+
+        <span class="cov0" title="0">return exams, nil</span>
+}
+
+func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*models.GeneratedExamOverview, error) <span class="cov0" title="0">{
+        generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get generated exam: %w", err)
+        }</span>
+
+        // Check if generatedExam.Edges is nil before accessing
+        <span class="cov0" title="0">if generatedExam.Edges.Exam == nil </span><span class="cov0" title="0">{
+                return nil, errors.New("exam details not found")
+        }</span>
+
+        <span class="cov0" title="0">if !isOpen </span><span class="cov0" title="0">{
+                hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to check access: %w", err)
+                }</span>
+
+                <span class="cov0" title="0">if !hasAccess </span><span class="cov0" title="0">{
+                        return nil, errors.New("forbidden")
+                }</span>
+        }
+
+        <span class="cov0" title="0">userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get user attempts: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">examSettings, err := e.examSettingRepository.GetByExam(ctx, generatedExam.Edges.Exam.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get exam settings: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">examOverview := e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts)
+        examOverview.ExamName = generatedExam.Edges.Exam.Name
+        examOverview.ExamType = generatedExam.Edges.Exam.Type.String()
+        examOverview.UserHasAccessToExam = true
+        examOverview.ExamStage = generatedExam.Edges.Exam.Stage
+        examOverview.IsSectional = generatedExam.Edges.Exam.IsSectional
+
+        return examOverview, nil</span>
+}
+
+func (e *ExamGenerationService) GetActiveExams(ctx context.Context, examType commonConstants.ExamType) ([]*ent.Exam, error) <span class="cov0" title="0">{
+        return e.examRepository.GetActiveByType(ctx, examType)
+}</span>
+
+func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam) []*ent.GeneratedExam <span class="cov0" title="0">{
+        sort.Slice(exams, func(i, j int) bool </span><span class="cov0" title="0">{
+                return exams[i].UpdatedAt.After(exams[j].UpdatedAt)
+        }</span>)
+        <span class="cov0" title="0">return exams</span>
+}
+
+func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, ex *ent.Exam, userId string) ([]*models.GeneratedExamOverview, error) <span class="cov0" title="0">{
+        generatedExamOverviewList := make([]*models.GeneratedExamOverview, 0, len(latestExams))
+
+        for _, generatedExam := range latestExams </span><span class="cov0" title="0">{
+                userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to get user attempts: %w", err)
+                }</span>
+
+                <span class="cov0" title="0">overview := e.buildGeneratedExamOverview(generatedExam, ex.Edges.Setting, userAttempts)
+                overview.ExamName = ex.Name
+                overview.ExamType = string(ex.Type)
+                overview.UserAttempts = len(userAttempts)
+                overview.ExamStage = ex.Stage
+                overview.IsSectional = ex.IsSectional
+
+                if ex.Type == exam.TypeMCQ </span><span class="cov0" title="0">{
+                        overview.RawExamData = nil
+                }</span>
+
+                <span class="cov0" title="0">generatedExamOverviewList = append(generatedExamOverviewList, overview)</span>
+        }
+
+        <span class="cov0" title="0">return generatedExamOverviewList, nil</span>
+}
+
+func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.GeneratedExam, examSettings *ent.ExamSetting, examAttempts []*ent.ExamAttempt) *models.GeneratedExamOverview <span class="cov0" title="0">{
+        return &amp;models.GeneratedExamOverview{
+                Id:                generatedExam.ID,
+                RawExamData:       generatedExam.RawExamData,
+                CreatedAt:         generatedExam.CreatedAt,
+                UpdatedAt:         generatedExam.UpdatedAt,
+                UserAttempts:      len(examAttempts),
+                MaxAttempts:       examSettings.MaxAttempts,
+                DurationSeconds:   examSettings.DurationSeconds,
+                NumberOfQuestions: examSettings.NumberOfQuestions,
+                NegativeMarking:   examSettings.NegativeMarking,
+        }
+}</span>
+
+func min(a, b int) int <span class="cov0" title="0">{
+        if a &lt; b </span><span class="cov0" title="0">{
+                return a
+        }</span>
+        <span class="cov0" title="0">return b</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package services
+
+import (
+        "log"
+
+        "common/util"
+
+        cashfree_pg "github.com/cashfree/cashfree-pg/v4"
+
+        "server/pkg/config"
+        "server/pkg/models"
+)
+
+type PaymentService struct {
+        environment *config.Environment
+}
+
+var xAPIVersion = "2023-08-01"
+
+func NewPaymentService() *PaymentService <span class="cov0" title="0">{
+        environment, err := config.LoadEnvironment()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("error initiating payment service, %v", err)
+        }</span>
+
+        <span class="cov0" title="0">cashfree_pg.XClientId = &amp;environment.PaymentProviderKey
+        cashfree_pg.XClientSecret = &amp;environment.PaymentProviderSecret
+        cashfree_pg.XEnvironment = cashfree_pg.SANDBOX
+
+        if environment.IsProduction </span><span class="cov0" title="0">{
+                cashfree_pg.XEnvironment = cashfree_pg.PRODUCTION
+        }</span>
+
+        <span class="cov0" title="0">return &amp;PaymentService{
+                environment: environment,
+        }</span>
+}
+
+func (p *PaymentService) CreateCustomer(model models.UpsertPaymentProviderCustomerModel) (*cashfree_pg.CustomerEntity, error) <span class="cov0" title="0">{
+
+        createCustomerRequest := cashfree_pg.CreateCustomerRequest{
+                CustomerPhone: model.Phone,
+                CustomerEmail: &amp;model.Email,
+                CustomerName:  &amp;model.Name,
+        }
+
+        xRequestId := util.GenerateUUID()
+        xIdempotencyKey := util.GenerateUUID()
+
+        resp, _, err := cashfree_pg.PGCreateCustomer(&amp;xAPIVersion, &amp;createCustomerRequest, &amp;xRequestId, &amp;xIdempotencyKey, nil)
+        return resp, err
+}</span>
+
+func (p *PaymentService) CreateOrder(model models.CreateOrderModel) (*cashfree_pg.OrderEntity, error) <span class="cov0" title="0">{
+        request := cashfree_pg.CreateOrderRequest{
+                OrderAmount: model.Amount,
+                CustomerDetails: cashfree_pg.CustomerDetails{
+                        // CustomerUid:   &amp;model.CustomerId,
+                        CustomerPhone: model.CustomerPhoneNumber,
+                        CustomerId:    model.UserId,
+                        CustomerEmail: &amp;model.CustomerEmail,
+                        CustomerName:  &amp;model.CustomerName,
+                },
+                OrderMeta: &amp;cashfree_pg.OrderMeta{
+                        ReturnUrl: model.ReturnUrl,
+                },
+                OrderCurrency: "INR",
+        }
+
+        response, _, err := cashfree_pg.PGCreateOrder(&amp;xAPIVersion, &amp;request, nil, nil, nil)
+        return response, err
+}</span>
+
+func (p *PaymentService) IsOrderSuccessful(orderId string) (bool, *cashfree_pg.PaymentEntity, error) <span class="cov0" title="0">{
+
+        response, _, err := cashfree_pg.PGOrderFetchPayments(&amp;xAPIVersion, orderId, nil, nil, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return false, nil, err
+        }</span>
+
+        <span class="cov0" title="0">for _, transaction := range response </span><span class="cov0" title="0">{
+                if *transaction.PaymentStatus == "SUCCESS" </span><span class="cov0" title="0">{
+                        return true, &amp;transaction, nil
+                }</span>
+        }
+
+        <span class="cov0" title="0">return false, nil, nil</span>
+}
+
+func (p *PaymentService) VerifyWebhookSignature(signature, timestamp, body string) (*cashfree_pg.PGWebhookEvent, error) <span class="cov0" title="0">{
+        return cashfree_pg.PGVerifyWebhookSignature(signature, body, timestamp)
+}</span>
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package services
+
+import (
+        "bytes"
+        "context"
+        "encoding/json"
+        "fmt"
+        "io"
+        "log"
+        "net/http"
+        "time"
+
+        commonConstants "common/constants"
+
+        "server/pkg/config"
+)
+
+type PromptService struct {
+}
+
+func NewPromptService() *PromptService <span class="cov0" title="0">{
+        return &amp;PromptService{}
+}</span>
+
+func (p *PromptService) GetPromptResult(ctx context.Context, prompt string, model commonConstants.GenAiModel) (string, error) <span class="cov0" title="0">{
+        env, err := config.LoadEnvironment()
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("failed to load environment: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">promptUrl := fmt.Sprintf("%s/prompt", env.AIServiceUrl)
+
+        req, err := prepareRequest(ctx, promptUrl, env.AIServiceAccessKey, prompt, model)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">responseBody, err := sendRequest(req)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">return responseBody, nil</span>
+}
+
+func prepareRequest(ctx context.Context, url, accessKey, prompt string, model commonConstants.GenAiModel) (*http.Request, error) <span class="cov0" title="0">{
+        postData := map[string]string{
+                "prompt": prompt,
+                "model":  string(model),
+        }
+
+        log.Println(postData)
+
+        jsonData, err := json.Marshal(postData)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("error encoding JSON: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to create request: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">req.Header.Set("Content-Type", "application/json")
+        req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", accessKey))
+
+        return req, nil</span>
+}
+
+func sendRequest(req *http.Request) (string, error) <span class="cov0" title="0">{
+        client := &amp;http.Client{
+                Timeout: 2 * time.Minute,
+        }
+
+        resp, err := client.Do(req)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("failed to send request: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        body, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("failed to read response body: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return string(body), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package services
+
+import (
+        "context"
+        "errors"
+        "fmt"
+        "log"
+        "time"
+
+        "common/ent"
+        "common/ent/usersubscription"
+        commonInterfaces "common/interfaces"
+
+        commonRepositories "common/repositories"
+
+        cashfree_pg "github.com/cashfree/cashfree-pg/v4"
+
+        "server/internal/interfaces"
+        "server/pkg/config"
+        "server/pkg/models"
+)
+
+// SubscriptionService defines the service for managing subscriptions.
+type SubscriptionService struct {
+        environment                *config.Environment
+        paymentService             interfaces.PaymentServiceInterface // Use interface for better testability
+        userRepository             commonInterfaces.UserRepositoryInterface
+        subscriptionRepository     commonInterfaces.SubscriptionRepositoryInterface
+        userSubscriptionRepository commonInterfaces.UserSubscriptionRepositoryInterface
+        paymentrepository          commonInterfaces.PaymentRepositoryInterface
+}
+
+// NewSubscriptionService creates a new SubscriptionService with the provided dependencies.
+func NewSubscriptionService(paymentService interfaces.PaymentServiceInterface, userRepo commonInterfaces.UserRepositoryInterface, subscriptionRepo commonInterfaces.SubscriptionRepositoryInterface, userSubscriptionRepo commonInterfaces.UserSubscriptionRepositoryInterface, paymentRepo commonInterfaces.PaymentRepositoryInterface) *SubscriptionService <span class="cov0" title="0">{
+        return &amp;SubscriptionService{
+                environment:                nil, // To be set in Init method
+                paymentService:             paymentService,
+                userRepository:             userRepo,
+                subscriptionRepository:     subscriptionRepo,
+                userSubscriptionRepository: userSubscriptionRepo,
+                paymentrepository:          paymentRepo,
+        }
+}</span>
+
+// InitSubscriptionService initializes the SubscriptionService for production use.
+func InitSubscriptionService(dbClient *ent.Client) *SubscriptionService <span class="cov0" title="0">{
+        environment, err := config.LoadEnvironment()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("error loading environment: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">paymentService := NewPaymentService()
+        userRepository := commonRepositories.NewUserRepository(dbClient)
+        subscriptionRepository := commonRepositories.NewSubscriptionRepository(dbClient)
+        userSubscriptionRepository := commonRepositories.NewUserSubscriptionRepository(dbClient)
+        paymentrepository := commonRepositories.NewPaymentRepository(dbClient)
+
+        service := NewSubscriptionService(paymentService, userRepository, subscriptionRepository, userSubscriptionRepository, paymentrepository)
+        service.environment = environment
+
+        return service</span>
+}
+
+func (s *SubscriptionService) GetAll(ctx context.Context) ([]models.SubscriptionOverview, error) <span class="cov0" title="0">{
+        subscriptions, err := s.subscriptionRepository.GetAll(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var subscriptionOverviews []models.SubscriptionOverview
+
+        for _, subscription := range subscriptions </span><span class="cov0" title="0">{
+                subscriptionOverview := models.SubscriptionOverview{
+                        Id:                  subscription.ID,
+                        ProviderPlanID:      subscription.ProviderPlanID,
+                        Name:                subscription.Name,
+                        IsActive:            subscription.IsActive,
+                        RawSubscriptionData: subscription.RawSubscriptionData,
+                        DurationInMonths:    subscription.DurationInMonths,
+                        FinalPrice:          subscription.FinalPrice,
+                        BasePrice:           subscription.BasePrice,
+                }
+
+                subscriptionOverviews = append(subscriptionOverviews, subscriptionOverview)
+        }</span>
+
+        <span class="cov0" title="0">return subscriptionOverviews, nil</span>
+}
+
+func (s *SubscriptionService) StartUserSubscription(ctx context.Context, subscriptionId int, returnUrl *string, userId string) (*models.SubscriptionToActivate, error) <span class="cov0" title="0">{
+        user, err := s.userRepository.Get(ctx, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if user.PaymentProviderCustomerID == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("user %s's profile does not have enough data to start subscription", user.Email)
+        }</span>
+
+        <span class="cov0" title="0">subscription, err := s.subscriptionRepository.GetById(ctx, subscriptionId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">userHasSubscription, err := s.UserHasActiveSubscription(ctx, subscription, user)
+        if err != nil </span><span class="cov0" title="0">{
+                var notFoundError *ent.NotFoundError
+                if !errors.As(err, &amp;notFoundError) </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+
+        <span class="cov0" title="0">if userHasSubscription </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("user already has active subscription")
+        }</span>
+
+        <span class="cov0" title="0">model := models.CreateOrderModel{
+                Amount:              subscription.FinalPrice,
+                CustomerId:          user.PaymentProviderCustomerID,
+                CustomerPhoneNumber: user.PhoneNumber,
+                CustomerEmail:       user.Email,
+                UserId:              userId,
+                CustomerName:        fmt.Sprintf("%s %s", user.FirstName, user.LastName),
+                ReturnUrl:           returnUrl,
+        }
+
+        createdSubscription, err := s.paymentService.CreateOrder(model)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">userSubscriptionModel := commonRepositories.UserSubscriptionModel{
+                SubscriptionId:         subscriptionId,
+                UserId:                 userId,
+                ProviderSubscriptionId: *createdSubscription.OrderId,
+        }
+
+        userSubscription, err := s.userSubscriptionRepository.Create(ctx, userSubscriptionModel)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">subscriptionToActivate := &amp;models.SubscriptionToActivate{
+                Id:               userSubscription.ID,
+                Status:           string(userSubscription.Status),
+                SubscriptionId:   userSubscription.ProviderSubscriptionID,
+                PaymentSessionId: *createdSubscription.PaymentSessionId,
+        }
+
+        return subscriptionToActivate, nil</span>
+}
+
+func (s *SubscriptionService) ActivateUserSubscription(ctx context.Context, providerSubscriptionId string, userEmail string) (*models.ActivatedSubscription, error) <span class="cov0" title="0">{
+        user, err := s.userRepository.GetByEmail(ctx, userEmail)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">userSubscriptionToUpdate, err := s.userSubscriptionRepository.GetByProviderSubscriptionId(ctx, providerSubscriptionId, user.ID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">isSuccessful, transaction, err := s.paymentService.IsOrderSuccessful(userSubscriptionToUpdate.ProviderSubscriptionID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if !isSuccessful </span><span class="cov0" title="0">{
+                return nil, errors.New("payment for subscription was not successful")
+        }</span>
+
+        <span class="cov0" title="0">userSubscriptionToUpdate.Status = usersubscription.StatusACTIVE
+        userSubscriptionToUpdate.StartDate = time.Now()
+        userSubscriptionToUpdate.IsActive = true
+        userSubscriptionToUpdate.EndDate = time.Now().AddDate(0, userSubscriptionToUpdate.Edges.Subscription.DurationInMonths, 0)
+
+        payment, err := s.StorePaymentForSubscription(ctx, transaction, userSubscriptionToUpdate.ID, user.ID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">log.Println("payment info stored successfully with id", payment.ID)
+
+        err = s.userSubscriptionRepository.Update(ctx, userSubscriptionToUpdate)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">activatedSubscription := models.ActivatedSubscription{
+                Id:        userSubscriptionToUpdate.ID,
+                Status:    string(userSubscriptionToUpdate.Status),
+                StartDate: userSubscriptionToUpdate.StartDate,
+                EndDate:   userSubscriptionToUpdate.EndDate,
+        }
+
+        return &amp;activatedSubscription, nil</span>
+}
+
+func (s *SubscriptionService) StorePaymentForSubscription(ctx context.Context, transaction *cashfree_pg.PaymentEntity, userSubscriptionId int, userId string) (*ent.Payment, error) <span class="cov0" title="0">{
+        const layout = time.RFC3339
+
+        paymentDate, err := time.Parse(layout, *transaction.PaymentCompletionTime)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">paymentModel := commonRepositories.CreatePaymentModel{
+                Status:             *transaction.PaymentStatus,
+                PaymentMethod:      determinePaymentMethod(transaction.PaymentMethod),
+                PaymentDate:        paymentDate,
+                Amount:             float64(*transaction.PaymentAmount),
+                UserSubscriptionId: userSubscriptionId,
+                ProviderPaymentId:  *transaction.CfPaymentId,
+        }
+
+        return s.paymentrepository.Create(ctx, paymentModel, userId)</span>
+}
+
+func determinePaymentMethod(transaction *cashfree_pg.PaymentEntityPaymentMethod) string <span class="cov0" title="0">{
+        switch </span>{
+        case transaction.PaymentMethodUPIInPaymentsEntity != nil:<span class="cov0" title="0">
+                return "UPI"</span>
+        case transaction.PaymentMethodCardInPaymentsEntity != nil:<span class="cov0" title="0">
+                return "Card"</span>
+        case transaction.PaymentMethodNetBankingInPaymentsEntity != nil:<span class="cov0" title="0">
+                return "Netbanking"</span>
+        default:<span class="cov0" title="0">
+                return "Unknown"</span>
+        }
+}
+
+func (s *SubscriptionService) UserHasActiveSubscription(ctx context.Context, subscription *ent.Subscription, user *ent.User) (bool, error) <span class="cov0" title="0">{
+        userSubscriptions, err := s.userSubscriptionRepository.GetByUserId(ctx, user.ID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                return false, err
+        }</span>
+
+        <span class="cov0" title="0">now := time.Now()
+
+        for _, userSubscription := range userSubscriptions </span><span class="cov0" title="0">{
+                if userSubscription.StartDate.Before(now) &amp;&amp; userSubscription.EndDate.After(now) &amp;&amp; userSubscription.Edges.Subscription.ID == subscription.ID </span><span class="cov0" title="0">{
+                        return true, nil
+                }</span>
+        }
+
+        <span class="cov0" title="0">return false, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file24" style="display: none">package services
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "common/ent"
+        "common/repositories"
+
+        commonInterfaces "common/interfaces"
+        "server/internal/interfaces"
+        "server/pkg/models"
+)
+
+type UserService struct {
+        paymentService             interfaces.PaymentServiceInterface
+        userRepository             commonInterfaces.UserRepositoryInterface
+        paymentRepository          commonInterfaces.PaymentRepositoryInterface
+        userSubscriptionRepository commonInterfaces.UserSubscriptionRepositoryInterface
+}
+
+// NewUserService creates a new UserService with the provided dependencies.
+func NewUserService(paymentService interfaces.PaymentServiceInterface, userRepo commonInterfaces.UserRepositoryInterface, paymentRepo commonInterfaces.PaymentRepositoryInterface, userSubscriptionRepo commonInterfaces.UserSubscriptionRepositoryInterface) *UserService <span class="cov0" title="0">{
+        return &amp;UserService{
+                paymentService:             paymentService,
+                userRepository:             userRepo,
+                paymentRepository:          paymentRepo,
+                userSubscriptionRepository: userSubscriptionRepo,
+        }
+}</span>
+
+// InitUserService initializes the UserService for production use.
+func InitUserService(dbClient *ent.Client) *UserService <span class="cov0" title="0">{
+        paymentService := NewPaymentService() // Assume NewPaymentService creates the service
+        userRepository := repositories.NewUserRepository(dbClient)
+        paymentRepository := repositories.NewPaymentRepository(dbClient)
+        userSubscriptionRepository := repositories.NewUserSubscriptionRepository(dbClient)
+
+        return NewUserService(paymentService, userRepository, paymentRepository, userSubscriptionRepository)
+}</span>
+
+func (u *UserService) GetUserProfile(ctx context.Context, userId string) (models.UserProfileResponse, error) <span class="cov0" title="0">{
+        user, err := u.userRepository.Get(ctx, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return models.UserProfileResponse{}, err
+        }</span>
+
+        <span class="cov0" title="0">userSubscriptions, err := u.userSubscriptionRepository.GetByUserId(ctx, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return models.UserProfileResponse{}, err
+        }</span>
+
+        <span class="cov0" title="0">var activeSubscriptions []models.UserSubscriptionDetails
+        now := time.Now()
+        for _, userSubscription := range userSubscriptions </span><span class="cov0" title="0">{
+                if userSubscription.StartDate.Before(now) &amp;&amp; userSubscription.EndDate.After(now) </span><span class="cov0" title="0">{
+                        subscriptionDetails := models.UserSubscriptionDetails{
+                                SubscriptionID:         userSubscription.Edges.Subscription.ID,
+                                ProviderPlanID:         userSubscription.Edges.Subscription.ProviderPlanID,
+                                ProviderSubscriptionID: userSubscription.ProviderSubscriptionID,
+                                DurationInMonths:       userSubscription.Edges.Subscription.DurationInMonths,
+                                StartDate:              userSubscription.StartDate,
+                                EndDate:                userSubscription.EndDate,
+                        }
+
+                        if len(userSubscription.Edges.Payments) &gt; 0 </span><span class="cov0" title="0">{
+                                paymentDetails := models.SubscriptionPaymentDetails{
+                                        Amount:        userSubscription.Edges.Payments[0].Amount, // Assuming the first payment holds the necessary details
+                                        PaymentDate:   userSubscription.Edges.Payments[0].PaymentDate,
+                                        PaymentStatus: string(userSubscription.Edges.Payments[0].Status),
+                                        PaymentMethod: userSubscription.Edges.Payments[0].PaymentMethod,
+                                }
+
+                                subscriptionDetails.PaymentDetails = paymentDetails
+                        }</span>
+
+                        <span class="cov0" title="0">activeSubscriptions = append(activeSubscriptions, subscriptionDetails)</span>
+                }
+        }
+
+        // Step 4: Create the response model
+        <span class="cov0" title="0">responseModel := models.UserProfileResponse{
+                Id:                  user.ID,
+                Email:               user.Email,
+                FirstName:           user.FirstName,
+                LastName:            user.LastName,
+                PhoneNumber:         user.PhoneNumber,
+                ActiveSubscriptions: activeSubscriptions,
+        }
+        return responseModel, nil</span>
+}
+
+func (u *UserService) UpdateUser(ctx context.Context, userId string, request models.UpdateUserRequest) (*ent.User, error) <span class="cov0" title="0">{
+        userToUpdate, err := u.userRepository.Get(ctx, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if request.FirstName != "" </span><span class="cov0" title="0">{
+                userToUpdate.FirstName = request.FirstName
+        }</span>
+
+        <span class="cov0" title="0">if request.LastName != "" </span><span class="cov0" title="0">{
+                userToUpdate.LastName = request.LastName
+        }</span>
+
+        <span class="cov0" title="0">if request.PhoneNumber != "" </span><span class="cov0" title="0">{
+                userToUpdate.PhoneNumber = request.PhoneNumber
+        }</span>
+
+        <span class="cov0" title="0">if err := u.updatePaymentProviderCustomer(userToUpdate); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">updatedUser, err := u.userRepository.Update(ctx, userToUpdate)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return updatedUser, nil</span>
+}
+
+func (u *UserService) GetUserTransactions(ctx context.Context, userId string) ([]models.SubscriptionPaymentDetails, error) <span class="cov0" title="0">{
+        var subscriptionPayments []models.SubscriptionPaymentDetails
+
+        payments, err := u.paymentRepository.GetByUserId(ctx, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">for _, payment := range payments </span><span class="cov0" title="0">{
+                subscriptionPayment := models.SubscriptionPaymentDetails{
+                        Amount:        payment.Amount,
+                        PaymentDate:   payment.PaymentDate,
+                        PaymentStatus: string(payment.Status),
+                        PaymentMethod: payment.PaymentMethod,
+                }
+
+                subscriptionPayments = append(subscriptionPayments, subscriptionPayment)
+        }</span>
+
+        <span class="cov0" title="0">return subscriptionPayments, nil</span>
+}
+
+func (u *UserService) updatePaymentProviderCustomer(user *ent.User) error <span class="cov0" title="0">{
+        model := models.UpsertPaymentProviderCustomerModel{
+                Name:  fmt.Sprintf("%s %s", user.FirstName, user.LastName),
+                Phone: user.PhoneNumber,
+                Email: user.Email,
+        }
+
+        customer, err := u.paymentService.CreateCustomer(model)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">customerId := customer.CustomerUid
+        if *customerId == "" </span><span class="cov0" title="0">{
+                return fmt.Errorf("could not extract customer id from response %v", customer)
+        }</span>
+
+        <span class="cov0" title="0">user.PaymentProviderCustomerID = *customerId
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file25" style="display: none">package workers
+
+import (
+        "context"
+        "log"
+
+        commonConstants "common/constants"
+
+        "server/pkg/models"
+)
+
+func (w *Worker) AddDescriptiveQuestionsInDatabase() error <span class="cov0" title="0">{
+        ctx := context.Background()
+
+        exams, err := w.examService.GetActiveExams(ctx, commonConstants.ExamTypeDescriptive)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">for _, exam := range exams </span><span class="cov0" title="0">{
+                err := w.examService.GenerateExams(ctx, exam.ID, models.DescriptiveExamType)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to Add Descriptive Question in Database: %v", err)
+                }</span>
+
+                <span class="cov0" title="0">err = w.examService.MarkExpiredExamsInactive(ctx, exam.ID)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to Add Descriptive Question in Database: %v", err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (w *Worker) AddMcqExamsInDatabase() error <span class="cov0" title="0">{
+        ctx := context.Background()
+
+        exams, err := w.examService.GetActiveExams(ctx, commonConstants.ExamTypeMCQ)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">for _, exam := range exams </span><span class="cov0" title="0">{
+                err := w.examService.GenerateExams(ctx, exam.ID, models.MCQExamType)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to Add MCQ Exam in Database: %v", err)
+                }</span>
+
+                <span class="cov0" title="0">err = w.examService.MarkExpiredExamsInactive(ctx, exam.ID)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to Add MCQ Exam in Database: %v", err)
+                }</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (w *Worker) MarkDescriptiveQuestionsAsOpenInDatabase() error <span class="cov0" title="0">{
+        ctx := context.Background()
+        examName := "GENERAL" // only set for general questions, need to make this dynamic
+        return w.examService.MarkQuestionsAsOpen(ctx, examName)
+}</span>
+</pre>
+		
+		<pre class="file" id="file26" style="display: none">package workers
+
+import (
+        "log"
+
+        "common/ent"
+
+        "github.com/redis/go-redis/v9"
+        "github.com/robfig/cron/v3"
+
+        "server/internal/services"
+)
+
+type Worker struct {
+        cronHandler *cron.Cron
+        examService *services.ExamGenerationService
+}
+
+func InitWorkers(redisClient *redis.Client, dbClient *ent.Client) *cron.Cron <span class="cov0" title="0">{
+        c := cron.New()
+
+        examService := services.InitExamGenerationService(redisClient, dbClient)
+
+        worker := &amp;Worker{
+                cronHandler: c,
+                examService: examService,
+        }
+
+        worker.RegisterWorkers()
+        c.Start()
+        return c
+}</span>
+
+func (w *Worker) RegisterWorkers() <span class="cov0" title="0">{
+        // _, err := w.cronHandler.AddFunc("*/1 * * * *", func() {
+        _, err := w.cronHandler.AddFunc("0 4 * * *", func() </span><span class="cov0" title="0">{
+                log.Println("Starting Worker Job for Adding Descriptive Question in Database")
+
+                // err := w.AddDescriptiveQuestionsInDatabase()
+                // if err != nil {
+                //         log.Printf("Failed to Add Descriptive Question in Database: %v", err)
+                // }
+
+                err := w.AddMcqExamsInDatabase()
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to Add MCQ Exam in Database: %v", err)
+                }</span>
+
+                <span class="cov0" title="0">log.Println("Finished Worker Job for Adding Descriptive Question in Database")</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                log.Fatalln(err)
+        }</span>
+
+        // w.cronHandler.AddFunc("*/1 * * * *", func() {
+        <span class="cov0" title="0">_, err = w.cronHandler.AddFunc("0 0 * * 0", func() </span><span class="cov0" title="0">{
+                log.Println("Starting Worker Job for Creating Descriptive Open Questions")
+
+                err := w.MarkDescriptiveQuestionsAsOpenInDatabase()
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Failed to Create Descriptive Open Questions: %v", err)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">log.Println("Finished Worker Job for Creating Descriptive Open Questions")</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                log.Fatalln(err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file27" style="display: none">package client
+
+import (
+        "context"
+        "fmt"
+        "log"
+
+        "common/ent"
+        "entgo.io/ent/dialect"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "github.com/jackc/pgx/v5/stdlib"
+
+        entsql "entgo.io/ent/dialect/sql"
+
+        "server/pkg/config"
+)
+
+func NewDbClient(ctx context.Context) (*ent.Client, error) <span class="cov0" title="0">{
+        environment, err := config.LoadEnvironment()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">databaseUrl := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", environment.DatabaseUser, environment.DatabasePassword, environment.DatabaseHost, environment.DatabasePort, environment.DatabaseName)
+
+        poolConfig, err := pgxpool.ParseConfig(databaseUrl)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+        <span class="cov0" title="0">poolConfig.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeCacheDescribe
+
+        pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+
+        <span class="cov0" title="0">db := stdlib.OpenDBFromPool(pool)
+        drv := entsql.OpenDB(dialect.Postgres, db)
+        client := ent.NewClient(ent.Driver(drv))
+
+        if err := client.Schema.Create(ctx); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("failed creating schema resources: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">log.Println("connected to database server", environment.DatabaseHost)
+        return client, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file28" style="display: none">package client
+
+import (
+        "context"
+        "fmt"
+        "log"
+
+        "github.com/redis/go-redis/v9"
+
+        "server/pkg/config"
+)
+
+func NewRedisClient(ctx context.Context) (*redis.Client, error) <span class="cov0" title="0">{
+        env, err := config.LoadEnvironment()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">fullAddress := fmt.Sprintf("%s:%s", env.RedisAddress, env.RedisPort)
+
+        redisClient := redis.NewClient(&amp;redis.Options{
+                Addr:     fullAddress,
+                Password: env.RedisPassword,
+                DB:       env.RedisDatabase,
+        })
+
+        pong, err := redisClient.Ping(ctx).Result()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("redis did not respond to Ping request %v", err)
+        }</span>
+
+        <span class="cov0" title="0">log.Println("redis connected to client", env.RedisAddress, ",PING -&gt;", pong)
+
+        return redisClient, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file29" style="display: none">package client
+
+import (
+        "log"
+
+        "github.com/nedpals/supabase-go"
+
+        "server/pkg/config"
+)
+
+func NewSupabaseClient() (*supabase.Client, error) <span class="cov0" title="0">{
+        environment, err := config.LoadEnvironment()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">client := supabase.CreateClient(environment.SupabaseUrl, environment.SupabaseKey)
+        log.Println("connected to supabase, url:", environment.SupabaseUrl)
+
+        return client, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file30" style="display: none">package config
+
+import (
+        "errors"
+        "os"
+        "strconv"
+)
+
+type Environment struct {
+        IsProduction          bool
+        CorsAllowedOrigin     string
+        ServerPort            string
+        DatabaseHost          string
+        DatabasePort          string
+        DatabaseName          string
+        DatabaseUser          string
+        DatabasePassword      string
+        RedisPort             string
+        RedisAddress          string
+        RedisPassword         string
+        RedisDatabase         int
+        SupabaseUrl           string
+        SupabaseKey           string
+        AIServiceAccessKey    string
+        AIServiceUrl          string
+        PaymentProviderKey    string
+        PaymentProviderSecret string
+}
+
+func LoadEnvironment() (*Environment, error) <span class="cov0" title="0">{
+        redisDbFromEnv := os.Getenv("REDIS_DATABASE")
+        redisDatabase, err := strconv.Atoi(redisDbFromEnv)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">env := &amp;Environment{
+                ServerPort:            os.Getenv("PORT"),
+                RedisPort:             os.Getenv("REDIS_PORT"),
+                DatabaseHost:          os.Getenv("DB_HOST"),
+                DatabasePort:          os.Getenv("DB_PORT"),
+                DatabaseName:          os.Getenv("DB_NAME"),
+                DatabaseUser:          os.Getenv("DB_USER"),
+                DatabasePassword:      os.Getenv("DB_PASSWORD"),
+                RedisAddress:          os.Getenv("REDIS_ADDRESS"),
+                RedisPassword:         os.Getenv("REDIS_PASSWORD"),
+                RedisDatabase:         redisDatabase,
+                SupabaseUrl:           os.Getenv("SUPABASE_URL"),
+                SupabaseKey:           os.Getenv("SUPABASE_KEY"),
+                AIServiceAccessKey:    os.Getenv("AI_SERVICE_ACCESS_KEY"),
+                AIServiceUrl:          os.Getenv("AI_SERVICE_URL"),
+                IsProduction:          os.Getenv("ENV") == "production",
+                CorsAllowedOrigin:     os.Getenv("CORS_ALLOWED_ORIGIN"),
+                PaymentProviderKey:    os.Getenv("PAYMENT_PROVIDER_KEY"),
+                PaymentProviderSecret: os.Getenv("PAYMENT_PROVIDER_SECRET"),
+        }
+
+        if env.ServerPort == "" || env.CorsAllowedOrigin == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("missing SERVER_PORT or Allowed CORS environment variable")
+        }</span>
+
+        <span class="cov0" title="0">if env.RedisPort == "" || env.RedisAddress == "" || env.RedisPassword == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("missing Redis environment variables")
+        }</span>
+
+        <span class="cov0" title="0">if env.DatabaseHost == "" || env.DatabasePort == "" || env.DatabaseName == "" || env.DatabaseUser == "" || env.DatabasePassword == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("missing Database environment variables")
+        }</span>
+
+        <span class="cov0" title="0">if env.SupabaseKey == "" || env.SupabaseUrl == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("missing Supabase environment variables")
+        }</span>
+
+        <span class="cov0" title="0">if env.AIServiceAccessKey == "" || env.AIServiceUrl == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("missing AI Service environment variables")
+        }</span>
+
+        <span class="cov0" title="0">if env.PaymentProviderKey == "" || env.PaymentProviderSecret == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("missing Payment Provider env keys")
+        }</span>
+
+        <span class="cov0" title="0">return env, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

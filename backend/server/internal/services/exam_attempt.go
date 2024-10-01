@@ -1,42 +1,64 @@
 package services
 
 import (
-	"common/ent"
-	commonRepositories "common/repositories"
 	"context"
 	"errors"
 	"fmt"
 	"math"
-	"server/pkg/models"
 	"time"
+
+	"common/ent"
+	commonInterfaces "common/interfaces"
+	commonRepositories "common/repositories"
+
+	"server/internal/interfaces"
+	"server/pkg/models"
 )
 
+// ExamAttemptService is the service for handling exam attempts
 type ExamAttemptService struct {
-	accessService           *AccessService
-	examRepository          *commonRepositories.ExamRepository
-	examAtemptRepository    *commonRepositories.ExamAttemptRepository
-	examSettingRepository   *commonRepositories.ExamSettingRepository
-	generatedExamRepository *commonRepositories.GeneratedExamRepository
+	accessService           interfaces.AccessServiceInterface
+	examRepository          commonInterfaces.ExamRepositoryInterface
+	examAttemptRepository   commonInterfaces.ExamAttemptRepositoryInterface
+	examSettingRepository   commonInterfaces.ExamSettingRepositoryInterface
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface
 }
 
-func NewExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
-	accessService := NewAccessService(dbClient)
-	examAtemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
-	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
-	examRepository := commonRepositories.NewExamRespository(dbClient)
-	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
-
+// NewExamAttemptService initializes a new ExamAttemptService
+func NewExamAttemptService(
+	accessService interfaces.AccessServiceInterface,
+	examRepository commonInterfaces.ExamRepositoryInterface,
+	examAttemptRepository commonInterfaces.ExamAttemptRepositoryInterface,
+	examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
+	generatedExamRepository commonInterfaces.GeneratedExamRepositoryInterface,
+) *ExamAttemptService {
 	return &ExamAttemptService{
 		accessService:           accessService,
-		examAtemptRepository:    examAtemptRepository,
-		examSettingRepository:   examSettingRepository,
 		examRepository:          examRepository,
+		examAttemptRepository:   examAttemptRepository,
+		examSettingRepository:   examSettingRepository,
 		generatedExamRepository: generatedExamRepository,
 	}
 }
 
+func InitExamAttemptService(dbClient *ent.Client) *ExamAttemptService {
+	accessService := InitAccessService(dbClient)
+	examAttemptRepository := commonRepositories.NewExamAttemptRepository(dbClient)
+	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
+	examRepository := commonRepositories.NewExamRepository(dbClient)
+	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
+
+	return NewExamAttemptService(
+		accessService,
+		examRepository,
+		examAttemptRepository,
+		examSettingRepository,
+		generatedExamRepository,
+	)
+}
+
 func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedExamId int, userId string, isOpen bool) (*ent.ExamAttempt, error) {
-	userExamAttempts, err := e.examAtemptRepository.GetByExam(ctx, generatedExamId, userId)
+	userExamAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExamId, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if !errors.As(err, &notFoundError) {
@@ -71,7 +93,7 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 		return nil, errors.New("max attempts for exam exceeded")
 	}
 
-	currentAttempt, err := e.examAtemptRepository.Create(ctx, currAttempts, generatedExamId, userId)
+	currentAttempt, err := e.examAttemptRepository.Create(ctx, currAttempts, generatedExamId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +101,7 @@ func (e *ExamAttemptService) CheckAndAddAttempt(ctx context.Context, generatedEx
 	return currentAttempt, nil
 }
 
+// GetAttempts retrieves exam attempts for the user with pagination
 func (e *ExamAttemptService) GetAttempts(ctx context.Context, userId string, page, limit int, from, to *time.Time, examTypeId, categoryId *int) (*models.PaginatedData, error) {
 	examWithAttempts, err := e.generatedExamRepository.GetPaginatedExamsByUserAndDate(ctx, userId, page, limit, from, to, examTypeId, categoryId)
 	if err != nil {

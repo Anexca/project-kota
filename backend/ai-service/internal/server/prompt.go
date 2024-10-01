@@ -1,11 +1,12 @@
 package server
 
 import (
-	"ai-service/pkg/models"
 	"net/http"
 	"time"
 
 	"go.uber.org/ratelimit"
+
+	"ai-service/pkg/models"
 )
 
 // var rl = ratelimit.New(1, ratelimit.Per(time.Minute))
@@ -18,22 +19,34 @@ func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 
 	if err := s.ReadJson(w, r, &request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("invalid json request body"))
+		_, err := w.Write([]byte("invalid json request body"))
+		if err != nil {
+			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+		}
 		return
 	}
 
 	if err := ValidateInput(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
+		_, err := w.Write([]byte(err.Error()))
+		if err != nil {
+			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+		}
 		return
 	}
 
 	promptResults, err := s.promptService.GetPromptResults(r.Context(), &request)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		_, err := w.Write([]byte(err.Error()))
+		if err != nil {
+			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+		}
 		return
 	}
 
-	w.Write([]byte(promptResults))
+	_, err = w.Write([]byte(promptResults))
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }

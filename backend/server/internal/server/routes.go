@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"server/internal/middlewares"
-	"server/pkg/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+
+	"server/internal/middlewares"
+	"server/pkg/config"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -59,9 +60,18 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		r.Route("/exams", func(r chi.Router) {
 			r.Route("/banking", func(r chi.Router) {
-				r.Get("/descriptive/open", s.GetOpenQuestions)
-				r.Get("/descriptive/{id}", s.GetBankingDescriptiveQuestionsByExamId)
-				r.Post("/descriptive/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
+				r.Route("/descriptive", func(r chi.Router) {
+					r.Get("/open", s.GetOpenQuestions)
+					r.Post("/{id}/evaluate", s.EvaluateBankingDescriptiveExam)
+				})
+
+				r.Route("/mcq", func(r chi.Router) {
+					// ToDo: Add assessment and open questions
+				})
+
+				r.Route("/{id}", func(r chi.Router) {
+					r.Get("/", s.GetGeneratedExamsByExamGroupId)
+				})
 			})
 
 			r.Route("/assesments", func(r chi.Router) {
@@ -87,7 +97,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/subscriptions", s.GetAllSubscriptions)
 	r.Get("/categories/exams/{id}", s.GetExamById)
-	r.Get("/exams/banking/descriptive", s.GetBankingDescriptiveCategories)
+	r.Get("/exams/banking", s.GetBankingExamGroups)
 
 	return r
 }
@@ -97,7 +107,10 @@ func (s *Server) Sup(w http.ResponseWriter, r *http.Request) {
 		Message: "Sup",
 	}
 
-	s.WriteJson(w, http.StatusOK, &response)
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -105,6 +118,8 @@ func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	response := Response{
 		Data: string(jsonResp),
 	}
-	s.WriteJson(w, http.StatusOK, &response)
-
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "Something went wrong while writing the response", http.StatusInternalServerError)
+	}
 }

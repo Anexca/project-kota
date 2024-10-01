@@ -1,37 +1,34 @@
 package services
 
 import (
-	commonConstants "common/constants"
-	"common/ent"
-	commonRepositories "common/repositories"
-	commonService "common/services"
-	commonUtil "common/util"
 	"context"
 	"fmt"
 	"log"
 	"time"
 
-	"cloud.google.com/go/vertexai/genai"
-	"github.com/redis/go-redis/v9"
+	commonConstants "common/constants"
+	commonInterfaces "common/interfaces"
+	commonUtil "common/util"
 )
 
 type ExamService struct {
-	genAIService                     *GenAIService
-	redisService                     *commonService.RedisService
-	examRepository                   *commonRepositories.ExamRepository
-	examCategoryRepository           *commonRepositories.ExamCategoryRepository
-	examSettingRepository            *commonRepositories.ExamSettingRepository
-	cachedQuestionMetaDataRepository *commonRepositories.CachedExamRepository
+	genAIService                     GenAIServiceInterface
+	redisService                     commonInterfaces.RedisServiceInterface
+	examRepository                   commonInterfaces.ExamRepositoryInterface
+	examCategoryRepository           commonInterfaces.ExamCategoryRepositoryInterface
+	examSettingRepository            commonInterfaces.ExamSettingRepositoryInterface
+	cachedQuestionMetaDataRepository commonInterfaces.CachedExamRepositoryInterface
 }
 
-func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *ExamService {
-	genAIService := NewGenAIService(genAIClient)
-	redisService := commonService.NewRedisService(redisClient)
-	examRepository := commonRepositories.NewExamRespository(dbClient)
-	examCategoryRepository := commonRepositories.NewExamCategoryRepository(dbClient)
-	examSettingRepository := commonRepositories.NewExamSettingRepository(dbClient)
-	cachedQuestionMetaDataRepository := commonRepositories.NewCachedExamRepository(dbClient)
-
+// NewExamService constructor with dependencies for both production and test usage
+func NewExamService(
+	genAIService GenAIServiceInterface,
+	redisService commonInterfaces.RedisServiceInterface,
+	examRepository commonInterfaces.ExamRepositoryInterface,
+	examCategoryRepository commonInterfaces.ExamCategoryRepositoryInterface,
+	examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
+	cachedQuestionMetaDataRepository commonInterfaces.CachedExamRepositoryInterface,
+) *ExamService {
 	return &ExamService{
 		genAIService:                     genAIService,
 		redisService:                     redisService,
@@ -44,69 +41,96 @@ func NewExamService(genAIClient *genai.Client, redisClient *redis.Client, dbClie
 
 const DEFAULT_CACHE_EXPIRY = 24 * time.Hour
 
+// PopulateExamQuestionCache processes exams, fetches AI-generated content, and caches the results
 func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
+	log.Println("Starting to populate exam question cache...")
+
+	// Fetch exam categories
 	examCategories, err := q.examCategoryRepository.Get(ctx)
 	if err != nil {
+		log.Printf("Error fetching exam categories: %v", err)
 		return err
 	}
 
+	// Check if examCategories is nil or empty
+	if len(examCategories) == 0 {
+		log.Println("No exam categories found.")
+		return nil // or return an error, depending on your requirements
+	}
+
 	for _, examCategory := range examCategories {
+		log.Printf("Processing category: %s", examCategory.Name)
+
+		// Fetch exams for the current category
 		exams, err := q.examRepository.GetByExamCategory(ctx, examCategory)
 		if err != nil {
-			log.Printf("Error getting exams for category %s: %v", examCategory.Name, err)
+			log.Printf("Error fetching exams for category %s: %v", examCategory.Name, err)
 			return err
 		}
 
 		for _, exam := range exams {
+			log.Printf("Processing exam: %s (ID: %d)", exam.Name, exam.ID)
+
+			// Skip inactive exams
 			if !exam.IsActive {
+				log.Printf("Skipping inactive exam: %s (ID: %d)", exam.Name, exam.ID)
 				continue
 			}
 
+			// Fetch exam settings
 			examSetting, err := q.examSettingRepository.GetByExam(ctx, exam.ID)
 			if err != nil {
-				log.Printf("Error getting exam setting for exam %s: %v", exam.Name, err)
+				log.Printf("Error fetching settings for exam %s: %v", exam.Name, err)
 				return err
 			}
 
+			// Skip exams without AI prompt
+			if examSetting.AiPrompt == "" {
+				log.Printf("Skipping exam %s (ID: %d) due to missing AI prompt", exam.Name, exam.ID)
+				continue
+			}
+
+			// Fetch AI-generated content
+			log.Printf("Fetching AI content stream for exam: %s (ID: %d)", exam.Name, exam.ID)
 			response, err := q.genAIService.GetContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
 			if err != nil {
-				log.Printf("Error generating content for exam %s: %v", exam.Name, err)
+				log.Printf("Error generating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
 				return err
 			}
 
-			validationPrompt := fmt.Sprintf(`Ensure that the following string is a valid JSON string.
-											Requirements:
-
-											•	The string must be a valid JSON format.
-											•	When parsed as JSON, no errors should occur.
-											•	The output should be a single-line string without extra spaces, newlines, or formatting.
-											"%s"`, response)
-
+			// Validate AI content
+			log.Printf("Validating AI response for exam %s (ID: %d)", exam.Name, exam.ID)
+			validationPrompt := fmt.Sprintf(`You are given a JSON string that may contain minor issues... "%s"`, response)
 			validationResponse, err := q.genAIService.GetContentStream(ctx, validationPrompt, commonConstants.PRO_15)
 			if err != nil {
-				log.Printf("Error generating validation content for exam %s: %v", exam.Name, err)
+				log.Printf("Error validating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
 				return err
 			}
 
+			// Generate UUID and store in Redis
 			uid := commonUtil.GenerateUUID()
-			err = q.redisService.Store(ctx, uid, validationResponse, DEFAULT_CACHE_EXPIRY)
-			if err != nil {
-				log.Printf("Error storing cached response for exam %s with uid %s: %v", exam.Name, uid, err)
+			log.Printf("Storing AI-generated content for exam %s (ID: %d) with UID %s", exam.Name, exam.ID, uid)
+			if err = q.redisService.Store(ctx, uid, validationResponse, DEFAULT_CACHE_EXPIRY); err != nil {
+				log.Printf("Error storing AI content for exam %s (ID: %d) with UID %s: %v", exam.Name, exam.ID, uid, err)
 				return err
 			}
 
+			// Save metadata
+			log.Printf("Saving cached metadata for exam %s (ID: %d)", exam.Name, exam.ID)
 			cacheMetaData, err := q.cachedQuestionMetaDataRepository.Create(ctx, uid, DEFAULT_CACHE_EXPIRY, exam)
 			if err != nil {
-				log.Printf("Error saving cached meta data for exam %s with uid %s: %v", exam.Name, uid, err)
+				log.Printf("Error saving cached metadata for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
 				return err
 			}
 
-			log.Printf("Cached response for exam %s with uid %s, saved its meta data in db with id %d", exam.Name, uid, cacheMetaData.ID)
+			// Log success
+			log.Printf("Cached metadata saved for exam %s (ID: %d), metadata ID: %d", exam.Name, exam.ID, cacheMetaData.ID)
 
-			log.Printf("Waiting for 1 minute before processing the next exam...")
-			time.Sleep(1 * time.Minute)
+			// Sleep before processing the next exam
+			time.Sleep(5 * time.Second)
 		}
 	}
 
+	log.Println("Completed populating exam question cache.")
 	return nil
 }

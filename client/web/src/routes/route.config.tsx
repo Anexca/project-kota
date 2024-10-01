@@ -22,6 +22,8 @@ import ViewPastSubmission from "../pages/view-past-submission";
 import MyTransactions from "../pages/my-transactions";
 import DescriptiveQuestionCategories from "../pages/descriptive-questions-categories";
 import ErrorBoundary from "./error-boundary";
+import { mcqRoutes } from "./route/mcq-routes";
+import MCQExamCenter from "../pages/mcq-exam-center/mcq-exam-center";
 
 const routes: RouteObject[] = [
   {
@@ -111,6 +113,7 @@ const routes: RouteObject[] = [
                 path: `${paths.MY_SUMBISSIONS}/:questionId/${paths.SUBMISSION}/:assesmentId`,
                 element: <ViewPastSubmission />,
               },
+              ...mcqRoutes,
             ],
           },
           {
@@ -139,6 +142,10 @@ const routes: RouteObject[] = [
           {
             path: `${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/:questionId`,
             element: <DiscriptiveExam isOpenMode />,
+          },
+          {
+            path: `${paths.EXAMS}/banking/${paths.MCQ}/:categoryId/:questionId`,
+            element: <MCQExamCenter />,
           },
         ],
       },

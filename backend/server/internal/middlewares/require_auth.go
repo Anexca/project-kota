@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
+
 	"server/internal/services"
 	"server/pkg/constants"
-	"strings"
 )
 
 func RequireAuthMiddleware(authService *services.AuthService) func(http.Handler) http.Handler {

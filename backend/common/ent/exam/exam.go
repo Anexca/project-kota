@@ -17,6 +17,10 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldStage holds the string denoting the stage field in the database.
+	FieldStage = "stage"
+	// FieldIsSectional holds the string denoting the is_sectional field in the database.
+	FieldIsSectional = "is_sectional"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldType holds the string denoting the type field in the database.
@@ -31,6 +35,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeCategory holds the string denoting the category edge name in mutations.
 	EdgeCategory = "category"
+	// EdgeGroup holds the string denoting the group edge name in mutations.
+	EdgeGroup = "group"
 	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
 	EdgeSubscriptions = "subscriptions"
 	// EdgeSetting holds the string denoting the setting edge name in mutations.
@@ -48,6 +54,13 @@ const (
 	CategoryInverseTable = "exam_categories"
 	// CategoryColumn is the table column denoting the category relation/edge.
 	CategoryColumn = "exam_category_exams"
+	// GroupTable is the table that holds the group relation/edge.
+	GroupTable = "exams"
+	// GroupInverseTable is the table name for the ExamGroup entity.
+	// It exists in this package in order to avoid circular dependency with the "examgroup" package.
+	GroupInverseTable = "exam_groups"
+	// GroupColumn is the table column denoting the group relation/edge.
+	GroupColumn = "exam_group_exams"
 	// SubscriptionsTable is the table that holds the subscriptions relation/edge.
 	SubscriptionsTable = "subscription_exams"
 	// SubscriptionsInverseTable is the table name for the SubscriptionExam entity.
@@ -82,10 +95,11 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
+	FieldStage,
+	FieldIsSectional,
 	FieldDescription,
 	FieldType,
 	FieldIsActive,
-	FieldLogoURL,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -94,6 +108,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"exam_category_exams",
+	"exam_group_exams",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -108,10 +123,17 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for _, f := range [...]string{FieldLogoURL} {
+		if column == f {
+			return true
+		}
+	}
 	return false
 }
 
 var (
+	// DefaultIsSectional holds the default value on creation for the "is_sectional" field.
+	DefaultIsSectional bool
 	// DefaultIsActive holds the default value on creation for the "is_active" field.
 	DefaultIsActive bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -161,6 +183,16 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// ByStage orders the results by the stage field.
+func ByStage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStage, opts...).ToFunc()
+}
+
+// ByIsSectional orders the results by the is_sectional field.
+func ByIsSectional(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsSectional, opts...).ToFunc()
+}
+
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
@@ -195,6 +227,13 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 func ByCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByGroupField orders the results by group field.
+func ByGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGroupStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -251,6 +290,13 @@ func newCategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+	)
+}
+func newGroupStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GroupInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
 	)
 }
 func newSubscriptionsStep() *sqlgraph.Step {
