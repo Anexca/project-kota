@@ -27,7 +27,7 @@ type MCQExamQuestion struct {
 	ContentReferenceId string   `json:"content_reference_id"`
 	Question           string   `json:"question"`
 	QuestionNumber     int      `json:"question_number"`
-	Answer             int      `json:"answer"`
+	Answer             []int    `json:"answer"`
 	Options            []string `json:"options"`
 	Explanation        string   `json:"explanation"`
 }

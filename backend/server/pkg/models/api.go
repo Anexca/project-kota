@@ -8,8 +8,8 @@ type DescriptiveExamAssesmentRequest struct {
 }
 
 type MCQExamAssessmentRequestModel struct {
-	QuestionNumber          int `json:"question_number" validate:"required"`
-	UserSelectedOptionIndex int `json:"user_selected_option_index" validate:"gte=0"`
+	QuestionNumber          int   `json:"question_number" validate:"required"`
+	UserSelectedOptionIndex []int `json:"user_selected_option_index" validate:"required"`
 }
 
 type MCQExamAssessmentRequest struct {
