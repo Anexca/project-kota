@@ -142,6 +142,16 @@ func (s *Server) EvaluateBankingMCQExam(w http.ResponseWriter, r *http.Request) 
 	}
 
 	assessment, err := s.examAssesmentService.AssessMCQExam(r.Context(), generatedExamId, attempt, &request, userId, isOpen)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.HandleError(w, err, "exam not found", http.StatusNotFound)
+			return
+		}
+
+		s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	err = s.WriteJson(w, http.StatusOK, &Response{Data: assessment})
 	if err != nil {
