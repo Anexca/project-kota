@@ -263,6 +263,7 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 		Id:                assessment.ID,
 		CompletedSeconds:  assessment.CompletedSeconds,
 		Status:            assessment.Status.String(),
+		ObtainedMarks:     assessment.ObtainedMarks,
 		RawUserSubmission: assessment.RawUserSubmission,
 		CreatedAt:         assessment.CreatedAt,
 		UpdatedAt:         assessment.UpdatedAt,
