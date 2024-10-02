@@ -31,6 +31,7 @@ type ExamAssesmentServiceInterface interface {
 	GetAssesmentById(ctx context.Context, assessmentId int, userId string) (*models.AssessmentDetails, error)
 	GetExamAssessments(ctx context.Context, generatedExamId int, userId string) ([]models.AssessmentDetails, error)
 	AssessDescriptiveExam(ctx context.Context, generatedExamId int, assessmentId int, content string, userId string, isOpen bool)
+	AssessMCQExam(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *models.MCQExamAssessmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error)
 }
 
 // ExamCategoryServiceInterface defines the operations available for an exam category service.

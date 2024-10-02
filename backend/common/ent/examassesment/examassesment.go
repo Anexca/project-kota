@@ -23,6 +23,8 @@ const (
 	FieldRawUserSubmission = "raw_user_submission"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldAssessmentRating holds the string denoting the assessment_rating field in the database.
+	FieldAssessmentRating = "assessment_rating"
 	// FieldRemarks holds the string denoting the remarks field in the database.
 	FieldRemarks = "remarks"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -49,6 +51,7 @@ var Columns = []string{
 	FieldRawAssesmentData,
 	FieldRawUserSubmission,
 	FieldStatus,
+	FieldAssessmentRating,
 	FieldRemarks,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -76,6 +79,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultAssessmentRating holds the default value on creation for the "assessment_rating" field.
+	DefaultAssessmentRating float64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -124,6 +129,11 @@ func ByCompletedSeconds(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByAssessmentRating orders the results by the assessment_rating field.
+func ByAssessmentRating(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAssessmentRating, opts...).ToFunc()
 }
 
 // ByRemarks orders the results by the remarks field.

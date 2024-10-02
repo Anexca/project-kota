@@ -27,7 +27,7 @@ type MCQExamQuestion struct {
 	ContentReferenceId string   `json:"content_reference_id"`
 	Question           string   `json:"question"`
 	QuestionNumber     int      `json:"question_number"`
-	Answer             string   `json:"answer"`
+	Answer             []int    `json:"answer"`
 	Options            []string `json:"options"`
 	Explanation        string   `json:"explanation"`
 }
@@ -63,12 +63,23 @@ type DescriptiveExamAssessmentResult struct {
 	ProfanityCheck   string   `json:"profanity_check,omitempty" `
 }
 
+type MCQExamAssessmentResult struct {
+	Summary MCQExamAssessmentResultSummary `json:"summary"`
+}
+
+type MCQExamAssessmentResultSummary struct {
+	Attempted int `json:"attempted"`
+	Correct   int `json:"correct"`
+	Incorrect int `json:"incorrect"`
+}
+
 type AssessmentDetails struct {
 	Id                int                    `json:"id"`
 	CompletedSeconds  int                    `json:"completed_seconds"`
+	AssessmentRating  float64                `json:"assessment_rating,omitempty"`
+	Status            string                 `json:"status"`
 	RawAssesmentData  map[string]interface{} `json:"raw_assesment_data,omitempty"`
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
-	Status            string                 `json:"status"`
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
 }
