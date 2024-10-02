@@ -81,6 +81,20 @@ func (esc *ExamSettingCreate) SetNillableMaxAttempts(i *int) *ExamSettingCreate 
 	return esc
 }
 
+// SetTotalMarks sets the "total_marks" field.
+func (esc *ExamSettingCreate) SetTotalMarks(i int) *ExamSettingCreate {
+	esc.mutation.SetTotalMarks(i)
+	return esc
+}
+
+// SetNillableTotalMarks sets the "total_marks" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableTotalMarks(i *int) *ExamSettingCreate {
+	if i != nil {
+		esc.SetTotalMarks(*i)
+	}
+	return esc
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esc *ExamSettingCreate) SetEvaluationAiPrompt(s string) *ExamSettingCreate {
 	esc.mutation.SetEvaluationAiPrompt(s)
@@ -181,6 +195,10 @@ func (esc *ExamSettingCreate) defaults() {
 		v := examsetting.DefaultMaxAttempts
 		esc.mutation.SetMaxAttempts(v)
 	}
+	if _, ok := esc.mutation.TotalMarks(); !ok {
+		v := examsetting.DefaultTotalMarks
+		esc.mutation.SetTotalMarks(v)
+	}
 	if _, ok := esc.mutation.CreatedAt(); !ok {
 		v := examsetting.DefaultCreatedAt()
 		esc.mutation.SetCreatedAt(v)
@@ -257,6 +275,10 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 	if value, ok := esc.mutation.MaxAttempts(); ok {
 		_spec.SetField(examsetting.FieldMaxAttempts, field.TypeInt, value)
 		_node.MaxAttempts = value
+	}
+	if value, ok := esc.mutation.TotalMarks(); ok {
+		_spec.SetField(examsetting.FieldTotalMarks, field.TypeInt, value)
+		_node.TotalMarks = value
 	}
 	if value, ok := esc.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)

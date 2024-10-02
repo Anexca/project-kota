@@ -76,7 +76,7 @@ type MCQExamAssessmentResultSummary struct {
 type AssessmentDetails struct {
 	Id                int                    `json:"id"`
 	CompletedSeconds  int                    `json:"completed_seconds"`
-	AssessmentRating  float64                `json:"assessment_rating,omitempty"`
+	ObtainedMarks     float64                `json:"obtained_marks,omitempty"`
 	Status            string                 `json:"status"`
 	RawAssesmentData  map[string]interface{} `json:"raw_assesment_data,omitempty"`
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`

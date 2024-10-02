@@ -74,7 +74,7 @@ var (
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "raw_user_submission", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}},
-		{Name: "assessment_rating", Type: field.TypeFloat64, Nullable: true, Default: 0},
+		{Name: "obtained_marks", Type: field.TypeFloat64, Nullable: true, Default: 0},
 		{Name: "remarks", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -172,6 +172,7 @@ var (
 		{Name: "ai_prompt", Type: field.TypeString, Nullable: true},
 		{Name: "other_details", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "json"}},
 		{Name: "max_attempts", Type: field.TypeInt, Default: 2},
+		{Name: "total_marks", Type: field.TypeInt, Nullable: true, Default: 0},
 		{Name: "evaluation_ai_prompt", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -185,7 +186,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exam_settings_exams_setting",
-				Columns:    []*schema.Column{ExamSettingsColumns[10]},
+				Columns:    []*schema.Column{ExamSettingsColumns[11]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

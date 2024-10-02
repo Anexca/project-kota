@@ -45,16 +45,16 @@ func (eac *ExamAssesmentCreate) SetStatus(e examassesment.Status) *ExamAssesment
 	return eac
 }
 
-// SetAssessmentRating sets the "assessment_rating" field.
-func (eac *ExamAssesmentCreate) SetAssessmentRating(f float64) *ExamAssesmentCreate {
-	eac.mutation.SetAssessmentRating(f)
+// SetObtainedMarks sets the "obtained_marks" field.
+func (eac *ExamAssesmentCreate) SetObtainedMarks(f float64) *ExamAssesmentCreate {
+	eac.mutation.SetObtainedMarks(f)
 	return eac
 }
 
-// SetNillableAssessmentRating sets the "assessment_rating" field if the given value is not nil.
-func (eac *ExamAssesmentCreate) SetNillableAssessmentRating(f *float64) *ExamAssesmentCreate {
+// SetNillableObtainedMarks sets the "obtained_marks" field if the given value is not nil.
+func (eac *ExamAssesmentCreate) SetNillableObtainedMarks(f *float64) *ExamAssesmentCreate {
 	if f != nil {
-		eac.SetAssessmentRating(*f)
+		eac.SetObtainedMarks(*f)
 	}
 	return eac
 }
@@ -155,9 +155,9 @@ func (eac *ExamAssesmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (eac *ExamAssesmentCreate) defaults() {
-	if _, ok := eac.mutation.AssessmentRating(); !ok {
-		v := examassesment.DefaultAssessmentRating
-		eac.mutation.SetAssessmentRating(v)
+	if _, ok := eac.mutation.ObtainedMarks(); !ok {
+		v := examassesment.DefaultObtainedMarks
+		eac.mutation.SetObtainedMarks(v)
 	}
 	if _, ok := eac.mutation.CreatedAt(); !ok {
 		v := examassesment.DefaultCreatedAt()
@@ -233,9 +233,9 @@ func (eac *ExamAssesmentCreate) createSpec() (*ExamAssesment, *sqlgraph.CreateSp
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
-	if value, ok := eac.mutation.AssessmentRating(); ok {
-		_spec.SetField(examassesment.FieldAssessmentRating, field.TypeFloat64, value)
-		_node.AssessmentRating = value
+	if value, ok := eac.mutation.ObtainedMarks(); ok {
+		_spec.SetField(examassesment.FieldObtainedMarks, field.TypeFloat64, value)
+		_node.ObtainedMarks = value
 	}
 	if value, ok := eac.mutation.Remarks(); ok {
 		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)
