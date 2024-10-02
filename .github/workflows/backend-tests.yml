@@ -1,18 +1,7 @@
 name: Backend Unit Tests
 
 on:
-  push:
-    branches:
-      - main
-      - dev
-    paths:
-      - "backend/**"
-      - ".github/**"
-
   pull_request:
-    branches:
-      - main
-      - dev
     paths:
       - "backend/**"
       - ".github/**"

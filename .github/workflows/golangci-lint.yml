@@ -5,13 +5,6 @@ on:
     paths:
       - "backend/**"
       - ".github/**"
-  push:
-    branches:
-      - "main"
-      - "dev"
-    paths:
-      - "backend/**"
-      - ".github/**"
 
 env:
   GO_VERSION: stable
