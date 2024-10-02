@@ -2,6 +2,7 @@ package services_test
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"common/constants"
@@ -13,6 +14,7 @@ import (
 	"server/pkg/models"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 // Test suite for ExamAssesmentService
@@ -117,5 +119,130 @@ func TestExamAssesmentService(t *testing.T) {
 
 		// Assert expectations
 		mockExamAssessmentRepository.AssertExpectations(t)
+	})
+}
+
+// Helper function to create a mock MCQ exam data
+func createMockMCQExam() map[string]interface{} {
+	exam := models.GeneratedMCQExam{
+		Questions: []models.MCQExamQuestion{
+			{
+				QuestionNumber: 1,
+				Answer:         []int{1},
+			},
+		},
+	}
+	jsonData, _ := json.Marshal(exam)
+	var mappedData map[string]interface{}
+
+	_ = json.Unmarshal(jsonData, &mappedData)
+	return mappedData
+}
+
+func TestAssessMCQExam(t *testing.T) {
+	ctx := context.Background()
+	t.Run("AssessMCQExam Success", func(t *testing.T) {
+		// Mock services
+		mockAccessService := new(mocks.MockAccessService)
+		mockPromptService := new(mocks.MockPromptService)
+		mockProfanityService := new(commonMocks.MockProfanityService)
+		mockGeneratedExamRepository := new(commonMocks.MockGeneratedExamRepository)
+		mockExamGenerationService := new(mocks.MockExamGenerationService)
+		mockExamAttemptRepository := new(commonMocks.MockExamAttemptRepository)
+		mockExamAssessmentRepository := new(commonMocks.MockExamAssessmentRepository)
+
+		mockAccessService.ExpectedCalls = nil
+		mockAccessService.Calls = nil
+
+		// Initialize the service with the mocked dependencies
+		service := services.NewExamAssesmentService(
+			mockAccessService,
+			mockPromptService,
+			mockProfanityService,
+			mockGeneratedExamRepository,
+			mockExamGenerationService,
+			mockExamAttemptRepository,
+			mockExamAssessmentRepository,
+		)
+
+		request := &models.MCQExamAssessmentRequest{
+			AttemptedQuestions: []models.MCQExamAssessmentRequestModel{
+				{
+					QuestionNumber:          1,
+					UserSelectedOptionIndex: []int{1},
+				},
+			},
+			CompletedSeconds: 100,
+		}
+		attempt := &ent.ExamAttempt{ID: 1}
+		generatedExam := &ent.GeneratedExam{
+			RawExamData: createMockMCQExam(),
+			Edges: ent.GeneratedExamEdges{
+				Exam: &ent.Exam{
+					ID: 1,
+					Edges: ent.ExamEdges{
+						Setting: &ent.ExamSetting{
+							NegativeMarking: 0.25,
+						},
+					},
+				},
+			},
+		}
+
+		mockGeneratedExamRepository.On("GetOpenById", ctx, mock.Anything, mock.Anything).Return(generatedExam, nil)
+		mockAccessService.On("UserHasAccessToExam", ctx, mock.Anything, mock.Anything).Return(true, nil)
+		mockExamAssessmentRepository.On("Create", ctx, mock.Anything, mock.Anything).Return(&ent.ExamAssesment{
+			ID: 1,
+		}, nil)
+
+		result, err := service.AssessMCQExam(ctx, 1, attempt, request, "user1", true)
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+	})
+
+	t.Run("AssessMCQExam Access Denied", func(t *testing.T) {
+		// Mock services
+		mockAccessService := new(mocks.MockAccessService)
+		mockPromptService := new(mocks.MockPromptService)
+		mockProfanityService := new(commonMocks.MockProfanityService)
+		mockGeneratedExamRepository := new(commonMocks.MockGeneratedExamRepository)
+		mockExamGenerationService := new(mocks.MockExamGenerationService)
+		mockExamAttemptRepository := new(commonMocks.MockExamAttemptRepository)
+		mockExamAssessmentRepository := new(commonMocks.MockExamAssessmentRepository)
+
+		mockAccessService.ExpectedCalls = nil
+		mockAccessService.Calls = nil
+
+		// Initialize the service with the mocked dependencies
+		service := services.NewExamAssesmentService(
+			mockAccessService,
+			mockPromptService,
+			mockProfanityService,
+			mockGeneratedExamRepository,
+			mockExamGenerationService,
+			mockExamAttemptRepository,
+			mockExamAssessmentRepository,
+		)
+
+		request := &models.MCQExamAssessmentRequest{
+			CompletedSeconds: 100,
+		}
+		attempt := &ent.ExamAttempt{ID: 1}
+		generatedExam := &ent.GeneratedExam{
+			RawExamData: createMockMCQExam(),
+			Edges: ent.GeneratedExamEdges{
+				Exam: &ent.Exam{
+					ID: 1,
+				},
+			},
+		}
+
+		mockGeneratedExamRepository.On("GetOpenById", ctx, mock.Anything, mock.Anything).Return(generatedExam, nil)
+		mockAccessService.On("UserHasAccessToExam", ctx, mock.Anything, mock.Anything).Return(false, nil)
+
+		result, err := service.AssessMCQExam(ctx, 1, attempt, request, "user1", false)
+		assert.Error(t, err)
+		assert.Equal(t, "forbidden", err.Error())
+		assert.Nil(t, result)
 	})
 }
