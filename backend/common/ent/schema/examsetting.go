@@ -27,6 +27,7 @@ func (ExamSetting) Fields() []ent.Field {
 				dialect.Postgres: "json",
 			}),
 		field.Int("max_attempts").Default(2),
+		field.Int("total_marks").Default(0).Optional(),
 		field.String("evaluation_ai_prompt").Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),

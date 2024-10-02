@@ -25,7 +25,7 @@ type AssessmentModel struct {
 	RawAssessmentData map[string]interface{}
 	RawUserSubmission map[string]interface{}
 	Remarks           string
-	AssessmentRating  float64
+	ObtainedMarks     float64
 }
 
 // NewExamAssessmentRepository creates a new instance of ExamAssessmentRepository.
@@ -47,8 +47,8 @@ func (e *ExamAssessmentRepository) Create(ctx context.Context, attemptId int, mo
 		query.SetRawAssesmentData(model.RawAssessmentData)
 	}
 
-	if model.AssessmentRating != 0 {
-		query.SetAssessmentRating(model.AssessmentRating)
+	if model.ObtainedMarks != 0 {
+		query.SetObtainedMarks(model.ObtainedMarks)
 	}
 
 	return query.Save(ctx)

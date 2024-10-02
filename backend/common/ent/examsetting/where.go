@@ -80,6 +80,11 @@ func MaxAttempts(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldMaxAttempts, v))
 }
 
+// TotalMarks applies equality check predicate on the "total_marks" field. It's identical to TotalMarksEQ.
+func TotalMarks(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldTotalMarks, v))
+}
+
 // EvaluationAiPrompt applies equality check predicate on the "evaluation_ai_prompt" field. It's identical to EvaluationAiPromptEQ.
 func EvaluationAiPrompt(v string) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldEvaluationAiPrompt, v))
@@ -348,6 +353,56 @@ func MaxAttemptsLT(v int) predicate.ExamSetting {
 // MaxAttemptsLTE applies the LTE predicate on the "max_attempts" field.
 func MaxAttemptsLTE(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldLTE(FieldMaxAttempts, v))
+}
+
+// TotalMarksEQ applies the EQ predicate on the "total_marks" field.
+func TotalMarksEQ(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldTotalMarks, v))
+}
+
+// TotalMarksNEQ applies the NEQ predicate on the "total_marks" field.
+func TotalMarksNEQ(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldTotalMarks, v))
+}
+
+// TotalMarksIn applies the In predicate on the "total_marks" field.
+func TotalMarksIn(vs ...int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldTotalMarks, vs...))
+}
+
+// TotalMarksNotIn applies the NotIn predicate on the "total_marks" field.
+func TotalMarksNotIn(vs ...int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldTotalMarks, vs...))
+}
+
+// TotalMarksGT applies the GT predicate on the "total_marks" field.
+func TotalMarksGT(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldTotalMarks, v))
+}
+
+// TotalMarksGTE applies the GTE predicate on the "total_marks" field.
+func TotalMarksGTE(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldTotalMarks, v))
+}
+
+// TotalMarksLT applies the LT predicate on the "total_marks" field.
+func TotalMarksLT(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldTotalMarks, v))
+}
+
+// TotalMarksLTE applies the LTE predicate on the "total_marks" field.
+func TotalMarksLTE(v int) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldTotalMarks, v))
+}
+
+// TotalMarksIsNil applies the IsNil predicate on the "total_marks" field.
+func TotalMarksIsNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIsNull(FieldTotalMarks))
+}
+
+// TotalMarksNotNil applies the NotNil predicate on the "total_marks" field.
+func TotalMarksNotNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotNull(FieldTotalMarks))
 }
 
 // EvaluationAiPromptEQ applies the EQ predicate on the "evaluation_ai_prompt" field.

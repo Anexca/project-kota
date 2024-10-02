@@ -151,6 +151,33 @@ func (esu *ExamSettingUpdate) AddMaxAttempts(i int) *ExamSettingUpdate {
 	return esu
 }
 
+// SetTotalMarks sets the "total_marks" field.
+func (esu *ExamSettingUpdate) SetTotalMarks(i int) *ExamSettingUpdate {
+	esu.mutation.ResetTotalMarks()
+	esu.mutation.SetTotalMarks(i)
+	return esu
+}
+
+// SetNillableTotalMarks sets the "total_marks" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableTotalMarks(i *int) *ExamSettingUpdate {
+	if i != nil {
+		esu.SetTotalMarks(*i)
+	}
+	return esu
+}
+
+// AddTotalMarks adds i to the "total_marks" field.
+func (esu *ExamSettingUpdate) AddTotalMarks(i int) *ExamSettingUpdate {
+	esu.mutation.AddTotalMarks(i)
+	return esu
+}
+
+// ClearTotalMarks clears the value of the "total_marks" field.
+func (esu *ExamSettingUpdate) ClearTotalMarks() *ExamSettingUpdate {
+	esu.mutation.ClearTotalMarks()
+	return esu
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esu *ExamSettingUpdate) SetEvaluationAiPrompt(s string) *ExamSettingUpdate {
 	esu.mutation.SetEvaluationAiPrompt(s)
@@ -290,6 +317,15 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := esu.mutation.AddedMaxAttempts(); ok {
 		_spec.AddField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esu.mutation.TotalMarks(); ok {
+		_spec.SetField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if value, ok := esu.mutation.AddedTotalMarks(); ok {
+		_spec.AddField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if esu.mutation.TotalMarksCleared() {
+		_spec.ClearField(examsetting.FieldTotalMarks, field.TypeInt)
 	}
 	if value, ok := esu.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)
@@ -471,6 +507,33 @@ func (esuo *ExamSettingUpdateOne) AddMaxAttempts(i int) *ExamSettingUpdateOne {
 	return esuo
 }
 
+// SetTotalMarks sets the "total_marks" field.
+func (esuo *ExamSettingUpdateOne) SetTotalMarks(i int) *ExamSettingUpdateOne {
+	esuo.mutation.ResetTotalMarks()
+	esuo.mutation.SetTotalMarks(i)
+	return esuo
+}
+
+// SetNillableTotalMarks sets the "total_marks" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableTotalMarks(i *int) *ExamSettingUpdateOne {
+	if i != nil {
+		esuo.SetTotalMarks(*i)
+	}
+	return esuo
+}
+
+// AddTotalMarks adds i to the "total_marks" field.
+func (esuo *ExamSettingUpdateOne) AddTotalMarks(i int) *ExamSettingUpdateOne {
+	esuo.mutation.AddTotalMarks(i)
+	return esuo
+}
+
+// ClearTotalMarks clears the value of the "total_marks" field.
+func (esuo *ExamSettingUpdateOne) ClearTotalMarks() *ExamSettingUpdateOne {
+	esuo.mutation.ClearTotalMarks()
+	return esuo
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esuo *ExamSettingUpdateOne) SetEvaluationAiPrompt(s string) *ExamSettingUpdateOne {
 	esuo.mutation.SetEvaluationAiPrompt(s)
@@ -640,6 +703,15 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	}
 	if value, ok := esuo.mutation.AddedMaxAttempts(); ok {
 		_spec.AddField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esuo.mutation.TotalMarks(); ok {
+		_spec.SetField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if value, ok := esuo.mutation.AddedTotalMarks(); ok {
+		_spec.AddField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if esuo.mutation.TotalMarksCleared() {
+		_spec.ClearField(examsetting.FieldTotalMarks, field.TypeInt)
 	}
 	if value, ok := esuo.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)

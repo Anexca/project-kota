@@ -206,11 +206,11 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 }
 
 func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, attempt *ent.ExamAttempt, summary models.MCQExamAssessmentResultSummary, exam *ent.GeneratedExam, request models.MCQExamAssessmentRequest) (*models.AssessmentDetails, error) {
-	assessmentRating := calculateAssessmentRating(summary, exam.Edges.Exam.Edges.Setting.NegativeMarking)
+	obtainedMarks := calculateObtainedMarks(summary, exam.Edges.Exam.Edges.Setting.NegativeMarking)
 	assessmentModel := &commonRepositories.AssessmentModel{
 		RawAssessmentData: map[string]interface{}{"summary": summary},
 		RawUserSubmission: map[string]interface{}{"attempted_questions": request.AttemptedQuestions},
-		AssessmentRating:  assessmentRating,
+		ObtainedMarks:     obtainedMarks,
 		Status:            constants.ASSESSMENT_COMPLETED,
 		CompletedSeconds:  request.CompletedSeconds,
 	}
@@ -223,7 +223,7 @@ func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, atte
 	return buildAssessmentDetails(assessment), nil
 }
 
-func calculateAssessmentRating(summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
+func calculateObtainedMarks(summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
 	return float64(summary.Correct) - (negativeMarking * float64(summary.Incorrect))
 }
 
@@ -232,7 +232,7 @@ func buildAssessmentDetails(assessment *ent.ExamAssesment) *models.AssessmentDet
 		Id:                assessment.ID,
 		CompletedSeconds:  assessment.CompletedSeconds,
 		Status:            assessment.Status.String(),
-		AssessmentRating:  assessment.AssessmentRating,
+		ObtainedMarks:     assessment.ObtainedMarks,
 		RawAssesmentData:  assessment.RawAssesmentData,
 		RawUserSubmission: assessment.RawUserSubmission,
 		CreatedAt:         assessment.CreatedAt,
