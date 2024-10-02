@@ -126,31 +126,87 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 }
 
 func (e *ExamAssesmentService) AssessMCQExam(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *models.MCQExamAssessmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error) {
-	// generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
-	// if err != nil {
-	// 	log.Printf("Error getting generated exam: %v", err)
-	// 	return nil, err
-	// }
+	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
+	if err != nil {
+		log.Printf("Error getting generated exam: %v", err)
+		return nil, err
+	}
 
-	// if generatedExam == nil {
-	// 	return nil, errors.New("generated exam not found")
-	// }
+	if generatedExam == nil {
+		return nil, errors.New("generated exam not found")
+	}
 
-	// if !isOpen {
-	// 	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("failed to check access: %w", err)
-	// 	}
+	if !isOpen {
+		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check access: %w", err)
+		}
 
-	// 	if !hasAccess {
-	// 		return nil, errors.New("forbidden")
-	// 	}
-	// }
+		if !hasAccess {
+			return nil, errors.New("forbidden")
+		}
+	}
+
+	jsonData, err := json.Marshal(generatedExam.RawExamData)
+	if err != nil {
+		return nil, err
+	}
+
+	var mcqExam models.GeneratedMCQExam
+	err = json.Unmarshal(jsonData, &mcqExam)
+	if err != nil {
+		return nil, err
+
+	}
+
+	result := map[string]int{
+		"attempted": 0,
+		"correct":   0,
+		"incorrect": 0,
+	}
+
+	for _, aq := range request.AttemptedQuestions {
+		for _, eq := range mcqExam.Questions {
+			if aq.QuestionNumber != eq.QuestionNumber {
+				continue
+			}
+
+			result["attempted"] += 1
+
+			if isCorrect(aq.UserSelectedOptionIndex, eq.Answer) {
+				result["correct"] += 1
+				continue
+			}
+
+			result["incorrect"] -= 1
+		}
+	}
+
+	log.Println(result)
 
 	// userSubmission := map[string]interface{}{
 	// 	"content": request.AttemptedQuestions,
 	// }
 	return nil, nil
+}
+
+func isCorrect(selected, correct []int) bool {
+	if len(selected) != len(correct) {
+		return false
+	}
+
+	correctMap := make(map[int]bool)
+	for _, v := range correct {
+		correctMap[v] = true
+	}
+
+	for _, v := range selected {
+		if !correctMap[v] {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) {
