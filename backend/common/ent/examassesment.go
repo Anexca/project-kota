@@ -27,6 +27,8 @@ type ExamAssesment struct {
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
 	// Status holds the value of the "status" field.
 	Status examassesment.Status `json:"status,omitempty"`
+	// AssessmentRating holds the value of the "assessment_rating" field.
+	AssessmentRating int `json:"assessment_rating,omitempty"`
 	// Remarks holds the value of the "remarks" field.
 	Remarks string `json:"remarks,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -67,7 +69,7 @@ func (*ExamAssesment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case examassesment.FieldRawAssesmentData, examassesment.FieldRawUserSubmission:
 			values[i] = new([]byte)
-		case examassesment.FieldID, examassesment.FieldCompletedSeconds:
+		case examassesment.FieldID, examassesment.FieldCompletedSeconds, examassesment.FieldAssessmentRating:
 			values[i] = new(sql.NullInt64)
 		case examassesment.FieldStatus, examassesment.FieldRemarks:
 			values[i] = new(sql.NullString)
@@ -123,6 +125,12 @@ func (ea *ExamAssesment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				ea.Status = examassesment.Status(value.String)
+			}
+		case examassesment.FieldAssessmentRating:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field assessment_rating", values[i])
+			} else if value.Valid {
+				ea.AssessmentRating = int(value.Int64)
 			}
 		case examassesment.FieldRemarks:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -201,6 +209,9 @@ func (ea *ExamAssesment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", ea.Status))
+	builder.WriteString(", ")
+	builder.WriteString("assessment_rating=")
+	builder.WriteString(fmt.Sprintf("%v", ea.AssessmentRating))
 	builder.WriteString(", ")
 	builder.WriteString("remarks=")
 	builder.WriteString(ea.Remarks)
