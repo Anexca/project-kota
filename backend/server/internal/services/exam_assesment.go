@@ -80,7 +80,7 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 	}
 
 	if generatedExam == nil {
-		return nil, errors.New("generated exam not found") // Handle the case where no exam is found
+		return nil, errors.New("generated exam not found")
 	}
 
 	if !isOpen {
@@ -123,6 +123,34 @@ func (e *ExamAssesmentService) StartNewDescriptiveAssesment(ctx context.Context,
 	}
 
 	return assessmentModel, nil
+}
+
+func (e *ExamAssesmentService) AssessMCQExam(ctx context.Context, generatedExamId int, attempt *ent.ExamAttempt, request *models.MCQExamAssessmentRequest, userId string, isOpen bool) (*models.AssessmentDetails, error) {
+	// generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, generatedExamId, isOpen)
+	// if err != nil {
+	// 	log.Printf("Error getting generated exam: %v", err)
+	// 	return nil, err
+	// }
+
+	// if generatedExam == nil {
+	// 	return nil, errors.New("generated exam not found")
+	// }
+
+	// if !isOpen {
+	// 	hasAccess, err := e.accessService.UserHasAccessToExam(ctx, generatedExam.Edges.Exam.ID, userId)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("failed to check access: %w", err)
+	// 	}
+
+	// 	if !hasAccess {
+	// 		return nil, errors.New("forbidden")
+	// 	}
+	// }
+
+	// userSubmission := map[string]interface{}{
+	// 	"content": request.AttemptedQuestions,
+	// }
+	return nil, nil
 }
 
 func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) {

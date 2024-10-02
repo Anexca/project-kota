@@ -89,16 +89,26 @@ func (s *Server) EvaluateBankingDescriptiveExam(w http.ResponseWriter, r *http.R
 
 func (s *Server) EvaluateBankingMCQExam(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
-	_, err := strconv.Atoi(idParam)
+	generatedExamId, err := strconv.Atoi(idParam)
 	if err != nil {
 		s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
 		return
 	}
 
-	_, err = GetHttpRequestContextValue(r, constants.UserIDKey)
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
 	if err != nil {
 		s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
 		return
+	}
+
+	isOpenStr := r.URL.Query().Get("isopen")
+	isOpen := false
+	if isOpenStr != "" {
+		isOpen, err = strconv.ParseBool(isOpenStr)
+		if err != nil {
+			s.HandleError(w, err, "invalid isopen query param, should be either true or false", http.StatusBadRequest)
+			return
+		}
 	}
 
 	var request models.MCQExamAssessmentRequest
@@ -111,6 +121,27 @@ func (s *Server) EvaluateBankingMCQExam(w http.ResponseWriter, r *http.Request) 
 		s.HandleError(w, err, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	attempt, err := s.examAttemptService.CheckAndAddAttempt(r.Context(), generatedExamId, userId, isOpen)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.HandleError(w, err, "exam not found", http.StatusNotFound)
+			return
+		}
+
+		switch {
+		case strings.Contains(err.Error(), "max attempts for exam exceeded"):
+			s.HandleError(w, err, err.Error(), http.StatusBadRequest)
+		case strings.Contains(err.Error(), "forbidden"):
+			s.HandleError(w, err, err.Error(), http.StatusForbidden)
+		default:
+			s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	_, err = s.examAssesmentService.AssessMCQExam(r.Context(), generatedExamId, attempt, &request, userId, isOpen)
 
 	err = s.WriteJson(w, http.StatusOK, &Response{Data: request})
 	if err != nil {
