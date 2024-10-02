@@ -206,7 +206,7 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 }
 
 func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, attempt *ent.ExamAttempt, summary models.MCQExamAssessmentResultSummary, exam *ent.GeneratedExam, request models.MCQExamAssessmentRequest) (*models.AssessmentDetails, error) {
-	obtainedMarks := calculateObtainedMarks(summary, exam.Edges.Exam.Edges.Setting.NegativeMarking)
+	obtainedMarks := calculateObtainedMarks(exam.Edges.Exam.Edges.Setting, summary, exam.Edges.Exam.Edges.Setting.NegativeMarking)
 	assessmentModel := &commonRepositories.AssessmentModel{
 		RawAssessmentData: map[string]interface{}{"summary": summary},
 		RawUserSubmission: map[string]interface{}{"attempted_questions": request.AttemptedQuestions},
@@ -223,8 +223,9 @@ func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, atte
 	return buildAssessmentDetails(assessment), nil
 }
 
-func calculateObtainedMarks(summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
-	return float64(summary.Correct) - (negativeMarking * float64(summary.Incorrect))
+func calculateObtainedMarks(examSettings *ent.ExamSetting, summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
+	markPerQuestion := float64(examSettings.TotalMarks) / float64(examSettings.NumberOfQuestions)
+	return (float64(summary.Correct) * markPerQuestion) - (negativeMarking * float64(summary.Incorrect))
 }
 
 func buildAssessmentDetails(assessment *ent.ExamAssesment) *models.AssessmentDetails {
@@ -259,15 +260,7 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 		return nil, err
 	}
 
-	assessmentModel := &models.AssessmentDetails{
-		Id:                assessment.ID,
-		CompletedSeconds:  assessment.CompletedSeconds,
-		Status:            assessment.Status.String(),
-		ObtainedMarks:     assessment.ObtainedMarks,
-		RawUserSubmission: assessment.RawUserSubmission,
-		CreatedAt:         assessment.CreatedAt,
-		UpdatedAt:         assessment.UpdatedAt,
-	}
+	assessmentModel := buildAssessmentDetails(assessment)
 
 	if assessment.RawAssesmentData == nil {
 		return assessmentModel, nil
