@@ -76,12 +76,12 @@ type MCQExamAssessmentResultSummary struct {
 type AssessmentDetails struct {
 	Id                int                    `json:"id"`
 	CompletedSeconds  int                    `json:"completed_seconds"`
+	AssessmentRating  float64                `json:"assessment_rating,omitempty"`
+	Status            string                 `json:"status"`
 	RawAssesmentData  map[string]interface{} `json:"raw_assesment_data,omitempty"`
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
-	Status            string                 `json:"status"`
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
-	AssessmentRating  int                    `json:"assessment_rating,omitempty"`
 }
 
 type UserExamAttempt struct {
