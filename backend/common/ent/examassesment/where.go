@@ -61,7 +61,7 @@ func CompletedSeconds(v int) predicate.ExamAssesment {
 }
 
 // AssessmentRating applies equality check predicate on the "assessment_rating" field. It's identical to AssessmentRatingEQ.
-func AssessmentRating(v int) predicate.ExamAssesment {
+func AssessmentRating(v float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldAssessmentRating, v))
 }
 
@@ -151,42 +151,42 @@ func StatusNotIn(vs ...Status) predicate.ExamAssesment {
 }
 
 // AssessmentRatingEQ applies the EQ predicate on the "assessment_rating" field.
-func AssessmentRatingEQ(v int) predicate.ExamAssesment {
+func AssessmentRatingEQ(v float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldAssessmentRating, v))
 }
 
 // AssessmentRatingNEQ applies the NEQ predicate on the "assessment_rating" field.
-func AssessmentRatingNEQ(v int) predicate.ExamAssesment {
+func AssessmentRatingNEQ(v float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldNEQ(FieldAssessmentRating, v))
 }
 
 // AssessmentRatingIn applies the In predicate on the "assessment_rating" field.
-func AssessmentRatingIn(vs ...int) predicate.ExamAssesment {
+func AssessmentRatingIn(vs ...float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldIn(FieldAssessmentRating, vs...))
 }
 
 // AssessmentRatingNotIn applies the NotIn predicate on the "assessment_rating" field.
-func AssessmentRatingNotIn(vs ...int) predicate.ExamAssesment {
+func AssessmentRatingNotIn(vs ...float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldNotIn(FieldAssessmentRating, vs...))
 }
 
 // AssessmentRatingGT applies the GT predicate on the "assessment_rating" field.
-func AssessmentRatingGT(v int) predicate.ExamAssesment {
+func AssessmentRatingGT(v float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldGT(FieldAssessmentRating, v))
 }
 
 // AssessmentRatingGTE applies the GTE predicate on the "assessment_rating" field.
-func AssessmentRatingGTE(v int) predicate.ExamAssesment {
+func AssessmentRatingGTE(v float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldGTE(FieldAssessmentRating, v))
 }
 
 // AssessmentRatingLT applies the LT predicate on the "assessment_rating" field.
-func AssessmentRatingLT(v int) predicate.ExamAssesment {
+func AssessmentRatingLT(v float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldLT(FieldAssessmentRating, v))
 }
 
 // AssessmentRatingLTE applies the LTE predicate on the "assessment_rating" field.
-func AssessmentRatingLTE(v int) predicate.ExamAssesment {
+func AssessmentRatingLTE(v float64) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldLTE(FieldAssessmentRating, v))
 }
 

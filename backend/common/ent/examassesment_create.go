@@ -46,15 +46,15 @@ func (eac *ExamAssesmentCreate) SetStatus(e examassesment.Status) *ExamAssesment
 }
 
 // SetAssessmentRating sets the "assessment_rating" field.
-func (eac *ExamAssesmentCreate) SetAssessmentRating(i int) *ExamAssesmentCreate {
-	eac.mutation.SetAssessmentRating(i)
+func (eac *ExamAssesmentCreate) SetAssessmentRating(f float64) *ExamAssesmentCreate {
+	eac.mutation.SetAssessmentRating(f)
 	return eac
 }
 
 // SetNillableAssessmentRating sets the "assessment_rating" field if the given value is not nil.
-func (eac *ExamAssesmentCreate) SetNillableAssessmentRating(i *int) *ExamAssesmentCreate {
-	if i != nil {
-		eac.SetAssessmentRating(*i)
+func (eac *ExamAssesmentCreate) SetNillableAssessmentRating(f *float64) *ExamAssesmentCreate {
+	if f != nil {
+		eac.SetAssessmentRating(*f)
 	}
 	return eac
 }
@@ -234,7 +234,7 @@ func (eac *ExamAssesmentCreate) createSpec() (*ExamAssesment, *sqlgraph.CreateSp
 		_node.Status = value
 	}
 	if value, ok := eac.mutation.AssessmentRating(); ok {
-		_spec.SetField(examassesment.FieldAssessmentRating, field.TypeInt, value)
+		_spec.SetField(examassesment.FieldAssessmentRating, field.TypeFloat64, value)
 		_node.AssessmentRating = value
 	}
 	if value, ok := eac.mutation.Remarks(); ok {

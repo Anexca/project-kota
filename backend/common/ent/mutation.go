@@ -1926,8 +1926,8 @@ type ExamAssesmentMutation struct {
 	raw_assesment_data   *map[string]interface{}
 	raw_user_submission  *map[string]interface{}
 	status               *examassesment.Status
-	assessment_rating    *int
-	addassessment_rating *int
+	assessment_rating    *float64
+	addassessment_rating *float64
 	remarks              *string
 	created_at           *time.Time
 	updated_at           *time.Time
@@ -2215,13 +2215,13 @@ func (m *ExamAssesmentMutation) ResetStatus() {
 }
 
 // SetAssessmentRating sets the "assessment_rating" field.
-func (m *ExamAssesmentMutation) SetAssessmentRating(i int) {
-	m.assessment_rating = &i
+func (m *ExamAssesmentMutation) SetAssessmentRating(f float64) {
+	m.assessment_rating = &f
 	m.addassessment_rating = nil
 }
 
 // AssessmentRating returns the value of the "assessment_rating" field in the mutation.
-func (m *ExamAssesmentMutation) AssessmentRating() (r int, exists bool) {
+func (m *ExamAssesmentMutation) AssessmentRating() (r float64, exists bool) {
 	v := m.assessment_rating
 	if v == nil {
 		return
@@ -2232,7 +2232,7 @@ func (m *ExamAssesmentMutation) AssessmentRating() (r int, exists bool) {
 // OldAssessmentRating returns the old "assessment_rating" field's value of the ExamAssesment entity.
 // If the ExamAssesment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ExamAssesmentMutation) OldAssessmentRating(ctx context.Context) (v int, err error) {
+func (m *ExamAssesmentMutation) OldAssessmentRating(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAssessmentRating is only allowed on UpdateOne operations")
 	}
@@ -2246,17 +2246,17 @@ func (m *ExamAssesmentMutation) OldAssessmentRating(ctx context.Context) (v int,
 	return oldValue.AssessmentRating, nil
 }
 
-// AddAssessmentRating adds i to the "assessment_rating" field.
-func (m *ExamAssesmentMutation) AddAssessmentRating(i int) {
+// AddAssessmentRating adds f to the "assessment_rating" field.
+func (m *ExamAssesmentMutation) AddAssessmentRating(f float64) {
 	if m.addassessment_rating != nil {
-		*m.addassessment_rating += i
+		*m.addassessment_rating += f
 	} else {
-		m.addassessment_rating = &i
+		m.addassessment_rating = &f
 	}
 }
 
 // AddedAssessmentRating returns the value that was added to the "assessment_rating" field in this mutation.
-func (m *ExamAssesmentMutation) AddedAssessmentRating() (r int, exists bool) {
+func (m *ExamAssesmentMutation) AddedAssessmentRating() (r float64, exists bool) {
 	v := m.addassessment_rating
 	if v == nil {
 		return
@@ -2590,7 +2590,7 @@ func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 		m.SetStatus(v)
 		return nil
 	case examassesment.FieldAssessmentRating:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2660,7 +2660,7 @@ func (m *ExamAssesmentMutation) AddField(name string, value ent.Value) error {
 		m.AddCompletedSeconds(v)
 		return nil
 	case examassesment.FieldAssessmentRating:
-		v, ok := value.(int)
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

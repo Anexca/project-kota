@@ -28,7 +28,7 @@ type ExamAssesment struct {
 	// Status holds the value of the "status" field.
 	Status examassesment.Status `json:"status,omitempty"`
 	// AssessmentRating holds the value of the "assessment_rating" field.
-	AssessmentRating int `json:"assessment_rating,omitempty"`
+	AssessmentRating float64 `json:"assessment_rating,omitempty"`
 	// Remarks holds the value of the "remarks" field.
 	Remarks string `json:"remarks,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -69,7 +69,9 @@ func (*ExamAssesment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case examassesment.FieldRawAssesmentData, examassesment.FieldRawUserSubmission:
 			values[i] = new([]byte)
-		case examassesment.FieldID, examassesment.FieldCompletedSeconds, examassesment.FieldAssessmentRating:
+		case examassesment.FieldAssessmentRating:
+			values[i] = new(sql.NullFloat64)
+		case examassesment.FieldID, examassesment.FieldCompletedSeconds:
 			values[i] = new(sql.NullInt64)
 		case examassesment.FieldStatus, examassesment.FieldRemarks:
 			values[i] = new(sql.NullString)
@@ -127,10 +129,10 @@ func (ea *ExamAssesment) assignValues(columns []string, values []any) error {
 				ea.Status = examassesment.Status(value.String)
 			}
 		case examassesment.FieldAssessmentRating:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field assessment_rating", values[i])
 			} else if value.Valid {
-				ea.AssessmentRating = int(value.Int64)
+				ea.AssessmentRating = value.Float64
 			}
 		case examassesment.FieldRemarks:
 			if value, ok := values[i].(*sql.NullString); !ok {

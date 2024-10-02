@@ -74,7 +74,7 @@ var (
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "raw_user_submission", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}},
-		{Name: "assessment_rating", Type: field.TypeInt, Nullable: true, Default: 0},
+		{Name: "assessment_rating", Type: field.TypeFloat64, Nullable: true, Default: 0},
 		{Name: "remarks", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},

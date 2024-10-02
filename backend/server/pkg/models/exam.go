@@ -63,6 +63,16 @@ type DescriptiveExamAssessmentResult struct {
 	ProfanityCheck   string   `json:"profanity_check,omitempty" `
 }
 
+type MCQExamAssessmentResult struct {
+	Summary MCQExamAssessmentResultSummary `json:"summary"`
+}
+
+type MCQExamAssessmentResultSummary struct {
+	Attempted int `json:"attempted"`
+	Correct   int `json:"correct"`
+	Incorrect int `json:"incorrect"`
+}
+
 type AssessmentDetails struct {
 	Id                int                    `json:"id"`
 	CompletedSeconds  int                    `json:"completed_seconds"`

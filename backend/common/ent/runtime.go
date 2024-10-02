@@ -65,7 +65,7 @@ func init() {
 	// examassesmentDescAssessmentRating is the schema descriptor for assessment_rating field.
 	examassesmentDescAssessmentRating := examassesmentFields[4].Descriptor()
 	// examassesment.DefaultAssessmentRating holds the default value on creation for the assessment_rating field.
-	examassesment.DefaultAssessmentRating = examassesmentDescAssessmentRating.Default.(int)
+	examassesment.DefaultAssessmentRating = examassesmentDescAssessmentRating.Default.(float64)
 	// examassesmentDescCreatedAt is the schema descriptor for created_at field.
 	examassesmentDescCreatedAt := examassesmentFields[6].Descriptor()
 	// examassesment.DefaultCreatedAt holds the default value on creation for the created_at field.

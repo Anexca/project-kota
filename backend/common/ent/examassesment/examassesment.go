@@ -80,7 +80,7 @@ func ValidColumn(column string) bool {
 
 var (
 	// DefaultAssessmentRating holds the default value on creation for the "assessment_rating" field.
-	DefaultAssessmentRating int
+	DefaultAssessmentRating float64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

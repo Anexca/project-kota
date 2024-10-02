@@ -141,9 +141,9 @@ func (s *Server) EvaluateBankingMCQExam(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	_, err = s.examAssesmentService.AssessMCQExam(r.Context(), generatedExamId, attempt, &request, userId, isOpen)
+	assessment, err := s.examAssesmentService.AssessMCQExam(r.Context(), generatedExamId, attempt, &request, userId, isOpen)
 
-	err = s.WriteJson(w, http.StatusOK, &Response{Data: request})
+	err = s.WriteJson(w, http.StatusOK, &Response{Data: assessment})
 	if err != nil {
 		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
 	}

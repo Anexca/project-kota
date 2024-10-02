@@ -159,10 +159,10 @@ func (e *ExamAssesmentService) AssessMCQExam(ctx context.Context, generatedExamI
 
 	}
 
-	result := map[string]int{
-		"attempted": 0,
-		"correct":   0,
-		"incorrect": 0,
+	resultSummary := models.MCQExamAssessmentResultSummary{
+		Attempted: 0,
+		Correct:   0,
+		Incorrect: 0,
 	}
 
 	for _, aq := range request.AttemptedQuestions {
@@ -171,23 +171,57 @@ func (e *ExamAssesmentService) AssessMCQExam(ctx context.Context, generatedExamI
 				continue
 			}
 
-			result["attempted"] += 1
+			resultSummary.Attempted += 1
 
 			if isCorrect(aq.UserSelectedOptionIndex, eq.Answer) {
-				result["correct"] += 1
+				resultSummary.Correct += 1
 				continue
 			}
 
-			result["incorrect"] -= 1
+			resultSummary.Incorrect -= 1
 		}
 	}
 
-	log.Println(result)
+	assessmentResult := models.MCQExamAssessmentResult{
+		Summary: resultSummary,
+	}
 
-	// userSubmission := map[string]interface{}{
-	// 	"content": request.AttemptedQuestions,
-	// }
-	return nil, nil
+	jsonData, err = json.Marshal(assessmentResult)
+	if err != nil {
+		return nil, err
+	}
+
+	var rawJsonData map[string]interface{}
+	err = json.Unmarshal([]byte(jsonData), &rawJsonData)
+	if err != nil {
+		return nil, err
+	}
+
+	assessmentRating := float64(1*resultSummary.Correct) - (generatedExam.Edges.Exam.Edges.Setting.NegativeMarking * float64(resultSummary.Incorrect))
+
+	assessmentToSave := &commonRepositories.AssessmentModel{
+		RawAssessmentData: rawJsonData,
+		RawUserSubmission: map[string]interface{}{
+			"user_attempt": request.AttemptedQuestions,
+		},
+		AssessmentRating: assessmentRating,
+		Status:           constants.ASSESSMENT_COMPLETED,
+		CompletedSeconds: request.CompletedSeconds,
+	}
+
+	assessment, err := e.examAssesmentRepository.Create(ctx, attempt.ID, *assessmentToSave)
+	assessmentModel := &models.AssessmentDetails{
+		Id:                assessment.ID,
+		CompletedSeconds:  assessment.CompletedSeconds,
+		Status:            assessment.Status.String(),
+		CreatedAt:         assessment.CreatedAt,
+		UpdatedAt:         assessment.UpdatedAt,
+		AssessmentRating:  int(assessment.AssessmentRating),
+		RawAssesmentData:  assessment.RawAssesmentData,
+		RawUserSubmission: assessment.RawUserSubmission,
+	}
+
+	return assessmentModel, nil
 }
 
 func isCorrect(selected, correct []int) bool {

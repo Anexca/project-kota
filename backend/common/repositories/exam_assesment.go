@@ -25,7 +25,7 @@ type AssessmentModel struct {
 	RawAssessmentData map[string]interface{}
 	RawUserSubmission map[string]interface{}
 	Remarks           string
-	AssessmentRating  int
+	AssessmentRating  float64
 }
 
 // NewExamAssessmentRepository creates a new instance of ExamAssessmentRepository.

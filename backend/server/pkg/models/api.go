@@ -14,6 +14,7 @@ type MCQExamAssessmentRequestModel struct {
 
 type MCQExamAssessmentRequest struct {
 	AttemptedQuestions []MCQExamAssessmentRequestModel `json:"attempted_questions" validate:"required"`
+	CompletedSeconds   int                             `json:"completed_seconds" validate:"gte=0"`
 }
 
 type UpsertPaymentProviderCustomerModel struct {

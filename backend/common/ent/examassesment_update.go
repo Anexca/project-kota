@@ -83,23 +83,23 @@ func (eau *ExamAssesmentUpdate) SetNillableStatus(e *examassesment.Status) *Exam
 }
 
 // SetAssessmentRating sets the "assessment_rating" field.
-func (eau *ExamAssesmentUpdate) SetAssessmentRating(i int) *ExamAssesmentUpdate {
+func (eau *ExamAssesmentUpdate) SetAssessmentRating(f float64) *ExamAssesmentUpdate {
 	eau.mutation.ResetAssessmentRating()
-	eau.mutation.SetAssessmentRating(i)
+	eau.mutation.SetAssessmentRating(f)
 	return eau
 }
 
 // SetNillableAssessmentRating sets the "assessment_rating" field if the given value is not nil.
-func (eau *ExamAssesmentUpdate) SetNillableAssessmentRating(i *int) *ExamAssesmentUpdate {
-	if i != nil {
-		eau.SetAssessmentRating(*i)
+func (eau *ExamAssesmentUpdate) SetNillableAssessmentRating(f *float64) *ExamAssesmentUpdate {
+	if f != nil {
+		eau.SetAssessmentRating(*f)
 	}
 	return eau
 }
 
-// AddAssessmentRating adds i to the "assessment_rating" field.
-func (eau *ExamAssesmentUpdate) AddAssessmentRating(i int) *ExamAssesmentUpdate {
-	eau.mutation.AddAssessmentRating(i)
+// AddAssessmentRating adds f to the "assessment_rating" field.
+func (eau *ExamAssesmentUpdate) AddAssessmentRating(f float64) *ExamAssesmentUpdate {
+	eau.mutation.AddAssessmentRating(f)
 	return eau
 }
 
@@ -242,13 +242,13 @@ func (eau *ExamAssesmentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := eau.mutation.AssessmentRating(); ok {
-		_spec.SetField(examassesment.FieldAssessmentRating, field.TypeInt, value)
+		_spec.SetField(examassesment.FieldAssessmentRating, field.TypeFloat64, value)
 	}
 	if value, ok := eau.mutation.AddedAssessmentRating(); ok {
-		_spec.AddField(examassesment.FieldAssessmentRating, field.TypeInt, value)
+		_spec.AddField(examassesment.FieldAssessmentRating, field.TypeFloat64, value)
 	}
 	if eau.mutation.AssessmentRatingCleared() {
-		_spec.ClearField(examassesment.FieldAssessmentRating, field.TypeInt)
+		_spec.ClearField(examassesment.FieldAssessmentRating, field.TypeFloat64)
 	}
 	if value, ok := eau.mutation.Remarks(); ok {
 		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)
@@ -362,23 +362,23 @@ func (eauo *ExamAssesmentUpdateOne) SetNillableStatus(e *examassesment.Status) *
 }
 
 // SetAssessmentRating sets the "assessment_rating" field.
-func (eauo *ExamAssesmentUpdateOne) SetAssessmentRating(i int) *ExamAssesmentUpdateOne {
+func (eauo *ExamAssesmentUpdateOne) SetAssessmentRating(f float64) *ExamAssesmentUpdateOne {
 	eauo.mutation.ResetAssessmentRating()
-	eauo.mutation.SetAssessmentRating(i)
+	eauo.mutation.SetAssessmentRating(f)
 	return eauo
 }
 
 // SetNillableAssessmentRating sets the "assessment_rating" field if the given value is not nil.
-func (eauo *ExamAssesmentUpdateOne) SetNillableAssessmentRating(i *int) *ExamAssesmentUpdateOne {
-	if i != nil {
-		eauo.SetAssessmentRating(*i)
+func (eauo *ExamAssesmentUpdateOne) SetNillableAssessmentRating(f *float64) *ExamAssesmentUpdateOne {
+	if f != nil {
+		eauo.SetAssessmentRating(*f)
 	}
 	return eauo
 }
 
-// AddAssessmentRating adds i to the "assessment_rating" field.
-func (eauo *ExamAssesmentUpdateOne) AddAssessmentRating(i int) *ExamAssesmentUpdateOne {
-	eauo.mutation.AddAssessmentRating(i)
+// AddAssessmentRating adds f to the "assessment_rating" field.
+func (eauo *ExamAssesmentUpdateOne) AddAssessmentRating(f float64) *ExamAssesmentUpdateOne {
+	eauo.mutation.AddAssessmentRating(f)
 	return eauo
 }
 
@@ -551,13 +551,13 @@ func (eauo *ExamAssesmentUpdateOne) sqlSave(ctx context.Context) (_node *ExamAss
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 	}
 	if value, ok := eauo.mutation.AssessmentRating(); ok {
-		_spec.SetField(examassesment.FieldAssessmentRating, field.TypeInt, value)
+		_spec.SetField(examassesment.FieldAssessmentRating, field.TypeFloat64, value)
 	}
 	if value, ok := eauo.mutation.AddedAssessmentRating(); ok {
-		_spec.AddField(examassesment.FieldAssessmentRating, field.TypeInt, value)
+		_spec.AddField(examassesment.FieldAssessmentRating, field.TypeFloat64, value)
 	}
 	if eauo.mutation.AssessmentRatingCleared() {
-		_spec.ClearField(examassesment.FieldAssessmentRating, field.TypeInt)
+		_spec.ClearField(examassesment.FieldAssessmentRating, field.TypeFloat64)
 	}
 	if value, ok := eauo.mutation.Remarks(); ok {
 		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)
