@@ -22,7 +22,7 @@ type PromptService struct {
 
 // Factory method for production use, using *genai.Client
 func NewPromptService(genAiClient *genai.Client) *PromptService {
-	genAIService := NewGenAIService(NewGenAIClientWrapper(genAiClient))
+	genAIService := NewGenAIService(genAiClient)
 
 	return &PromptService{
 		genAIService: genAIService,

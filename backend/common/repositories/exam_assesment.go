@@ -84,7 +84,9 @@ func (e *ExamAssessmentRepository) GetById(ctx context.Context, assessmentId int
 			examassesment.HasAttemptWith(examattempt.HasUserWith(user.ID(userUid))),
 			examassesment.ID(assessmentId),
 		).
-		WithAttempt().
+		WithAttempt(func(eaq *ent.ExamAttemptQuery) {
+			eaq.WithGeneratedexam()
+		}).
 		Only(ctx)
 }
 

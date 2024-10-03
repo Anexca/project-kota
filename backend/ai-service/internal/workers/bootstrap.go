@@ -27,7 +27,7 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient 
 
 	// Inject real implementations into the ExamService
 	examService := services.NewExamService(
-		services.NewGenAIService(services.NewGenAIClientWrapper(genAiClient)),
+		services.NewGenAIService(genAiClient),
 		commonService.NewRedisService(redisClient),
 		repositories.NewExamRepository(dbClient),
 		repositories.NewExamCategoryRepository(dbClient),
