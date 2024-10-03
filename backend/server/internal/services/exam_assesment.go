@@ -53,7 +53,7 @@ func NewExamAssesmentService(
 }
 
 func InitExamAssesmentService(redisClient *redis.Client, dbClient *ent.Client) *ExamAssesmentService {
-	accessService := InitAccessService(dbClient) // Assuming this is still using concrete implementations
+	accessService := InitAccessService(dbClient)
 	promptService := NewPromptService()
 	profanityService := commonServices.NewProfanityService()
 	generatedExamRepository := commonRepositories.NewGeneratedExamRepository(dbClient)
@@ -184,7 +184,20 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 	return assessmentsList, nil
 }
 
-func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.Context, generatedExamId int, userId string) (map[string]interface{}, error) {
+func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.Context, assessmentId, questionNumber int, userId string) (map[string]interface{}, error) {
+	_, err := e.examAssesmentRepository.GetById(ctx, assessmentId, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = `Respond to the user's query regarding the question "some question". 
+				If the user's query is out of context with respect to the given question, the response should indicate that the query is invalid.
+
+				User Query: "asa sa sa sa s"
+
+				Considerations:
+				- If the query does not pertain to "some question", the response should be "invalid query".`
+
 	response := map[string]interface{}{
 		"response": "yay",
 	}
