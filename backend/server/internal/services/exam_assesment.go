@@ -144,116 +144,6 @@ func (e *ExamAssesmentService) AssessMCQExam(ctx context.Context, generatedExamI
 	return e.createAndSaveAssessment(ctx, attempt, resultSummary, generatedExam, *request)
 }
 
-func (e *ExamAssesmentService) fetchGeneratedExam(ctx context.Context, examId int, isOpen bool) (*ent.GeneratedExam, error) {
-	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, examId, isOpen)
-	if err != nil {
-		log.Printf("Error getting generated exam: %v", err)
-		return nil, err
-	}
-	if generatedExam == nil {
-		return nil, errors.New("generated exam not found")
-	}
-	return generatedExam, nil
-}
-
-func (e *ExamAssesmentService) checkAccessForExam(ctx context.Context, exam *ent.GeneratedExam, userId string, isOpen bool) error {
-	if !isOpen {
-		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, exam.Edges.Exam.ID, userId)
-		if err != nil {
-			return fmt.Errorf("failed to check access: %w", err)
-		}
-		if !hasAccess {
-			return errors.New("forbidden")
-		}
-	}
-	return nil
-}
-
-func (e *ExamAssesmentService) parseMCQExamData(rawData map[string]interface{}) (*models.GeneratedMCQExam, error) {
-	jsonData, err := json.Marshal(rawData)
-	if err != nil {
-		return nil, err
-	}
-
-	var mcqExam models.GeneratedMCQExam
-	err = json.Unmarshal(jsonData, &mcqExam)
-	if err != nil {
-		return nil, err
-	}
-	return &mcqExam, nil
-}
-
-func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQExam, request *models.MCQExamAssessmentRequest) models.MCQExamAssessmentResultSummary {
-	resultSummary := models.MCQExamAssessmentResultSummary{
-		Attempted: 0,
-		Correct:   0,
-		Incorrect: 0,
-	}
-	for _, aq := range request.AttemptedQuestions {
-		for _, eq := range mcqExam.Questions {
-			if aq.QuestionNumber == eq.QuestionNumber {
-				resultSummary.Attempted++
-				if isCorrect(aq.UserSelectedOptionIndex, eq.Answer) {
-					resultSummary.Correct++
-				} else {
-					resultSummary.Incorrect++
-				}
-				break
-			}
-		}
-	}
-	return resultSummary
-}
-
-func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, attempt *ent.ExamAttempt, summary models.MCQExamAssessmentResultSummary, exam *ent.GeneratedExam, request models.MCQExamAssessmentRequest) (*models.AssessmentDetails, error) {
-	obtainedMarks := calculateObtainedMarks(exam.Edges.Exam.Edges.Setting, summary, exam.Edges.Exam.Edges.Setting.NegativeMarking)
-	assessmentModel := &commonRepositories.AssessmentModel{
-		RawAssessmentData: map[string]interface{}{"summary": summary},
-		RawUserSubmission: map[string]interface{}{"attempted_questions": request.AttemptedQuestions},
-		ObtainedMarks:     obtainedMarks,
-		Status:            constants.ASSESSMENT_COMPLETED,
-		CompletedSeconds:  request.CompletedSeconds,
-	}
-
-	assessment, err := e.examAssesmentRepository.Create(ctx, attempt.ID, *assessmentModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return buildAssessmentDetails(assessment), nil
-}
-
-func calculateObtainedMarks(examSettings *ent.ExamSetting, summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
-	markPerQuestion := float64(examSettings.TotalMarks) / float64(examSettings.NumberOfQuestions)
-	return (float64(summary.Correct) * markPerQuestion) - (negativeMarking * float64(summary.Incorrect))
-}
-
-func buildAssessmentDetails(assessment *ent.ExamAssesment) *models.AssessmentDetails {
-	return &models.AssessmentDetails{
-		Id:                assessment.ID,
-		CompletedSeconds:  assessment.CompletedSeconds,
-		Status:            assessment.Status.String(),
-		ObtainedMarks:     assessment.ObtainedMarks,
-		RawAssesmentData:  assessment.RawAssesmentData,
-		RawUserSubmission: assessment.RawUserSubmission,
-		CreatedAt:         assessment.CreatedAt,
-		UpdatedAt:         assessment.UpdatedAt,
-	}
-}
-
-func isCorrect(selected, correct []int) bool {
-	correctMap := make(map[int]bool)
-	for _, v := range correct {
-		correctMap[v] = true
-	}
-	for _, v := range selected {
-		if !correctMap[v] {
-			return false
-		}
-	}
-	return true
-}
-
 func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId int, userId string) (*models.AssessmentDetails, error) {
 	assessment, err := e.examAssesmentRepository.GetById(ctx, assesmentId, userId)
 	if err != nil {
@@ -292,6 +182,14 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 		assessmentsList = append(assessmentsList, assessmentModel)
 	}
 	return assessmentsList, nil
+}
+
+func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.Context, generatedExamId int, userId string) (map[string]interface{}, error) {
+	response := map[string]interface{}{
+		"response": "yay",
+	}
+
+	return response, nil
 }
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string, userId string, isOpen bool) {
@@ -457,4 +355,114 @@ Content to evaluate:
 
 func (e *ExamAssesmentService) updateAssessment(ctx context.Context, assessmentId int, assesmentModel commonRepositories.AssessmentModel) error {
 	return e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
+}
+
+func (e *ExamAssesmentService) fetchGeneratedExam(ctx context.Context, examId int, isOpen bool) (*ent.GeneratedExam, error) {
+	generatedExam, err := e.generatedExamRepository.GetOpenById(ctx, examId, isOpen)
+	if err != nil {
+		log.Printf("Error getting generated exam: %v", err)
+		return nil, err
+	}
+	if generatedExam == nil {
+		return nil, errors.New("generated exam not found")
+	}
+	return generatedExam, nil
+}
+
+func (e *ExamAssesmentService) checkAccessForExam(ctx context.Context, exam *ent.GeneratedExam, userId string, isOpen bool) error {
+	if !isOpen {
+		hasAccess, err := e.accessService.UserHasAccessToExam(ctx, exam.Edges.Exam.ID, userId)
+		if err != nil {
+			return fmt.Errorf("failed to check access: %w", err)
+		}
+		if !hasAccess {
+			return errors.New("forbidden")
+		}
+	}
+	return nil
+}
+
+func (e *ExamAssesmentService) parseMCQExamData(rawData map[string]interface{}) (*models.GeneratedMCQExam, error) {
+	jsonData, err := json.Marshal(rawData)
+	if err != nil {
+		return nil, err
+	}
+
+	var mcqExam models.GeneratedMCQExam
+	err = json.Unmarshal(jsonData, &mcqExam)
+	if err != nil {
+		return nil, err
+	}
+	return &mcqExam, nil
+}
+
+func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQExam, request *models.MCQExamAssessmentRequest) models.MCQExamAssessmentResultSummary {
+	resultSummary := models.MCQExamAssessmentResultSummary{
+		Attempted: 0,
+		Correct:   0,
+		Incorrect: 0,
+	}
+	for _, aq := range request.AttemptedQuestions {
+		for _, eq := range mcqExam.Questions {
+			if aq.QuestionNumber == eq.QuestionNumber {
+				resultSummary.Attempted++
+				if isCorrect(aq.UserSelectedOptionIndex, eq.Answer) {
+					resultSummary.Correct++
+				} else {
+					resultSummary.Incorrect++
+				}
+				break
+			}
+		}
+	}
+	return resultSummary
+}
+
+func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, attempt *ent.ExamAttempt, summary models.MCQExamAssessmentResultSummary, exam *ent.GeneratedExam, request models.MCQExamAssessmentRequest) (*models.AssessmentDetails, error) {
+	obtainedMarks := calculateObtainedMarks(exam.Edges.Exam.Edges.Setting, summary, exam.Edges.Exam.Edges.Setting.NegativeMarking)
+	assessmentModel := &commonRepositories.AssessmentModel{
+		RawAssessmentData: map[string]interface{}{"summary": summary},
+		RawUserSubmission: map[string]interface{}{"attempted_questions": request.AttemptedQuestions},
+		ObtainedMarks:     obtainedMarks,
+		Status:            constants.ASSESSMENT_COMPLETED,
+		CompletedSeconds:  request.CompletedSeconds,
+	}
+
+	assessment, err := e.examAssesmentRepository.Create(ctx, attempt.ID, *assessmentModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return buildAssessmentDetails(assessment), nil
+}
+
+func calculateObtainedMarks(examSettings *ent.ExamSetting, summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
+	markPerQuestion := float64(examSettings.TotalMarks) / float64(examSettings.NumberOfQuestions)
+	return (float64(summary.Correct) * markPerQuestion) - (negativeMarking * float64(summary.Incorrect))
+}
+
+func buildAssessmentDetails(assessment *ent.ExamAssesment) *models.AssessmentDetails {
+	return &models.AssessmentDetails{
+		Id:                assessment.ID,
+		CompletedSeconds:  assessment.CompletedSeconds,
+		Status:            assessment.Status.String(),
+		ObtainedMarks:     assessment.ObtainedMarks,
+		RawAssesmentData:  assessment.RawAssesmentData,
+		RawUserSubmission: assessment.RawUserSubmission,
+		CreatedAt:         assessment.CreatedAt,
+		UpdatedAt:         assessment.UpdatedAt,
+	}
+}
+
+func isCorrect(selected, correct []int) bool {
+	correctMap := make(map[int]bool)
+	for _, v := range correct {
+		correctMap[v] = true
+	}
+	for _, v := range selected {
+		if !correctMap[v] {
+			return false
+		}
+	}
+	return true
 }

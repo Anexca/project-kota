@@ -158,3 +158,39 @@ func (s *Server) EvaluateBankingMCQExam(w http.ResponseWriter, r *http.Request) 
 		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
 	}
 }
+
+func (s *Server) GetUserMCQExamQuestionQueryResponse(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	generatedExamId, err := strconv.Atoi(idParam)
+	if err != nil {
+		s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
+		return
+	}
+
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		s.HandleError(w, err, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	response, err := s.examAssesmentService.GetUserMCQExamQuestionQueryResponse(r.Context(), generatedExamId, userId)
+	if err != nil {
+		var notFoundError *ent.NotFoundError
+		if errors.As(err, &notFoundError) {
+			s.HandleError(w, err, "exam not found", http.StatusNotFound)
+			return
+		}
+
+		switch {
+		case strings.Contains(err.Error(), "max attempts for exam exceeded"):
+			s.HandleError(w, err, err.Error(), http.StatusBadRequest)
+		case strings.Contains(err.Error(), "forbidden"):
+			s.HandleError(w, err, err.Error(), http.StatusForbidden)
+		default:
+			s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	err = s.WriteJson(w, http.StatusOK, &Response{Data: response})
+}
