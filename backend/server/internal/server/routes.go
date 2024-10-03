@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -106,6 +107,13 @@ func (s *Server) Sup(w http.ResponseWriter, r *http.Request) {
 	response := Response{
 		Message: "Sup",
 	}
+
+	go func() {
+		err := s.promptService.PingServer(context.Background())
+		if err != nil {
+			log.Println("error 'supping' ai service", err)
+		}
+	}()
 
 	err := s.WriteJson(w, http.StatusOK, &response)
 	if err != nil {

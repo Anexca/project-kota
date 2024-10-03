@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -43,13 +42,32 @@ func (p *PromptService) GetPromptResult(ctx context.Context, prompt string, mode
 	return responseBody, nil
 }
 
+func (p *PromptService) PingServer(ctx context.Context) error {
+	env, err := config.LoadEnvironment()
+	if err != nil {
+		return fmt.Errorf("failed to load environment: %v", err)
+	}
+
+	supRequestUrl := fmt.Sprintf("%s/sup", env.AIServiceUrl)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", supRequestUrl, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	_, err = sendRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func prepareRequest(ctx context.Context, url, accessKey, prompt string, model commonConstants.GenAiModel) (*http.Request, error) {
 	postData := map[string]string{
 		"prompt": prompt,
 		"model":  string(model),
 	}
-
-	log.Println(postData)
 
 	jsonData, err := json.Marshal(postData)
 	if err != nil {
