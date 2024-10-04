@@ -211,6 +211,9 @@ func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.C
 		return nil, err
 	}
 	err = json.Unmarshal(jsonString, &userSubmissions)
+	if err != nil {
+		return nil, err
+	}
 
 	var question models.MCQExamQuestion
 	var userSubmissionForQuestion models.MCQExamAssessmentRequestModel
@@ -249,10 +252,16 @@ func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.C
 				`, question.Question, request.Query, userSubmissionForQuestion.UserSelectedOptionIndex, question.Options, question.ContentReferenceId, examContent)
 
 	response, err := e.promptService.GetStructuredPromptResult(ctx, p, constants.FLASH_15)
+	if err != nil {
+		return nil, err
+	}
 
 	var jsonResponse map[string]interface{}
 
 	err = json.Unmarshal([]byte(response), &jsonResponse)
+	if err != nil {
+		return nil, err
+	}
 
 	return jsonResponse, nil
 }
