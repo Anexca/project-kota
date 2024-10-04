@@ -5,7 +5,6 @@ import (
 	"context"
 	"time"
 
-	"cloud.google.com/go/vertexai/genai"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -19,8 +18,8 @@ func (m *MockGenAIService) GetContentStream(ctx context.Context, prompt string, 
 	return args.String(0), args.Error(1)
 }
 
-func (m *MockGenAIService) GetStructuredContentStream(ctx context.Context, prompt string, modelName constants.GenAiModel, genaiSchema *genai.Schema) (string, error) {
-	args := m.Called(ctx, prompt, modelName, genaiSchema)
+func (m *MockGenAIService) GetStructuredContentStream(ctx context.Context, prompt string, modelName constants.GenAiModel) (string, error) {
+	args := m.Called(ctx, prompt, modelName)
 	return args.String(0), args.Error(1)
 }
 

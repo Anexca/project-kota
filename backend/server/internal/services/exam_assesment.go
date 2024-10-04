@@ -196,7 +196,12 @@ func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.C
 				User Query: "asa sa sa sa s"
 
 				Considerations:
-				- If the query does not pertain to "some question", the response should be "invalid query".`
+				- If the query does not pertain to "some question", the response should be "invalid query".
+				
+				Output should be in following JSON Schema:
+				Response = {'response': string}
+				Return Response
+				`
 
 	response := map[string]interface{}{
 		"response": "yay",

@@ -195,6 +195,7 @@ func (q *GeneratedExamRepository) GetPaginatedExamsByUserAndDate(ctx context.Con
 		WithExam(
 			func(query *ent.ExamQuery) {
 				query.WithCategory()
+				query.WithGroup()
 			},
 		).
 		WithAttempts(

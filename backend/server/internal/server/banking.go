@@ -161,7 +161,7 @@ func (s *Server) EvaluateBankingMCQExam(w http.ResponseWriter, r *http.Request) 
 
 func (s *Server) GetUserMCQExamQuestionQueryResponse(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
-	generatedExamId, err := strconv.Atoi(idParam)
+	assessmentId, err := strconv.Atoi(idParam)
 	if err != nil {
 		s.HandleError(w, err, "invalid exam id", http.StatusBadRequest)
 		return
@@ -173,11 +173,20 @@ func (s *Server) GetUserMCQExamQuestionQueryResponse(w http.ResponseWriter, r *h
 		return
 	}
 
-	response, err := s.examAssesmentService.GetUserMCQExamQuestionQueryResponse(r.Context(), generatedExamId, userId)
+	var questionNumber int
+	questionNumberParam := r.URL.Query().Get("questionNumber")
+
+	if questionNumberParam != "" {
+		if p, err := strconv.Atoi(questionNumberParam); err == nil && p > 0 {
+			questionNumber = p
+		}
+	}
+
+	response, err := s.examAssesmentService.GetUserMCQExamQuestionQueryResponse(r.Context(), assessmentId, questionNumber, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {
-			s.HandleError(w, err, "exam not found", http.StatusNotFound)
+			s.HandleError(w, err, "assessment not found", http.StatusNotFound)
 			return
 		}
 
