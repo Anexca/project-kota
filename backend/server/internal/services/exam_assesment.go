@@ -10,6 +10,7 @@ import (
 
 	"common/constants"
 	"common/ent"
+	"common/ent/exam"
 
 	commonInterfaces "common/interfaces"
 	commonRepositories "common/repositories"
@@ -185,24 +186,68 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 }
 
 func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.Context, assessmentId, questionNumber int, userId string) (map[string]interface{}, error) {
-	_, err := e.examAssesmentRepository.GetById(ctx, assessmentId, userId)
+	assessment, err := e.examAssesmentRepository.GetById(ctx, assessmentId, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	_ = `Respond to the user's query regarding the question "some question". 
-				If the user's query is out of context with respect to the given question, the response should indicate that the query is invalid.
+	if assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Type == exam.TypeDESCRIPTIVE {
+		return nil, errors.New("invalid exam type")
+	}
 
-				User Query: "asa sa sa sa s"
+	var examData models.GeneratedMCQExam
+	jsonString, err := json.Marshal(assessment.Edges.Attempt.Edges.Generatedexam.RawExamData)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(jsonString, &examData)
+	if err != nil {
+		return nil, err
+	}
 
-				Considerations:
-				- If the query does not pertain to "some question", the response should be "invalid query".
-				
-				Output should be in following JSON Schema:
-				Response = {'response': string}
-				Return Response
-				`
+	var userSubmissions models.MCQExamAssessmentRequest
+	jsonString, err = json.Marshal(assessment.RawUserSubmission)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(jsonString, &userSubmissions)
 
+	var question models.MCQExamQuestion
+	var userSubmissionForQuestion models.MCQExamAssessmentRequestModel
+
+	for _, q := range examData.Questions {
+		if q.QuestionNumber == questionNumber {
+			question = q
+		}
+	}
+
+	for _, a := range userSubmissions.AttemptedQuestions {
+		if a.QuestionNumber == questionNumber {
+			userSubmissionForQuestion = a
+		}
+	}
+
+	examContent := examData.ContentGroups
+
+	p := fmt.Sprintf(`Respond to the user's query regarding the question '%v'. 
+						- User query: '%s'
+						- User selected option index: %v from the option array: %v
+						- Content ID: %s (to be checked against the content array: %v)
+
+					Considerations:
+					1. If the query is 'is my answer correct?', evaluate the user's selected option against the correct answer.
+						- If the answer is correct, return a positive response.
+						- If the answer is incorrect, return a response indicating the correct answer.
+					2. If the query is related to the content of the question, check the provided content ID and respond accordingly.
+					3. If the query is unrelated to the current question or the data provided, return 'invalid query.'
+					4. Ignore the content if it is empty.
+
+					Output should follow this JSON schema:
+					Response = {'response': string}
+
+					Return the Response.
+				`, question.Question, userSubmissionForQuestion.UserSelectedOptionIndex, question.Options, question.ContentReferenceId, examContent)
+	log.Println(p)
 	response := map[string]interface{}{
 		"response": "yay",
 	}

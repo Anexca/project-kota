@@ -19,6 +19,8 @@ type DescriptiveExam struct {
 }
 
 type GeneratedMCQExam struct {
+	Type          string                `json:"type"`
+	Topic         string                `json:"topic"`
 	Questions     []MCQExamQuestion     `json:"questions"`
 	ContentGroups []MCQExamContentGroup `json:"content_groups"`
 }
