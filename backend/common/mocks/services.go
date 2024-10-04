@@ -18,6 +18,11 @@ func (m *MockGenAIService) GetContentStream(ctx context.Context, prompt string, 
 	return args.String(0), args.Error(1)
 }
 
+func (m *MockGenAIService) GetStructuredContentStream(ctx context.Context, prompt string, modelName constants.GenAiModel) (string, error) {
+	args := m.Called(ctx, prompt, modelName)
+	return args.String(0), args.Error(1)
+}
+
 // Mock for RedisServiceInterface
 type MockRedisService struct {
 	mock.Mock

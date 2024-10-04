@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -67,6 +68,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 				r.Route("/mcq", func(r chi.Router) {
 					r.Post("/{id}/evaluate", s.EvaluateBankingMCQExam)
+					r.Post("/{id}/query", s.GetUserMCQExamQuestionQueryResponse)
 				})
 
 				r.Route("/{id}", func(r chi.Router) {
@@ -106,6 +108,13 @@ func (s *Server) Sup(w http.ResponseWriter, r *http.Request) {
 	response := Response{
 		Message: "Sup",
 	}
+
+	go func() {
+		err := s.promptService.PingServer(context.Background())
+		if err != nil {
+			log.Println("error 'supping' ai service", err)
+		}
+	}()
 
 	err := s.WriteJson(w, http.StatusOK, &response)
 	if err != nil {

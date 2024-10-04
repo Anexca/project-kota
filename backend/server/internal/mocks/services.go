@@ -21,6 +21,11 @@ func (m *MockPromptService) GetPromptResult(ctx context.Context, prompt string, 
 	return args.String(0), args.Error(1)
 }
 
+func (m *MockPromptService) GetStructuredPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error) {
+	args := m.Called(ctx, prompt, model)
+	return args.String(0), args.Error(1)
+}
+
 // Mock for ExamGenerationServiceInterface
 type MockExamGenerationService struct {
 	mock.Mock

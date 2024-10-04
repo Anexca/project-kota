@@ -19,6 +19,8 @@ type DescriptiveExam struct {
 }
 
 type GeneratedMCQExam struct {
+	Type          string                `json:"type"`
+	Topic         string                `json:"topic"`
 	Questions     []MCQExamQuestion     `json:"questions"`
 	ContentGroups []MCQExamContentGroup `json:"content_groups"`
 }
@@ -88,10 +90,14 @@ type UserExamAttempt struct {
 	AttemptedExamId int       `json:"attempted_exam_id"`
 	IsActive        bool      `json:"is_active"`
 	ExamType        string    `json:"exam_type"`
+	ExamGroup       string    `json:"exam_group"`
+	ExamGroupId     int       `json:"exam_group_id"`
 	ExamName        string    `json:"exam_name"`
 	ExamTypeId      int       `json:"exam_type_id"`
 	ExamCategory    string    `json:"exam_category"`
 	ExamCategoryId  int       `json:"exam_category_id"`
+	ExamStage       string    `json:"exam_stage"`
+	IsSectional     bool      `json:"is_sectional"`
 	Topic           string    `json:"topic"`
 	Type            string    `json:"type"`
 	Attempts        []Attempt `json:"attempts"`

@@ -12,6 +12,7 @@ import (
 // PromptServiceInterface defines the contract for PromptService
 type PromptServiceInterface interface {
 	GetPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error)
+	GetStructuredPromptResult(ctx context.Context, prompt string, model constants.GenAiModel) (string, error)
 }
 
 // ExamGenerationServiceInterface defines the contract for ExamGenerationService
