@@ -173,16 +173,19 @@ func (s *Server) GetUserMCQExamQuestionQueryResponse(w http.ResponseWriter, r *h
 		return
 	}
 
-	var questionNumber int
-	questionNumberParam := r.URL.Query().Get("questionNumber")
+	var request models.MCQExamQuestionQueryRequest
 
-	if questionNumberParam != "" {
-		if p, err := strconv.Atoi(questionNumberParam); err == nil && p > 0 {
-			questionNumber = p
-		}
+	if err := s.ReadJson(w, r, &request); err != nil {
+		s.HandleError(w, err, "invalid json request body", http.StatusBadRequest)
+		return
 	}
 
-	response, err := s.examAssesmentService.GetUserMCQExamQuestionQueryResponse(r.Context(), assessmentId, questionNumber, userId)
+	if err := ValidateInput(&request); err != nil {
+		s.HandleError(w, err, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	response, err := s.examAssesmentService.GetUserMCQExamQuestionQueryResponse(r.Context(), assessmentId, request, userId)
 	if err != nil {
 		var notFoundError *ent.NotFoundError
 		if errors.As(err, &notFoundError) {

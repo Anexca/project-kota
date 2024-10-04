@@ -42,6 +42,27 @@ func (p *PromptService) GetPromptResult(ctx context.Context, prompt string, mode
 	return responseBody, nil
 }
 
+func (p *PromptService) GetStructuredPromptResult(ctx context.Context, prompt string, model commonConstants.GenAiModel) (string, error) {
+	env, err := config.LoadEnvironment()
+	if err != nil {
+		return "", fmt.Errorf("failed to load environment: %v", err)
+	}
+
+	promptUrl := fmt.Sprintf("%s/prompt/structured", env.AIServiceUrl)
+
+	req, err := prepareRequest(ctx, promptUrl, env.AIServiceAccessKey, prompt, model)
+	if err != nil {
+		return "", err
+	}
+
+	responseBody, err := sendRequest(req)
+	if err != nil {
+		return "", err
+	}
+
+	return responseBody, nil
+}
+
 func (p *PromptService) PingServer(ctx context.Context) error {
 	env, err := config.LoadEnvironment()
 	if err != nil {

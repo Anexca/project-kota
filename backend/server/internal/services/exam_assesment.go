@@ -185,7 +185,7 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 	return assessmentsList, nil
 }
 
-func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.Context, assessmentId, questionNumber int, userId string) (map[string]interface{}, error) {
+func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.Context, assessmentId int, request models.MCQExamQuestionQueryRequest, userId string) (map[string]interface{}, error) {
 	assessment, err := e.examAssesmentRepository.GetById(ctx, assessmentId, userId)
 	if err != nil {
 		return nil, err
@@ -216,13 +216,13 @@ func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.C
 	var userSubmissionForQuestion models.MCQExamAssessmentRequestModel
 
 	for _, q := range examData.Questions {
-		if q.QuestionNumber == questionNumber {
+		if q.QuestionNumber == request.QuestionNumber {
 			question = q
 		}
 	}
 
 	for _, a := range userSubmissions.AttemptedQuestions {
-		if a.QuestionNumber == questionNumber {
+		if a.QuestionNumber == request.QuestionNumber {
 			userSubmissionForQuestion = a
 		}
 	}
@@ -246,13 +246,15 @@ func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.C
 					Response = {'response': string}
 
 					Return the Response.
-				`, question.Question, userSubmissionForQuestion.UserSelectedOptionIndex, question.Options, question.ContentReferenceId, examContent)
-	log.Println(p)
-	response := map[string]interface{}{
-		"response": "yay",
-	}
+				`, question.Question, request.Query, userSubmissionForQuestion.UserSelectedOptionIndex, question.Options, question.ContentReferenceId, examContent)
 
-	return response, nil
+	response, err := e.promptService.GetStructuredPromptResult(ctx, p, constants.FLASH_15)
+
+	var jsonResponse map[string]interface{}
+
+	err = json.Unmarshal([]byte(response), &jsonResponse)
+
+	return jsonResponse, nil
 }
 
 func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, generatedExamId, assessmentId int, content string, userId string, isOpen bool) {

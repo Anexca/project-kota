@@ -47,3 +47,8 @@ type UserProfileResponse struct {
 	PhoneNumber         string                    `json:"phone_number"`
 	ActiveSubscriptions []UserSubscriptionDetails `json:"active_subscriptions"`
 }
+
+type MCQExamQuestionQueryRequest struct {
+	QuestionNumber int    `json:"question_number" validate:"required"`
+	Query          string `json:"query" validate:"required"`
+}
