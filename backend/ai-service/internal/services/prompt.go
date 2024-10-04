@@ -14,6 +14,7 @@ import (
 // Define an interface for GenAIService to make it mockable
 type GenAIServiceInterface interface {
 	GetContentStream(ctx context.Context, prompt string, model commonConstants.GenAiModel) (string, error)
+	GetStructuredContentStream(ctx context.Context, prompt string, modelName commonConstants.GenAiModel) (string, error)
 }
 
 type PromptService struct {
@@ -37,4 +38,14 @@ func (p *PromptService) GetPromptResults(ctx context.Context, request *models.Ge
 	}
 
 	return p.genAIService.GetContentStream(ctx, request.Prompt, model)
+}
+
+func (p *PromptService) GetStructuredPromptResults(ctx context.Context, request *models.GetPromptResultsRequest) (string, error) {
+	model := commonConstants.FLASH_15
+
+	if strings.Contains(request.Model, "gemini-1.5-pro") {
+		model = commonConstants.PRO_15
+	}
+
+	return p.genAIService.GetStructuredContentStream(ctx, request.Prompt, model)
 }

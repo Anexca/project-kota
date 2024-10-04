@@ -22,7 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAccessKeyMiddleware())
 		r.Post("/prompt", s.GetPromptResults)
-		// r.Post("/prompt/structured",)
+		r.Post("/prompt/structured", s.GetStructuredPromptResults)
 	})
 
 	return r

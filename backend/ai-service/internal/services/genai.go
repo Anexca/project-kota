@@ -73,7 +73,7 @@ func (g *GenAIService) GetContentStream(ctx context.Context, prompt string, mode
 	return completeResponse, nil
 }
 
-func (g *GenAIService) GetStructuredContentStream(ctx context.Context, prompt string, modelName commonConstants.GenAiModel, genaiSchema *genai.Schema) (string, error) {
+func (g *GenAIService) GetStructuredContentStream(ctx context.Context, prompt string, modelName commonConstants.GenAiModel) (string, error) {
 	if prompt == "" {
 		return "", fmt.Errorf("prompt cannot be empty")
 	}
@@ -87,7 +87,6 @@ func (g *GenAIService) GetStructuredContentStream(ctx context.Context, prompt st
 	}
 
 	model.ResponseMIMEType = "application/json"
-	model.ResponseSchema = genaiSchema
 
 	iter := model.GenerateContentStream(ctx, genai.Text(prompt))
 	if iter == nil {
