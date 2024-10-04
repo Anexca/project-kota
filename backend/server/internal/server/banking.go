@@ -205,4 +205,7 @@ func (s *Server) GetUserMCQExamQuestionQueryResponse(w http.ResponseWriter, r *h
 	}
 
 	err = s.WriteJson(w, http.StatusOK, &Response{Data: response})
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }
