@@ -21,7 +21,7 @@ func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte("invalid json request body"))
 		if err != nil {
-			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
 		}
 		return
 	}
@@ -30,7 +30,7 @@ func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(err.Error()))
 		if err != nil {
-			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
 		}
 		return
 	}
@@ -40,14 +40,14 @@ func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte(err.Error()))
 		if err != nil {
-			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
 		}
 		return
 	}
 
 	_, err = w.Write([]byte(promptResults))
 	if err != nil {
-		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
 	}
 }
 
@@ -60,7 +60,7 @@ func (s *Server) GetStructuredPromptResults(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte("invalid json request body"))
 		if err != nil {
-			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
 		}
 		return
 	}
@@ -69,7 +69,7 @@ func (s *Server) GetStructuredPromptResults(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(err.Error()))
 		if err != nil {
-			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
 		}
 		return
 	}
@@ -79,13 +79,13 @@ func (s *Server) GetStructuredPromptResults(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte(err.Error()))
 		if err != nil {
-			s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+			http.Error(w, "something went wrong", http.StatusInternalServerError)
 		}
 		return
 	}
 
 	_, err = w.Write([]byte(promptResults))
 	if err != nil {
-		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
 	}
 }
