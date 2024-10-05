@@ -47,5 +47,9 @@ func (p *PromptService) GetStructuredPromptResults(ctx context.Context, request 
 		model = commonConstants.PRO_15
 	}
 
+	if strings.Contains(request.Model, "gemini-1.0-pro") {
+		model = commonConstants.PRO_10
+	}
+
 	return p.genAIService.GetStructuredContentStream(ctx, request.Prompt, model)
 }
