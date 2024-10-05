@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -9,11 +10,13 @@ import (
 	"ai-service/pkg/models"
 )
 
-// var rl = ratelimit.New(1, ratelimit.Per(time.Minute))
-var rl = ratelimit.New(1, ratelimit.Per(time.Second))
+// Separate rate limiters for each function
+var rlPromptResults = ratelimit.New(1, ratelimit.Per(time.Second))
+var rlStructuredPromptResults = ratelimit.New(1, ratelimit.Per(time.Second))
 
 func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
-	rl.Take()
+	rlPromptResults.Take()
+	log.Println("GetPromptResults request allowed at", time.Now())
 
 	var request models.GetPromptResultsRequest
 
@@ -52,7 +55,8 @@ func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) GetStructuredPromptResults(w http.ResponseWriter, r *http.Request) {
-	rl.Take()
+	rlStructuredPromptResults.Take()
+	log.Println("GetStructuredPromptResults request allowed at", time.Now())
 
 	var request models.GetPromptResultsRequest
 
