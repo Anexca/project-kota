@@ -1,9 +1,6 @@
 package workers
 
 import (
-	"context"
-	"log"
-
 	"common/ent"
 	"common/repositories"
 
@@ -53,16 +50,16 @@ func InitWorkers(genAiClient *genai.Client, redisClient *redis.Client, dbClient 
 // RegisterWorkers registers the cron jobs and their associated tasks
 func (w *Worker) RegisterWorkers() {
 	// Schedule the cron job to run daily at 3 AM
-	_, err := w.cronHandler.AddFunc("0 3 * * *", func() {
-		log.Println("Starting Worker Job for Populating Exam Question Cache")
-		ctx := context.Background()
-		err := w.examService.PopulateExamQuestionCache(ctx)
-		if err != nil {
-			log.Printf("Failed to generate questions: %v", err)
-		}
-	})
+	// _, err := w.cronHandler.AddFunc("0 3 * * *", func() {
+	// 	log.Println("Starting Worker Job for Populating Exam Question Cache")
+	// 	ctx := context.Background()
+	// 	err := w.examService.PopulateExamQuestionCache(ctx)
+	// 	if err != nil {
+	// 		log.Printf("Failed to generate questions: %v", err)
+	// 	}
+	// })
 
-	if err != nil {
-		log.Printf("Error registering worker: %v", err)
-	}
+	// if err != nil {
+	// 	log.Printf("Error registering worker: %v", err)
+	// }
 }
