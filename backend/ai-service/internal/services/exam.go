@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -98,19 +97,10 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 				return err
 			}
 
-			// Validate AI content
-			log.Printf("Validating AI response for exam %s (ID: %d)", exam.Name, exam.ID)
-			validationPrompt := fmt.Sprintf(`You are given a JSON string that may contain minor issues... "%s"`, response)
-			validationResponse, err := q.genAIService.GetContentStream(ctx, validationPrompt, commonConstants.PRO_15)
-			if err != nil {
-				log.Printf("Error validating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
-				return err
-			}
-
 			// Generate UUID and store in Redis
 			uid := commonUtil.GenerateUUID()
 			log.Printf("Storing AI-generated content for exam %s (ID: %d) with UID %s", exam.Name, exam.ID, uid)
-			if err = q.redisService.Store(ctx, uid, validationResponse, DEFAULT_CACHE_EXPIRY); err != nil {
+			if err = q.redisService.Store(ctx, uid, response, DEFAULT_CACHE_EXPIRY); err != nil {
 				log.Printf("Error storing AI content for exam %s (ID: %d) with UID %s: %v", exam.Name, exam.ID, uid, err)
 				return err
 			}

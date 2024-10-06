@@ -47,10 +47,9 @@ func TestPopulateExamQuestionCache_Success(t *testing.T) {
 
 	// Mocking AI service
 	mockGenAIService.On("GetContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
-	mockGenAIService.On("GetContentStream", ctx, mock.Anything, constants.PRO_15).Return("Validation successful", nil)
 
 	// Mocking Redis service
-	mockRedisService.On("Store", ctx, mock.Anything, "Validation successful", services.DEFAULT_CACHE_EXPIRY).Return(nil)
+	mockRedisService.On("Store", ctx, mock.Anything, "AI generated content", services.DEFAULT_CACHE_EXPIRY).Return(nil)
 
 	// Mocking cached exam repository
 	cachedExam := &ent.CachedExam{ID: 1}
@@ -226,11 +225,8 @@ func TestPopulateExamQuestionCache_ErrorStoringInRedis(t *testing.T) {
 	// Mock the first call to GetContentStream for AI content generation
 	mockGenAIService.On("GetContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
 
-	// Mock the second call to GetContentStream for validation
-	mockGenAIService.On("GetContentStream", ctx, mock.Anything, constants.PRO_15).Return("Validation successful", nil)
-
 	// Simulate an error when storing in Redis
-	mockRedisService.On("Store", ctx, mock.Anything, "Validation successful", services.DEFAULT_CACHE_EXPIRY).Return(errors.New("redis store error"))
+	mockRedisService.On("Store", ctx, mock.Anything, "AI generated content", services.DEFAULT_CACHE_EXPIRY).Return(errors.New("redis store error"))
 
 	err := examService.PopulateExamQuestionCache(ctx)
 	assert.Error(t, err)
@@ -266,9 +262,8 @@ func TestPopulateExamQuestionCache_ErrorSavingCachedMetadata(t *testing.T) {
 	mockExamSettingRepository.On("GetByExam", ctx, exam.ID).Return(examSetting, nil)
 
 	mockGenAIService.On("GetContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
-	mockGenAIService.On("GetContentStream", ctx, mock.Anything, constants.PRO_15).Return("Validation successful", nil)
 
-	mockRedisService.On("Store", ctx, mock.Anything, "Validation successful", services.DEFAULT_CACHE_EXPIRY).Return(nil)
+	mockRedisService.On("Store", ctx, mock.Anything, "AI generated content", services.DEFAULT_CACHE_EXPIRY).Return(nil)
 
 	// Create a valid CachedExam instance to return from the mock
 	cachedExam := &ent.CachedExam{ID: 1}
