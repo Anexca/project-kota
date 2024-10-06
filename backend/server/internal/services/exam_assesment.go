@@ -218,7 +218,9 @@ func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.C
 	var question models.MCQExamQuestion
 	var userSubmissionForQuestion models.MCQExamAssessmentRequestModel
 
-	for _, q := range examData.Questions {
+	allQuestions := getAllQuestions(examData)
+
+	for _, q := range allQuestions {
 		if q.QuestionNumber == request.QuestionNumber {
 			question = q
 		}
@@ -238,12 +240,13 @@ func (e *ExamAssesmentService) GetUserMCQExamQuestionQueryResponse(ctx context.C
 						- Content ID: %s (to be checked against the content array: %v)
 
 					Considerations:
-					1. If the query is 'is my answer correct?', evaluate the user's selected option against the correct answer.
+					1.
 						- If the answer is correct, return a positive response.
 						- If the answer is incorrect, return a response indicating the correct answer.
 					2. If the query is related to the content of the question, check the provided content ID and respond accordingly.
 					3. If the query is unrelated to the current question or the data provided, return 'invalid query.'
 					4. Ignore the content if it is empty.
+					5. If user query is out of context of the exam question and content provided, return "invalid query" as response
 
 					Output should follow this JSON schema:
 					Response = {'response': string}
@@ -476,8 +479,10 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 		Correct:   0,
 		Incorrect: 0,
 	}
+	allQuestions := getAllQuestions(*mcqExam)
+
 	for _, aq := range request.AttemptedQuestions {
-		for _, eq := range mcqExam.Questions {
+		for _, eq := range allQuestions {
 			if aq.QuestionNumber == eq.QuestionNumber {
 				resultSummary.Attempted++
 				if isCorrect(aq.UserSelectedOptionIndex, eq.Answer) {
@@ -539,4 +544,14 @@ func isCorrect(selected, correct []int) bool {
 		}
 	}
 	return true
+}
+
+func getAllQuestions(exam models.GeneratedMCQExam) []models.MCQExamQuestion {
+	var allQuestions []models.MCQExamQuestion
+
+	for _, questions := range exam.Sections {
+		allQuestions = append(allQuestions, questions...)
+	}
+
+	return allQuestions
 }
