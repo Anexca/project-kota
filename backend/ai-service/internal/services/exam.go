@@ -117,7 +117,7 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 
 			// Fetch AI-generated content
 			log.Printf("Fetching AI content stream for exam: %s (ID: %d)", exam.Name, exam.ID)
-			response, err := q.genAIService.GetContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
+			response, err := q.genAIService.GetStructuredContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
 			if err != nil {
 				log.Printf("Error generating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
 				return err
