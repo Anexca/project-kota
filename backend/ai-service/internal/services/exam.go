@@ -173,7 +173,7 @@ func (q *ExamService) GenerateExamQuestionAndPopulateCache(ctx context.Context, 
 	}
 
 	log.Printf("Fetching AI content stream for exam: %s (ID: %d)", exam.Name, exam.ID)
-	response, err := q.genAIService.GetContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
+	response, err := q.genAIService.GetStructuredContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
 	if err != nil {
 		log.Printf("Error generating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
 		return nil, err
@@ -197,5 +197,6 @@ func (q *ExamService) GenerateExamQuestionAndPopulateCache(ctx context.Context, 
 	return &models.GenerateQuestionResponse{
 		ExamName:         exam.Name,
 		CachedMetaDataId: cacheMetaData.ID,
+		RedisCacheUid:    uid,
 	}, nil
 }

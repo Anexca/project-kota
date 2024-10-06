@@ -315,7 +315,7 @@ func TestGenerateExamQuestionAndPopulateCache_ActiveExam_Success(t *testing.T) {
 		return id == capturedUID // Match the captured UID
 	}), services.DEFAULT_CACHE_EXPIRY, exam).Return(&ent.CachedExam{ID: 1}, nil)
 
-	err := examService.GenerateExamQuestionAndPopulateCache(ctx, examId)
+	_, err := examService.GenerateExamQuestionAndPopulateCache(ctx, examId)
 	assert.NoError(t, err)
 
 	mockExamRepository.AssertExpectations(t)
@@ -344,7 +344,7 @@ func TestGenerateExamQuestionAndPopulateCache_InactiveExam_Error(t *testing.T) {
 
 	mockExamRepository.On("GetById", ctx, examId).Return(exam, nil)
 
-	err := examService.GenerateExamQuestionAndPopulateCache(ctx, examId)
+	_, err := examService.GenerateExamQuestionAndPopulateCache(ctx, examId)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Skipping inactive exam")
 

@@ -8,4 +8,5 @@ type GetPromptResultsRequest struct {
 type GenerateQuestionResponse struct {
 	ExamName         string `json:"exam_name"`
 	CachedMetaDataId int    `json:"cached_meta_data_id"`
+	RedisCacheUid    string `json:"redis_cache_uid"`
 }
