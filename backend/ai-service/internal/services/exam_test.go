@@ -46,11 +46,10 @@ func TestPopulateExamQuestionCache_Success(t *testing.T) {
 	mockExamSettingRepository.On("GetByExam", ctx, exam.ID).Return(examSetting, nil)
 
 	// Mocking AI service
-	mockGenAIService.On("GetContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
-	mockGenAIService.On("GetContentStream", ctx, mock.Anything, constants.PRO_15).Return("Validation successful", nil)
+	mockGenAIService.On("GetStructuredContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
 
 	// Mocking Redis service
-	mockRedisService.On("Store", ctx, mock.Anything, "Validation successful", services.DEFAULT_CACHE_EXPIRY).Return(nil)
+	mockRedisService.On("Store", ctx, mock.Anything, "AI generated content", services.DEFAULT_CACHE_EXPIRY).Return(nil)
 
 	// Mocking cached exam repository
 	cachedExam := &ent.CachedExam{ID: 1}
@@ -188,7 +187,7 @@ func TestPopulateExamQuestionCache_ErrorGeneratingContent(t *testing.T) {
 	mockExamSettingRepository.On("GetByExam", ctx, exam.ID).Return(examSetting, nil)
 
 	// Simulate an error when generating AI content
-	mockGenAIService.On("GetContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("", errors.New("AI generation error"))
+	mockGenAIService.On("GetStructuredContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("", errors.New("AI generation error"))
 
 	err := examService.PopulateExamQuestionCache(ctx)
 	assert.Error(t, err)
@@ -223,14 +222,11 @@ func TestPopulateExamQuestionCache_ErrorStoringInRedis(t *testing.T) {
 	examSetting := &ent.ExamSetting{AiPrompt: "Generate questions for banking exam."}
 	mockExamSettingRepository.On("GetByExam", ctx, exam.ID).Return(examSetting, nil)
 
-	// Mock the first call to GetContentStream for AI content generation
-	mockGenAIService.On("GetContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
-
-	// Mock the second call to GetContentStream for validation
-	mockGenAIService.On("GetContentStream", ctx, mock.Anything, constants.PRO_15).Return("Validation successful", nil)
+	// Mock the first call to GetStructuredContentStream for AI content generation
+	mockGenAIService.On("GetStructuredContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
 
 	// Simulate an error when storing in Redis
-	mockRedisService.On("Store", ctx, mock.Anything, "Validation successful", services.DEFAULT_CACHE_EXPIRY).Return(errors.New("redis store error"))
+	mockRedisService.On("Store", ctx, mock.Anything, "AI generated content", services.DEFAULT_CACHE_EXPIRY).Return(errors.New("redis store error"))
 
 	err := examService.PopulateExamQuestionCache(ctx)
 	assert.Error(t, err)
@@ -265,10 +261,9 @@ func TestPopulateExamQuestionCache_ErrorSavingCachedMetadata(t *testing.T) {
 	examSetting := &ent.ExamSetting{AiPrompt: "Generate questions for banking exam."}
 	mockExamSettingRepository.On("GetByExam", ctx, exam.ID).Return(examSetting, nil)
 
-	mockGenAIService.On("GetContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
-	mockGenAIService.On("GetContentStream", ctx, mock.Anything, constants.PRO_15).Return("Validation successful", nil)
+	mockGenAIService.On("GetStructuredContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return("AI generated content", nil)
 
-	mockRedisService.On("Store", ctx, mock.Anything, "Validation successful", services.DEFAULT_CACHE_EXPIRY).Return(nil)
+	mockRedisService.On("Store", ctx, mock.Anything, "AI generated content", services.DEFAULT_CACHE_EXPIRY).Return(nil)
 
 	// Create a valid CachedExam instance to return from the mock
 	cachedExam := &ent.CachedExam{ID: 1}
@@ -277,4 +272,82 @@ func TestPopulateExamQuestionCache_ErrorSavingCachedMetadata(t *testing.T) {
 	err := examService.PopulateExamQuestionCache(ctx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "cache metadata error")
+}
+
+func TestGenerateExamQuestionAndPopulateCache_ActiveExam_Success(t *testing.T) {
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+	mockGenAIService := new(mocks.MockGenAIService)
+	mockRedisService := new(mocks.MockRedisService)
+	mockCachedQuestionMetaDataRepository := new(mocks.MockCachedExamRepository)
+
+	examService := services.NewExamService(
+		mockGenAIService,
+		mockRedisService,
+		mockExamRepository,
+		nil, // Assuming exam category repository is not used here
+		mockExamSettingRepository,
+		mockCachedQuestionMetaDataRepository, // Assuming cached exam repository is not used here
+	)
+
+	ctx := context.Background()
+	examId := 1
+	exam := &ent.Exam{ID: examId, Name: "Active Exam", IsActive: true}
+	examSetting := &ent.ExamSetting{AiPrompt: "Generate questions for active exam."}
+	aiResponse := "AI generated question content"
+
+	mockExamRepository.On("GetById", ctx, examId).Return(exam, nil)
+	mockExamSettingRepository.On("GetByExam", ctx, examId).Return(examSetting, nil)
+	mockGenAIService.On("GetStructuredContentStream", ctx, examSetting.AiPrompt, constants.PRO_15).Return(aiResponse, nil)
+	var capturedUID string
+
+	// Setup the first mock to capture the dynamically generated UID
+	mockRedisService.On("Store", mock.Anything, mock.MatchedBy(func(id string) bool {
+		if id != "" { // Ensure the UID is not empty
+			capturedUID = id // Capture the UID for use in the next mock
+			return true
+		}
+		return false
+	}), mock.Anything, mock.Anything).Return(nil)
+
+	// Ensure subsequent use of the captured UID in another mock
+	mockCachedQuestionMetaDataRepository.On("Create", ctx, mock.MatchedBy(func(id string) bool {
+		return id == capturedUID // Match the captured UID
+	}), services.DEFAULT_CACHE_EXPIRY, exam).Return(&ent.CachedExam{ID: 1}, nil)
+
+	_, err := examService.GenerateExamQuestionAndPopulateCache(ctx, examId)
+	assert.NoError(t, err)
+
+	mockExamRepository.AssertExpectations(t)
+	mockExamSettingRepository.AssertExpectations(t)
+	mockGenAIService.AssertExpectations(t)
+	mockRedisService.AssertExpectations(t)
+	mockCachedQuestionMetaDataRepository.AssertExpectations(t)
+}
+
+func TestGenerateExamQuestionAndPopulateCache_InactiveExam_Error(t *testing.T) {
+	mockExamRepository := new(mocks.MockExamRepository)
+	mockExamSettingRepository := new(mocks.MockExamSettingRepository)
+
+	examService := services.NewExamService(
+		nil, // Gen AI service not called for inactive exams
+		nil, // Redis service not called for inactive exams
+		mockExamRepository,
+		nil, // Not used here
+		mockExamSettingRepository,
+		nil, // Not used here
+	)
+
+	ctx := context.Background()
+	examId := 2
+	exam := &ent.Exam{ID: examId, Name: "Inactive Exam", IsActive: false}
+
+	mockExamRepository.On("GetById", ctx, examId).Return(exam, nil)
+
+	_, err := examService.GenerateExamQuestionAndPopulateCache(ctx, examId)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Skipping inactive exam")
+
+	mockExamRepository.AssertExpectations(t)
+	mockExamSettingRepository.AssertNotCalled(t, "GetByExam", mock.Anything, mock.Anything)
 }

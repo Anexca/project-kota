@@ -25,6 +25,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Post("/prompt/structured", s.GetStructuredPromptResults)
 	})
 
+	r.Route("/admin", func(r chi.Router) {
+		r.Use(middlewares.RequireAdminKeyMiddleware())
+		r.Route("/generate", func(r chi.Router) {
+			r.Post("/exam/{id}", s.GenerateExamQuestionAndPopulateCache)
+		})
+	})
+
 	return r
 }
 

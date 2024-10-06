@@ -1,14 +1,21 @@
 package services
 
 import (
+	"ai-service/pkg/models"
 	"context"
 	"fmt"
 	"log"
 	"time"
 
 	commonConstants "common/constants"
+	"common/ent"
 	commonInterfaces "common/interfaces"
+	"common/repositories"
+	commonService "common/services"
 	commonUtil "common/util"
+
+	"cloud.google.com/go/vertexai/genai"
+	"github.com/redis/go-redis/v9"
 )
 
 type ExamService struct {
@@ -29,6 +36,24 @@ func NewExamService(
 	examSettingRepository commonInterfaces.ExamSettingRepositoryInterface,
 	cachedQuestionMetaDataRepository commonInterfaces.CachedExamRepositoryInterface,
 ) *ExamService {
+	return &ExamService{
+		genAIService:                     genAIService,
+		redisService:                     redisService,
+		examRepository:                   examRepository,
+		examCategoryRepository:           examCategoryRepository,
+		examSettingRepository:            examSettingRepository,
+		cachedQuestionMetaDataRepository: cachedQuestionMetaDataRepository,
+	}
+}
+
+func InitExamService(genAiClient *genai.Client, redisClient *redis.Client, dbClient *ent.Client) *ExamService {
+	genAIService := NewGenAIService(genAiClient)
+	redisService := commonService.NewRedisService(redisClient)
+	examRepository := repositories.NewExamRepository(dbClient)
+	examCategoryRepository := repositories.NewExamCategoryRepository(dbClient)
+	examSettingRepository := repositories.NewExamSettingRepository(dbClient)
+	cachedQuestionMetaDataRepository := repositories.NewCachedExamRepository(dbClient)
+
 	return &ExamService{
 		genAIService:                     genAIService,
 		redisService:                     redisService,
@@ -92,25 +117,16 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 
 			// Fetch AI-generated content
 			log.Printf("Fetching AI content stream for exam: %s (ID: %d)", exam.Name, exam.ID)
-			response, err := q.genAIService.GetContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
+			response, err := q.genAIService.GetStructuredContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
 			if err != nil {
 				log.Printf("Error generating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
-				return err
-			}
-
-			// Validate AI content
-			log.Printf("Validating AI response for exam %s (ID: %d)", exam.Name, exam.ID)
-			validationPrompt := fmt.Sprintf(`You are given a JSON string that may contain minor issues... "%s"`, response)
-			validationResponse, err := q.genAIService.GetContentStream(ctx, validationPrompt, commonConstants.PRO_15)
-			if err != nil {
-				log.Printf("Error validating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
 				return err
 			}
 
 			// Generate UUID and store in Redis
 			uid := commonUtil.GenerateUUID()
 			log.Printf("Storing AI-generated content for exam %s (ID: %d) with UID %s", exam.Name, exam.ID, uid)
-			if err = q.redisService.Store(ctx, uid, validationResponse, DEFAULT_CACHE_EXPIRY); err != nil {
+			if err = q.redisService.Store(ctx, uid, response, DEFAULT_CACHE_EXPIRY); err != nil {
 				log.Printf("Error storing AI content for exam %s (ID: %d) with UID %s: %v", exam.Name, exam.ID, uid, err)
 				return err
 			}
@@ -133,4 +149,54 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 
 	log.Println("Completed populating exam question cache.")
 	return nil
+}
+
+func (q *ExamService) GenerateExamQuestionAndPopulateCache(ctx context.Context, examId int) (*models.GenerateQuestionResponse, error) {
+	exam, err := q.examRepository.GetById(ctx, examId)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Processing exam: %s (ID: %d)", exam.Name, exam.ID)
+
+	if !exam.IsActive {
+		return nil, fmt.Errorf("Skipping inactive exam: %s (ID: %d)", exam.Name, exam.ID)
+	}
+
+	examSetting, err := q.examSettingRepository.GetByExam(ctx, exam.ID)
+	if err != nil {
+		log.Printf("Error fetching settings for exam %s: %v", exam.Name, err)
+		return nil, err
+	}
+
+	if examSetting.AiPrompt == "" {
+		return nil, fmt.Errorf("Skipping exam %s (ID: %d) due to missing AI prompt", exam.Name, exam.ID)
+	}
+
+	log.Printf("Fetching AI content stream for exam: %s (ID: %d)", exam.Name, exam.ID)
+	response, err := q.genAIService.GetStructuredContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
+	if err != nil {
+		log.Printf("Error generating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
+		return nil, err
+	}
+
+	uid := commonUtil.GenerateUUID()
+	log.Printf("Storing AI-generated content for exam %s (ID: %d) with UID %s", exam.Name, exam.ID, uid)
+	if err = q.redisService.Store(ctx, uid, response, DEFAULT_CACHE_EXPIRY); err != nil {
+		log.Printf("Error storing AI content for exam %s (ID: %d) with UID %s: %v", exam.Name, exam.ID, uid, err)
+		return nil, err
+	}
+
+	log.Printf("Saving cached metadata for exam %s (ID: %d)", exam.Name, exam.ID)
+	cacheMetaData, err := q.cachedQuestionMetaDataRepository.Create(ctx, uid, DEFAULT_CACHE_EXPIRY, exam)
+	if err != nil {
+		log.Printf("Error saving cached metadata for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
+		return nil, err
+	}
+
+	log.Printf("Cached metadata saved for exam %s (ID: %d), metadata ID: %d", exam.Name, exam.ID, cacheMetaData.ID)
+	return &models.GenerateQuestionResponse{
+		ExamName:         exam.Name,
+		CachedMetaDataId: cacheMetaData.ID,
+		RedisCacheUid:    uid,
+	}, nil
 }

@@ -35,7 +35,7 @@ func main() {
 
 	defer c.Stop()
 
-	server := server.InitServer(genAiClient, redisClient)
+	server := server.InitServer(genAiClient, redisClient, dbclient)
 
 	err = server.ListenAndServe()
 	if err != nil {
