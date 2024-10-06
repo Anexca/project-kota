@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -122,5 +123,51 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 	}
 
 	log.Println("Completed populating exam question cache.")
+	return nil
+}
+
+func (q *ExamService) GenerateExamQuestionAndPopulateCache(ctx context.Context, examId int) error {
+	exam, err := q.examRepository.GetById(ctx, examId)
+	if err != nil {
+		return err
+	}
+	log.Printf("Processing exam: %s (ID: %d)", exam.Name, exam.ID)
+
+	if !exam.IsActive {
+		return fmt.Errorf("Skipping inactive exam: %s (ID: %d)", exam.Name, exam.ID)
+	}
+
+	examSetting, err := q.examSettingRepository.GetByExam(ctx, exam.ID)
+	if err != nil {
+		log.Printf("Error fetching settings for exam %s: %v", exam.Name, err)
+		return err
+	}
+
+	if examSetting.AiPrompt == "" {
+		return fmt.Errorf("Skipping exam %s (ID: %d) due to missing AI prompt", exam.Name, exam.ID)
+	}
+
+	log.Printf("Fetching AI content stream for exam: %s (ID: %d)", exam.Name, exam.ID)
+	response, err := q.genAIService.GetContentStream(ctx, examSetting.AiPrompt, commonConstants.PRO_15)
+	if err != nil {
+		log.Printf("Error generating AI content for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
+		return err
+	}
+
+	uid := commonUtil.GenerateUUID()
+	log.Printf("Storing AI-generated content for exam %s (ID: %d) with UID %s", exam.Name, exam.ID, uid)
+	if err = q.redisService.Store(ctx, uid, response, DEFAULT_CACHE_EXPIRY); err != nil {
+		log.Printf("Error storing AI content for exam %s (ID: %d) with UID %s: %v", exam.Name, exam.ID, uid, err)
+		return err
+	}
+
+	log.Printf("Saving cached metadata for exam %s (ID: %d)", exam.Name, exam.ID)
+	cacheMetaData, err := q.cachedQuestionMetaDataRepository.Create(ctx, uid, DEFAULT_CACHE_EXPIRY, exam)
+	if err != nil {
+		log.Printf("Error saving cached metadata for exam %s (ID: %d): %v", exam.Name, exam.ID, err)
+		return err
+	}
+
+	log.Printf("Cached metadata saved for exam %s (ID: %d), metadata ID: %d", exam.Name, exam.ID, cacheMetaData.ID)
 	return nil
 }
