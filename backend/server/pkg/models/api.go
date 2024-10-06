@@ -10,6 +10,7 @@ type DescriptiveExamAssesmentRequest struct {
 type MCQExamAssessmentRequestModel struct {
 	QuestionNumber          int   `json:"question_number" validate:"required"`
 	UserSelectedOptionIndex []int `json:"user_selected_option_index" validate:"required"`
+	TimeTakenInSeconds      int   `json:"time_taken_in_seconds,omitempty"`
 }
 
 type MCQExamAssessmentRequest struct {
