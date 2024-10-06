@@ -226,7 +226,7 @@ func TestGeneratedExamRepository_GetByWeekOffset(t *testing.T) {
 	require.NoError(t, err)
 
 	// Set a date for 7 days ago (last week)
-	oneWeekAgo := time.Now().AddDate(0, 0, -6)
+	oneWeekAgo := time.Now().AddDate(0, 0, -7)
 
 	// Create a generated exam with a past created_at date and inactive status
 	repo := repositories.NewGeneratedExamRepository(client)
