@@ -125,13 +125,20 @@ func TestExamAssesmentService(t *testing.T) {
 // Helper function to create a mock MCQ exam data
 func createMockMCQExam() map[string]interface{} {
 	exam := models.GeneratedMCQExam{
-		Questions: []models.MCQExamQuestion{
-			{
-				QuestionNumber: 1,
-				Answer:         []int{1},
+		Sections: map[string][]models.MCQExamQuestion{
+			"ENGLISH": {
+				{
+					ContentReferenceId: "ref1", // Example content reference ID
+					Question:           "QQ",
+					QuestionNumber:     1,
+					Answer:             []int{1}, // Example answer index
+					Options:            []string{"Option A", "Option B", "Option C"},
+					Explanation:        "This is why Option B is correct.",
+				},
 			},
 		},
 	}
+
 	jsonData, _ := json.Marshal(exam)
 	var mappedData map[string]interface{}
 
