@@ -151,14 +151,7 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 		return nil, err
 	}
 
-	assessmentModel := buildAssessmentDetails(assessment)
-
-	if assessment.RawAssesmentData == nil {
-		return assessmentModel, nil
-	}
-
-	assessmentModel.RawAssesmentData = assessment.RawAssesmentData
-
+	assessmentModel := e.mapAssessmentModel(assessment)
 	return assessmentModel, nil
 }
 
@@ -172,14 +165,9 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 	assessmentsList := make([]models.AssessmentDetails, 0, len(assessments))
 
 	for _, assessment := range assessments {
-		assessmentModel := models.AssessmentDetails{
-			Id:               assessment.ID,
-			CompletedSeconds: assessment.CompletedSeconds,
-			Status:           assessment.Status.String(),
-			CreatedAt:        assessment.CreatedAt,
-			UpdatedAt:        assessment.UpdatedAt,
-		}
-
+		assessmentModel := *e.mapAssessmentModel(assessment)
+		assessmentModel.RawAssesmentData = nil
+		assessmentModel.RawUserSubmission = nil
 		assessmentsList = append(assessmentsList, assessmentModel)
 	}
 	return assessmentsList, nil
@@ -430,6 +418,35 @@ Content to evaluate:
 	log.Println("Processed Assessment", assessmentId)
 }
 
+func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment) *models.AssessmentDetails {
+	if assessment == nil {
+		return nil
+	}
+
+	totalMarks := 0
+	if assessment.Edges.Attempt != nil &&
+		assessment.Edges.Attempt.Edges.Generatedexam != nil &&
+		assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam != nil &&
+		assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting != nil {
+
+		totalMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.TotalMarks
+	}
+
+	status := assessment.Status.String()
+
+	return &models.AssessmentDetails{
+		Id:                assessment.ID,
+		CompletedSeconds:  assessment.CompletedSeconds,
+		ObtainedMarks:     assessment.ObtainedMarks,
+		TotalMarks:        totalMarks,
+		Status:            status,
+		RawAssesmentData:  assessment.RawAssesmentData,
+		RawUserSubmission: assessment.RawUserSubmission,
+		CreatedAt:         assessment.CreatedAt,
+		UpdatedAt:         assessment.UpdatedAt,
+	}
+}
+
 func (e *ExamAssesmentService) updateAssessment(ctx context.Context, assessmentId int, assesmentModel commonRepositories.AssessmentModel) error {
 	return e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
 }
@@ -512,25 +529,12 @@ func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, atte
 		return nil, err
 	}
 
-	return buildAssessmentDetails(assessment), nil
+	return e.mapAssessmentModel(assessment), nil
 }
 
 func calculateObtainedMarks(examSettings *ent.ExamSetting, summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
 	markPerQuestion := float64(examSettings.TotalMarks) / float64(examSettings.NumberOfQuestions)
 	return (float64(summary.Correct) * markPerQuestion) - (negativeMarking * float64(summary.Incorrect))
-}
-
-func buildAssessmentDetails(assessment *ent.ExamAssesment) *models.AssessmentDetails {
-	return &models.AssessmentDetails{
-		Id:                assessment.ID,
-		CompletedSeconds:  assessment.CompletedSeconds,
-		Status:            assessment.Status.String(),
-		ObtainedMarks:     assessment.ObtainedMarks,
-		RawAssesmentData:  assessment.RawAssesmentData,
-		RawUserSubmission: assessment.RawUserSubmission,
-		CreatedAt:         assessment.CreatedAt,
-		UpdatedAt:         assessment.UpdatedAt,
-	}
 }
 
 func isCorrect(selected, correct []int) bool {

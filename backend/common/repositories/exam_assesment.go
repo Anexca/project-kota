@@ -86,7 +86,9 @@ func (e *ExamAssessmentRepository) GetById(ctx context.Context, assessmentId int
 		).
 		WithAttempt(func(eaq *ent.ExamAttemptQuery) {
 			eaq.WithGeneratedexam(func(geq *ent.GeneratedExamQuery) {
-				geq.WithExam()
+				geq.WithExam(func(eq *ent.ExamQuery) {
+					eq.WithSetting()
+				})
 			})
 		}).
 		Only(ctx)
@@ -103,5 +105,13 @@ func (e *ExamAssessmentRepository) GetByExam(ctx context.Context, generatedExamI
 		Where(examassesment.HasAttemptWith(
 			examattempt.HasUserWith(user.ID(userUid)),
 			examattempt.HasGeneratedexamWith(generatedexam.ID(generatedExamId)),
-		)).All(ctx)
+		)).
+		WithAttempt(func(eaq *ent.ExamAttemptQuery) {
+			eaq.WithGeneratedexam(func(geq *ent.GeneratedExamQuery) {
+				geq.WithExam(func(eq *ent.ExamQuery) {
+					eq.WithSetting()
+				})
+			})
+		}).
+		All(ctx)
 }
