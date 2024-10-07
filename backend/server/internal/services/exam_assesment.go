@@ -496,6 +496,7 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 		Correct:   0,
 		Incorrect: 0,
 	}
+
 	allQuestions := getAllQuestions(*mcqExam)
 
 	for _, aq := range request.AttemptedQuestions {
@@ -529,7 +530,13 @@ func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, atte
 		return nil, err
 	}
 
-	return e.mapAssessmentModel(assessment), nil
+	assessmentMappedModel := e.mapAssessmentModel(assessment)
+
+	if assessmentMappedModel.TotalMarks == 0 {
+		assessmentMappedModel.TotalMarks = exam.Edges.Exam.Edges.Setting.TotalMarks
+	}
+
+	return assessmentMappedModel, nil
 }
 
 func calculateObtainedMarks(examSettings *ent.ExamSetting, summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
