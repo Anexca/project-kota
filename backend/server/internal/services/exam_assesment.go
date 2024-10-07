@@ -425,12 +425,14 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 	}
 
 	totalMarks := 0
+	var cutoffMarks float64 = 0
 	if assessment.Edges.Attempt != nil &&
 		assessment.Edges.Attempt.Edges.Generatedexam != nil &&
 		assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam != nil &&
 		assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting != nil {
 
 		totalMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.TotalMarks
+		cutoffMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.CutoffMarks
 	}
 
 	status := assessment.Status.String()
@@ -440,6 +442,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 		CompletedSeconds:  assessment.CompletedSeconds,
 		ObtainedMarks:     assessment.ObtainedMarks,
 		TotalMarks:        totalMarks,
+		CutoffMarks:       cutoffMarks,
 		Status:            status,
 		RawAssesmentData:  assessment.RawAssesmentData,
 		RawUserSubmission: assessment.RawUserSubmission,
@@ -542,6 +545,10 @@ func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, atte
 
 	if assessmentMappedModel.TotalMarks == 0 {
 		assessmentMappedModel.TotalMarks = exam.Edges.Exam.Edges.Setting.TotalMarks
+	}
+
+	if assessmentMappedModel.CutoffMarks == 0 {
+		assessmentMappedModel.CutoffMarks = exam.Edges.Exam.Edges.Setting.CutoffMarks
 	}
 
 	return assessmentMappedModel, nil
