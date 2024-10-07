@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 
 	"common/constants"
@@ -495,6 +496,7 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 		Attempted: 0,
 		Correct:   0,
 		Incorrect: 0,
+		Accuracy:  0,
 	}
 
 	allQuestions := getAllQuestions(*mcqExam)
@@ -512,6 +514,12 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 			}
 		}
 	}
+
+	if resultSummary.Attempted > 0 {
+		accuracy := float64(resultSummary.Attempted-resultSummary.Incorrect) / float64(resultSummary.Attempted) * 100
+		resultSummary.Accuracy = math.Round(accuracy*100) / 100 // Round to two decimal places
+	}
+
 	return resultSummary
 }
 
