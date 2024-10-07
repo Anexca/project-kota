@@ -21,7 +21,7 @@ const exams = [
   {
     title: "Banking Descriptive Exams",
     desc: "AI-Assisted Descriptive Assessment with Insights. Get understanding about your weak and strong points.",
-    link: `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`,
+    link: `/${paths.EXAMS}/${ExamDomain.banking}`,
     type: "Descriptive",
     isActive: true,
     isPremium: true,
@@ -29,7 +29,7 @@ const exams = [
   {
     title: "Banking MCQ Exams",
     desc: "Practice Banking MCQs to boost your knowledge and exam readiness with detailed solutions and explanations.",
-    link: `/${paths.EXAMS}/${ExamDomain.banking}/${paths.MCQ}`,
+    link: `/${paths.EXAMS}/${ExamDomain.banking}`,
     type: "MCQ",
     isActive: true,
   },

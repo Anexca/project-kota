@@ -182,12 +182,12 @@ const MCQQuestions = ({ isOpenMode }: { isOpenMode?: boolean }) => {
             const attempts = item.max_attempts - item.user_attempts;
             return (
               <DescriptiveQuestionCard
-                key={item.id}
+                key={item.exam_id}
                 topic={item.exam_name}
                 type={item.exam_type}
-                srNumber={item.id}
+                srNumber={item.exam_id}
                 isAttemped={!!item.user_attempts}
-                handleAttemptClick={() => attemptQuestion(item.id)}
+                handleAttemptClick={() => attemptQuestion(item.exam_id)}
                 duration={item.duration_seconds / 60}
                 attempts={attempts}
                 showSubmission={() => setSelectedQuestions(item)}

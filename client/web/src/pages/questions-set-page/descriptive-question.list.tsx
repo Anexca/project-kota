@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { getQuestions } from "../../services/exam.service";
-
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Checkbox } from "../../componnets/base/checkbox";
 import DescriptiveQuestionCard from "../../componnets/shared/descriptive-question-card";
 import { IQuestion } from "../../interface/question";
@@ -22,11 +20,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "../../componnets/base/sheet";
+import { StyledLink } from "../../componnets/base/styled-link";
 import NoPremiumBanner from "../../componnets/shared/no-premium-banner";
 import PreviousSubmissions from "../../componnets/shared/previous-submissions-list";
-import { useToast } from "../../hooks/use-toast";
 import useUserProfileStore from "../../store/user-info-store";
-import { StyledLink } from "../../componnets/base/styled-link";
 
 export function ViewSubmissionDrawer({
   open,
@@ -71,44 +68,24 @@ const selectOptions = [
     value: "formal_letter",
   },
 ];
+type Props = { isOpenMode?: boolean; questions: IQuestion[] };
 
-const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
+const DescriptiveQuestionsList = ({ isOpenMode, questions }: Props) => {
   const [filterType, setFilterType] = useState("all");
   const { profile } = useUserProfileStore();
 
-  const [questions, setQuestions] = useState<IQuestion[]>([]);
   const [selectedQuestion, setSelectedQuestions] = useState<IQuestion | null>(
     null
   );
   const params = useParams();
   const [showUnattempted, setShowUnattempted] = useState(false);
-  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const getQuestionsList = async () => {
-    setLoading(true);
-    try {
-      const data = await getQuestions({
-        categoryId: params.categoryId! || "open",
-      });
-      setQuestions(data.data);
-    } catch (error) {
-      toast({
-        title: "Oh ho Something went wrong.",
-        variant: "destructive",
-        description: "Sorry there is some problem in processing your request.",
-      });
-    }
-    setLoading(false);
-  };
-  useEffect(() => {
-    getQuestionsList();
-  }, []);
 
   const attempQuestion = (index: number) => {
     const path = isOpenMode
-      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/${index}`
-      : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${params.categoryId}/${index}`;
+      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`
+      : `/${paths.EXAMS}/banking/${params.categoryId}/${paths.DISCRIPTIVE}/${index}`;
     navigate(path);
   };
 
@@ -127,20 +104,10 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     }
     return questions;
   }, [questions, filterType, showUnattempted]);
-  const backPath = isOpenMode
-    ? `/${paths.HOMEPAGE}`
-    : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`;
+
   return (
-    <div className="pt-2 w-full md:max-w-2xl 2xl:max-w-2xl mx-auto flex flex-col gap-2 p-4">
+    <>
       <div className="py-2">
-        <div className="flex gap-2 items-center">
-          <Link to={backPath} className="p-0">
-            <Icon icon="arrow_back" className="text-info text-lg" />
-          </Link>
-          <span className="text-lg font-semibold">
-            Banking Descriptive Question
-          </span>
-        </div>
         <div className="text-sm text-black font-medium mb-2">
           Get started with the questions below.
         </div>
@@ -174,55 +141,53 @@ const DescriptiveQuestion = ({ isOpenMode }: { isOpenMode?: boolean }) => {
           </span>
         </div>
       </div>
-      {loading ? (
-        <div className="flex flex-col gap-2 justify-center items-center">
-          <span className="rounded-full w-8 h-8 animate-spin border-2 border-info border-t-info/30"></span>
-          Getting Exciting Questions
-        </div>
-      ) : (
-        <div className="animate-fadeIn flex flex-col gap-2">
-          {questionList.map((item) => {
-            const attempts = item.max_attempts - item.user_attempts;
-            return (
-              <DescriptiveQuestionCard
-                key={item.exam_id}
-                topic={item.raw_exam_data.topic}
-                type={item.raw_exam_data.type}
-                srNumber={item.exam_id}
-                isAttemped={!!item.user_attempts}
-                handleAttemptClick={() => attempQuestion(item.exam_id)}
-                duration={item.duration_seconds / 60}
-                attempts={attempts}
-                showSubmission={() => setSelectedQuestions(item)}
-              />
-            );
-          })}
-          {isOpenMode && !profile?.active_subscriptions?.length ? (
-            <NoPremiumBanner />
-          ) : (
-            <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
-              <div className=" w-2 bg-info rounded-full"></div>
-              <div className="flex flex-col flex-1">
-                <div className="text-sm font-semibold">
-                  Explore more descriptive question.
-                </div>
-                <div>
-                  <StyledLink
-                    to={`/${paths.EXAMS}/banking`}
-                    size={"sm"}
-                    className="px-3 py-1 h-7 mt-2"
-                    variant={"info"}
-                  >
-                    <Icon icon="send" className="mr-2" /> See More
-                  </StyledLink>
+
+      <div className="animate-fadeIn flex flex-col gap-2">
+        {questionList.map((item) => {
+          const attempts = item.max_attempts - item.user_attempts;
+          return (
+            <DescriptiveQuestionCard
+              key={item.exam_id}
+              topic={item.raw_exam_data.topic}
+              type={item.raw_exam_data.type}
+              srNumber={item.exam_id}
+              isAttemped={!!item.user_attempts}
+              handleAttemptClick={() => attempQuestion(item.exam_id)}
+              duration={item.duration_seconds / 60}
+              attempts={attempts}
+              showSubmission={() => setSelectedQuestions(item)}
+            />
+          );
+        })}
+        {isOpenMode && (
+          <>
+            {!profile?.active_subscriptions?.length ? (
+              <NoPremiumBanner />
+            ) : (
+              <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
+                <div className=" w-2 bg-info rounded-full"></div>
+                <div className="flex flex-col flex-1">
+                  <div className="text-sm font-semibold">
+                    Explore more descriptive question.
+                  </div>
+                  <div>
+                    <StyledLink
+                      to={`/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`}
+                      size={"sm"}
+                      className="px-3 py-1 h-7 mt-2"
+                      variant={"info"}
+                    >
+                      <Icon icon="send" className="mr-2" /> See More
+                    </StyledLink>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 };
 
-export default DescriptiveQuestion;
+export default DescriptiveQuestionsList;

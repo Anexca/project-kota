@@ -7,7 +7,7 @@ interface RawExamData {
 }
 
 export interface IQuestion {
-  id: number;
+  exam_id: number;
   raw_exam_data: RawExamData;
   user_attempts: number;
   max_attempts: number;
@@ -15,6 +15,7 @@ export interface IQuestion {
   number_of_questions: number;
   created_at: string;
   updated_at: string;
+  exam_type: (typeof typeOfExam)[0];
 }
 
 export const typeOfExam = ["DESCRIPTIVE", "MCQ"] as const;
@@ -31,8 +32,7 @@ export interface ICategory {
 }
 
 export interface IMCQExam {
-  id: number;
-  exam_type: string;
+  exam_id: number;
   exam_name: string;
   user_attempts: number;
   max_attempts: number;
@@ -41,6 +41,8 @@ export interface IMCQExam {
   negative_marking: number;
   created_at: string;
   updated_at: string;
+  exam_type: (typeof typeOfExam)[1];
+  exam_stage: string;
 }
 
 export interface IMCQQuestionSet {
@@ -48,7 +50,10 @@ export interface IMCQQuestionSet {
   exam_type: string;
   exam_name: string;
   raw_exam_data: {
-    exam_content: IMCQQuestion[];
+    content_groups: IContentGroup[];
+    sections: Record<string, IMCQQuestion[]>;
+    topic: string;
+    type: string;
   };
   user_attempts: number;
   max_attempts: number;
@@ -60,10 +65,14 @@ export interface IMCQQuestionSet {
 }
 export interface IMCQQuestion {
   answer: string;
-  content: string;
+  content_reference_id: string;
   explanation: string;
-  note: string;
   options: string[];
   question: string;
   question_number: number;
+}
+export interface IContentGroup {
+  content: string;
+  content_id: string;
+  instructions: string;
 }
