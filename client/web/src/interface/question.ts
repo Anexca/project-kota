@@ -50,8 +50,10 @@ export interface IMCQQuestionSet {
   exam_type: string;
   exam_name: string;
   raw_exam_data: {
-    questions: IMCQQuestion[];
     content_groups: IContentGroup[];
+    sections: Record<string, IMCQQuestion[]>;
+    topic: string;
+    type: string;
   };
   user_attempts: number;
   max_attempts: number;

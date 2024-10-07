@@ -1,8 +1,9 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
+import MarkdownRender from "../markdown-rendere";
 
 interface ReadMoreProps {
-  text: string;
+  text: ReactNode;
 }
 
 export const ReadMore = ({ text }: ReadMoreProps) => {
@@ -12,10 +13,10 @@ export const ReadMore = ({ text }: ReadMoreProps) => {
     <span className={""}>
       <p
         className={clsx(
-          !isExpanded && "overflow-hidden whitespace-nowrap text-ellipsis"
+          !isExpanded && "h-5 overflow-hidden whitespace-nowrap text-ellipsis"
         )}
       >
-        {text}
+        <MarkdownRender>{text}</MarkdownRender>
       </p>
 
       <>

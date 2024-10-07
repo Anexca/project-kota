@@ -1,7 +1,7 @@
-import { MathJax } from "better-react-mathjax";
 import { cn } from "../../../lib/utils";
 import { Label } from "../../base/label/label";
 import { RadioGroup, RadioGroupItem } from "../../base/radio-group/radio-group";
+import MarkdownRender from "../markdown-rendere";
 
 type Props = {
   options: string[];
@@ -17,6 +17,7 @@ const AnswerOptions = ({ options, selected, onChange, name }: Props) => {
       onValueChange={(a) => {
         onChange(a);
       }}
+      value={selected as any}
     >
       {options.map((item, index) => (
         <div
@@ -25,9 +26,9 @@ const AnswerOptions = ({ options, selected, onChange, name }: Props) => {
             selected == index && "bg-info/15 color-info"
           )}
         >
-          <RadioGroupItem value={item} id={item} />
-          <Label htmlFor={item}>
-            <MathJax>{item}</MathJax>
+          <RadioGroupItem value={`${index}`} id={`${index}`} />
+          <Label htmlFor={`${index}`}>
+            <MarkdownRender>{item}</MarkdownRender>
           </Label>
         </div>
       ))}

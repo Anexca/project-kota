@@ -21,6 +21,7 @@ import {
   SheetTitle,
 } from "../../componnets/base/sheet";
 import { StyledLink } from "../../componnets/base/styled-link";
+import MCQPreviousSubmissions from "../../componnets/shared/mcq-previous-submissions-list";
 import NoPremiumBanner from "../../componnets/shared/no-premium-banner";
 import useUserProfileStore from "../../store/user-info-store";
 
@@ -45,9 +46,9 @@ export function ViewSubmissionDrawer({
         <SheetHeader>
           <SheetTitle>Submissions</SheetTitle>
         </SheetHeader>
-        {/* {question && (
-          <PreviousSubmissions question={question} isOpenExam={isOpenExam} />
-        )} */}
+        {question && (
+          <MCQPreviousSubmissions question={question} isOpenExam={isOpenExam} />
+        )}
         {question && isOpenExam && <>yo</>}
       </SheetContent>
     </Sheet>
