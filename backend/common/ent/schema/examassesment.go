@@ -1,13 +1,14 @@
 package schema
 
 import (
-	"common/constants"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"common/constants"
 )
 
 // ExamAssesment holds the schema definition for the ExamAssesment entity.
@@ -33,6 +34,7 @@ func (ExamAssesment) Fields() []ent.Field {
 			string(constants.ASSESSMENT_REJECTED),
 			string(constants.ASSESSMENT_PENDING),
 		),
+		field.Float("obtained_marks").Optional().Default(0),
 		field.String("remarks").Optional(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),

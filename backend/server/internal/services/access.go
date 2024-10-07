@@ -1,25 +1,31 @@
 package services
 
 import (
-	"common/ent"
-	"common/repositories"
 	"context"
 	"time"
+
+	"common/ent"
+	commonInterfaces "common/interfaces"
+	"common/repositories"
 )
 
 type AccessService struct {
-	subscriptionRepository     *repositories.SubscriptionRepository
-	userSubscriptionRepository *repositories.UserSubscriptioRepository
+	subscriptionRepository     commonInterfaces.SubscriptionRepositoryInterface
+	userSubscriptionRepository commonInterfaces.UserSubscriptionRepositoryInterface
 }
 
-func NewAccessService(dbClient *ent.Client) *AccessService {
-	subscriptionRepository := repositories.NewSubscriptionRepository(dbClient)
-	userSubscriptionRepository := repositories.NewUserSubscriptioRepository(dbClient)
-
+func NewAccessService(subscriptionRepo commonInterfaces.SubscriptionRepositoryInterface, userSubscriptionRepo commonInterfaces.UserSubscriptionRepositoryInterface) *AccessService {
 	return &AccessService{
-		subscriptionRepository:     subscriptionRepository,
-		userSubscriptionRepository: userSubscriptionRepository,
+		subscriptionRepository:     subscriptionRepo,
+		userSubscriptionRepository: userSubscriptionRepo,
 	}
+}
+
+func InitAccessService(dbClient *ent.Client) *AccessService {
+	subscriptionRepository := repositories.NewSubscriptionRepository(dbClient)
+	userSubscriptionRepository := repositories.NewUserSubscriptionRepository(dbClient)
+
+	return NewAccessService(subscriptionRepository, userSubscriptionRepository)
 }
 
 func (a *AccessService) UserHasAccessToExam(ctx context.Context, examId int, userId string) (bool, error) {
@@ -28,20 +34,28 @@ func (a *AccessService) UserHasAccessToExam(ctx context.Context, examId int, use
 		return false, err
 	}
 
+	if len(userSubscriptions) == 0 {
+		return false, nil // No subscriptions found
+	}
+
 	now := time.Now()
 
 	for _, userSubscription := range userSubscriptions {
 		if userSubscription.StartDate.Before(now) && userSubscription.EndDate.After(now) {
-
 			subscription, err := a.subscriptionRepository.GetById(ctx, userSubscription.Edges.Subscription.ID)
 			if err != nil {
 				return false, err
 			}
 
+			// Create a map of exam IDs for quick lookup
+			examMap := make(map[int]struct{})
 			for _, exam := range subscription.Edges.Exams {
-				if exam.Edges.Exam.ID == examId {
-					return true, nil
-				}
+				examMap[exam.Edges.Exam.ID] = struct{}{}
+			}
+
+			// Check if the requested examId exists in the subscription exams
+			if _, exists := examMap[examId]; exists {
+				return true, nil
 			}
 		}
 	}

@@ -17,6 +17,10 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldStage holds the string denoting the stage field in the database.
+	FieldStage = "stage"
+	// FieldIsSectional holds the string denoting the is_sectional field in the database.
+	FieldIsSectional = "is_sectional"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldType holds the string denoting the type field in the database.
@@ -91,6 +95,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
+	FieldStage,
+	FieldIsSectional,
 	FieldDescription,
 	FieldType,
 	FieldIsActive,
@@ -126,6 +132,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultIsSectional holds the default value on creation for the "is_sectional" field.
+	DefaultIsSectional bool
 	// DefaultIsActive holds the default value on creation for the "is_active" field.
 	DefaultIsActive bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -173,6 +181,16 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByStage orders the results by the stage field.
+func ByStage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStage, opts...).ToFunc()
+}
+
+// ByIsSectional orders the results by the is_sectional field.
+func ByIsSectional(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsSectional, opts...).ToFunc()
 }
 
 // ByDescription orders the results by the description field.

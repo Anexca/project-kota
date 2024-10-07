@@ -668,6 +668,8 @@ type ExamMutation struct {
 	typ                   string
 	id                    *int
 	name                  *string
+	stage                 *string
+	is_sectional          *bool
 	description           *string
 	_type                 *exam.Type
 	is_active             *bool
@@ -827,6 +829,104 @@ func (m *ExamMutation) OldName(ctx context.Context) (v string, err error) {
 // ResetName resets all changes to the "name" field.
 func (m *ExamMutation) ResetName() {
 	m.name = nil
+}
+
+// SetStage sets the "stage" field.
+func (m *ExamMutation) SetStage(s string) {
+	m.stage = &s
+}
+
+// Stage returns the value of the "stage" field in the mutation.
+func (m *ExamMutation) Stage() (r string, exists bool) {
+	v := m.stage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStage returns the old "stage" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldStage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStage: %w", err)
+	}
+	return oldValue.Stage, nil
+}
+
+// ClearStage clears the value of the "stage" field.
+func (m *ExamMutation) ClearStage() {
+	m.stage = nil
+	m.clearedFields[exam.FieldStage] = struct{}{}
+}
+
+// StageCleared returns if the "stage" field was cleared in this mutation.
+func (m *ExamMutation) StageCleared() bool {
+	_, ok := m.clearedFields[exam.FieldStage]
+	return ok
+}
+
+// ResetStage resets all changes to the "stage" field.
+func (m *ExamMutation) ResetStage() {
+	m.stage = nil
+	delete(m.clearedFields, exam.FieldStage)
+}
+
+// SetIsSectional sets the "is_sectional" field.
+func (m *ExamMutation) SetIsSectional(b bool) {
+	m.is_sectional = &b
+}
+
+// IsSectional returns the value of the "is_sectional" field in the mutation.
+func (m *ExamMutation) IsSectional() (r bool, exists bool) {
+	v := m.is_sectional
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsSectional returns the old "is_sectional" field's value of the Exam entity.
+// If the Exam object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamMutation) OldIsSectional(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsSectional is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsSectional requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsSectional: %w", err)
+	}
+	return oldValue.IsSectional, nil
+}
+
+// ClearIsSectional clears the value of the "is_sectional" field.
+func (m *ExamMutation) ClearIsSectional() {
+	m.is_sectional = nil
+	m.clearedFields[exam.FieldIsSectional] = struct{}{}
+}
+
+// IsSectionalCleared returns if the "is_sectional" field was cleared in this mutation.
+func (m *ExamMutation) IsSectionalCleared() bool {
+	_, ok := m.clearedFields[exam.FieldIsSectional]
+	return ok
+}
+
+// ResetIsSectional resets all changes to the "is_sectional" field.
+func (m *ExamMutation) ResetIsSectional() {
+	m.is_sectional = nil
+	delete(m.clearedFields, exam.FieldIsSectional)
 }
 
 // SetDescription sets the "description" field.
@@ -1371,9 +1471,15 @@ func (m *ExamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.name != nil {
 		fields = append(fields, exam.FieldName)
+	}
+	if m.stage != nil {
+		fields = append(fields, exam.FieldStage)
+	}
+	if m.is_sectional != nil {
+		fields = append(fields, exam.FieldIsSectional)
 	}
 	if m.description != nil {
 		fields = append(fields, exam.FieldDescription)
@@ -1403,6 +1509,10 @@ func (m *ExamMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case exam.FieldName:
 		return m.Name()
+	case exam.FieldStage:
+		return m.Stage()
+	case exam.FieldIsSectional:
+		return m.IsSectional()
 	case exam.FieldDescription:
 		return m.Description()
 	case exam.FieldType:
@@ -1426,6 +1536,10 @@ func (m *ExamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case exam.FieldName:
 		return m.OldName(ctx)
+	case exam.FieldStage:
+		return m.OldStage(ctx)
+	case exam.FieldIsSectional:
+		return m.OldIsSectional(ctx)
 	case exam.FieldDescription:
 		return m.OldDescription(ctx)
 	case exam.FieldType:
@@ -1453,6 +1567,20 @@ func (m *ExamMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case exam.FieldStage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStage(v)
+		return nil
+	case exam.FieldIsSectional:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsSectional(v)
 		return nil
 	case exam.FieldDescription:
 		v, ok := value.(string)
@@ -1526,6 +1654,12 @@ func (m *ExamMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ExamMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(exam.FieldStage) {
+		fields = append(fields, exam.FieldStage)
+	}
+	if m.FieldCleared(exam.FieldIsSectional) {
+		fields = append(fields, exam.FieldIsSectional)
+	}
 	if m.FieldCleared(exam.FieldLogoURL) {
 		fields = append(fields, exam.FieldLogoURL)
 	}
@@ -1543,6 +1677,12 @@ func (m *ExamMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ExamMutation) ClearField(name string) error {
 	switch name {
+	case exam.FieldStage:
+		m.ClearStage()
+		return nil
+	case exam.FieldIsSectional:
+		m.ClearIsSectional()
+		return nil
 	case exam.FieldLogoURL:
 		m.ClearLogoURL()
 		return nil
@@ -1556,6 +1696,12 @@ func (m *ExamMutation) ResetField(name string) error {
 	switch name {
 	case exam.FieldName:
 		m.ResetName()
+		return nil
+	case exam.FieldStage:
+		m.ResetStage()
+		return nil
+	case exam.FieldIsSectional:
+		m.ResetIsSectional()
 		return nil
 	case exam.FieldDescription:
 		m.ResetDescription()
@@ -1780,6 +1926,8 @@ type ExamAssesmentMutation struct {
 	raw_assesment_data   *map[string]interface{}
 	raw_user_submission  *map[string]interface{}
 	status               *examassesment.Status
+	obtained_marks       *float64
+	addobtained_marks    *float64
 	remarks              *string
 	created_at           *time.Time
 	updated_at           *time.Time
@@ -2066,6 +2214,76 @@ func (m *ExamAssesmentMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetObtainedMarks sets the "obtained_marks" field.
+func (m *ExamAssesmentMutation) SetObtainedMarks(f float64) {
+	m.obtained_marks = &f
+	m.addobtained_marks = nil
+}
+
+// ObtainedMarks returns the value of the "obtained_marks" field in the mutation.
+func (m *ExamAssesmentMutation) ObtainedMarks() (r float64, exists bool) {
+	v := m.obtained_marks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldObtainedMarks returns the old "obtained_marks" field's value of the ExamAssesment entity.
+// If the ExamAssesment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamAssesmentMutation) OldObtainedMarks(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldObtainedMarks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldObtainedMarks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldObtainedMarks: %w", err)
+	}
+	return oldValue.ObtainedMarks, nil
+}
+
+// AddObtainedMarks adds f to the "obtained_marks" field.
+func (m *ExamAssesmentMutation) AddObtainedMarks(f float64) {
+	if m.addobtained_marks != nil {
+		*m.addobtained_marks += f
+	} else {
+		m.addobtained_marks = &f
+	}
+}
+
+// AddedObtainedMarks returns the value that was added to the "obtained_marks" field in this mutation.
+func (m *ExamAssesmentMutation) AddedObtainedMarks() (r float64, exists bool) {
+	v := m.addobtained_marks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearObtainedMarks clears the value of the "obtained_marks" field.
+func (m *ExamAssesmentMutation) ClearObtainedMarks() {
+	m.obtained_marks = nil
+	m.addobtained_marks = nil
+	m.clearedFields[examassesment.FieldObtainedMarks] = struct{}{}
+}
+
+// ObtainedMarksCleared returns if the "obtained_marks" field was cleared in this mutation.
+func (m *ExamAssesmentMutation) ObtainedMarksCleared() bool {
+	_, ok := m.clearedFields[examassesment.FieldObtainedMarks]
+	return ok
+}
+
+// ResetObtainedMarks resets all changes to the "obtained_marks" field.
+func (m *ExamAssesmentMutation) ResetObtainedMarks() {
+	m.obtained_marks = nil
+	m.addobtained_marks = nil
+	delete(m.clearedFields, examassesment.FieldObtainedMarks)
+}
+
 // SetRemarks sets the "remarks" field.
 func (m *ExamAssesmentMutation) SetRemarks(s string) {
 	m.remarks = &s
@@ -2260,7 +2478,7 @@ func (m *ExamAssesmentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamAssesmentMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.completed_seconds != nil {
 		fields = append(fields, examassesment.FieldCompletedSeconds)
 	}
@@ -2272,6 +2490,9 @@ func (m *ExamAssesmentMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, examassesment.FieldStatus)
+	}
+	if m.obtained_marks != nil {
+		fields = append(fields, examassesment.FieldObtainedMarks)
 	}
 	if m.remarks != nil {
 		fields = append(fields, examassesment.FieldRemarks)
@@ -2298,6 +2519,8 @@ func (m *ExamAssesmentMutation) Field(name string) (ent.Value, bool) {
 		return m.RawUserSubmission()
 	case examassesment.FieldStatus:
 		return m.Status()
+	case examassesment.FieldObtainedMarks:
+		return m.ObtainedMarks()
 	case examassesment.FieldRemarks:
 		return m.Remarks()
 	case examassesment.FieldCreatedAt:
@@ -2321,6 +2544,8 @@ func (m *ExamAssesmentMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldRawUserSubmission(ctx)
 	case examassesment.FieldStatus:
 		return m.OldStatus(ctx)
+	case examassesment.FieldObtainedMarks:
+		return m.OldObtainedMarks(ctx)
 	case examassesment.FieldRemarks:
 		return m.OldRemarks(ctx)
 	case examassesment.FieldCreatedAt:
@@ -2364,6 +2589,13 @@ func (m *ExamAssesmentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
+	case examassesment.FieldObtainedMarks:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetObtainedMarks(v)
+		return nil
 	case examassesment.FieldRemarks:
 		v, ok := value.(string)
 		if !ok {
@@ -2396,6 +2628,9 @@ func (m *ExamAssesmentMutation) AddedFields() []string {
 	if m.addcompleted_seconds != nil {
 		fields = append(fields, examassesment.FieldCompletedSeconds)
 	}
+	if m.addobtained_marks != nil {
+		fields = append(fields, examassesment.FieldObtainedMarks)
+	}
 	return fields
 }
 
@@ -2406,6 +2641,8 @@ func (m *ExamAssesmentMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case examassesment.FieldCompletedSeconds:
 		return m.AddedCompletedSeconds()
+	case examassesment.FieldObtainedMarks:
+		return m.AddedObtainedMarks()
 	}
 	return nil, false
 }
@@ -2422,6 +2659,13 @@ func (m *ExamAssesmentMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddCompletedSeconds(v)
 		return nil
+	case examassesment.FieldObtainedMarks:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddObtainedMarks(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ExamAssesment numeric field %s", name)
 }
@@ -2432,6 +2676,9 @@ func (m *ExamAssesmentMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(examassesment.FieldRawAssesmentData) {
 		fields = append(fields, examassesment.FieldRawAssesmentData)
+	}
+	if m.FieldCleared(examassesment.FieldObtainedMarks) {
+		fields = append(fields, examassesment.FieldObtainedMarks)
 	}
 	if m.FieldCleared(examassesment.FieldRemarks) {
 		fields = append(fields, examassesment.FieldRemarks)
@@ -2452,6 +2699,9 @@ func (m *ExamAssesmentMutation) ClearField(name string) error {
 	switch name {
 	case examassesment.FieldRawAssesmentData:
 		m.ClearRawAssesmentData()
+		return nil
+	case examassesment.FieldObtainedMarks:
+		m.ClearObtainedMarks()
 		return nil
 	case examassesment.FieldRemarks:
 		m.ClearRemarks()
@@ -2475,6 +2725,9 @@ func (m *ExamAssesmentMutation) ResetField(name string) error {
 		return nil
 	case examassesment.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case examassesment.FieldObtainedMarks:
+		m.ResetObtainedMarks()
 		return nil
 	case examassesment.FieldRemarks:
 		m.ResetRemarks()
@@ -4722,6 +4975,8 @@ type ExamSettingMutation struct {
 	other_details          *map[string]interface{}
 	max_attempts           *int
 	addmax_attempts        *int
+	total_marks            *int
+	addtotal_marks         *int
 	evaluation_ai_prompt   *string
 	created_at             *time.Time
 	updated_at             *time.Time
@@ -5167,6 +5422,76 @@ func (m *ExamSettingMutation) ResetMaxAttempts() {
 	m.addmax_attempts = nil
 }
 
+// SetTotalMarks sets the "total_marks" field.
+func (m *ExamSettingMutation) SetTotalMarks(i int) {
+	m.total_marks = &i
+	m.addtotal_marks = nil
+}
+
+// TotalMarks returns the value of the "total_marks" field in the mutation.
+func (m *ExamSettingMutation) TotalMarks() (r int, exists bool) {
+	v := m.total_marks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalMarks returns the old "total_marks" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldTotalMarks(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalMarks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalMarks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalMarks: %w", err)
+	}
+	return oldValue.TotalMarks, nil
+}
+
+// AddTotalMarks adds i to the "total_marks" field.
+func (m *ExamSettingMutation) AddTotalMarks(i int) {
+	if m.addtotal_marks != nil {
+		*m.addtotal_marks += i
+	} else {
+		m.addtotal_marks = &i
+	}
+}
+
+// AddedTotalMarks returns the value that was added to the "total_marks" field in this mutation.
+func (m *ExamSettingMutation) AddedTotalMarks() (r int, exists bool) {
+	v := m.addtotal_marks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTotalMarks clears the value of the "total_marks" field.
+func (m *ExamSettingMutation) ClearTotalMarks() {
+	m.total_marks = nil
+	m.addtotal_marks = nil
+	m.clearedFields[examsetting.FieldTotalMarks] = struct{}{}
+}
+
+// TotalMarksCleared returns if the "total_marks" field was cleared in this mutation.
+func (m *ExamSettingMutation) TotalMarksCleared() bool {
+	_, ok := m.clearedFields[examsetting.FieldTotalMarks]
+	return ok
+}
+
+// ResetTotalMarks resets all changes to the "total_marks" field.
+func (m *ExamSettingMutation) ResetTotalMarks() {
+	m.total_marks = nil
+	m.addtotal_marks = nil
+	delete(m.clearedFields, examsetting.FieldTotalMarks)
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (m *ExamSettingMutation) SetEvaluationAiPrompt(s string) {
 	m.evaluation_ai_prompt = &s
@@ -5361,7 +5686,7 @@ func (m *ExamSettingMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamSettingMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.number_of_questions != nil {
 		fields = append(fields, examsetting.FieldNumberOfQuestions)
 	}
@@ -5379,6 +5704,9 @@ func (m *ExamSettingMutation) Fields() []string {
 	}
 	if m.max_attempts != nil {
 		fields = append(fields, examsetting.FieldMaxAttempts)
+	}
+	if m.total_marks != nil {
+		fields = append(fields, examsetting.FieldTotalMarks)
 	}
 	if m.evaluation_ai_prompt != nil {
 		fields = append(fields, examsetting.FieldEvaluationAiPrompt)
@@ -5409,6 +5737,8 @@ func (m *ExamSettingMutation) Field(name string) (ent.Value, bool) {
 		return m.OtherDetails()
 	case examsetting.FieldMaxAttempts:
 		return m.MaxAttempts()
+	case examsetting.FieldTotalMarks:
+		return m.TotalMarks()
 	case examsetting.FieldEvaluationAiPrompt:
 		return m.EvaluationAiPrompt()
 	case examsetting.FieldCreatedAt:
@@ -5436,6 +5766,8 @@ func (m *ExamSettingMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldOtherDetails(ctx)
 	case examsetting.FieldMaxAttempts:
 		return m.OldMaxAttempts(ctx)
+	case examsetting.FieldTotalMarks:
+		return m.OldTotalMarks(ctx)
 	case examsetting.FieldEvaluationAiPrompt:
 		return m.OldEvaluationAiPrompt(ctx)
 	case examsetting.FieldCreatedAt:
@@ -5493,6 +5825,13 @@ func (m *ExamSettingMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetMaxAttempts(v)
 		return nil
+	case examsetting.FieldTotalMarks:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalMarks(v)
+		return nil
 	case examsetting.FieldEvaluationAiPrompt:
 		v, ok := value.(string)
 		if !ok {
@@ -5534,6 +5873,9 @@ func (m *ExamSettingMutation) AddedFields() []string {
 	if m.addmax_attempts != nil {
 		fields = append(fields, examsetting.FieldMaxAttempts)
 	}
+	if m.addtotal_marks != nil {
+		fields = append(fields, examsetting.FieldTotalMarks)
+	}
 	return fields
 }
 
@@ -5550,6 +5892,8 @@ func (m *ExamSettingMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedNegativeMarking()
 	case examsetting.FieldMaxAttempts:
 		return m.AddedMaxAttempts()
+	case examsetting.FieldTotalMarks:
+		return m.AddedTotalMarks()
 	}
 	return nil, false
 }
@@ -5587,6 +5931,13 @@ func (m *ExamSettingMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddMaxAttempts(v)
 		return nil
+	case examsetting.FieldTotalMarks:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalMarks(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ExamSetting numeric field %s", name)
 }
@@ -5603,6 +5954,9 @@ func (m *ExamSettingMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(examsetting.FieldOtherDetails) {
 		fields = append(fields, examsetting.FieldOtherDetails)
+	}
+	if m.FieldCleared(examsetting.FieldTotalMarks) {
+		fields = append(fields, examsetting.FieldTotalMarks)
 	}
 	if m.FieldCleared(examsetting.FieldEvaluationAiPrompt) {
 		fields = append(fields, examsetting.FieldEvaluationAiPrompt)
@@ -5629,6 +5983,9 @@ func (m *ExamSettingMutation) ClearField(name string) error {
 		return nil
 	case examsetting.FieldOtherDetails:
 		m.ClearOtherDetails()
+		return nil
+	case examsetting.FieldTotalMarks:
+		m.ClearTotalMarks()
 		return nil
 	case examsetting.FieldEvaluationAiPrompt:
 		m.ClearEvaluationAiPrompt()
@@ -5658,6 +6015,9 @@ func (m *ExamSettingMutation) ResetField(name string) error {
 		return nil
 	case examsetting.FieldMaxAttempts:
 		m.ResetMaxAttempts()
+		return nil
+	case examsetting.FieldTotalMarks:
+		m.ResetTotalMarks()
 		return nil
 	case examsetting.FieldEvaluationAiPrompt:
 		m.ResetEvaluationAiPrompt()

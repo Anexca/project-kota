@@ -5,10 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+
+	"server/pkg/constants"
 )
 
 type ValidationError struct {
@@ -152,4 +157,32 @@ func getErrorMessage(fieldError validator.FieldError) string {
 	default:
 		return "Invalid value"
 	}
+}
+
+func (s *Server) HandleError(w http.ResponseWriter, err error, msg string, statusCode int) {
+	if err != nil {
+		log.Println(err)
+
+		responseError := s.ErrorJson(w, errors.New(msg), statusCode)
+		if responseError != nil {
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		}
+	}
+}
+
+func ParseIDParam(r *http.Request, paramName string) (int, error) {
+	idParam := chi.URLParam(r, paramName)
+	id, err := strconv.Atoi(idParam)
+	if err != nil || id <= 0 {
+		return 0, errors.New("invalid id parameter")
+	}
+	return id, nil
+}
+
+func (s *Server) GetUserIdFromRequest(r *http.Request) (string, error) {
+	userId, err := GetHttpRequestContextValue(r, constants.UserIDKey)
+	if err != nil {
+		return "", errors.New("unauthorized")
+	}
+	return userId, nil
 }

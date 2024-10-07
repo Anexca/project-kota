@@ -1,12 +1,13 @@
 package schema
 
 import (
-	"common/constants"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"common/constants"
 )
 
 // Exam holds the schema definition for the Exam entity.
@@ -18,6 +19,8 @@ type Exam struct {
 func (Exam) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
+		field.String("stage").Optional(),
+		field.Bool("is_sectional").Optional().Default(true),
 		field.String("description"),
 		field.Enum("type").
 			Values(

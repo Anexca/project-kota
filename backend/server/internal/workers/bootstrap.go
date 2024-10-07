@@ -3,10 +3,11 @@ package workers
 import (
 	"common/ent"
 	"log"
-	"server/internal/services"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
+
+	"server/internal/services"
 )
 
 type Worker struct {
@@ -17,7 +18,7 @@ type Worker struct {
 func InitWorkers(redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 	c := cron.New()
 
-	examService := services.NewExamGenerationService(redisClient, dbClient)
+	examService := services.InitExamGenerationService(redisClient, dbClient)
 
 	worker := &Worker{
 		cronHandler: c,
@@ -30,8 +31,8 @@ func InitWorkers(redisClient *redis.Client, dbClient *ent.Client) *cron.Cron {
 }
 
 func (w *Worker) RegisterWorkers() {
-	// w.cronHandler.AddFunc("*/1 * * * *", func() {
-	w.cronHandler.AddFunc("0 4 * * *", func() {
+	// _, err := w.cronHandler.AddFunc("*/1 * * * *", func() {
+	_, err := w.cronHandler.AddFunc("0 4 * * *", func() {
 		log.Println("Starting Worker Job for Adding Descriptive Question in Database")
 
 		err := w.AddDescriptiveQuestionsInDatabase()
@@ -47,8 +48,12 @@ func (w *Worker) RegisterWorkers() {
 		log.Println("Finished Worker Job for Adding Descriptive Question in Database")
 	})
 
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// w.cronHandler.AddFunc("*/1 * * * *", func() {
-	w.cronHandler.AddFunc("0 0 * * 0", func() {
+	_, err = w.cronHandler.AddFunc("0 0 * * 0", func() {
 		log.Println("Starting Worker Job for Creating Descriptive Open Questions")
 
 		err := w.MarkDescriptiveQuestionsAsOpenInDatabase()
@@ -59,4 +64,8 @@ func (w *Worker) RegisterWorkers() {
 
 		log.Println("Finished Worker Job for Creating Descriptive Open Questions")
 	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 }

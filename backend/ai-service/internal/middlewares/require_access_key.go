@@ -1,11 +1,12 @@
 package middlewares
 
 import (
-	"ai-service/pkg/config"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"ai-service/pkg/config"
 )
 
 func RequireAccessKeyMiddleware() func(http.Handler) http.Handler {

@@ -19,30 +19,40 @@ type DescriptiveExam struct {
 }
 
 type GeneratedMCQExam struct {
-	ExamContent []MCQExam `json:"exam_content"`
+	Type          string                       `json:"type"`
+	Topic         string                       `json:"topic"`
+	Sections      map[string][]MCQExamQuestion `json:"sections"`
+	ContentGroups []MCQExamContentGroup        `json:"content_groups"`
 }
 
-type MCQExam struct {
-	Note           string      `json:"note,omitempty"`
-	Content        interface{} `json:"content,omitempty"`
-	Question       string      `json:"question"`
-	QuestionNumber int         `json:"question_number"`
-	Answer         string      `json:"answer"`
-	Options        []string    `json:"options"`
-	Explanation    string      `json:"explanation"`
+type MCQExamQuestion struct {
+	ContentReferenceId string   `json:"content_reference_id"`
+	Question           string   `json:"question"`
+	QuestionNumber     int      `json:"question_number"`
+	Answer             []int    `json:"answer"`
+	Options            []string `json:"options"`
+	Explanation        string   `json:"explanation"`
+}
+
+type MCQExamContentGroup struct {
+	ContentId    string      `json:"content_id"`
+	Instructions string      `json:"instructions"`
+	Content      interface{} `json:"content"` // String or Object depending on the content type
 }
 
 type GeneratedExamOverview struct {
 	Id                  int                    `json:"exam_id"`
 	ExamType            string                 `json:"exam_type"`
 	ExamName            string                 `json:"exam_name"`
+	ExamStage           string                 `json:"exam_stage"`
+	IsSectional         bool                   `json:"is_sectional"`
 	RawExamData         map[string]interface{} `json:"raw_exam_data,omitempty"`
 	UserAttempts        int                    `json:"user_attempts"`
 	MaxAttempts         int                    `json:"max_attempts"`
 	DurationSeconds     int                    `json:"duration_seconds"`
 	NumberOfQuestions   int                    `json:"number_of_questions"`
 	NegativeMarking     float64                `json:"negative_marking,omitempty"`
-	UserHasAccessToExam bool                   `json:"has_access,omitempty"`
+	UserHasAccessToExam bool                   `json:"has_access"`
 	CreatedAt           time.Time              `json:"created_at"`
 	UpdatedAt           time.Time              `json:"updated_at"`
 }
@@ -55,12 +65,23 @@ type DescriptiveExamAssessmentResult struct {
 	ProfanityCheck   string   `json:"profanity_check,omitempty" `
 }
 
+type MCQExamAssessmentResult struct {
+	Summary MCQExamAssessmentResultSummary `json:"summary"`
+}
+
+type MCQExamAssessmentResultSummary struct {
+	Attempted int `json:"attempted"`
+	Correct   int `json:"correct"`
+	Incorrect int `json:"incorrect"`
+}
+
 type AssessmentDetails struct {
 	Id                int                    `json:"id"`
 	CompletedSeconds  int                    `json:"completed_seconds"`
+	ObtainedMarks     float64                `json:"obtained_marks,omitempty"`
+	Status            string                 `json:"status"`
 	RawAssesmentData  map[string]interface{} `json:"raw_assesment_data,omitempty"`
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
-	Status            string                 `json:"status"`
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
 }
@@ -69,10 +90,14 @@ type UserExamAttempt struct {
 	AttemptedExamId int       `json:"attempted_exam_id"`
 	IsActive        bool      `json:"is_active"`
 	ExamType        string    `json:"exam_type"`
+	ExamGroup       string    `json:"exam_group"`
+	ExamGroupId     int       `json:"exam_group_id"`
 	ExamName        string    `json:"exam_name"`
 	ExamTypeId      int       `json:"exam_type_id"`
 	ExamCategory    string    `json:"exam_category"`
 	ExamCategoryId  int       `json:"exam_category_id"`
+	ExamStage       string    `json:"exam_stage"`
+	IsSectional     bool      `json:"is_sectional"`
 	Topic           string    `json:"topic"`
 	Type            string    `json:"type"`
 	Attempts        []Attempt `json:"attempts"`

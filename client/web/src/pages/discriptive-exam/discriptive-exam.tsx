@@ -258,7 +258,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
       const response = await sendAnswerForAssesment({
         questionId: question!.exam_id,
         answer: value.answer,
-        completedTime: timeTaken,
+        completedTime: timeTaken >= 1 ? timeTaken : 1,
         isOpen: isOpenMode,
       });
       fetchResultRef.current = getResultByExamId(response.data.id);
