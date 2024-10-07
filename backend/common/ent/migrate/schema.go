@@ -173,6 +173,7 @@ var (
 		{Name: "other_details", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "json"}},
 		{Name: "max_attempts", Type: field.TypeInt, Default: 2},
 		{Name: "total_marks", Type: field.TypeInt, Nullable: true, Default: 0},
+		{Name: "cutoff_marks", Type: field.TypeFloat64, Nullable: true, Default: 0},
 		{Name: "evaluation_ai_prompt", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -186,7 +187,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exam_settings_exams_setting",
-				Columns:    []*schema.Column{ExamSettingsColumns[11]},
+				Columns:    []*schema.Column{ExamSettingsColumns[12]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

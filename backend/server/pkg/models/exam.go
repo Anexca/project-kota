@@ -70,15 +70,18 @@ type MCQExamAssessmentResult struct {
 }
 
 type MCQExamAssessmentResultSummary struct {
-	Attempted int `json:"attempted"`
-	Correct   int `json:"correct"`
-	Incorrect int `json:"incorrect"`
+	Attempted int     `json:"attempted"`
+	Correct   int     `json:"correct"`
+	Incorrect int     `json:"incorrect"`
+	Accuracy  float64 `json:"accuracy"`
 }
 
 type AssessmentDetails struct {
 	Id                int                    `json:"id"`
 	CompletedSeconds  int                    `json:"completed_seconds"`
 	ObtainedMarks     float64                `json:"obtained_marks,omitempty"`
+	TotalMarks        int                    `json:"total_marks"`
+	CutoffMarks       float64                `json:"cutoff_marks,omitempty"`
 	Status            string                 `json:"status"`
 	RawAssesmentData  map[string]interface{} `json:"raw_assesment_data,omitempty"`
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
