@@ -34,7 +34,7 @@ const ConformationDialog = ({ timerStart, time, open, setOpen }: any) => {
         <DialogHeader>
           <DialogTitle>Exam Instruction.</DialogTitle>
           <DialogDescription>
-            <div className="mb-2 text-neutral-700 font-semibold">
+            <div className="mb-2 text-neutral-700 font-semibold ">
               The exam will automatically close when the time is up, so please
               manage your time carefully. You have{" "}
               <span className="text-orange-600">{time}</span> minutes to
@@ -286,8 +286,12 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     );
     perQuestionTimeRef.current = 0;
     perQuestionTimeInterval.start();
-    console.log(getValues("questionTimeMap"));
   };
+
+  const isLastQuestionOfExam =
+    sectionList?.[sectionList?.length - 1] == activeSection &&
+    activeIndex == answers[activeSection]?.length - 1;
+
   const handleQuestionChange = (index: number, section: string) => {
     if (index == activeIndex && section == activeSection) return;
     const currentAnswer = answers?.[activeSection]?.[activeIndex];
@@ -321,7 +325,7 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     if (!tempAnswerIndex && mobileMode) {
       setValue(`answers.${activeSection}.${activeIndex}.state`, "NOT-ANSWERED");
     }
-    moveToNextQuestion();
+    !isLastQuestionOfExam && moveToNextQuestion();
   };
   const handleReviewNNext = () => {
     if (tempAnswerIndex) {
@@ -454,8 +458,8 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
             <div className="flex-1 max-h-full flex flex-col">
               <div className="text-start p-2 pl-4 shadow flex bg-white items-center z-10 sticky md:static top-[48px]">
                 <span className="ml-auto flex-1 ">
-                  Que No {activeIndex + 1} /{" "}
-                  {questionSet?.number_of_questions || 0}
+                  Que No {answers[activeSection]?.[activeIndex].questionNumber}{" "}
+                  / {questionSet?.number_of_questions || 0}
                 </span>
                 {!isScreenView && (
                   <MCQMobileHeader
@@ -516,17 +520,19 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                 </div>
               </div>
               <div className="min-h-12 flex gap-2 p-2 border-orange-300 border-t sticky bottom-0 bg-white">
-                <Button
-                  size={"sm"}
-                  type="button"
-                  disabled={
-                    tempAnswerIndex == null &&
-                    !answers?.[activeSection]?.[activeIndex]?.selectedOption
-                  }
-                  onClick={handleReviewNNext}
-                >
-                  Mark for Review & Next
-                </Button>
+                {!isLastQuestionOfExam && (
+                  <Button
+                    size={"sm"}
+                    type="button"
+                    disabled={
+                      tempAnswerIndex == null &&
+                      !answers?.[activeSection]?.[activeIndex]?.selectedOption
+                    }
+                    onClick={handleReviewNNext}
+                  >
+                    Mark for Review & Next
+                  </Button>
+                )}
 
                 <Button
                   onClick={() => {
@@ -553,7 +559,22 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                     {answers?.[activeSection]?.[activeIndex]?.selectedOption &&
                     tempAnswerIndex == null
                       ? "Next"
-                      : "SAVE & NEXT"}
+                      : "Save & Next"}
+                  </Button>
+                ) : isLastQuestionOfExam ? (
+                  <Button
+                    size={"sm"}
+                    variant={"success"}
+                    className="justify-self-end"
+                    type="button"
+                    onClick={() => {
+                      handleSaveNNext(
+                        !answers?.[activeSection]?.[activeIndex]?.selectedOption
+                      );
+                      checkForAllAttempted();
+                    }}
+                  >
+                    Save and Submit
                   </Button>
                 ) : (
                   <Button
@@ -568,10 +589,10 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                     }
                   >
                     {answers?.[activeSection]?.[activeIndex]?.selectedOption
-                      ? "NEXT"
+                      ? "Next"
                       : tempAnswerIndex == null
                       ? "Next"
-                      : "SAVE & NEXT"}
+                      : "Save & Next"}
                   </Button>
                 )}
               </div>
