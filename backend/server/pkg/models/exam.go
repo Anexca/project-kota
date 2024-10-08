@@ -16,6 +16,7 @@ type DescriptiveExam struct {
 	Hints                   []string `json:"hints" validate:"required"`
 	MaxNumberOfWordsAllowed string   `json:"max_number_of_words" validate:"required"`
 	TotalMarks              string   `json:"total_marks" validate:"required"`
+	Content                 string   `json:"content,omitempty"`
 }
 
 type GeneratedMCQExam struct {
