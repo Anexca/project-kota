@@ -294,12 +294,21 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     if (currentAnswer?.state == "UN-ATTEMPTED") {
       setValue(`answers.${activeSection}.${activeIndex}.state`, "NOT-ANSWERED");
     }
+    setValue("tempAnswerIndex", null);
     setValue("activeQuestionIndex", index);
     setValue("activeSection", section);
     saveTimeForQuestion();
   };
-
-  const handleSaveNNext = () => {
+  const moveToNextQuestion = () => {
+    const isEndOfSection = answers[activeSection].length - 1 == activeIndex;
+    const sectionIndex = sectionList.findIndex((e) => e == activeSection);
+    const isLastSetion = sectionList.length - 1 == sectionIndex;
+    setValue("activeQuestionIndex", isEndOfSection ? 0 : activeIndex + 1);
+    isEndOfSection &&
+      !isLastSetion &&
+      setValue("activeSection", sectionList[sectionIndex + 1]);
+  };
+  const handleSaveNNext = (mobileMode?: boolean) => {
     if (tempAnswerIndex) {
       setValue(`answers.${activeSection}.${activeIndex}.state`, "ATTEMPTED");
       setValue(
@@ -309,6 +318,10 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
       setValue("tempAnswerIndex", null);
       saveTimeForQuestion();
     }
+    if (!tempAnswerIndex && mobileMode) {
+      setValue(`answers.${activeSection}.${activeIndex}.state`, "NOT-ANSWERED");
+    }
+    moveToNextQuestion();
   };
   const handleReviewNNext = () => {
     if (tempAnswerIndex) {
@@ -319,7 +332,10 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
       );
       setValue("tempAnswerIndex", null);
       saveTimeForQuestion();
+    } else {
+      setValue(`answers.${activeSection}.${activeIndex}.state`, "FOR-REVIEW");
     }
+    moveToNextQuestion();
   };
 
   const questions = questionSet?.raw_exam_data?.sections?.[activeSection] || [];
@@ -364,6 +380,7 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
 
   const handleFormSubmit = async () => {
     saveTimeForQuestion();
+    interval.stop();
     perQuestionTimeInterval.stop();
     const payload: any = {
       attempted_questions: [],
@@ -405,9 +422,10 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
 
     return { incompleteExam, markedForReview };
   }, [incompleteModelOpen]);
+
   return (
     <MathJaxContext>
-      <div className="md:max-h-screen md:h-screen flex flex-col ">
+      <div className={"md:max-h-screen md:h-screen flex flex-col "}>
         <TestHeader currentTime={examTime} active={interval.active} />
         <ConformationDialog
           timerStart={() => {
@@ -434,8 +452,8 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
         <div className="flex-1 md:overflow-hidden">
           <div className="flex flex-col md:flex-row items-stretch md:max-h-full md:h-full">
             <div className="flex-1 max-h-full flex flex-col">
-              <div className="text-start p-2 pl-4 shadow flex items-center">
-                <span className="ml-auto flex-1">
+              <div className="text-start p-2 pl-4 shadow flex bg-white items-center z-10 sticky md:static top-[48px]">
+                <span className="ml-auto flex-1 ">
                   Que No {activeIndex + 1} /{" "}
                   {questionSet?.number_of_questions || 0}
                 </span>
@@ -485,7 +503,11 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                             name={field.name}
                             onChange={field.onChange}
                             options={questions[activeIndex].options}
-                            selected={field.value}
+                            selected={
+                              field.value ??
+                              answers?.[activeSection]?.[activeIndex]
+                                ?.selectedOption
+                            }
                           />
                         )}
                       />
@@ -493,28 +515,19 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                   )}
                 </div>
               </div>
-              <div className="min-h-12 flex gap-2 p-2 border-orange-300 border-t">
-                <Controller
-                  name={`activeQuestionIndex`}
-                  control={control}
-                  render={({ field }) => (
-                    <Button
-                      size={"sm"}
-                      type="button"
-                      disabled={
-                        field.value + 1 >= questions.length ||
-                        tempAnswerIndex == null
-                      }
-                      onClick={() => {
-                        const nextIdx = field.value + 1;
-                        handleReviewNNext();
-                        field.onChange(nextIdx);
-                      }}
-                    >
-                      Mark for Review & Next
-                    </Button>
-                  )}
-                />
+              <div className="min-h-12 flex gap-2 p-2 border-orange-300 border-t sticky bottom-0 bg-white">
+                <Button
+                  size={"sm"}
+                  type="button"
+                  disabled={
+                    tempAnswerIndex == null &&
+                    !answers?.[activeSection]?.[activeIndex]?.selectedOption
+                  }
+                  onClick={handleReviewNNext}
+                >
+                  Mark for Review & Next
+                </Button>
+
                 <Button
                   onClick={() => {
                     setValue("tempAnswerIndex", null);
@@ -525,27 +538,42 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                 >
                   Clear
                 </Button>
-                <Controller
-                  name={`activeQuestionIndex`}
-                  control={control}
-                  render={({ field }) => (
-                    <Button
-                      size={"sm"}
-                      variant={"success"}
-                      className="justify-self-end"
-                      type="button"
-                      disabled={tempAnswerIndex == null}
-                      onClick={() => {
-                        const nextIdx = field.value + 1;
-                        handleSaveNNext();
-                        field.value + 1 <= questions.length &&
-                          field.onChange(nextIdx);
-                      }}
-                    >
-                      SAVE & NEXT
-                    </Button>
-                  )}
-                />
+                {isMobileView ? (
+                  <Button
+                    size={"sm"}
+                    variant={"success"}
+                    className="justify-self-end"
+                    type="button"
+                    disabled={
+                      tempAnswerIndex == null &&
+                      !answers?.[activeSection]?.[activeIndex]?.selectedOption
+                    }
+                    onClick={() => handleSaveNNext()}
+                  >
+                    {answers?.[activeSection]?.[activeIndex]?.selectedOption &&
+                    tempAnswerIndex == null
+                      ? "Next"
+                      : "SAVE & NEXT"}
+                  </Button>
+                ) : (
+                  <Button
+                    size={"sm"}
+                    variant={"success"}
+                    className="justify-self-end"
+                    type="button"
+                    onClick={() =>
+                      handleSaveNNext(
+                        !answers?.[activeSection]?.[activeIndex]?.selectedOption
+                      )
+                    }
+                  >
+                    {answers?.[activeSection]?.[activeIndex]?.selectedOption
+                      ? "NEXT"
+                      : tempAnswerIndex == null
+                      ? "Next"
+                      : "SAVE & NEXT"}
+                  </Button>
+                )}
               </div>
             </div>
 

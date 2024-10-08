@@ -25,7 +25,7 @@ const MCQMobileHeader = ({
             onClick={() => setMobileViewHeader(!mobileViewHeader)}
             aria-label="humburger"
             id="hamburger"
-            className="relative  p-6"
+            className="relative p-2 md:p-6"
           >
             <div
               aria-hidden="true"
