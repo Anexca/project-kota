@@ -130,12 +130,16 @@ func init() {
 	examsettingDescTotalMarks := examsettingFields[6].Descriptor()
 	// examsetting.DefaultTotalMarks holds the default value on creation for the total_marks field.
 	examsetting.DefaultTotalMarks = examsettingDescTotalMarks.Default.(int)
+	// examsettingDescCutoffMarks is the schema descriptor for cutoff_marks field.
+	examsettingDescCutoffMarks := examsettingFields[7].Descriptor()
+	// examsetting.DefaultCutoffMarks holds the default value on creation for the cutoff_marks field.
+	examsetting.DefaultCutoffMarks = examsettingDescCutoffMarks.Default.(float64)
 	// examsettingDescCreatedAt is the schema descriptor for created_at field.
-	examsettingDescCreatedAt := examsettingFields[8].Descriptor()
+	examsettingDescCreatedAt := examsettingFields[9].Descriptor()
 	// examsetting.DefaultCreatedAt holds the default value on creation for the created_at field.
 	examsetting.DefaultCreatedAt = examsettingDescCreatedAt.Default.(func() time.Time)
 	// examsettingDescUpdatedAt is the schema descriptor for updated_at field.
-	examsettingDescUpdatedAt := examsettingFields[9].Descriptor()
+	examsettingDescUpdatedAt := examsettingFields[10].Descriptor()
 	// examsetting.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	examsetting.DefaultUpdatedAt = examsettingDescUpdatedAt.Default.(func() time.Time)
 	// examsetting.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

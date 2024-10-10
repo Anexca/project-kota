@@ -4977,6 +4977,8 @@ type ExamSettingMutation struct {
 	addmax_attempts        *int
 	total_marks            *int
 	addtotal_marks         *int
+	cutoff_marks           *float64
+	addcutoff_marks        *float64
 	evaluation_ai_prompt   *string
 	created_at             *time.Time
 	updated_at             *time.Time
@@ -5492,6 +5494,76 @@ func (m *ExamSettingMutation) ResetTotalMarks() {
 	delete(m.clearedFields, examsetting.FieldTotalMarks)
 }
 
+// SetCutoffMarks sets the "cutoff_marks" field.
+func (m *ExamSettingMutation) SetCutoffMarks(f float64) {
+	m.cutoff_marks = &f
+	m.addcutoff_marks = nil
+}
+
+// CutoffMarks returns the value of the "cutoff_marks" field in the mutation.
+func (m *ExamSettingMutation) CutoffMarks() (r float64, exists bool) {
+	v := m.cutoff_marks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCutoffMarks returns the old "cutoff_marks" field's value of the ExamSetting entity.
+// If the ExamSetting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ExamSettingMutation) OldCutoffMarks(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCutoffMarks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCutoffMarks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCutoffMarks: %w", err)
+	}
+	return oldValue.CutoffMarks, nil
+}
+
+// AddCutoffMarks adds f to the "cutoff_marks" field.
+func (m *ExamSettingMutation) AddCutoffMarks(f float64) {
+	if m.addcutoff_marks != nil {
+		*m.addcutoff_marks += f
+	} else {
+		m.addcutoff_marks = &f
+	}
+}
+
+// AddedCutoffMarks returns the value that was added to the "cutoff_marks" field in this mutation.
+func (m *ExamSettingMutation) AddedCutoffMarks() (r float64, exists bool) {
+	v := m.addcutoff_marks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCutoffMarks clears the value of the "cutoff_marks" field.
+func (m *ExamSettingMutation) ClearCutoffMarks() {
+	m.cutoff_marks = nil
+	m.addcutoff_marks = nil
+	m.clearedFields[examsetting.FieldCutoffMarks] = struct{}{}
+}
+
+// CutoffMarksCleared returns if the "cutoff_marks" field was cleared in this mutation.
+func (m *ExamSettingMutation) CutoffMarksCleared() bool {
+	_, ok := m.clearedFields[examsetting.FieldCutoffMarks]
+	return ok
+}
+
+// ResetCutoffMarks resets all changes to the "cutoff_marks" field.
+func (m *ExamSettingMutation) ResetCutoffMarks() {
+	m.cutoff_marks = nil
+	m.addcutoff_marks = nil
+	delete(m.clearedFields, examsetting.FieldCutoffMarks)
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (m *ExamSettingMutation) SetEvaluationAiPrompt(s string) {
 	m.evaluation_ai_prompt = &s
@@ -5686,7 +5758,7 @@ func (m *ExamSettingMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ExamSettingMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.number_of_questions != nil {
 		fields = append(fields, examsetting.FieldNumberOfQuestions)
 	}
@@ -5707,6 +5779,9 @@ func (m *ExamSettingMutation) Fields() []string {
 	}
 	if m.total_marks != nil {
 		fields = append(fields, examsetting.FieldTotalMarks)
+	}
+	if m.cutoff_marks != nil {
+		fields = append(fields, examsetting.FieldCutoffMarks)
 	}
 	if m.evaluation_ai_prompt != nil {
 		fields = append(fields, examsetting.FieldEvaluationAiPrompt)
@@ -5739,6 +5814,8 @@ func (m *ExamSettingMutation) Field(name string) (ent.Value, bool) {
 		return m.MaxAttempts()
 	case examsetting.FieldTotalMarks:
 		return m.TotalMarks()
+	case examsetting.FieldCutoffMarks:
+		return m.CutoffMarks()
 	case examsetting.FieldEvaluationAiPrompt:
 		return m.EvaluationAiPrompt()
 	case examsetting.FieldCreatedAt:
@@ -5768,6 +5845,8 @@ func (m *ExamSettingMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldMaxAttempts(ctx)
 	case examsetting.FieldTotalMarks:
 		return m.OldTotalMarks(ctx)
+	case examsetting.FieldCutoffMarks:
+		return m.OldCutoffMarks(ctx)
 	case examsetting.FieldEvaluationAiPrompt:
 		return m.OldEvaluationAiPrompt(ctx)
 	case examsetting.FieldCreatedAt:
@@ -5832,6 +5911,13 @@ func (m *ExamSettingMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTotalMarks(v)
 		return nil
+	case examsetting.FieldCutoffMarks:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCutoffMarks(v)
+		return nil
 	case examsetting.FieldEvaluationAiPrompt:
 		v, ok := value.(string)
 		if !ok {
@@ -5876,6 +5962,9 @@ func (m *ExamSettingMutation) AddedFields() []string {
 	if m.addtotal_marks != nil {
 		fields = append(fields, examsetting.FieldTotalMarks)
 	}
+	if m.addcutoff_marks != nil {
+		fields = append(fields, examsetting.FieldCutoffMarks)
+	}
 	return fields
 }
 
@@ -5894,6 +5983,8 @@ func (m *ExamSettingMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedMaxAttempts()
 	case examsetting.FieldTotalMarks:
 		return m.AddedTotalMarks()
+	case examsetting.FieldCutoffMarks:
+		return m.AddedCutoffMarks()
 	}
 	return nil, false
 }
@@ -5938,6 +6029,13 @@ func (m *ExamSettingMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddTotalMarks(v)
 		return nil
+	case examsetting.FieldCutoffMarks:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCutoffMarks(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ExamSetting numeric field %s", name)
 }
@@ -5957,6 +6055,9 @@ func (m *ExamSettingMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(examsetting.FieldTotalMarks) {
 		fields = append(fields, examsetting.FieldTotalMarks)
+	}
+	if m.FieldCleared(examsetting.FieldCutoffMarks) {
+		fields = append(fields, examsetting.FieldCutoffMarks)
 	}
 	if m.FieldCleared(examsetting.FieldEvaluationAiPrompt) {
 		fields = append(fields, examsetting.FieldEvaluationAiPrompt)
@@ -5986,6 +6087,9 @@ func (m *ExamSettingMutation) ClearField(name string) error {
 		return nil
 	case examsetting.FieldTotalMarks:
 		m.ClearTotalMarks()
+		return nil
+	case examsetting.FieldCutoffMarks:
+		m.ClearCutoffMarks()
 		return nil
 	case examsetting.FieldEvaluationAiPrompt:
 		m.ClearEvaluationAiPrompt()
@@ -6018,6 +6122,9 @@ func (m *ExamSettingMutation) ResetField(name string) error {
 		return nil
 	case examsetting.FieldTotalMarks:
 		m.ResetTotalMarks()
+		return nil
+	case examsetting.FieldCutoffMarks:
+		m.ResetCutoffMarks()
 		return nil
 	case examsetting.FieldEvaluationAiPrompt:
 		m.ResetEvaluationAiPrompt()

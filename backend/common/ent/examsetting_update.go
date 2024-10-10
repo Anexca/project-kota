@@ -178,6 +178,33 @@ func (esu *ExamSettingUpdate) ClearTotalMarks() *ExamSettingUpdate {
 	return esu
 }
 
+// SetCutoffMarks sets the "cutoff_marks" field.
+func (esu *ExamSettingUpdate) SetCutoffMarks(f float64) *ExamSettingUpdate {
+	esu.mutation.ResetCutoffMarks()
+	esu.mutation.SetCutoffMarks(f)
+	return esu
+}
+
+// SetNillableCutoffMarks sets the "cutoff_marks" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableCutoffMarks(f *float64) *ExamSettingUpdate {
+	if f != nil {
+		esu.SetCutoffMarks(*f)
+	}
+	return esu
+}
+
+// AddCutoffMarks adds f to the "cutoff_marks" field.
+func (esu *ExamSettingUpdate) AddCutoffMarks(f float64) *ExamSettingUpdate {
+	esu.mutation.AddCutoffMarks(f)
+	return esu
+}
+
+// ClearCutoffMarks clears the value of the "cutoff_marks" field.
+func (esu *ExamSettingUpdate) ClearCutoffMarks() *ExamSettingUpdate {
+	esu.mutation.ClearCutoffMarks()
+	return esu
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esu *ExamSettingUpdate) SetEvaluationAiPrompt(s string) *ExamSettingUpdate {
 	esu.mutation.SetEvaluationAiPrompt(s)
@@ -326,6 +353,15 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if esu.mutation.TotalMarksCleared() {
 		_spec.ClearField(examsetting.FieldTotalMarks, field.TypeInt)
+	}
+	if value, ok := esu.mutation.CutoffMarks(); ok {
+		_spec.SetField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if value, ok := esu.mutation.AddedCutoffMarks(); ok {
+		_spec.AddField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if esu.mutation.CutoffMarksCleared() {
+		_spec.ClearField(examsetting.FieldCutoffMarks, field.TypeFloat64)
 	}
 	if value, ok := esu.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)
@@ -534,6 +570,33 @@ func (esuo *ExamSettingUpdateOne) ClearTotalMarks() *ExamSettingUpdateOne {
 	return esuo
 }
 
+// SetCutoffMarks sets the "cutoff_marks" field.
+func (esuo *ExamSettingUpdateOne) SetCutoffMarks(f float64) *ExamSettingUpdateOne {
+	esuo.mutation.ResetCutoffMarks()
+	esuo.mutation.SetCutoffMarks(f)
+	return esuo
+}
+
+// SetNillableCutoffMarks sets the "cutoff_marks" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableCutoffMarks(f *float64) *ExamSettingUpdateOne {
+	if f != nil {
+		esuo.SetCutoffMarks(*f)
+	}
+	return esuo
+}
+
+// AddCutoffMarks adds f to the "cutoff_marks" field.
+func (esuo *ExamSettingUpdateOne) AddCutoffMarks(f float64) *ExamSettingUpdateOne {
+	esuo.mutation.AddCutoffMarks(f)
+	return esuo
+}
+
+// ClearCutoffMarks clears the value of the "cutoff_marks" field.
+func (esuo *ExamSettingUpdateOne) ClearCutoffMarks() *ExamSettingUpdateOne {
+	esuo.mutation.ClearCutoffMarks()
+	return esuo
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esuo *ExamSettingUpdateOne) SetEvaluationAiPrompt(s string) *ExamSettingUpdateOne {
 	esuo.mutation.SetEvaluationAiPrompt(s)
@@ -712,6 +775,15 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	}
 	if esuo.mutation.TotalMarksCleared() {
 		_spec.ClearField(examsetting.FieldTotalMarks, field.TypeInt)
+	}
+	if value, ok := esuo.mutation.CutoffMarks(); ok {
+		_spec.SetField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if value, ok := esuo.mutation.AddedCutoffMarks(); ok {
+		_spec.AddField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if esuo.mutation.CutoffMarksCleared() {
+		_spec.ClearField(examsetting.FieldCutoffMarks, field.TypeFloat64)
 	}
 	if value, ok := esuo.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)

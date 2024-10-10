@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 
 	"common/constants"
@@ -151,14 +152,7 @@ func (e *ExamAssesmentService) GetAssesmentById(ctx context.Context, assesmentId
 		return nil, err
 	}
 
-	assessmentModel := buildAssessmentDetails(assessment)
-
-	if assessment.RawAssesmentData == nil {
-		return assessmentModel, nil
-	}
-
-	assessmentModel.RawAssesmentData = assessment.RawAssesmentData
-
+	assessmentModel := e.mapAssessmentModel(assessment)
 	return assessmentModel, nil
 }
 
@@ -172,14 +166,9 @@ func (e *ExamAssesmentService) GetExamAssessments(ctx context.Context, generated
 	assessmentsList := make([]models.AssessmentDetails, 0, len(assessments))
 
 	for _, assessment := range assessments {
-		assessmentModel := models.AssessmentDetails{
-			Id:               assessment.ID,
-			CompletedSeconds: assessment.CompletedSeconds,
-			Status:           assessment.Status.String(),
-			CreatedAt:        assessment.CreatedAt,
-			UpdatedAt:        assessment.UpdatedAt,
-		}
-
+		assessmentModel := *e.mapAssessmentModel(assessment)
+		assessmentModel.RawAssesmentData = nil
+		assessmentModel.RawUserSubmission = nil
 		assessmentsList = append(assessmentsList, assessmentModel)
 	}
 	return assessmentsList, nil
@@ -347,34 +336,49 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 	}
 
 	prompt := fmt.Sprintf(`
-Evaluate the following "%s" based on the topic: “%s”.
-Criteria to consider for evaluation:
-	•	Grammar accuracy.
-	•	Proper use of punctuation.
-	•	Relevance to the given topic.
-	•	Check for structure if evaluating "essay", formatting if evaluating "error"
-	•	Word count in content provided should not exceed "%s" words (only count words, exclude special characters, spaces and formatting characters like "\n, \t, \r" etc).
-	•	Do Not visit any URLs provided in Content.
-	•	Make sure rating is based only on content provided, and use the provided criteria to calculate it
+			Evaluate the following "%s" based on the topic: “%s”.
 
-Scoring: 
-	•	Provide a rating out of "%s" marks based on the above criteria. 
-	•	The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
+			Criteria to consider for evaluation:
+			- Grammar accuracy.
+			- Proper use of punctuation.
+			- Relevance to the given topic.
+			- For essays: Check for logical structure, coherence, and content development.
+			- For formal letters: Check for correct formatting, tone, and clarity.
+			- For precis: Ensure the content is concise, conveys the key points of the original content, and does not exceed the word limit.
+			- Word count should not exceed "%s" words (only count words, exclude special characters, spaces, and formatting characters like "\n, \t, \r" etc).
+			- Do Not visit any URLs provided in Content.
+			- Ensure the rating is based only on content provided, and use the provided criteria to calculate it.
 
-Output Requirements:
-	•	Return a valid JSON object with the following keys:
-	•	"rating": A string representing the rating. 
-	•	"strengths": An array of strings highlighting the content’s strengths.
-	•	"weaknesses": An array of strings pointing out the content’s weaknesses.
-	•	"corrected_version": Generate a single-line string with the corrected version of the content. There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
-	•	The entire output should be a single-line string with no extra spaces, newlines, or formatting, ensuring it can be parsed as valid JSON.
+			For precis evaluation, please summarize the content provided:
 
-Content to evaluate:
+			**Content for Precis**:
+			“%s”
 
-	“%s”
-`, descriptiveExam.Type, descriptiveExam.Topic, descriptiveExam.MaxNumberOfWordsAllowed, descriptiveExam.TotalMarks, content)
+			Scoring:
+			- Provide a rating out of "%s" marks based on the above criteria.
+			- The rating must always be between 0 and the maximum marks, with full marks awarded if the content is relevant to the topic and there are no or minimal errors.
 
-	response, err := e.promptService.GetPromptResult(ctx, prompt, constants.PRO_15)
+			Output Requirements:
+			- Return a valid JSON object with the following keys:
+			- "rating": A string representing the rating.
+			- "strengths": An array of strings highlighting the content’s strengths.
+			- "weaknesses": An array of strings pointing out the content’s weaknesses.
+			- "corrected_version": Generate a single-line string with the corrected version of the content. There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+
+			Assessment JSON Schema:
+			{
+				"rating": string
+				"strengths": []string
+				"weakness": []string
+				"corrected_version": string
+			}
+
+			user submission to evaluate:
+
+				“%s”
+`, descriptiveExam.Type, descriptiveExam.Topic, descriptiveExam.MaxNumberOfWordsAllowed, descriptiveExam.Content, descriptiveExam.TotalMarks, content)
+
+	response, err := e.promptService.GetStructuredPromptResult(ctx, prompt, constants.PRO_15)
 	if err != nil {
 		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, Remarks: fmt.Sprintf("error getting prompt results, %v", err)})
 		if err != nil {
@@ -430,6 +434,38 @@ Content to evaluate:
 	log.Println("Processed Assessment", assessmentId)
 }
 
+func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment) *models.AssessmentDetails {
+	if assessment == nil {
+		return nil
+	}
+
+	totalMarks := 0
+	var cutoffMarks float64 = 0
+	if assessment.Edges.Attempt != nil &&
+		assessment.Edges.Attempt.Edges.Generatedexam != nil &&
+		assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam != nil &&
+		assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting != nil {
+
+		totalMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.TotalMarks
+		cutoffMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.CutoffMarks
+	}
+
+	status := assessment.Status.String()
+
+	return &models.AssessmentDetails{
+		Id:                assessment.ID,
+		CompletedSeconds:  assessment.CompletedSeconds,
+		ObtainedMarks:     assessment.ObtainedMarks,
+		TotalMarks:        totalMarks,
+		CutoffMarks:       cutoffMarks,
+		Status:            status,
+		RawAssesmentData:  assessment.RawAssesmentData,
+		RawUserSubmission: assessment.RawUserSubmission,
+		CreatedAt:         assessment.CreatedAt,
+		UpdatedAt:         assessment.UpdatedAt,
+	}
+}
+
 func (e *ExamAssesmentService) updateAssessment(ctx context.Context, assessmentId int, assesmentModel commonRepositories.AssessmentModel) error {
 	return e.examAssesmentRepository.Update(ctx, assessmentId, assesmentModel)
 }
@@ -478,7 +514,9 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 		Attempted: 0,
 		Correct:   0,
 		Incorrect: 0,
+		Accuracy:  0,
 	}
+
 	allQuestions := getAllQuestions(*mcqExam)
 
 	for _, aq := range request.AttemptedQuestions {
@@ -494,6 +532,12 @@ func (e *ExamAssesmentService) evaluateMCQResponses(mcqExam *models.GeneratedMCQ
 			}
 		}
 	}
+
+	if resultSummary.Attempted > 0 {
+		accuracy := float64(resultSummary.Attempted-resultSummary.Incorrect) / float64(resultSummary.Attempted) * 100
+		resultSummary.Accuracy = math.Round(accuracy*100) / 100 // Round to two decimal places
+	}
+
 	return resultSummary
 }
 
@@ -512,25 +556,22 @@ func (e *ExamAssesmentService) createAndSaveAssessment(ctx context.Context, atte
 		return nil, err
 	}
 
-	return buildAssessmentDetails(assessment), nil
+	assessmentMappedModel := e.mapAssessmentModel(assessment)
+
+	if assessmentMappedModel.TotalMarks == 0 {
+		assessmentMappedModel.TotalMarks = exam.Edges.Exam.Edges.Setting.TotalMarks
+	}
+
+	if assessmentMappedModel.CutoffMarks == 0 {
+		assessmentMappedModel.CutoffMarks = exam.Edges.Exam.Edges.Setting.CutoffMarks
+	}
+
+	return assessmentMappedModel, nil
 }
 
 func calculateObtainedMarks(examSettings *ent.ExamSetting, summary models.MCQExamAssessmentResultSummary, negativeMarking float64) float64 {
 	markPerQuestion := float64(examSettings.TotalMarks) / float64(examSettings.NumberOfQuestions)
 	return (float64(summary.Correct) * markPerQuestion) - (negativeMarking * float64(summary.Incorrect))
-}
-
-func buildAssessmentDetails(assessment *ent.ExamAssesment) *models.AssessmentDetails {
-	return &models.AssessmentDetails{
-		Id:                assessment.ID,
-		CompletedSeconds:  assessment.CompletedSeconds,
-		Status:            assessment.Status.String(),
-		ObtainedMarks:     assessment.ObtainedMarks,
-		RawAssesmentData:  assessment.RawAssesmentData,
-		RawUserSubmission: assessment.RawUserSubmission,
-		CreatedAt:         assessment.CreatedAt,
-		UpdatedAt:         assessment.UpdatedAt,
-	}
 }
 
 func isCorrect(selected, correct []int) bool {
