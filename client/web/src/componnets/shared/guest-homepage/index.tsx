@@ -3,16 +3,24 @@ import { Link, useNavigate } from "react-router-dom";
 import { ScreenSizeQuery } from "../../../constants/shared";
 import { useMediaQuery } from "../../../hooks/use-media-query";
 import { useToast } from "../../../hooks/use-toast";
-import { ICategory } from "../../../interface/question";
 import { paths } from "../../../routes/route.constant";
-import { getQuestionsCategories } from "../../../services/exam.service";
+
+import { IExamCategories } from "../../../interface/exam-categories";
+import { getQuestionsCategories } from "../../../services/exam-categories.services";
 import Chip from "../../base/chip";
+import { ToastAction } from "../../base/toast";
 import Footer from "../footer";
 import Header from "../header/header";
 import StrippedLoader from "../stripped-loader";
-import { ToastAction } from "../../base/toast";
 
-const Card = ({
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../accordian";
+
+export const Card = ({
   title,
   description,
   icon,
@@ -50,17 +58,18 @@ const Card = ({
 
 const featureWeOffer = [
   {
-    title: "AI-Powered Test Analysis",
-    description:
-      "Get personalized insights and recommendations based on your performance, highlighting areas of improvement.",
-    icon: "fas fa-chart-pie",
-  },
-  {
     title: "Descriptive Answer Test with AI Insights",
     description:
       "Submit descriptive answers and receive detailed insights, feedback, and assessments using our AI-powered analysis system.",
     icon: "fas fa-robot",
   },
+  {
+    title: "AI-Powered Test Analysis",
+    description:
+      "Get personalized insights and recommendations based on your performance, highlighting areas of improvement.",
+    icon: "fas fa-chart-pie",
+  },
+
   {
     title: "Daily New Questions",
     description:
@@ -104,7 +113,7 @@ const upcomingFeatures = [
 ];
 
 const GuestHomePage = () => {
-  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [categories, setCategories] = useState<IExamCategories[]>([]);
   const isDesktopMode = useMediaQuery(ScreenSizeQuery.largeScreen, true);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -216,29 +225,10 @@ const GuestHomePage = () => {
                 </div>
               </div>
             </div>
-            <div className="text-center my-4 font-bold text-2xl underline mt-14">
-              Service We Offers
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {featureWeOffer.map((item) => (
-                <div className="p-4">
-                  <Card
-                    chip={
-                      <Chip variant={"success"} icon="play_circle">
-                        Live
-                      </Chip>
-                    }
-                    title={item.title}
-                    description={item.description}
-                    icon={item.icon}
-                  />
-                </div>
-              ))}
-            </div>
 
             <>
               <div className="text-center my-4 font-bold text-2xl underline mt-14">
-                Descriptive Exams we Offer
+                Exams We Offer
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
                 {loading
@@ -264,7 +254,7 @@ const GuestHomePage = () => {
                             />
                           </div>
                           <h3 className="text-lg font-bold text-gray-900 sm:text-xl">
-                            {item.exam_name.split("_").join(" ")}
+                            {item.exam_group_name.split("_").join(" ")}
                           </h3>
                         </article>
                       </div>
@@ -277,20 +267,38 @@ const GuestHomePage = () => {
               )}
             </>
 
-            <div className="text-center my-4 font-bold text-2xl underline">
-              Exciting Upcoming Features
+            <div className="text-center my-4 font-bold text-2xl underline mt-14">
+              Feature We Provide
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-              {upcomingFeatures.map((item) => (
-                <div className="p-4 lg:grayscale grayscale-0 transition duration-200 hover:grayscale-0">
-                  <Card
-                    chip={<Chip icon="clock">Coming Soon</Chip>}
-                    title={item.title}
-                    description={item.description}
-                    icon={item.icon}
-                  />
-                </div>
-              ))}
+            <div className=" max-w-3xl mx-auto">
+              <Accordion type="single" collapsible className="w-full">
+                {featureWeOffer.map((item, index) => (
+                  <AccordionItem value={`item-${index}`}>
+                    <AccordionTrigger>
+                      <span>
+                        <i className={item.icon}></i>
+                        <span className="mx-4">{item.title}</span>
+                        <Chip variant={"success"} icon="play_circle">
+                          Live
+                        </Chip>
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>{item.description}</AccordionContent>
+                  </AccordionItem>
+                ))}
+                {upcomingFeatures.map((item, index) => (
+                  <AccordionItem value={`coming-soon-${index}`}>
+                    <AccordionTrigger>
+                      <span>
+                        <i className={item.icon}></i>
+                        <span className="mx-4">{item.title}</span>
+                        <Chip icon="clock">Coming Soon</Chip>
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>{item.description}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </div>

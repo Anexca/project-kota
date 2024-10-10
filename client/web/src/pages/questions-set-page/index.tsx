@@ -17,7 +17,7 @@ import {
   getQuestions,
 } from "../../services/exam-categories.services";
 import DescriptiveQuestionsList from "./descriptive-question.list";
-import MCQQuestionsList from "./mcq-question.list";
+// import MCQQuestionsList from "./mcq-question.list";
 
 const QuestionSetPage = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const [questions, setQuestions] = useState<{
@@ -102,13 +102,24 @@ const QuestionSetPage = ({ isOpenMode }: { isOpenMode?: boolean }) => {
               )}
             </TabsContent>
             <TabsContent value="MCQ">
-              {!!questions.MCQ.length && (
+              <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
+                <div className=" w-2 bg-destructive rounded-full"></div>
+                <div className="flex flex-col flex-1">
+                  <div className="text-sm font-semibold text-destructive">
+                    Coming Soon
+                  </div>
+                  <div className="text-sm font-medium">
+                    This feature is under development. Will be released soon.
+                  </div>
+                </div>
+              </div>
+              {/* {!!questions.MCQ.length && (
                 <MCQQuestionsList
                   // questions={exams}
                   questions={questions.MCQ}
                   isOpenMode={isOpenMode}
                 />
-              )}
+              )} */}
             </TabsContent>
           </Tabs>
         </>
