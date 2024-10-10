@@ -8,6 +8,7 @@ export enum QUESTION_STATE {
 export const questionType: Record<string, string> = {
   formal_letter: "Formal Letter",
   essay: "Essay",
+  precis: "Precis",
 };
 
 export const ScreenSizeQuery = {

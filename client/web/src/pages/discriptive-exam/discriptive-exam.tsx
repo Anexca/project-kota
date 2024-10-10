@@ -377,6 +377,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
           <div className="text-sm font-medium">
             Que - {question?.raw_exam_data.topic}
           </div>
+          <></>
           <div>
             <Chip icon="clock" variant={"success"}>
               {question?.raw_exam_data.type
@@ -392,6 +393,12 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
             !!question?.raw_exam_data?.hints.length && (
               <Hints hints={question?.raw_exam_data?.hints || []} />
             )}
+          {question?.raw_exam_data?.content && (
+            <div className="p-2 px-3 border rounded my-2 text-sm font-medium">
+              <p className="text-info mb-2">Summarize the below paragraph :</p>
+              <p>{question?.raw_exam_data?.content}</p>
+            </div>
+          )}
         </div>
         {!evaluationResult && !noAttemptLeft && (
           <>

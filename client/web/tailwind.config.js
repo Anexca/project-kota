@@ -133,6 +133,7 @@ export default {
         fourth: "moveHorizontal 40s ease infinite",
         fifth: "moveInCircle 20s ease infinite",
         fadeIn: 'fadeIn 0.25s ease',
+        
       },
     },
   },

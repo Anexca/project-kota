@@ -4,6 +4,7 @@ interface RawExamData {
   type: string;
   max_number_of_words: string;
   total_marks: string;
+  content?: string;
 }
 
 export interface IQuestion {

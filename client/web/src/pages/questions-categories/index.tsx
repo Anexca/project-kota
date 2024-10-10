@@ -51,12 +51,10 @@ const QuestionCategories = ({ isOpenMode }: { isOpenMode?: boolean }) => {
           <Link to={`/${paths.HOMEPAGE}`} className="p-0">
             <Icon icon="arrow_back" className="text-info text-lg" />
           </Link>
-          <span className="text-lg font-semibold">
-            Banking Descriptive Question
-          </span>
+          <span className="text-lg font-semibold">Banking Exams</span>
         </div>
         <div className="text-sm text-black font-medium mb-2">
-          Get started with the exam categories below.
+          Get started with the exam below.
         </div>
       </div>
       {loading ? (
