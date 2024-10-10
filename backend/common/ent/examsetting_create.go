@@ -95,6 +95,20 @@ func (esc *ExamSettingCreate) SetNillableTotalMarks(i *int) *ExamSettingCreate {
 	return esc
 }
 
+// SetCutoffMarks sets the "cutoff_marks" field.
+func (esc *ExamSettingCreate) SetCutoffMarks(f float64) *ExamSettingCreate {
+	esc.mutation.SetCutoffMarks(f)
+	return esc
+}
+
+// SetNillableCutoffMarks sets the "cutoff_marks" field if the given value is not nil.
+func (esc *ExamSettingCreate) SetNillableCutoffMarks(f *float64) *ExamSettingCreate {
+	if f != nil {
+		esc.SetCutoffMarks(*f)
+	}
+	return esc
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esc *ExamSettingCreate) SetEvaluationAiPrompt(s string) *ExamSettingCreate {
 	esc.mutation.SetEvaluationAiPrompt(s)
@@ -199,6 +213,10 @@ func (esc *ExamSettingCreate) defaults() {
 		v := examsetting.DefaultTotalMarks
 		esc.mutation.SetTotalMarks(v)
 	}
+	if _, ok := esc.mutation.CutoffMarks(); !ok {
+		v := examsetting.DefaultCutoffMarks
+		esc.mutation.SetCutoffMarks(v)
+	}
 	if _, ok := esc.mutation.CreatedAt(); !ok {
 		v := examsetting.DefaultCreatedAt()
 		esc.mutation.SetCreatedAt(v)
@@ -279,6 +297,10 @@ func (esc *ExamSettingCreate) createSpec() (*ExamSetting, *sqlgraph.CreateSpec) 
 	if value, ok := esc.mutation.TotalMarks(); ok {
 		_spec.SetField(examsetting.FieldTotalMarks, field.TypeInt, value)
 		_node.TotalMarks = value
+	}
+	if value, ok := esc.mutation.CutoffMarks(); ok {
+		_spec.SetField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+		_node.CutoffMarks = value
 	}
 	if value, ok := esc.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)

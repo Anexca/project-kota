@@ -85,6 +85,11 @@ func TotalMarks(v int) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldTotalMarks, v))
 }
 
+// CutoffMarks applies equality check predicate on the "cutoff_marks" field. It's identical to CutoffMarksEQ.
+func CutoffMarks(v float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldCutoffMarks, v))
+}
+
 // EvaluationAiPrompt applies equality check predicate on the "evaluation_ai_prompt" field. It's identical to EvaluationAiPromptEQ.
 func EvaluationAiPrompt(v string) predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldEQ(FieldEvaluationAiPrompt, v))
@@ -403,6 +408,56 @@ func TotalMarksIsNil() predicate.ExamSetting {
 // TotalMarksNotNil applies the NotNil predicate on the "total_marks" field.
 func TotalMarksNotNil() predicate.ExamSetting {
 	return predicate.ExamSetting(sql.FieldNotNull(FieldTotalMarks))
+}
+
+// CutoffMarksEQ applies the EQ predicate on the "cutoff_marks" field.
+func CutoffMarksEQ(v float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldEQ(FieldCutoffMarks, v))
+}
+
+// CutoffMarksNEQ applies the NEQ predicate on the "cutoff_marks" field.
+func CutoffMarksNEQ(v float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNEQ(FieldCutoffMarks, v))
+}
+
+// CutoffMarksIn applies the In predicate on the "cutoff_marks" field.
+func CutoffMarksIn(vs ...float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIn(FieldCutoffMarks, vs...))
+}
+
+// CutoffMarksNotIn applies the NotIn predicate on the "cutoff_marks" field.
+func CutoffMarksNotIn(vs ...float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotIn(FieldCutoffMarks, vs...))
+}
+
+// CutoffMarksGT applies the GT predicate on the "cutoff_marks" field.
+func CutoffMarksGT(v float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGT(FieldCutoffMarks, v))
+}
+
+// CutoffMarksGTE applies the GTE predicate on the "cutoff_marks" field.
+func CutoffMarksGTE(v float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldGTE(FieldCutoffMarks, v))
+}
+
+// CutoffMarksLT applies the LT predicate on the "cutoff_marks" field.
+func CutoffMarksLT(v float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLT(FieldCutoffMarks, v))
+}
+
+// CutoffMarksLTE applies the LTE predicate on the "cutoff_marks" field.
+func CutoffMarksLTE(v float64) predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldLTE(FieldCutoffMarks, v))
+}
+
+// CutoffMarksIsNil applies the IsNil predicate on the "cutoff_marks" field.
+func CutoffMarksIsNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldIsNull(FieldCutoffMarks))
+}
+
+// CutoffMarksNotNil applies the NotNil predicate on the "cutoff_marks" field.
+func CutoffMarksNotNil() predicate.ExamSetting {
+	return predicate.ExamSetting(sql.FieldNotNull(FieldCutoffMarks))
 }
 
 // EvaluationAiPromptEQ applies the EQ predicate on the "evaluation_ai_prompt" field.
