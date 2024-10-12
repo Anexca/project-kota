@@ -96,6 +96,7 @@ func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExam
 		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen), generatedexam.IsActive(!isOpen)).
 		WithExam(func(eq *ent.ExamQuery) {
 			eq.WithSetting()
+			eq.WithGroup()
 		}).
 		Only(ctx)
 }

@@ -349,7 +349,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 			- Do Not visit any URLs provided in Content.
 			- Ensure the rating is based only on content provided, and use the provided criteria to calculate it.
 
-			For precis evaluation, please summarize the content provided:
+			For precis evaluation, please summarize the provided content in fewer, meaningful words.:
 
 			**Content for Precis**:
 			“%s”
@@ -363,7 +363,10 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 			- "rating": A string representing the rating.
 			- "strengths": An array of strings highlighting the content’s strengths.
 			- "weaknesses": An array of strings pointing out the content’s weaknesses.
-			- "corrected_version": Generate a single-line string with the corrected version of the content. There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+			- "corrected_version": 
+				- Generate a single-line string with the corrected version of the content with required formatting. 
+				- There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+				- Should always generate a correct solution for exam with required parameters.
 
 			Assessment JSON Schema:
 			{
@@ -440,6 +443,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 	}
 
 	totalMarks := 0
+	totalQuestions := 0
 	var cutoffMarks float64 = 0
 	if assessment.Edges.Attempt != nil &&
 		assessment.Edges.Attempt.Edges.Generatedexam != nil &&
@@ -448,6 +452,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 
 		totalMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.TotalMarks
 		cutoffMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.CutoffMarks
+		totalQuestions = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.NumberOfQuestions
 	}
 
 	status := assessment.Status.String()
@@ -457,6 +462,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 		CompletedSeconds:  assessment.CompletedSeconds,
 		ObtainedMarks:     assessment.ObtainedMarks,
 		TotalMarks:        totalMarks,
+		TotalQuestions:    totalQuestions,
 		CutoffMarks:       cutoffMarks,
 		Status:            status,
 		RawAssesmentData:  assessment.RawAssesmentData,

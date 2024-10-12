@@ -373,6 +373,7 @@ func (e *ExamGenerationService) GetGeneratedExamById(ctx context.Context, genera
 	examOverview := e.buildGeneratedExamOverview(generatedExam, examSettings, userAttempts)
 	examOverview.ExamName = generatedExam.Edges.Exam.Name
 	examOverview.ExamType = generatedExam.Edges.Exam.Type.String()
+	examOverview.ExamGroup = generatedExam.Edges.Exam.Edges.Group.Name
 	examOverview.UserHasAccessToExam = true
 	examOverview.ExamStage = generatedExam.Edges.Exam.Stage
 	examOverview.IsSectional = generatedExam.Edges.Exam.IsSectional
@@ -405,6 +406,7 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 		overview.ExamType = string(ex.Type)
 		overview.UserAttempts = len(userAttempts)
 		overview.ExamStage = ex.Stage
+		overview.ExamGroup = ex.Edges.Group.Name
 		overview.IsSectional = ex.IsSectional
 
 		if ex.Type == exam.TypeMCQ {

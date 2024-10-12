@@ -36,6 +36,7 @@ func (e *ExamGroupRepository) GetActiveByIdWithExams(ctx context.Context, examGr
 			eq.Where(exam.IsActiveEQ(isActive)).
 				WithSetting().
 				WithCategory().
+				WithGroup().
 				WithGeneratedexams(func(geq *ent.GeneratedExamQuery) {
 					geq.Where(generatedexam.IsActiveEQ(isActive))
 				})
