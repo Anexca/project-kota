@@ -33,9 +33,9 @@ jobs:
 
       - name: Install dependencies and Run tests
         run: |
-          cd server && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' | xargs go test -coverprofile=server-coverage.out -coverpkg=$(go list ./... | grep -v -e '/cmd' -e '/pkg')
-          cd ../ai-service && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' | xargs go test -coverprofile=ai-service-coverage.out -coverpkg=$(go list ./... | grep -v -e '/cmd' -e '/pkg')
-          cd ../common && go mod tidy && go list ./... | grep -v -e '/constants' -e '/config' -e '/ent' -e '/mocks' -e '/interfaces' | xargs go test -coverprofile=common-coverage.out -coverpkg=$(go list ./... | grep -v -e '/constants' -e '/config' -e '/ent' -e '/mocks' -e '/interfaces')
+          cd server && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' | xargs go test -coverprofile=server-coverage.out -covermode=atomic   
+          cd ../ai-service && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' | xargs go test -coverprofile=ai-service-coverage.out  -covermode=atomic
+          cd ../common && go mod tidy && go list ./... | grep -v -e '/constants' -e '/config' -e '/ent' -e '/mocks' -e '/interfaces' | xargs go test -coverprofile=common-coverage.out -covermode=atomic
 
       - name: Generate Cobertura Coverage Report for Server
         run: cat server/server-coverage.out | gocover-cobertura > server/coverage.xml
@@ -49,6 +49,7 @@ jobs:
         run: cat common/common-coverage.out | gocover-cobertura > common/coverage.xml
         working-directory: backend
 
+      # Use the Code Coverage Summary action to generate a summary and optionally fail the check if coverage is below threshold
       - name: Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
         continue-on-error: true
