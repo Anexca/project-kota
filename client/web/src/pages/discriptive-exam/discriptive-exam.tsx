@@ -256,7 +256,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
     const timeTaken = question!.duration_seconds - examTime;
     try {
       const response = await sendAnswerForAssesment({
-        questionId: question!.id,
+        questionId: question!.exam_id,
         answer: value.answer,
         completedTime: timeTaken >= 1 ? timeTaken : 1,
         isOpen: isOpenMode,
@@ -317,7 +317,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
 
   const endExamNavigatePath = isOpenMode
     ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}`
-    : `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}/${param.categoryId}`;
+    : `/${paths.EXAMS}/banking/${param.categoryId}`;
   const exitExam = () => {
     interval.stop();
     navigate(endExamNavigatePath);
@@ -377,6 +377,7 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
           <div className="text-sm font-medium">
             Que - {question?.raw_exam_data.topic}
           </div>
+          <></>
           <div>
             <Chip icon="clock" variant={"success"}>
               {question?.raw_exam_data.type
@@ -392,6 +393,12 @@ const DiscriptiveExam = ({ isOpenMode }: { isOpenMode?: boolean }) => {
             !!question?.raw_exam_data?.hints.length && (
               <Hints hints={question?.raw_exam_data?.hints || []} />
             )}
+          {question?.raw_exam_data?.content && (
+            <div className="p-2 px-3 border rounded my-2 text-sm font-medium">
+              <p className="text-info mb-2">Summarize the below paragraph :</p>
+              <p>{question?.raw_exam_data?.content}</p>
+            </div>
+          )}
         </div>
         {!evaluationResult && !noAttemptLeft && (
           <>

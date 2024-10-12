@@ -1,6 +1,6 @@
 export enum QUESTION_STATE {
-  ATTEMPED = "ATTEMPED",
-  NOT_ATTEMPED = "NOT-ATTEMPED",
+  ATTEMPTED = "ATTEMPTED",
+  UN_ATTEMPTED = "UN-ATTEMPTED",
   FOR_REVIEW = "FOR-REVIEW",
   NOT_ANSWERED = "NOT-ANSWERED",
 }
@@ -8,6 +8,7 @@ export enum QUESTION_STATE {
 export const questionType: Record<string, string> = {
   formal_letter: "Formal Letter",
   essay: "Essay",
+  precis: "Precis",
 };
 
 export const ScreenSizeQuery = {

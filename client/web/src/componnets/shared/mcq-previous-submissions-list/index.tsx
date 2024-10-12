@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../../../hooks/use-toast";
-import { IQuestion } from "../../../interface/question";
+import { IMCQExam } from "../../../interface/question";
 import { paths } from "../../../routes/route.constant";
 import { getPastSubmission } from "../../../services/exam.service";
 import { Button } from "../../base/button/button";
 import Chip from "../../base/chip";
 import Icon from "../../base/icon";
-import { questionType } from "../../../constants/shared";
 interface ISubmission {
   id: number;
   completed_seconds: number;
@@ -35,11 +34,11 @@ const iconSet = {
     />
   ),
 };
-const PreviousSubmissions = ({
+const MCQPreviousSubmissions = ({
   question,
   isOpenExam,
 }: {
-  question: IQuestion;
+  question: IMCQExam;
   isOpenExam?: boolean;
 }) => {
   const [submissionList, setSubmissionList] = useState<ISubmission[]>([]);
@@ -63,24 +62,27 @@ const PreviousSubmissions = ({
   };
   const viewSubmission = (id: number) => {
     const path = isOpenExam
-      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.DISCRIPTIVE}/${question.exam_id}/${paths.SUBMISSION}/${id}`
-      : `/${paths.EXAMS}/banking/${param.categoryId}/${paths.DISCRIPTIVE}/${question.exam_id}/${paths.SUBMISSION}/${id}`;
+      ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.MCQ}/${question.exam_id}/${paths.SUBMISSION}/${id}`
+      : `/${paths.EXAMS}/banking/${param.categoryId}/${paths.MCQ}/${question.exam_id}/${paths.SUBMISSION}/${id}`;
     navigate(path);
   };
   useEffect(() => {
     fetchPastSubmissions();
   }, []);
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className=" flex flex-col gap-2 p-1 items-start">
-        <div className="text-sm font-medium">
-          Que - {question?.raw_exam_data.topic}
+        <div className="text-sm font-medium capitalize">
+          Que - {question?.exam_name.toLowerCase()}{" "}
+          {question?.exam_stage.toLowerCase()}
+        </div>
+        <div className="text-sm font-medium capitalize">
+          Question Paper Set - #{question.exam_id}
         </div>
 
         <Chip variant={"success"} icon={"file"}>
-          {question?.raw_exam_data.type
-            ? questionType[question?.raw_exam_data.type] || "--"
-            : "--"}
+          {question?.exam_type || "--"}
         </Chip>
       </div>
       {loading ? (
@@ -131,4 +133,4 @@ const PreviousSubmissions = ({
   );
 };
 
-export default PreviousSubmissions;
+export default MCQPreviousSubmissions;
