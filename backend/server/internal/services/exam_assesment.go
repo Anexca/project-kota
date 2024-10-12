@@ -443,6 +443,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 	}
 
 	totalMarks := 0
+	totalQuestions := 0
 	var cutoffMarks float64 = 0
 	if assessment.Edges.Attempt != nil &&
 		assessment.Edges.Attempt.Edges.Generatedexam != nil &&
@@ -451,6 +452,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 
 		totalMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.TotalMarks
 		cutoffMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.CutoffMarks
+		totalQuestions = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.NumberOfQuestions
 	}
 
 	status := assessment.Status.String()
@@ -460,6 +462,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 		CompletedSeconds:  assessment.CompletedSeconds,
 		ObtainedMarks:     assessment.ObtainedMarks,
 		TotalMarks:        totalMarks,
+		TotalQuestions:    totalQuestions,
 		CutoffMarks:       cutoffMarks,
 		Status:            status,
 		RawAssesmentData:  assessment.RawAssesmentData,

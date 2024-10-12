@@ -82,7 +82,8 @@ type AssessmentDetails struct {
 	Id                int                    `json:"id"`
 	CompletedSeconds  int                    `json:"completed_seconds"`
 	ObtainedMarks     float64                `json:"obtained_marks,omitempty"`
-	TotalMarks        int                    `json:"total_marks"`
+	TotalMarks        int                    `json:"total_marks,omitempty"`
+	TotalQuestions    int                    `json:"total_questions,omitempty"`
 	CutoffMarks       float64                `json:"cutoff_marks,omitempty"`
 	Status            string                 `json:"status"`
 	RawAssesmentData  map[string]interface{} `json:"raw_assesment_data,omitempty"`
