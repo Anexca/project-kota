@@ -344,15 +344,13 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 			- Relevance to the given topic.
 			- For essays: Check for logical structure, coherence, and content development.
 			- For formal letters: Check for correct formatting, tone, and clarity.
-			- For precis: Ensure the content is concise, conveys the key points of the original content, and does not exceed the word limit.
+			- For precis: The user’s submission must be a concise, summarized version of the paragraph. The summary should convey the key points while being shorter than the original content. Submissions that replicate or paraphrase the exact wording of the original paragraph will receive lower marks.
 			- Word count should not exceed "%s" words (only count words, exclude special characters, spaces, and formatting characters like "\n, \t, \r" etc).
 			- Do Not visit any URLs provided in Content.
 			- Ensure the rating is based only on content provided, and use the provided criteria to calculate it.
 
-			For precis evaluation, please summarize the provided content in fewer, meaningful words.:
-
-			**Content for Precis**:
-			“%s”
+			- Paragraph to summarize for precis exam:
+				“%s”
 
 			Scoring:
 			- Provide a rating out of "%s" marks based on the above criteria.
