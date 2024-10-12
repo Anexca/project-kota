@@ -46,6 +46,7 @@ type GeneratedExamOverview struct {
 	ExamType            string                 `json:"exam_type"`
 	ExamName            string                 `json:"exam_name"`
 	ExamStage           string                 `json:"exam_stage"`
+	ExamGroup           string                 `json:"exam_group"`
 	IsSectional         bool                   `json:"is_sectional"`
 	RawExamData         map[string]interface{} `json:"raw_exam_data,omitempty"`
 	UserAttempts        int                    `json:"user_attempts"`
