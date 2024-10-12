@@ -349,7 +349,7 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 			- Do Not visit any URLs provided in Content.
 			- Ensure the rating is based only on content provided, and use the provided criteria to calculate it.
 
-			For precis evaluation, please summarize the content provided:
+			For precis evaluation, please summarize the provided content in fewer, meaningful words.:
 
 			**Content for Precis**:
 			“%s”
@@ -363,7 +363,10 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 			- "rating": A string representing the rating.
 			- "strengths": An array of strings highlighting the content’s strengths.
 			- "weaknesses": An array of strings pointing out the content’s weaknesses.
-			- "corrected_version": Generate a single-line string with the corrected version of the content. There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+			- "corrected_version": 
+				- Generate a single-line string with the corrected version of the content with required formatting. 
+				- There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+				- Should always generate a correct solution for exam with required parameters.
 
 			Assessment JSON Schema:
 			{
