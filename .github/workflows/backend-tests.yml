@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies and Run tests
         run: |
-          cd server && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' -e '/internal/interfaces' -e '/internal/mocks' | xargs go test -coverprofile=server-coverage.out -coverpkg=$(go list ./... | grep -v -e '/cmd' -e '/pkg' -e '/internal/interfaces' -e '/internal/mocks')
+          cd server && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' | xargs go test -coverprofile=server-coverage.out -coverpkg=$(go list ./... | grep -v -e '/cmd' -e '/pkg')
           cd ../ai-service && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' | xargs go test -coverprofile=ai-service-coverage.out -coverpkg=$(go list ./... | grep -v -e '/cmd' -e '/pkg')
           cd ../common && go mod tidy && go list ./... | grep -v -e '/constants' -e '/config' -e '/ent' -e '/mocks' -e '/interfaces' | xargs go test -coverprofile=common-coverage.out -coverpkg=$(go list ./... | grep -v -e '/constants' -e '/config' -e '/ent' -e '/mocks' -e '/interfaces')
 
