@@ -18,11 +18,11 @@ headers = {
 }
 
 data = {
-    "completed_seconds": 0,
-    "content": "In an increasingly interconnected yet volatile global market, export credit agencies (ECAs) play a crucial role in facilitating and promoting international trade. These institutions provide a safety net for exporters by offering insurance against a range of political and commercial risks, including non-payment by foreign buyers, political instability in buyer countries, and currency fluctuations..."
+    "completed_seconds": 50,
+    "content": "some test assessment data"
 }
 
-def poll_assessment(id):
+def poll_assessment(id, start_time):
     assessment_url = f"{server_url}/exams/assesments/{id}"
     
     while True:
@@ -32,7 +32,9 @@ def poll_assessment(id):
             status = assessment_data['data']['status']
             print(f"Assessment {id} status: {status}")
             if status != "PENDING":
-                print(f"Assessment {id} completed with status: {status}")
+                end_time = time.time()
+                elapsed_time = end_time - start_time
+                print(f"Assessment {id} completed with status: {status} in {elapsed_time:.2f} seconds.")
                 break
         else:
             print(f"Failed to retrieve assessment {id}: {response.text}")
@@ -41,14 +43,14 @@ def poll_assessment(id):
 
 def call_api(url, attempt):
     print(f"Calling {url} (Attempt {attempt})")
+    start_time = time.time()
     response = requests.post(url, headers=headers, json=data)
     
     if response.status_code == 200 or response.status_code == 202:
         result = response.json()
         assessment_id = result['data']['id']
         print(f"Initial request successful for {url} (Attempt {attempt}). Assessment ID: {assessment_id}")
-        # Start polling the assessment endpoint
-        poll_assessment(assessment_id)
+        poll_assessment(assessment_id, start_time)
     else:
         print(f"Failed with status code {response.status_code}: {response.text}")
 
