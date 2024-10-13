@@ -105,6 +105,7 @@ const PreviousSubmissionPage = () => {
                   srNumber={item.attempted_exam_id}
                   category={item.exam_category}
                   submissions={item.attempts}
+                  examType={item.exam_type}
                 />
               ) : null;
             })

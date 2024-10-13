@@ -70,6 +70,12 @@ const DescriptiveSubmission = ({
             : "--"}
         </Chip>
       </div>
+      {question?.raw_exam_data?.content && (
+        <div className="p-2 px-3 border rounded my-2 text-sm font-medium">
+          <p className="text-info mb-2">Summarize the below paragraph :</p>
+          <p>{question?.raw_exam_data?.content}</p>
+        </div>
+      )}
       {loading ? (
         <div className="flex flex-col gap-2 justify-center items-center">
           <span className="rounded-full w-8 h-8 animate-spin border-2 border-info border-t-info/30"></span>

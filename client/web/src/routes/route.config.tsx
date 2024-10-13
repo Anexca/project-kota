@@ -114,6 +114,7 @@ const routes: RouteObject[] = [
                 path: `${paths.MY_SUMBISSIONS}/:questionId/${paths.SUBMISSION}/:assesmentId`,
                 element: <ViewPastSubmission />,
               },
+
               ...mcqRoutes,
             ],
           },

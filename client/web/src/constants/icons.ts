@@ -16,6 +16,8 @@ export const ICONS = {
   target: "fa-solid fa-bullseye",
   exclaimation_circle: "fa-solid fa-exclamation-circle",
   xmark_circle: "fa-solid fa-xmark-circle",
+  tasks: "fa-solid fa-tasks",
+  forward: "fa-solid fa-forward",
   file: "fa-solid fa-file",
   rupee: "fa-solid fa-indian-rupee-sign",
   chevron_down: "fa-solid fa-chevron-down",

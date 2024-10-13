@@ -19,6 +19,7 @@ type Props = {
   type: string;
   category: string;
   submissions: Attempt[];
+  examType: string;
 };
 
 const iconSet = {
@@ -47,6 +48,7 @@ const AttemptedSubmissionsCard = ({
   type,
   category,
   submissions,
+  examType,
 }: Props) => {
   const [listOpen, setListOpen] = useState(false);
   return (
@@ -54,7 +56,7 @@ const AttemptedSubmissionsCard = ({
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <p className="font-medium text-balance md:text-pretty text-black mb-2">
-            #{srNumber} - {topic}
+            #{srNumber} - {topic.split("_").join(" ")}
           </p>
         </div>
         <div className="flex flex-col items-stretch gap-2 md:justify-center md:w-32">
@@ -63,7 +65,7 @@ const AttemptedSubmissionsCard = ({
               {category}
             </Chip>
             <Chip icon="file" variant={"success"}>
-              {questionType[type] || "--"}
+              {questionType[type] || type}
             </Chip>
           </div>
         </div>
@@ -112,7 +114,11 @@ const AttemptedSubmissionsCard = ({
                 size="sm"
                 className="text-sm py-1"
                 variant={"secondary"}
-                to={`/${paths.EXAMS}/${paths.MY_SUMBISSIONS}/${srNumber}/${paths.SUBMISSION}/${item.assessment_id}`}
+                to={
+                  examType == "MCQ"
+                    ? `/${paths.EXAMS}/${paths.MY_SUMBISSIONS}/${paths.MCQ}/${srNumber}/${paths.SUBMISSION}/${item.assessment_id}`
+                    : `/${paths.EXAMS}/${paths.MY_SUMBISSIONS}/${srNumber}/${paths.SUBMISSION}/${item.assessment_id}`
+                }
               >
                 <Icon icon="send" className="mr-2" /> View
               </StyledLink>

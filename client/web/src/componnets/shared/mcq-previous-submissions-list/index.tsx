@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "../../../hooks/use-toast";
 import { IMCQExam } from "../../../interface/question";
 import { paths } from "../../../routes/route.constant";
@@ -44,7 +44,7 @@ const MCQPreviousSubmissions = ({
   const [submissionList, setSubmissionList] = useState<ISubmission[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const param = useParams();
+
   const { toast } = useToast();
   const fetchPastSubmissions = async () => {
     setLoading(true);
@@ -63,7 +63,7 @@ const MCQPreviousSubmissions = ({
   const viewSubmission = (id: number) => {
     const path = isOpenExam
       ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.MCQ}/${question.exam_id}/${paths.SUBMISSION}/${id}`
-      : `/${paths.EXAMS}/banking/${param.categoryId}/${paths.MCQ}/${question.exam_id}/${paths.SUBMISSION}/${id}`;
+      : `/${paths.EXAMS}/${paths.MY_SUMBISSIONS}/${paths.MCQ}/${question.exam_id}/${paths.SUBMISSION}/${id}`;
     navigate(path);
   };
   useEffect(() => {

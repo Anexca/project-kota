@@ -65,7 +65,7 @@ export interface IMCQQuestionSet {
   updated_at: string;
 }
 export interface IMCQQuestion {
-  answer: string;
+  answer: number[];
   content_reference_id: string;
   explanation: string;
   options: string[];
