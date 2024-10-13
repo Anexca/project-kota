@@ -11,8 +11,8 @@ import (
 )
 
 // Separate rate limiters for each function
-var rlPromptResults = ratelimit.New(1, ratelimit.Per(time.Second))
-var rlStructuredPromptResults = ratelimit.New(1, ratelimit.Per(time.Second))
+var rlPromptResults = ratelimit.New(1, ratelimit.Per(time.Minute))
+var rlStructuredPromptResults = ratelimit.New(2, ratelimit.Per(time.Minute))
 
 func (s *Server) GetPromptResults(w http.ResponseWriter, r *http.Request) {
 	rlPromptResults.Take()
