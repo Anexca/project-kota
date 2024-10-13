@@ -29,3 +29,4 @@ main
 *templ.go
 tmp
 *debug*
+*coverage

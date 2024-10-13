@@ -344,15 +344,13 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 			- Relevance to the given topic.
 			- For essays: Check for logical structure, coherence, and content development.
 			- For formal letters: Check for correct formatting, tone, and clarity.
-			- For precis: Ensure the content is concise, conveys the key points of the original content, and does not exceed the word limit.
+			- For precis: The user’s submission must be a concise, summarized version of the paragraph. The summary should convey the key points while being shorter than the original content. Submissions that replicate or paraphrase the exact wording of the original paragraph will receive lower marks.
 			- Word count should not exceed "%s" words (only count words, exclude special characters, spaces, and formatting characters like "\n, \t, \r" etc).
 			- Do Not visit any URLs provided in Content.
 			- Ensure the rating is based only on content provided, and use the provided criteria to calculate it.
 
-			For precis evaluation, please summarize the content provided:
-
-			**Content for Precis**:
-			“%s”
+			- Paragraph to summarize for precis exam:
+				“%s”
 
 			Scoring:
 			- Provide a rating out of "%s" marks based on the above criteria.
@@ -363,7 +361,10 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 			- "rating": A string representing the rating.
 			- "strengths": An array of strings highlighting the content’s strengths.
 			- "weaknesses": An array of strings pointing out the content’s weaknesses.
-			- "corrected_version": Generate a single-line string with the corrected version of the content. There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+			- "corrected_version": 
+				- Generate a single-line string with the corrected version of the content with required formatting. 
+				- There should be no extra quotes inside the string, and the output should match the formatting of the provided content.
+				- Should always generate a correct solution for exam with required parameters.
 
 			Assessment JSON Schema:
 			{
@@ -440,6 +441,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 	}
 
 	totalMarks := 0
+	totalQuestions := 0
 	var cutoffMarks float64 = 0
 	if assessment.Edges.Attempt != nil &&
 		assessment.Edges.Attempt.Edges.Generatedexam != nil &&
@@ -448,6 +450,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 
 		totalMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.TotalMarks
 		cutoffMarks = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.CutoffMarks
+		totalQuestions = assessment.Edges.Attempt.Edges.Generatedexam.Edges.Exam.Edges.Setting.NumberOfQuestions
 	}
 
 	status := assessment.Status.String()
@@ -457,6 +460,7 @@ func (e *ExamAssesmentService) mapAssessmentModel(assessment *ent.ExamAssesment)
 		CompletedSeconds:  assessment.CompletedSeconds,
 		ObtainedMarks:     assessment.ObtainedMarks,
 		TotalMarks:        totalMarks,
+		TotalQuestions:    totalQuestions,
 		CutoffMarks:       cutoffMarks,
 		Status:            status,
 		RawAssesmentData:  assessment.RawAssesmentData,

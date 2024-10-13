@@ -96,6 +96,7 @@ func (q *GeneratedExamRepository) GetOpenById(ctx context.Context, generatedExam
 		Where(generatedexam.IDEQ(generatedExamId), generatedexam.IsOpenEQ(isOpen), generatedexam.IsActive(!isOpen)).
 		WithExam(func(eq *ent.ExamQuery) {
 			eq.WithSetting()
+			eq.WithGroup()
 		}).
 		Only(ctx)
 }
@@ -122,7 +123,10 @@ func (q *GeneratedExamRepository) GetByExam(ctx context.Context, ex *ent.Exam) (
 func (q *GeneratedExamRepository) GetByOpenFlag(ctx context.Context, examId int) ([]*ent.GeneratedExam, error) {
 	return q.dbClient.GeneratedExam.Query().
 		Where(generatedexam.IsOpenEQ(true), generatedexam.HasExamWith(exam.ID(examId))).
-		WithExam().
+		WithExam(func(eq *ent.ExamQuery) {
+			eq.WithGroup()
+			eq.WithSetting()
+		}).
 		All(ctx)
 }
 

@@ -33,9 +33,9 @@ jobs:
 
       - name: Install dependencies and Run tests
         run: |
-          cd server && go mod tidy && go test -coverprofile=server-coverage.out ./...
-          cd ../ai-service && go mod tidy && go test -coverprofile=ai-service-coverage.out ./...
-          cd ../common && go mod tidy && go test -coverprofile=common-coverage.out ./...
+          cd server && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' -e '/internal/interfaces' -e '/internal/mocks' | xargs go test -coverprofile=server-coverage.out -covermode=atomic   
+          cd ../ai-service && go mod tidy && go list ./... | grep -v -e '/cmd' -e '/pkg' | xargs go test -coverprofile=ai-service-coverage.out  -covermode=atomic
+          cd ../common && go mod tidy && go list ./... | grep -v -e '/constants' -e '/config' -e '/ent' -e '/mocks' -e '/interfaces' | xargs go test -coverprofile=common-coverage.out -covermode=atomic
 
       - name: Generate Cobertura Coverage Report for Server
         run: cat server/server-coverage.out | gocover-cobertura > server/coverage.xml
@@ -62,7 +62,7 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
-          thresholds: "0 100"
+          thresholds: "30 100"
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
