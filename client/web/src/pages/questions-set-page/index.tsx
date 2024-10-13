@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { IMCQExam, IQuestion } from "../../interface/question";
 import { paths } from "../../routes/route.constant";
 
@@ -20,7 +20,12 @@ import DescriptiveQuestionsList from "./descriptive-question.list";
 import MCQQuestionsList from "./mcq-question.list";
 // import MCQQuestionsList from "./mcq-question.list";
 
+const tabConfig = {
+  mcq: "mcq",
+  descriptive: "descriptive",
+};
 const QuestionSetPage = ({ isOpenMode }: { isOpenMode?: boolean }) => {
+  const [searchParam, setSearchParam] = useSearchParams();
   const [questions, setQuestions] = useState<{
     DESCRIPTIVE: IQuestion[];
     MCQ: IMCQExam[];
@@ -63,6 +68,10 @@ const QuestionSetPage = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const backPath = isOpenMode
     ? `/${paths.HOMEPAGE}`
     : `/${paths.EXAMS}/banking`;
+
+  const defaultTab = useMemo(() => {
+    return searchParam.get("activeTab");
+  }, []);
   return (
     <div className="pt-2 w-full md:max-w-2xl 2xl:max-w-2xl mx-auto flex flex-col gap-2 p-4">
       <div className="py-2">
@@ -89,12 +98,32 @@ const QuestionSetPage = ({ isOpenMode }: { isOpenMode?: boolean }) => {
         </div>
       ) : (
         <>
-          <Tabs defaultValue="Descriptive" className="w-full">
+          <Tabs
+            defaultValue={
+              //@ts-ignore
+              (defaultTab && tabConfig[defaultTab]) || tabConfig.descriptive
+            }
+            className="w-full"
+          >
             <TabsList>
-              <TabsTrigger value="Descriptive">Descriptive</TabsTrigger>
-              <TabsTrigger value="MCQ">MCQ</TabsTrigger>
+              <TabsTrigger
+                onClick={() => {
+                  setSearchParam(() => ({ activeTab: tabConfig.descriptive }));
+                }}
+                value={tabConfig.descriptive}
+              >
+                Descriptive
+              </TabsTrigger>
+              <TabsTrigger
+                onClick={() => {
+                  setSearchParam(() => ({ activeTab: tabConfig.mcq }));
+                }}
+                value={tabConfig.mcq}
+              >
+                MCQ
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="Descriptive">
+            <TabsContent value={tabConfig.descriptive}>
               {!!questions.DESCRIPTIVE?.length && (
                 <DescriptiveQuestionsList
                   questions={questions.DESCRIPTIVE}
@@ -102,21 +131,9 @@ const QuestionSetPage = ({ isOpenMode }: { isOpenMode?: boolean }) => {
                 />
               )}
             </TabsContent>
-            <TabsContent value="MCQ">
-              {/* <div className="flex p-4 rounded bg-white shadow-sm mt-2 gap-4">
-                <div className=" w-2 bg-destructive rounded-full"></div>
-                <div className="flex flex-col flex-1">
-                  <div className="text-sm font-semibold text-destructive">
-                    Coming Soon
-                  </div>
-                  <div className="text-sm font-medium">
-                    This feature is under development. Will be released soon.
-                  </div>
-                </div>
-              </div> */}
+            <TabsContent value={tabConfig.mcq}>
               {!!questions.MCQ.length && (
                 <MCQQuestionsList
-                  // questions={exams}
                   questions={questions.MCQ}
                   isOpenMode={isOpenMode}
                 />

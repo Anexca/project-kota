@@ -124,7 +124,7 @@ const MCQSubmission = ({ backLink }: { backLink?: string }) => {
     };
   }, [questionSet, assessment]);
   const exitLink = categoryId
-    ? `/${paths.EXAMS}/banking/${categoryId}`
+    ? `/${paths.EXAMS}/banking/${categoryId}?activeTab=mcq`
     : `/${paths.EXAMS}/${paths.MY_SUMBISSIONS}`;
 
   return summaryView ? (
@@ -155,11 +155,11 @@ const MCQSubmission = ({ backLink }: { backLink?: string }) => {
               variant={clearedExam ? "success" : "destructive"}
               className="text-base"
             >
-              {assessment?.obtained_marks || ""}
+              {assessment?.obtained_marks ?? 0}
             </Chip>{" "}
             And cutoff is{" "}
             <Chip icon={"target"} className="text-base">
-              {assessment?.cutoff_marks || ""}
+              {assessment?.cutoff_marks ?? ""}
             </Chip>
           </div>
 
@@ -227,6 +227,18 @@ const MCQSubmission = ({ backLink }: { backLink?: string }) => {
                 Skipped{" "}
                 <span className="font-bold">
                   {assessment?.raw_assesment_data.summary.attempted}{" "}
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center px-4 p-2 bg-white border border-gray-200 rounded-lg shadow hover:scale-105 transition-transform">
+              <div className="font-bold text-2xl bg-pink-400/25 text-pink-500 flex items-center justify-center w-12 h-12 rounded-full">
+                <Icon icon="clock" />
+              </div>
+              <div className="mt-2 text-sm font-semibold  text-gray-900">
+                Time Taken{" "}
+                <span className="font-bold">
+                  {assessment?.completed_seconds}
+                  {" sec"}
                 </span>
               </div>
             </div>
