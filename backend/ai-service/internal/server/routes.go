@@ -1,12 +1,13 @@
 package server
 
 import (
-	"ai-service/internal/middlewares"
 	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	"ai-service/internal/middlewares"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -21,6 +22,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Group(func(r chi.Router) {
 		r.Use(middlewares.RequireAccessKeyMiddleware())
 		r.Post("/prompt", s.GetPromptResults)
+		r.Post("/prompt/structured", s.GetStructuredPromptResults)
+	})
+
+	r.Route("/admin", func(r chi.Router) {
+		r.Use(middlewares.RequireAdminKeyMiddleware())
+		r.Route("/generate", func(r chi.Router) {
+			r.Post("/exam/{id}", s.GenerateExamQuestionAndPopulateCache)
+		})
 	})
 
 	return r
@@ -31,7 +40,10 @@ func (s *Server) SupHandler(w http.ResponseWriter, r *http.Request) {
 		Message: "Sup",
 	}
 
-	s.WriteJson(w, http.StatusOK, &response)
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +51,8 @@ func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	response := Response{
 		Data: string(jsonResp),
 	}
-	s.WriteJson(w, http.StatusOK, &response)
-
+	err := s.WriteJson(w, http.StatusOK, &response)
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
 }

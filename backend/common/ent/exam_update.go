@@ -6,6 +6,7 @@ import (
 	"common/ent/cachedexam"
 	"common/ent/exam"
 	"common/ent/examcategory"
+	"common/ent/examgroup"
 	"common/ent/examsetting"
 	"common/ent/generatedexam"
 	"common/ent/predicate"
@@ -44,6 +45,46 @@ func (eu *ExamUpdate) SetNillableName(s *string) *ExamUpdate {
 	if s != nil {
 		eu.SetName(*s)
 	}
+	return eu
+}
+
+// SetStage sets the "stage" field.
+func (eu *ExamUpdate) SetStage(s string) *ExamUpdate {
+	eu.mutation.SetStage(s)
+	return eu
+}
+
+// SetNillableStage sets the "stage" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableStage(s *string) *ExamUpdate {
+	if s != nil {
+		eu.SetStage(*s)
+	}
+	return eu
+}
+
+// ClearStage clears the value of the "stage" field.
+func (eu *ExamUpdate) ClearStage() *ExamUpdate {
+	eu.mutation.ClearStage()
+	return eu
+}
+
+// SetIsSectional sets the "is_sectional" field.
+func (eu *ExamUpdate) SetIsSectional(b bool) *ExamUpdate {
+	eu.mutation.SetIsSectional(b)
+	return eu
+}
+
+// SetNillableIsSectional sets the "is_sectional" field if the given value is not nil.
+func (eu *ExamUpdate) SetNillableIsSectional(b *bool) *ExamUpdate {
+	if b != nil {
+		eu.SetIsSectional(*b)
+	}
+	return eu
+}
+
+// ClearIsSectional clears the value of the "is_sectional" field.
+func (eu *ExamUpdate) ClearIsSectional() *ExamUpdate {
+	eu.mutation.ClearIsSectional()
 	return eu
 }
 
@@ -134,6 +175,25 @@ func (eu *ExamUpdate) SetCategory(e *ExamCategory) *ExamUpdate {
 	return eu.SetCategoryID(e.ID)
 }
 
+// SetGroupID sets the "group" edge to the ExamGroup entity by ID.
+func (eu *ExamUpdate) SetGroupID(id int) *ExamUpdate {
+	eu.mutation.SetGroupID(id)
+	return eu
+}
+
+// SetNillableGroupID sets the "group" edge to the ExamGroup entity by ID if the given value is not nil.
+func (eu *ExamUpdate) SetNillableGroupID(id *int) *ExamUpdate {
+	if id != nil {
+		eu = eu.SetGroupID(*id)
+	}
+	return eu
+}
+
+// SetGroup sets the "group" edge to the ExamGroup entity.
+func (eu *ExamUpdate) SetGroup(e *ExamGroup) *ExamUpdate {
+	return eu.SetGroupID(e.ID)
+}
+
 // AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by IDs.
 func (eu *ExamUpdate) AddSubscriptionIDs(ids ...int) *ExamUpdate {
 	eu.mutation.AddSubscriptionIDs(ids...)
@@ -206,6 +266,12 @@ func (eu *ExamUpdate) Mutation() *ExamMutation {
 // ClearCategory clears the "category" edge to the ExamCategory entity.
 func (eu *ExamUpdate) ClearCategory() *ExamUpdate {
 	eu.mutation.ClearCategory()
+	return eu
+}
+
+// ClearGroup clears the "group" edge to the ExamGroup entity.
+func (eu *ExamUpdate) ClearGroup() *ExamUpdate {
+	eu.mutation.ClearGroup()
 	return eu
 }
 
@@ -339,6 +405,18 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Name(); ok {
 		_spec.SetField(exam.FieldName, field.TypeString, value)
 	}
+	if value, ok := eu.mutation.Stage(); ok {
+		_spec.SetField(exam.FieldStage, field.TypeString, value)
+	}
+	if eu.mutation.StageCleared() {
+		_spec.ClearField(exam.FieldStage, field.TypeString)
+	}
+	if value, ok := eu.mutation.IsSectional(); ok {
+		_spec.SetField(exam.FieldIsSectional, field.TypeBool, value)
+	}
+	if eu.mutation.IsSectionalCleared() {
+		_spec.ClearField(exam.FieldIsSectional, field.TypeBool)
+	}
 	if value, ok := eu.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 	}
@@ -379,6 +457,35 @@ func (eu *ExamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.GroupCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   exam.GroupTable,
+			Columns: []string{exam.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examgroup.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   exam.GroupTable,
+			Columns: []string{exam.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examgroup.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -584,6 +691,46 @@ func (euo *ExamUpdateOne) SetNillableName(s *string) *ExamUpdateOne {
 	return euo
 }
 
+// SetStage sets the "stage" field.
+func (euo *ExamUpdateOne) SetStage(s string) *ExamUpdateOne {
+	euo.mutation.SetStage(s)
+	return euo
+}
+
+// SetNillableStage sets the "stage" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableStage(s *string) *ExamUpdateOne {
+	if s != nil {
+		euo.SetStage(*s)
+	}
+	return euo
+}
+
+// ClearStage clears the value of the "stage" field.
+func (euo *ExamUpdateOne) ClearStage() *ExamUpdateOne {
+	euo.mutation.ClearStage()
+	return euo
+}
+
+// SetIsSectional sets the "is_sectional" field.
+func (euo *ExamUpdateOne) SetIsSectional(b bool) *ExamUpdateOne {
+	euo.mutation.SetIsSectional(b)
+	return euo
+}
+
+// SetNillableIsSectional sets the "is_sectional" field if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableIsSectional(b *bool) *ExamUpdateOne {
+	if b != nil {
+		euo.SetIsSectional(*b)
+	}
+	return euo
+}
+
+// ClearIsSectional clears the value of the "is_sectional" field.
+func (euo *ExamUpdateOne) ClearIsSectional() *ExamUpdateOne {
+	euo.mutation.ClearIsSectional()
+	return euo
+}
+
 // SetDescription sets the "description" field.
 func (euo *ExamUpdateOne) SetDescription(s string) *ExamUpdateOne {
 	euo.mutation.SetDescription(s)
@@ -671,6 +818,25 @@ func (euo *ExamUpdateOne) SetCategory(e *ExamCategory) *ExamUpdateOne {
 	return euo.SetCategoryID(e.ID)
 }
 
+// SetGroupID sets the "group" edge to the ExamGroup entity by ID.
+func (euo *ExamUpdateOne) SetGroupID(id int) *ExamUpdateOne {
+	euo.mutation.SetGroupID(id)
+	return euo
+}
+
+// SetNillableGroupID sets the "group" edge to the ExamGroup entity by ID if the given value is not nil.
+func (euo *ExamUpdateOne) SetNillableGroupID(id *int) *ExamUpdateOne {
+	if id != nil {
+		euo = euo.SetGroupID(*id)
+	}
+	return euo
+}
+
+// SetGroup sets the "group" edge to the ExamGroup entity.
+func (euo *ExamUpdateOne) SetGroup(e *ExamGroup) *ExamUpdateOne {
+	return euo.SetGroupID(e.ID)
+}
+
 // AddSubscriptionIDs adds the "subscriptions" edge to the SubscriptionExam entity by IDs.
 func (euo *ExamUpdateOne) AddSubscriptionIDs(ids ...int) *ExamUpdateOne {
 	euo.mutation.AddSubscriptionIDs(ids...)
@@ -743,6 +909,12 @@ func (euo *ExamUpdateOne) Mutation() *ExamMutation {
 // ClearCategory clears the "category" edge to the ExamCategory entity.
 func (euo *ExamUpdateOne) ClearCategory() *ExamUpdateOne {
 	euo.mutation.ClearCategory()
+	return euo
+}
+
+// ClearGroup clears the "group" edge to the ExamGroup entity.
+func (euo *ExamUpdateOne) ClearGroup() *ExamUpdateOne {
+	euo.mutation.ClearGroup()
 	return euo
 }
 
@@ -906,6 +1078,18 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 	if value, ok := euo.mutation.Name(); ok {
 		_spec.SetField(exam.FieldName, field.TypeString, value)
 	}
+	if value, ok := euo.mutation.Stage(); ok {
+		_spec.SetField(exam.FieldStage, field.TypeString, value)
+	}
+	if euo.mutation.StageCleared() {
+		_spec.ClearField(exam.FieldStage, field.TypeString)
+	}
+	if value, ok := euo.mutation.IsSectional(); ok {
+		_spec.SetField(exam.FieldIsSectional, field.TypeBool, value)
+	}
+	if euo.mutation.IsSectionalCleared() {
+		_spec.ClearField(exam.FieldIsSectional, field.TypeBool)
+	}
 	if value, ok := euo.mutation.Description(); ok {
 		_spec.SetField(exam.FieldDescription, field.TypeString, value)
 	}
@@ -946,6 +1130,35 @@ func (euo *ExamUpdateOne) sqlSave(ctx context.Context) (_node *Exam, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(examcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.GroupCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   exam.GroupTable,
+			Columns: []string{exam.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examgroup.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   exam.GroupTable,
+			Columns: []string{exam.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(examgroup.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

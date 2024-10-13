@@ -31,6 +31,7 @@ export const ICONS = {
   thumbs_up: "fa-solid fa-thumbs-up",
   bank: "fa-solid fa-bank",
   ellipses_horizontal: "fa-solid fa-ellipsis",
+  minus_circle: "fa-solid fa-minus-circle",
 };
 type IconType = keyof typeof ICONS;
 export type { IconType };

@@ -1,19 +1,27 @@
 package services
 
 import (
-	commonConstants "common/constants"
+	"context"
 	"strings"
 
-	"ai-service/pkg/models"
-	"context"
-
 	"cloud.google.com/go/vertexai/genai"
+
+	commonConstants "common/constants"
+
+	"ai-service/pkg/models"
 )
 
-type PromptService struct {
-	genAIService *GenAIService
+// Define an interface for GenAIService to make it mockable
+type GenAIServiceInterface interface {
+	GetContentStream(ctx context.Context, prompt string, model commonConstants.GenAiModel) (string, error)
+	GetStructuredContentStream(ctx context.Context, prompt string, modelName commonConstants.GenAiModel) (string, error)
 }
 
+type PromptService struct {
+	genAIService GenAIServiceInterface
+}
+
+// Factory method for production use, using *genai.Client
 func NewPromptService(genAiClient *genai.Client) *PromptService {
 	genAIService := NewGenAIService(genAiClient)
 
@@ -30,4 +38,18 @@ func (p *PromptService) GetPromptResults(ctx context.Context, request *models.Ge
 	}
 
 	return p.genAIService.GetContentStream(ctx, request.Prompt, model)
+}
+
+func (p *PromptService) GetStructuredPromptResults(ctx context.Context, request *models.GetPromptResultsRequest) (string, error) {
+	model := commonConstants.FLASH_15
+
+	if strings.Contains(request.Model, "gemini-1.5-pro") {
+		model = commonConstants.PRO_15
+	}
+
+	if strings.Contains(request.Model, "gemini-1.0-pro") {
+		model = commonConstants.PRO_10
+	}
+
+	return p.genAIService.GetStructuredContentStream(ctx, request.Prompt, model)
 }

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { paths } from "../../../routes/route.constant";
+import { ExamDomain, paths } from "../../../routes/route.constant";
 import useUserProfileStore from "../../../store/user-info-store";
 import { Button } from "../../base/button/button";
 import Chip from "../../base/chip";
@@ -19,24 +19,17 @@ const exams = [
     isActive: true,
   },
   {
-    title: "Banking Descriptive Exams",
-    desc: "AI-Assisted Descriptive Assessment with Insights. Get understanding about your weak and strong points.",
-    link: `/${paths.EXAMS}/banking/${paths.DISCRIPTIVE}`,
-    type: "Descriptive",
+    title: "Banking Exams",
+    desc: "AI-Assisted Descriptive and MCQ Assessment with Insights. Get understanding about your weak and strong points.",
+    link: `/${paths.EXAMS}/${ExamDomain.banking}`,
+    type: "Mixed",
     isActive: true,
     isPremium: true,
   },
   {
-    title: "Banking MCQ Exams",
-    desc: "Practice Banking MCQs to boost your knowledge and exam readiness with detailed solutions and explanations.",
-    link: `/${paths.EXAMS}/banking/${paths.MCQ}`,
-    type: "MCQ",
-    isActive: false,
-  },
-  {
-    title: "Ranked MCQ Exams",
-    desc: "Compete in Ranked MCQ Exams and see how you rank among others while improving your skills.",
-    link: `/${paths.EXAMS}/ranked/${paths.MCQ}`,
+    title: "Ranked Banking Exams",
+    desc: "Compete in Ranked MCQ and Descriptive Exams and see how you rank among others while improving your skills.",
+    link: `/${paths.EXAMS}/${ExamDomain.banking}`,
     type: "MCQ",
     isActive: false,
   },

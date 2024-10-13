@@ -31,6 +31,10 @@ type ExamSetting struct {
 	OtherDetails map[string]interface{} `json:"other_details,omitempty"`
 	// MaxAttempts holds the value of the "max_attempts" field.
 	MaxAttempts int `json:"max_attempts,omitempty"`
+	// TotalMarks holds the value of the "total_marks" field.
+	TotalMarks int `json:"total_marks,omitempty"`
+	// CutoffMarks holds the value of the "cutoff_marks" field.
+	CutoffMarks float64 `json:"cutoff_marks,omitempty"`
 	// EvaluationAiPrompt holds the value of the "evaluation_ai_prompt" field.
 	EvaluationAiPrompt string `json:"evaluation_ai_prompt,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -71,9 +75,9 @@ func (*ExamSetting) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case examsetting.FieldOtherDetails:
 			values[i] = new([]byte)
-		case examsetting.FieldNegativeMarking:
+		case examsetting.FieldNegativeMarking, examsetting.FieldCutoffMarks:
 			values[i] = new(sql.NullFloat64)
-		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationSeconds, examsetting.FieldMaxAttempts:
+		case examsetting.FieldID, examsetting.FieldNumberOfQuestions, examsetting.FieldDurationSeconds, examsetting.FieldMaxAttempts, examsetting.FieldTotalMarks:
 			values[i] = new(sql.NullInt64)
 		case examsetting.FieldAiPrompt, examsetting.FieldEvaluationAiPrompt:
 			values[i] = new(sql.NullString)
@@ -139,6 +143,18 @@ func (es *ExamSetting) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field max_attempts", values[i])
 			} else if value.Valid {
 				es.MaxAttempts = int(value.Int64)
+			}
+		case examsetting.FieldTotalMarks:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field total_marks", values[i])
+			} else if value.Valid {
+				es.TotalMarks = int(value.Int64)
+			}
+		case examsetting.FieldCutoffMarks:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field cutoff_marks", values[i])
+			} else if value.Valid {
+				es.CutoffMarks = value.Float64
 			}
 		case examsetting.FieldEvaluationAiPrompt:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -223,6 +239,12 @@ func (es *ExamSetting) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("max_attempts=")
 	builder.WriteString(fmt.Sprintf("%v", es.MaxAttempts))
+	builder.WriteString(", ")
+	builder.WriteString("total_marks=")
+	builder.WriteString(fmt.Sprintf("%v", es.TotalMarks))
+	builder.WriteString(", ")
+	builder.WriteString("cutoff_marks=")
+	builder.WriteString(fmt.Sprintf("%v", es.CutoffMarks))
 	builder.WriteString(", ")
 	builder.WriteString("evaluation_ai_prompt=")
 	builder.WriteString(es.EvaluationAiPrompt)

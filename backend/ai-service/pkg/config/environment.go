@@ -21,6 +21,7 @@ type Environment struct {
 	GoogleCloudProjectId     string
 	GoogleCloudProjectRegion string
 	ServerAccessKey          string
+	ServerAdminKey           string
 }
 
 func LoadEnvironment() (*Environment, error) {
@@ -44,6 +45,7 @@ func LoadEnvironment() (*Environment, error) {
 		GoogleCloudProjectId:     os.Getenv("GCLOUD_PROJECT_ID"),
 		GoogleCloudProjectRegion: os.Getenv("GCLOUD_PROJECT_REGION"),
 		ServerAccessKey:          os.Getenv("SERVER_ACCESS_KEY"),
+		ServerAdminKey:           os.Getenv("SERVER_ADMIN_KEY"),
 		IsProduction:             os.Getenv("ENV") == "production",
 	}
 
@@ -65,6 +67,10 @@ func LoadEnvironment() (*Environment, error) {
 
 	if env.ServerAccessKey == "" {
 		return nil, errors.New("missing Server Access Key environment variable")
+	}
+
+	if env.ServerAdminKey == "" {
+		return nil, errors.New("missing Server Admin Key environment variable")
 	}
 
 	return env, nil

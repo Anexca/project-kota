@@ -36,6 +36,8 @@ var (
 	ExamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
+		{Name: "stage", Type: field.TypeString, Nullable: true},
+		{Name: "is_sectional", Type: field.TypeBool, Nullable: true, Default: true},
 		{Name: "description", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"MCQ", "DESCRIPTIVE"}, Default: "DESCRIPTIVE"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
@@ -43,6 +45,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "exam_category_exams", Type: field.TypeInt, Nullable: true},
+		{Name: "exam_group_exams", Type: field.TypeInt, Nullable: true},
 	}
 	// ExamsTable holds the schema information for the "exams" table.
 	ExamsTable = &schema.Table{
@@ -52,8 +55,14 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exams_exam_categories_exams",
-				Columns:    []*schema.Column{ExamsColumns[8]},
+				Columns:    []*schema.Column{ExamsColumns[10]},
 				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "exams_exam_groups_exams",
+				Columns:    []*schema.Column{ExamsColumns[11]},
+				RefColumns: []*schema.Column{ExamGroupsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -65,6 +74,7 @@ var (
 		{Name: "raw_assesment_data", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "raw_user_submission", Type: field.TypeJSON, SchemaType: map[string]string{"postgres": "jsonb"}},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"COMPLETED", "REJECTED", "PENDING"}},
+		{Name: "obtained_marks", Type: field.TypeFloat64, Nullable: true, Default: 0},
 		{Name: "remarks", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -78,7 +88,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exam_assesments_exam_attempts_assesment",
-				Columns:    []*schema.Column{ExamAssesmentsColumns[8]},
+				Columns:    []*schema.Column{ExamAssesmentsColumns[9]},
 				RefColumns: []*schema.Column{ExamAttemptsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -128,6 +138,31 @@ var (
 		Columns:    ExamCategoriesColumns,
 		PrimaryKey: []*schema.Column{ExamCategoriesColumns[0]},
 	}
+	// ExamGroupsColumns holds the columns for the "exam_groups" table.
+	ExamGroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "logo_url", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "exam_category_groups", Type: field.TypeInt, Nullable: true},
+	}
+	// ExamGroupsTable holds the schema information for the "exam_groups" table.
+	ExamGroupsTable = &schema.Table{
+		Name:       "exam_groups",
+		Columns:    ExamGroupsColumns,
+		PrimaryKey: []*schema.Column{ExamGroupsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "exam_groups_exam_categories_groups",
+				Columns:    []*schema.Column{ExamGroupsColumns[7]},
+				RefColumns: []*schema.Column{ExamCategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// ExamSettingsColumns holds the columns for the "exam_settings" table.
 	ExamSettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -137,6 +172,8 @@ var (
 		{Name: "ai_prompt", Type: field.TypeString, Nullable: true},
 		{Name: "other_details", Type: field.TypeJSON, Nullable: true, SchemaType: map[string]string{"postgres": "json"}},
 		{Name: "max_attempts", Type: field.TypeInt, Default: 2},
+		{Name: "total_marks", Type: field.TypeInt, Nullable: true, Default: 0},
+		{Name: "cutoff_marks", Type: field.TypeFloat64, Nullable: true, Default: 0},
 		{Name: "evaluation_ai_prompt", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -150,7 +187,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "exam_settings_exams_setting",
-				Columns:    []*schema.Column{ExamSettingsColumns[10]},
+				Columns:    []*schema.Column{ExamSettingsColumns[12]},
 				RefColumns: []*schema.Column{ExamsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -317,6 +354,7 @@ var (
 		ExamAssesmentsTable,
 		ExamAttemptsTable,
 		ExamCategoriesTable,
+		ExamGroupsTable,
 		ExamSettingsTable,
 		GeneratedExamsTable,
 		PaymentsTable,
@@ -330,9 +368,11 @@ var (
 func init() {
 	CachedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 	ExamsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
+	ExamsTable.ForeignKeys[1].RefTable = ExamGroupsTable
 	ExamAssesmentsTable.ForeignKeys[0].RefTable = ExamAttemptsTable
 	ExamAttemptsTable.ForeignKeys[0].RefTable = GeneratedExamsTable
 	ExamAttemptsTable.ForeignKeys[1].RefTable = UsersTable
+	ExamGroupsTable.ForeignKeys[0].RefTable = ExamCategoriesTable
 	ExamSettingsTable.ForeignKeys[0].RefTable = ExamsTable
 	GeneratedExamsTable.ForeignKeys[0].RefTable = ExamsTable
 	PaymentsTable.ForeignKeys[0].RefTable = UsersTable

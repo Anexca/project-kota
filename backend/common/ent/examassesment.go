@@ -27,6 +27,8 @@ type ExamAssesment struct {
 	RawUserSubmission map[string]interface{} `json:"raw_user_submission,omitempty"`
 	// Status holds the value of the "status" field.
 	Status examassesment.Status `json:"status,omitempty"`
+	// ObtainedMarks holds the value of the "obtained_marks" field.
+	ObtainedMarks float64 `json:"obtained_marks,omitempty"`
 	// Remarks holds the value of the "remarks" field.
 	Remarks string `json:"remarks,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -67,6 +69,8 @@ func (*ExamAssesment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case examassesment.FieldRawAssesmentData, examassesment.FieldRawUserSubmission:
 			values[i] = new([]byte)
+		case examassesment.FieldObtainedMarks:
+			values[i] = new(sql.NullFloat64)
 		case examassesment.FieldID, examassesment.FieldCompletedSeconds:
 			values[i] = new(sql.NullInt64)
 		case examassesment.FieldStatus, examassesment.FieldRemarks:
@@ -123,6 +127,12 @@ func (ea *ExamAssesment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				ea.Status = examassesment.Status(value.String)
+			}
+		case examassesment.FieldObtainedMarks:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field obtained_marks", values[i])
+			} else if value.Valid {
+				ea.ObtainedMarks = value.Float64
 			}
 		case examassesment.FieldRemarks:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -201,6 +211,9 @@ func (ea *ExamAssesment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", ea.Status))
+	builder.WriteString(", ")
+	builder.WriteString("obtained_marks=")
+	builder.WriteString(fmt.Sprintf("%v", ea.ObtainedMarks))
 	builder.WriteString(", ")
 	builder.WriteString("remarks=")
 	builder.WriteString(ea.Remarks)

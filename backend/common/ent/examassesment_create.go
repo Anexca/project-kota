@@ -45,6 +45,20 @@ func (eac *ExamAssesmentCreate) SetStatus(e examassesment.Status) *ExamAssesment
 	return eac
 }
 
+// SetObtainedMarks sets the "obtained_marks" field.
+func (eac *ExamAssesmentCreate) SetObtainedMarks(f float64) *ExamAssesmentCreate {
+	eac.mutation.SetObtainedMarks(f)
+	return eac
+}
+
+// SetNillableObtainedMarks sets the "obtained_marks" field if the given value is not nil.
+func (eac *ExamAssesmentCreate) SetNillableObtainedMarks(f *float64) *ExamAssesmentCreate {
+	if f != nil {
+		eac.SetObtainedMarks(*f)
+	}
+	return eac
+}
+
 // SetRemarks sets the "remarks" field.
 func (eac *ExamAssesmentCreate) SetRemarks(s string) *ExamAssesmentCreate {
 	eac.mutation.SetRemarks(s)
@@ -141,6 +155,10 @@ func (eac *ExamAssesmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (eac *ExamAssesmentCreate) defaults() {
+	if _, ok := eac.mutation.ObtainedMarks(); !ok {
+		v := examassesment.DefaultObtainedMarks
+		eac.mutation.SetObtainedMarks(v)
+	}
 	if _, ok := eac.mutation.CreatedAt(); !ok {
 		v := examassesment.DefaultCreatedAt()
 		eac.mutation.SetCreatedAt(v)
@@ -214,6 +232,10 @@ func (eac *ExamAssesmentCreate) createSpec() (*ExamAssesment, *sqlgraph.CreateSp
 	if value, ok := eac.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := eac.mutation.ObtainedMarks(); ok {
+		_spec.SetField(examassesment.FieldObtainedMarks, field.TypeFloat64, value)
+		_node.ObtainedMarks = value
 	}
 	if value, ok := eac.mutation.Remarks(); ok {
 		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)

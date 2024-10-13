@@ -26,6 +26,10 @@ const (
 	FieldOtherDetails = "other_details"
 	// FieldMaxAttempts holds the string denoting the max_attempts field in the database.
 	FieldMaxAttempts = "max_attempts"
+	// FieldTotalMarks holds the string denoting the total_marks field in the database.
+	FieldTotalMarks = "total_marks"
+	// FieldCutoffMarks holds the string denoting the cutoff_marks field in the database.
+	FieldCutoffMarks = "cutoff_marks"
 	// FieldEvaluationAiPrompt holds the string denoting the evaluation_ai_prompt field in the database.
 	FieldEvaluationAiPrompt = "evaluation_ai_prompt"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -54,6 +58,8 @@ var Columns = []string{
 	FieldAiPrompt,
 	FieldOtherDetails,
 	FieldMaxAttempts,
+	FieldTotalMarks,
+	FieldCutoffMarks,
 	FieldEvaluationAiPrompt,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -83,6 +89,10 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultMaxAttempts holds the default value on creation for the "max_attempts" field.
 	DefaultMaxAttempts int
+	// DefaultTotalMarks holds the default value on creation for the "total_marks" field.
+	DefaultTotalMarks int
+	// DefaultCutoffMarks holds the default value on creation for the "cutoff_marks" field.
+	DefaultCutoffMarks float64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -122,6 +132,16 @@ func ByAiPrompt(opts ...sql.OrderTermOption) OrderOption {
 // ByMaxAttempts orders the results by the max_attempts field.
 func ByMaxAttempts(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMaxAttempts, opts...).ToFunc()
+}
+
+// ByTotalMarks orders the results by the total_marks field.
+func ByTotalMarks(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotalMarks, opts...).ToFunc()
+}
+
+// ByCutoffMarks orders the results by the cutoff_marks field.
+func ByCutoffMarks(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCutoffMarks, opts...).ToFunc()
 }
 
 // ByEvaluationAiPrompt orders the results by the evaluation_ai_prompt field.

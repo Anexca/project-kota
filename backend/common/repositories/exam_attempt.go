@@ -1,25 +1,29 @@
 package repositories
 
 import (
+	"context"
+
+	"github.com/google/uuid"
+
 	"common/ent"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/user"
-	"context"
-
-	"github.com/google/uuid"
 )
 
+// ExamAttemptRepository is a concrete implementation of ExamAttemptRepositoryInterface.
 type ExamAttemptRepository struct {
 	dbClient *ent.Client
 }
 
+// NewExamAttemptRepository creates a new instance of ExamAttemptRepository.
 func NewExamAttemptRepository(dbClient *ent.Client) *ExamAttemptRepository {
 	return &ExamAttemptRepository{
 		dbClient: dbClient,
 	}
 }
 
+// GetById retrieves an exam attempt by its ID and user ID.
 func (e *ExamAttemptRepository) GetById(ctx context.Context, attemptId int, userId string) (*ent.ExamAttempt, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
@@ -35,6 +39,8 @@ func (e *ExamAttemptRepository) GetById(ctx context.Context, attemptId int, user
 		).
 		Only(ctx)
 }
+
+// GetByUserId retrieves all exam attempts for a given user.
 func (e *ExamAttemptRepository) GetByUserId(ctx context.Context, userId string) ([]*ent.ExamAttempt, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
@@ -47,6 +53,7 @@ func (e *ExamAttemptRepository) GetByUserId(ctx context.Context, userId string) 
 		All(ctx)
 }
 
+// GetByExam retrieves all exam attempts for a specific generated exam and user.
 func (e *ExamAttemptRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAttempt, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
@@ -59,6 +66,7 @@ func (e *ExamAttemptRepository) GetByExam(ctx context.Context, generatedExamId i
 		All(ctx)
 }
 
+// Create creates a new exam attempt for a given user and generated exam.
 func (e *ExamAttemptRepository) Create(ctx context.Context, currentAttempt int, generatedExamId int, userId string) (*ent.ExamAttempt, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {

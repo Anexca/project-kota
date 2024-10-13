@@ -1,12 +1,13 @@
 package schema
 
 import (
-	"common/constants"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"common/constants"
 )
 
 // Exam holds the schema definition for the Exam entity.
@@ -18,6 +19,8 @@ type Exam struct {
 func (Exam) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
+		field.String("stage").Optional(),
+		field.Bool("is_sectional").Optional().Default(true),
 		field.String("description"),
 		field.Enum("type").
 			Values(
@@ -25,7 +28,7 @@ func (Exam) Fields() []ent.Field {
 				string(constants.ExamTypeDescriptive),
 			).Default(string(constants.ExamTypeDescriptive)),
 		field.Bool("is_active").Default(true),
-		field.String("logo_url").Optional(),
+		field.String("logo_url").Optional().Deprecated(),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}
@@ -35,6 +38,10 @@ func (Exam) Fields() []ent.Field {
 func (Exam) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("category", ExamCategory.Type).
+			Ref("exams").
+			Unique(), // Many Exams belong to one ExamCategory
+
+		edge.From("group", ExamGroup.Type).
 			Ref("exams").
 			Unique(), // Many Exams belong to one ExamCategory
 

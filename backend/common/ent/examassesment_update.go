@@ -82,6 +82,33 @@ func (eau *ExamAssesmentUpdate) SetNillableStatus(e *examassesment.Status) *Exam
 	return eau
 }
 
+// SetObtainedMarks sets the "obtained_marks" field.
+func (eau *ExamAssesmentUpdate) SetObtainedMarks(f float64) *ExamAssesmentUpdate {
+	eau.mutation.ResetObtainedMarks()
+	eau.mutation.SetObtainedMarks(f)
+	return eau
+}
+
+// SetNillableObtainedMarks sets the "obtained_marks" field if the given value is not nil.
+func (eau *ExamAssesmentUpdate) SetNillableObtainedMarks(f *float64) *ExamAssesmentUpdate {
+	if f != nil {
+		eau.SetObtainedMarks(*f)
+	}
+	return eau
+}
+
+// AddObtainedMarks adds f to the "obtained_marks" field.
+func (eau *ExamAssesmentUpdate) AddObtainedMarks(f float64) *ExamAssesmentUpdate {
+	eau.mutation.AddObtainedMarks(f)
+	return eau
+}
+
+// ClearObtainedMarks clears the value of the "obtained_marks" field.
+func (eau *ExamAssesmentUpdate) ClearObtainedMarks() *ExamAssesmentUpdate {
+	eau.mutation.ClearObtainedMarks()
+	return eau
+}
+
 // SetRemarks sets the "remarks" field.
 func (eau *ExamAssesmentUpdate) SetRemarks(s string) *ExamAssesmentUpdate {
 	eau.mutation.SetRemarks(s)
@@ -214,6 +241,15 @@ func (eau *ExamAssesmentUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := eau.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
 	}
+	if value, ok := eau.mutation.ObtainedMarks(); ok {
+		_spec.SetField(examassesment.FieldObtainedMarks, field.TypeFloat64, value)
+	}
+	if value, ok := eau.mutation.AddedObtainedMarks(); ok {
+		_spec.AddField(examassesment.FieldObtainedMarks, field.TypeFloat64, value)
+	}
+	if eau.mutation.ObtainedMarksCleared() {
+		_spec.ClearField(examassesment.FieldObtainedMarks, field.TypeFloat64)
+	}
 	if value, ok := eau.mutation.Remarks(); ok {
 		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)
 	}
@@ -322,6 +358,33 @@ func (eauo *ExamAssesmentUpdateOne) SetNillableStatus(e *examassesment.Status) *
 	if e != nil {
 		eauo.SetStatus(*e)
 	}
+	return eauo
+}
+
+// SetObtainedMarks sets the "obtained_marks" field.
+func (eauo *ExamAssesmentUpdateOne) SetObtainedMarks(f float64) *ExamAssesmentUpdateOne {
+	eauo.mutation.ResetObtainedMarks()
+	eauo.mutation.SetObtainedMarks(f)
+	return eauo
+}
+
+// SetNillableObtainedMarks sets the "obtained_marks" field if the given value is not nil.
+func (eauo *ExamAssesmentUpdateOne) SetNillableObtainedMarks(f *float64) *ExamAssesmentUpdateOne {
+	if f != nil {
+		eauo.SetObtainedMarks(*f)
+	}
+	return eauo
+}
+
+// AddObtainedMarks adds f to the "obtained_marks" field.
+func (eauo *ExamAssesmentUpdateOne) AddObtainedMarks(f float64) *ExamAssesmentUpdateOne {
+	eauo.mutation.AddObtainedMarks(f)
+	return eauo
+}
+
+// ClearObtainedMarks clears the value of the "obtained_marks" field.
+func (eauo *ExamAssesmentUpdateOne) ClearObtainedMarks() *ExamAssesmentUpdateOne {
+	eauo.mutation.ClearObtainedMarks()
 	return eauo
 }
 
@@ -486,6 +549,15 @@ func (eauo *ExamAssesmentUpdateOne) sqlSave(ctx context.Context) (_node *ExamAss
 	}
 	if value, ok := eauo.mutation.Status(); ok {
 		_spec.SetField(examassesment.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := eauo.mutation.ObtainedMarks(); ok {
+		_spec.SetField(examassesment.FieldObtainedMarks, field.TypeFloat64, value)
+	}
+	if value, ok := eauo.mutation.AddedObtainedMarks(); ok {
+		_spec.AddField(examassesment.FieldObtainedMarks, field.TypeFloat64, value)
+	}
+	if eauo.mutation.ObtainedMarksCleared() {
+		_spec.ClearField(examassesment.FieldObtainedMarks, field.TypeFloat64)
 	}
 	if value, ok := eauo.mutation.Remarks(); ok {
 		_spec.SetField(examassesment.FieldRemarks, field.TypeString, value)

@@ -68,6 +68,18 @@ func (f ExamCategoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamCategoryMutation", m)
 }
 
+// The ExamGroupFunc type is an adapter to allow the use of ordinary
+// function as ExamGroup mutator.
+type ExamGroupFunc func(context.Context, *ent.ExamGroupMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ExamGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ExamGroupMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExamGroupMutation", m)
+}
+
 // The ExamSettingFunc type is an adapter to allow the use of ordinary
 // function as ExamSetting mutator.
 type ExamSettingFunc func(context.Context, *ent.ExamSettingMutation) (ent.Value, error)

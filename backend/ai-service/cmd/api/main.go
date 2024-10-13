@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
+	"log"
+
 	"ai-service/internal/server"
 	"ai-service/internal/workers"
 	"ai-service/pkg/client"
-	"context"
-	"fmt"
-	"log"
 )
 
 func main() {
@@ -14,19 +14,19 @@ func main() {
 
 	genAiClient, err := client.NewGeminiClient(ctx)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 	defer genAiClient.Close()
 
 	redisClient, err := client.NewRedisClient(ctx)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 	defer redisClient.Close()
 
 	dbclient, err := client.NewDbClient(ctx)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 	defer dbclient.Close()
 
@@ -35,11 +35,11 @@ func main() {
 
 	defer c.Stop()
 
-	server := server.InitServer(genAiClient, redisClient)
+	server := server.InitServer(genAiClient, redisClient, dbclient)
 
 	err = server.ListenAndServe()
 	if err != nil {
-		log.Fatal(fmt.Sprintf("cannot start server: %s", err))
+		log.Printf("cannot start server: %s", err)
 	}
 
 }

@@ -60,6 +60,11 @@ func CompletedSeconds(v int) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldCompletedSeconds, v))
 }
 
+// ObtainedMarks applies equality check predicate on the "obtained_marks" field. It's identical to ObtainedMarksEQ.
+func ObtainedMarks(v float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEQ(FieldObtainedMarks, v))
+}
+
 // Remarks applies equality check predicate on the "remarks" field. It's identical to RemarksEQ.
 func Remarks(v string) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldEQ(FieldRemarks, v))
@@ -143,6 +148,56 @@ func StatusIn(vs ...Status) predicate.ExamAssesment {
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.ExamAssesment {
 	return predicate.ExamAssesment(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// ObtainedMarksEQ applies the EQ predicate on the "obtained_marks" field.
+func ObtainedMarksEQ(v float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldEQ(FieldObtainedMarks, v))
+}
+
+// ObtainedMarksNEQ applies the NEQ predicate on the "obtained_marks" field.
+func ObtainedMarksNEQ(v float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNEQ(FieldObtainedMarks, v))
+}
+
+// ObtainedMarksIn applies the In predicate on the "obtained_marks" field.
+func ObtainedMarksIn(vs ...float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldIn(FieldObtainedMarks, vs...))
+}
+
+// ObtainedMarksNotIn applies the NotIn predicate on the "obtained_marks" field.
+func ObtainedMarksNotIn(vs ...float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNotIn(FieldObtainedMarks, vs...))
+}
+
+// ObtainedMarksGT applies the GT predicate on the "obtained_marks" field.
+func ObtainedMarksGT(v float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldGT(FieldObtainedMarks, v))
+}
+
+// ObtainedMarksGTE applies the GTE predicate on the "obtained_marks" field.
+func ObtainedMarksGTE(v float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldGTE(FieldObtainedMarks, v))
+}
+
+// ObtainedMarksLT applies the LT predicate on the "obtained_marks" field.
+func ObtainedMarksLT(v float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldLT(FieldObtainedMarks, v))
+}
+
+// ObtainedMarksLTE applies the LTE predicate on the "obtained_marks" field.
+func ObtainedMarksLTE(v float64) predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldLTE(FieldObtainedMarks, v))
+}
+
+// ObtainedMarksIsNil applies the IsNil predicate on the "obtained_marks" field.
+func ObtainedMarksIsNil() predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldIsNull(FieldObtainedMarks))
+}
+
+// ObtainedMarksNotNil applies the NotNil predicate on the "obtained_marks" field.
+func ObtainedMarksNotNil() predicate.ExamAssesment {
+	return predicate.ExamAssesment(sql.FieldNotNull(FieldObtainedMarks))
 }
 
 // RemarksEQ applies the EQ predicate on the "remarks" field.

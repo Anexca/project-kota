@@ -1,11 +1,11 @@
-import { MathJax } from "better-react-mathjax";
 import { cn } from "../../../lib/utils";
 import { Label } from "../../base/label/label";
 import { RadioGroup, RadioGroupItem } from "../../base/radio-group/radio-group";
+import MarkdownRender from "../markdown-rendere";
 
 type Props = {
-  options: { label: string; value: string }[];
-  selected: string | null;
+  options: string[];
+  selected: number | null;
   onChange: (data: string) => void;
   name: string;
 };
@@ -17,17 +17,18 @@ const AnswerOptions = ({ options, selected, onChange, name }: Props) => {
       onValueChange={(a) => {
         onChange(a);
       }}
+      value={selected as any}
     >
-      {options.map((item) => (
+      {options.map((item, index) => (
         <div
           className={cn(
-            "flex items-center space-x-2 px-4 py-2 rounded border shadow bg-white",
-            selected == item.value && "bg-slate-200"
+            "flex items-center space-x-2 px-4 py-2 rounded shadow bg-white",
+            selected == index && "bg-info/15 color-info"
           )}
         >
-          <RadioGroupItem value={item.value} id={item.value} />
-          <Label htmlFor={item.value}>
-            <MathJax>{item.label}</MathJax>
+          <RadioGroupItem value={`${index}`} id={`${index}`} />
+          <Label htmlFor={`${index}`}>
+            <MarkdownRender>{item}</MarkdownRender>
           </Label>
         </div>
       ))}

@@ -1,36 +1,42 @@
 package repositories
 
 import (
+	"context"
+
+	"github.com/google/uuid"
+
 	"common/constants"
 	"common/ent"
 	"common/ent/examassesment"
 	"common/ent/examattempt"
 	"common/ent/generatedexam"
 	"common/ent/user"
-	"context"
-
-	"github.com/google/uuid"
 )
 
-type ExamAssesmentRepository struct {
+// ExamAssessmentRepository is a concrete implementation of ExamAssessmentRepositoryInterface.
+type ExamAssessmentRepository struct {
 	dbClient *ent.Client
 }
 
-type AssesmentModel struct {
+// AssessmentModel is used to pass data for creating or updating assessments.
+type AssessmentModel struct {
 	CompletedSeconds  int
 	Status            constants.AssessmentStatusType
 	RawAssessmentData map[string]interface{}
 	RawUserSubmission map[string]interface{}
 	Remarks           string
+	ObtainedMarks     float64
 }
 
-func NewExamAssesmentRepository(dbClient *ent.Client) *ExamAssesmentRepository {
-	return &ExamAssesmentRepository{
+// NewExamAssessmentRepository creates a new instance of ExamAssessmentRepository.
+func NewExamAssessmentRepository(dbClient *ent.Client) *ExamAssessmentRepository {
+	return &ExamAssessmentRepository{
 		dbClient: dbClient,
 	}
 }
 
-func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, model AssesmentModel) (*ent.ExamAssesment, error) {
+// Create creates a new exam assessment for a given attempt.
+func (e *ExamAssessmentRepository) Create(ctx context.Context, attemptId int, model AssessmentModel) (*ent.ExamAssesment, error) {
 	query := e.dbClient.ExamAssesment.Create().
 		SetAttemptID(attemptId).
 		SetCompletedSeconds(model.CompletedSeconds).
@@ -41,10 +47,15 @@ func (e *ExamAssesmentRepository) Create(ctx context.Context, attemptId int, mod
 		query.SetRawAssesmentData(model.RawAssessmentData)
 	}
 
+	if model.ObtainedMarks != 0 {
+		query.SetObtainedMarks(model.ObtainedMarks)
+	}
+
 	return query.Save(ctx)
 }
 
-func (e *ExamAssesmentRepository) Update(ctx context.Context, assessmentId int, model AssesmentModel) error {
+// Update updates an existing exam assessment by ID.
+func (e *ExamAssessmentRepository) Update(ctx context.Context, assessmentId int, model AssessmentModel) error {
 	query := e.dbClient.ExamAssesment.Update().
 		Where(examassesment.ID(assessmentId)).
 		SetStatus(examassesment.Status(model.Status))
@@ -61,7 +72,8 @@ func (e *ExamAssesmentRepository) Update(ctx context.Context, assessmentId int, 
 	return err
 }
 
-func (e *ExamAssesmentRepository) GetById(ctx context.Context, assesmentId int, userId string) (*ent.ExamAssesment, error) {
+// GetById retrieves a specific exam assessment by its ID and the user's UUID.
+func (e *ExamAssessmentRepository) GetById(ctx context.Context, assessmentId int, userId string) (*ent.ExamAssesment, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
@@ -70,13 +82,20 @@ func (e *ExamAssesmentRepository) GetById(ctx context.Context, assesmentId int, 
 	return e.dbClient.ExamAssesment.Query().
 		Where(
 			examassesment.HasAttemptWith(examattempt.HasUserWith(user.ID(userUid))),
-			examassesment.ID(assesmentId),
+			examassesment.ID(assessmentId),
 		).
-		WithAttempt().
+		WithAttempt(func(eaq *ent.ExamAttemptQuery) {
+			eaq.WithGeneratedexam(func(geq *ent.GeneratedExamQuery) {
+				geq.WithExam(func(eq *ent.ExamQuery) {
+					eq.WithSetting()
+				})
+			})
+		}).
 		Only(ctx)
 }
 
-func (e *ExamAssesmentRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error) {
+// GetByExam retrieves all exam assessments for a specific generated exam and user.
+func (e *ExamAssessmentRepository) GetByExam(ctx context.Context, generatedExamId int, userId string) ([]*ent.ExamAssesment, error) {
 	userUid, err := uuid.Parse(userId)
 	if err != nil {
 		return nil, err
@@ -86,5 +105,13 @@ func (e *ExamAssesmentRepository) GetByExam(ctx context.Context, generatedExamId
 		Where(examassesment.HasAttemptWith(
 			examattempt.HasUserWith(user.ID(userUid)),
 			examattempt.HasGeneratedexamWith(generatedexam.ID(generatedExamId)),
-		)).All(ctx)
+		)).
+		WithAttempt(func(eaq *ent.ExamAttemptQuery) {
+			eaq.WithGeneratedexam(func(geq *ent.GeneratedExamQuery) {
+				geq.WithExam(func(eq *ent.ExamQuery) {
+					eq.WithSetting()
+				})
+			})
+		}).
+		All(ctx)
 }

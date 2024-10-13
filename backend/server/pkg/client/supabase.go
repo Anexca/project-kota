@@ -2,9 +2,10 @@ package client
 
 import (
 	"log"
-	"server/pkg/config"
 
 	"github.com/nedpals/supabase-go"
+
+	"server/pkg/config"
 )
 
 func NewSupabaseClient() (*supabase.Client, error) {

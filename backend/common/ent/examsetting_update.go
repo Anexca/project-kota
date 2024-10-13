@@ -151,6 +151,60 @@ func (esu *ExamSettingUpdate) AddMaxAttempts(i int) *ExamSettingUpdate {
 	return esu
 }
 
+// SetTotalMarks sets the "total_marks" field.
+func (esu *ExamSettingUpdate) SetTotalMarks(i int) *ExamSettingUpdate {
+	esu.mutation.ResetTotalMarks()
+	esu.mutation.SetTotalMarks(i)
+	return esu
+}
+
+// SetNillableTotalMarks sets the "total_marks" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableTotalMarks(i *int) *ExamSettingUpdate {
+	if i != nil {
+		esu.SetTotalMarks(*i)
+	}
+	return esu
+}
+
+// AddTotalMarks adds i to the "total_marks" field.
+func (esu *ExamSettingUpdate) AddTotalMarks(i int) *ExamSettingUpdate {
+	esu.mutation.AddTotalMarks(i)
+	return esu
+}
+
+// ClearTotalMarks clears the value of the "total_marks" field.
+func (esu *ExamSettingUpdate) ClearTotalMarks() *ExamSettingUpdate {
+	esu.mutation.ClearTotalMarks()
+	return esu
+}
+
+// SetCutoffMarks sets the "cutoff_marks" field.
+func (esu *ExamSettingUpdate) SetCutoffMarks(f float64) *ExamSettingUpdate {
+	esu.mutation.ResetCutoffMarks()
+	esu.mutation.SetCutoffMarks(f)
+	return esu
+}
+
+// SetNillableCutoffMarks sets the "cutoff_marks" field if the given value is not nil.
+func (esu *ExamSettingUpdate) SetNillableCutoffMarks(f *float64) *ExamSettingUpdate {
+	if f != nil {
+		esu.SetCutoffMarks(*f)
+	}
+	return esu
+}
+
+// AddCutoffMarks adds f to the "cutoff_marks" field.
+func (esu *ExamSettingUpdate) AddCutoffMarks(f float64) *ExamSettingUpdate {
+	esu.mutation.AddCutoffMarks(f)
+	return esu
+}
+
+// ClearCutoffMarks clears the value of the "cutoff_marks" field.
+func (esu *ExamSettingUpdate) ClearCutoffMarks() *ExamSettingUpdate {
+	esu.mutation.ClearCutoffMarks()
+	return esu
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esu *ExamSettingUpdate) SetEvaluationAiPrompt(s string) *ExamSettingUpdate {
 	esu.mutation.SetEvaluationAiPrompt(s)
@@ -290,6 +344,24 @@ func (esu *ExamSettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := esu.mutation.AddedMaxAttempts(); ok {
 		_spec.AddField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esu.mutation.TotalMarks(); ok {
+		_spec.SetField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if value, ok := esu.mutation.AddedTotalMarks(); ok {
+		_spec.AddField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if esu.mutation.TotalMarksCleared() {
+		_spec.ClearField(examsetting.FieldTotalMarks, field.TypeInt)
+	}
+	if value, ok := esu.mutation.CutoffMarks(); ok {
+		_spec.SetField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if value, ok := esu.mutation.AddedCutoffMarks(); ok {
+		_spec.AddField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if esu.mutation.CutoffMarksCleared() {
+		_spec.ClearField(examsetting.FieldCutoffMarks, field.TypeFloat64)
 	}
 	if value, ok := esu.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)
@@ -471,6 +543,60 @@ func (esuo *ExamSettingUpdateOne) AddMaxAttempts(i int) *ExamSettingUpdateOne {
 	return esuo
 }
 
+// SetTotalMarks sets the "total_marks" field.
+func (esuo *ExamSettingUpdateOne) SetTotalMarks(i int) *ExamSettingUpdateOne {
+	esuo.mutation.ResetTotalMarks()
+	esuo.mutation.SetTotalMarks(i)
+	return esuo
+}
+
+// SetNillableTotalMarks sets the "total_marks" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableTotalMarks(i *int) *ExamSettingUpdateOne {
+	if i != nil {
+		esuo.SetTotalMarks(*i)
+	}
+	return esuo
+}
+
+// AddTotalMarks adds i to the "total_marks" field.
+func (esuo *ExamSettingUpdateOne) AddTotalMarks(i int) *ExamSettingUpdateOne {
+	esuo.mutation.AddTotalMarks(i)
+	return esuo
+}
+
+// ClearTotalMarks clears the value of the "total_marks" field.
+func (esuo *ExamSettingUpdateOne) ClearTotalMarks() *ExamSettingUpdateOne {
+	esuo.mutation.ClearTotalMarks()
+	return esuo
+}
+
+// SetCutoffMarks sets the "cutoff_marks" field.
+func (esuo *ExamSettingUpdateOne) SetCutoffMarks(f float64) *ExamSettingUpdateOne {
+	esuo.mutation.ResetCutoffMarks()
+	esuo.mutation.SetCutoffMarks(f)
+	return esuo
+}
+
+// SetNillableCutoffMarks sets the "cutoff_marks" field if the given value is not nil.
+func (esuo *ExamSettingUpdateOne) SetNillableCutoffMarks(f *float64) *ExamSettingUpdateOne {
+	if f != nil {
+		esuo.SetCutoffMarks(*f)
+	}
+	return esuo
+}
+
+// AddCutoffMarks adds f to the "cutoff_marks" field.
+func (esuo *ExamSettingUpdateOne) AddCutoffMarks(f float64) *ExamSettingUpdateOne {
+	esuo.mutation.AddCutoffMarks(f)
+	return esuo
+}
+
+// ClearCutoffMarks clears the value of the "cutoff_marks" field.
+func (esuo *ExamSettingUpdateOne) ClearCutoffMarks() *ExamSettingUpdateOne {
+	esuo.mutation.ClearCutoffMarks()
+	return esuo
+}
+
 // SetEvaluationAiPrompt sets the "evaluation_ai_prompt" field.
 func (esuo *ExamSettingUpdateOne) SetEvaluationAiPrompt(s string) *ExamSettingUpdateOne {
 	esuo.mutation.SetEvaluationAiPrompt(s)
@@ -640,6 +766,24 @@ func (esuo *ExamSettingUpdateOne) sqlSave(ctx context.Context) (_node *ExamSetti
 	}
 	if value, ok := esuo.mutation.AddedMaxAttempts(); ok {
 		_spec.AddField(examsetting.FieldMaxAttempts, field.TypeInt, value)
+	}
+	if value, ok := esuo.mutation.TotalMarks(); ok {
+		_spec.SetField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if value, ok := esuo.mutation.AddedTotalMarks(); ok {
+		_spec.AddField(examsetting.FieldTotalMarks, field.TypeInt, value)
+	}
+	if esuo.mutation.TotalMarksCleared() {
+		_spec.ClearField(examsetting.FieldTotalMarks, field.TypeInt)
+	}
+	if value, ok := esuo.mutation.CutoffMarks(); ok {
+		_spec.SetField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if value, ok := esuo.mutation.AddedCutoffMarks(); ok {
+		_spec.AddField(examsetting.FieldCutoffMarks, field.TypeFloat64, value)
+	}
+	if esuo.mutation.CutoffMarksCleared() {
+		_spec.ClearField(examsetting.FieldCutoffMarks, field.TypeFloat64)
 	}
 	if value, ok := esuo.mutation.EvaluationAiPrompt(); ok {
 		_spec.SetField(examsetting.FieldEvaluationAiPrompt, field.TypeString, value)

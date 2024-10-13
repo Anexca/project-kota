@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 
 const GeneralLayout = ({ children }: PropsWithChildren) => {
   return (
-    <div className="w-full bg-neutral-50 min-h-screen">
+    <div className="w-full bg-neutral-50 min-h-screen ">
       <Header />
       {children || <Outlet />}
     </div>
