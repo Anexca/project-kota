@@ -15,4 +15,11 @@ export interface IPastExamAttempt {
   topic: string;
   type: string;
   attempts: Attempt[];
+
+  exam_group: string;
+  exam_group_id: number;
+  exam_name: string;
+
+  exam_stage: string;
+  is_sectional: boolean;
 }

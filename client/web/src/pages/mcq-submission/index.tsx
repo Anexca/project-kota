@@ -1,230 +1,248 @@
-// import { MathJaxContext } from "better-react-mathjax";
-// import { useEffect, useMemo, useState } from "react";
-// import { Controller, useForm, useWatch } from "react-hook-form";
-// import { useNavigate, useParams } from "react-router-dom";
-// import { Button } from "../../componnets/base/button/button";
-// import AnswerOptions from "../../componnets/shared/answer-option/answer-options";
-// import { ReadMore } from "../../componnets/shared/read-more-content";
-// import TestHeader from "../../componnets/shared/test-header/test-header";
-// import { QUESTION_STATE, ScreenSizeQuery } from "../../constants/shared";
-// import { useInterval } from "../../hooks/use-interval";
-// import { useMediaQuery } from "../../hooks/use-media-query";
-// import { useToast } from "../../hooks/use-toast";
-// import { MCQFormModal } from "../../interface/mcq-exam";
-// import { IContentGroup, IMCQQuestionSet } from "../../interface/question";
-// import { paths } from "../../routes/route.constant";
-// import { getMCQQuestionById } from "../../services/exam.service";
-// import { evaluateMcqExam } from "../../services/mcq-exam.services";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { Button } from "../../componnets/base/button/button";
+import Chip from "../../componnets/base/chip";
+import Icon from "../../componnets/base/icon";
+import Container from "../../componnets/shared/container";
+import MCQSubmissionView from "../../componnets/shared/mcq-submission-view";
+import { QUESTION_STATE } from "../../constants/shared";
+import { useToast } from "../../hooks/use-toast";
+import { IMCQSubmission } from "../../interface/mcq-submission";
+import { IContentGroup, IMCQQuestionSet } from "../../interface/question";
+import { paths } from "../../routes/route.constant";
+import {
+  getAssesmetsResult,
+  getMCQQuestionById,
+} from "../../services/exam.service";
+import useUserProfileStore from "../../store/user-info-store";
 
-// import MarkdownRender from "../../componnets/shared/markdown-rendere";
-// import MCQMobileHeader from "../../componnets/shared/mcq-mobile-header";
-// import MCQQuestionPallet from "../../componnets/shared/mcq-question-pallet";
+const MCQSubmission = ({ backLink }: { backLink?: string }) => {
+  const location = useLocation();
+  const param = useParams();
+  const [assessment, setAssessment] = useState<IMCQSubmission | null>(null);
+  const [questionSet, setQuestionSet] = useState<IMCQQuestionSet | null>(null);
+  const [summaryView, setSummaryView] = useState(true);
+  const profile = useUserProfileStore();
+  const { toast } = useToast();
+  const assesmentId = Math.abs(Number.parseInt(param.assesmentId || ""));
+  const questionId = Math.abs(Number.parseInt(param.questionId || ""));
 
-// const MCQSubmission = ({ isOpenMode }: { isOpenMode?: boolean }) => {
-//   const param = useParams();
-//   const [questionSet, setQuestionSet] = useState<IMCQQuestionSet | null>(null);
-//   const [examTime, setExamTime] = useState(0);
-//   const interval = useInterval(() => setExamTime((s) => s - 1), 1000);
-//   const { toast } = useToast();
-//   const isScreenView = useMediaQuery(ScreenSizeQuery.largeScreen, true);
-//   const isMobileView = useMediaQuery(ScreenSizeQuery.mediumScreen, true);
+  const categoryId = location?.state?.categoryId as any;
 
-//   const navigate = useNavigate();
+  const fetchSubmission = async () => {
+    try {
+      const res = await getAssesmetsResult(assesmentId);
+      setAssessment(res.data);
+    } catch (error) {
+      toast({
+        title: "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in processing your request.",
+      });
+    }
+  };
 
-//   const { control, setValue, reset } = useForm<
-//     MCQFormModal & { tempAnswerIndex: number | null }
-//   >({
-//     defaultValues: {
-//       answers: [],
-//       activeQuestionIndex: 0,
-//       tempAnswerIndex: null,
-//     },
-//   });
-//   const activeIndex = useWatch({ control, name: "activeQuestionIndex" });
-//   const answers = useWatch({ control, name: "answers" });
-//   const tempAnswerIndex = useWatch({ control, name: "tempAnswerIndex" });
+  const fetchExam = async () => {
+    try {
+      const res = await getMCQQuestionById(`${questionId}`);
+      setQuestionSet(res.data);
+    } catch (error) {
+      toast({
+        title: "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in processing your request.",
+      });
+    }
+  };
 
-//   const fetchExam = async () => {
-//     try {
-//       const res = await getMCQQuestionById(param.questionId!);
-//       // setExamTime(5);
-//       setExamTime(res.data.duration_seconds);
-//       setQuestionSet(res.data);
-//       const ques = res.data.raw_exam_data.questions.map((_) => ({
-//         state: QUESTION_STATE.UN_ATTEMPTED,
-//         selectedOption: null,
-//       }));
-//       reset({ activeQuestionIndex: 0, answers: ques });
-//     } catch (error) {
-//       toast({
-//         title: "Something went wrong.",
-//         variant: "destructive",
-//         description: "Sorry there is some problem in processing your request.",
-//       });
-//     }
-//   };
+  useEffect(() => {
+    fetchExam();
+    fetchSubmission();
+  }, []);
 
-//   useEffect(() => {
-//     fetchExam();
-//   }, []);
+  const clearedExam = useMemo(() => {
+    if (!assessment) return false;
+    return assessment.obtained_marks >= assessment.cutoff_marks;
+  }, [assessment]);
 
-//   const contentGroup = useMemo(() => {
-//     const temp: Record<string, IContentGroup> = {};
-//     if (questionSet) {
-//       questionSet?.raw_exam_data?.content_groups?.forEach((e) => {
-//         temp[e.content_id] = e;
-//       });
-//     }
-//     return temp;
-//   }, [questionSet]);
-//   const handleQuestionChange = (index: number) => {
-//     if (index == activeIndex) return;
-//     if (answers?.[activeIndex]?.state == "UN-ATTEMPTED") {
-//       setValue(`answers.${activeIndex}.state`, "NOT-ANSWERED");
-//     }
-//     setValue("activeQuestionIndex", index);
-//   };
+  const examMetaData = useMemo(() => {
+    if (!assessment || !questionSet) {
+      return {
+        activeQuestionIndex: 0,
+        answers: {},
+        activeSection: "",
+        sectionList: [],
+        contentGroup: {},
+        perQuestionMarks: 0,
+        negativeMark: 0,
+      };
+    }
+    const assessmentList =
+      assessment?.raw_user_submission.attempted_questions || [];
+    const ques = questionSet?.raw_exam_data?.sections || {};
+    const sets = Object.keys(ques);
+    const questionsSet: any = {};
+    const questionTimeMap: Record<string, number> = {};
+    const answerMap: any = {};
+    assessmentList?.forEach((i) => {
+      answerMap[i.question_number] = {
+        timeTaken: i.time_taken_in_seconds,
+        optionTaken: i.user_selected_option_index[0],
+      };
+    });
+    sets.forEach((item) => {
+      const quesArray = ques[item].map((i) => {
+        questionTimeMap[i.question_number] = 0;
+        return {
+          state: answerMap[i.question_number]
+            ? QUESTION_STATE.ATTEMPTED
+            : QUESTION_STATE.NOT_ANSWERED,
+          selectedOption: answerMap[i.question_number]?.optionTaken,
+          questionNumber: i.question_number,
+          timeTaken: answerMap[i.question_number]?.timeTaken,
+          correctAnswer: i.answer[0],
+        };
+      });
+      questionsSet[item] = quesArray;
+    });
+    const temp: Record<string, IContentGroup> = {};
+    if (questionSet) {
+      questionSet?.raw_exam_data?.content_groups?.forEach((e) => {
+        temp[e.content_id] = e;
+      });
+    }
 
-//   const handleSaveNNext = () => {
-//     if (tempAnswerIndex) {
-//       setValue(`answers.${activeIndex}.state`, "ATTEMPTED");
-//       setValue(`answers.${activeIndex}.selectedOption`, tempAnswerIndex);
-//       setValue("tempAnswerIndex", null);
-//     }
-//   };
+    return {
+      activeQuestionIndex: 0,
+      answers: questionsSet,
+      activeSection: sets[0],
+      sectionList: sets,
+      contentGroup: temp,
+      perQuestionMarks:
+        assessment!.total_marks / questionSet!.number_of_questions,
+      negativeMark: questionSet!.negative_marking,
+    };
+  }, [questionSet, assessment]);
+  const exitLink = categoryId
+    ? `/${paths.EXAMS}/banking/${categoryId}`
+    : `/${paths.EXAMS}/${paths.MY_SUMBISSIONS}`;
 
-//   const questions = questionSet?.raw_exam_data?.questions || [];
-//   const activeContentReference = questions?.[activeIndex]?.content_reference_id;
-//   const contentInfo = contentGroup[activeContentReference];
+  return summaryView ? (
+    <Container>
+      <div className="flex flex-col  ">
+        <div className="p-4 md:p-10 md:pr-2">
+          <div className="flex items-center flex-wrap capitalize mb-2 font-medium text-lg">
+            <Link className="text-info mr-2 text-sm" to={backLink || exitLink}>
+              <Icon icon="arrow_back" /> Back
+            </Link>{" "}
+            {questionSet?.exam_name?.split("_").join(" ").toLowerCase()}{" "}
+          </div>
+          <div className="font-semibold text-lg">
+            {clearedExam ? "Congratulations!!!" : "Oh Sorry!!!"}
+          </div>
+          <div className="text-xl font-semibold text-info">
+            {profile.profile.first_name} {profile.profile.last_name}
+          </div>
+          <div className="font-semibold ">
+            {clearedExam
+              ? "You have met the desired cutoff score."
+              : "You did not met the passing cutoff."}
+          </div>
+          <div className="font-semibold">
+            Your Score is{" "}
+            <Chip
+              icon={"bank"}
+              variant={clearedExam ? "success" : "destructive"}
+              className="text-base"
+            >
+              {assessment?.obtained_marks || ""}
+            </Chip>{" "}
+            And cutoff is{" "}
+            <Chip icon={"target"} className="text-base">
+              {assessment?.cutoff_marks || ""}
+            </Chip>
+          </div>
 
-//   const endExamNavigatePath = isOpenMode
-//     ? `/${paths.COMMUNITY_EXAMS}/banking/${paths.MCQ}`
-//     : `/${paths.EXAMS}/banking/${param.categoryId}`;
-//   const exitExam = () => {
-//     navigate(endExamNavigatePath);
-//   };
+          <Button
+            onClick={() => setSummaryView(false)}
+            className="mt-3"
+            size={"sm"}
+          >
+            View Solution
+          </Button>
+        </div>
+        <div className="p-4 md:mx-auto">
+          <div className="grid  grid-cols-2 md:grid-cols-3  gap-2">
+            <div className="flex flex-col items-center px-4 p-2 bg-white border border-gray-200 rounded-lg shadow hover:scale-105 transition-transform">
+              <div className="font-bold text-2xl bg-info/25 text-info flex items-center justify-center w-12 h-12 rounded-full">
+                <Icon icon="target" />
+              </div>
+              <div className="mt-2 text-sm font-semibold  text-gray-900">
+                Accuracy{" "}
+                <span className="font-bold">
+                  {assessment?.raw_assesment_data.summary.accuracy}{" "}
+                </span>
+              </div>
+            </div>
 
-//   return (
-//     <MathJaxContext>
-//       <div className="md:max-h-[calc(100vh_-_54px)] md:h-[calc(100vh_-_54px)] flex flex-col ">
-//         <div className="flex-1 md:overflow-hidden">
-//           <div className="flex flex-col md:flex-row items-stretch md:max-h-full md:h-full">
-//             <div className="flex-1 max-h-full flex flex-col">
-//               <div className="text-start p-2 pl-4 shadow flex items-center">
-//                 <span className="ml-auto flex-1">
-//                   Que No {activeIndex + 1} /{" "}
-//                   {questionSet?.number_of_questions || 0}
-//                 </span>
-//                 {!isScreenView && (
-//                   <MCQMobileHeader
-//                     answers={answers}
-//                     onQuestionNumberClick={handleQuestionChange}
-//                     activeQuestionIndex={activeIndex}
-//                   />
-//                 )}
-//               </div>
-//               <div className="flex-1 flex flex-col md:flex-row md:overflow-hidden">
-//                 {contentInfo && (
-//                   <div className="md:w-1/2 min-w-[50%] overflow-auto p-4 pt-0 md:pt-4  text-pretty font-medium border-r-0 border-b md:border-b-0 md:border-r">
-//                     {contentInfo?.instructions && (
-//                       <p className="font-semibold mb-2 pt-4 md:pt-0">
-//                         {contentInfo.instructions}
-//                       </p>
-//                     )}
-//                     {contentInfo?.content && (
-//                       <>
-//                         {isMobileView ? (
-//                           <p>{contentInfo.content}</p>
-//                         ) : (
-//                           <ReadMore text={contentInfo.content} />
-//                         )}
-//                       </>
-//                     )}
-//                   </div>
-//                 )}
-//                 <div className="md:max-h-[70vh] h-full flex flex-col p-4 flex-1">
-//                   {questions.length && (
-//                     <>
-//                       <p className="items-start text-start pb-2">
-//                         <MarkdownRender
-//                           children={questions?.[activeIndex]?.question || ""}
-//                         />
-//                       </p>
-//                       <Controller
-//                         name={"tempAnswerIndex"}
-//                         control={control}
-//                         render={({ field }) => (
-//                           <AnswerOptions
-//                             name={field.name}
-//                             onChange={field.onChange}
-//                             options={questions[activeIndex].options}
-//                             selected={field.value}
-//                           />
-//                         )}
-//                       />
-//                     </>
-//                   )}
-//                 </div>
-//               </div>
-//               <div className="min-h-12 flex gap-2 p-2 border-orange-300 border-t">
-//                 <Controller
-//                   name={`activeQuestionIndex`}
-//                   control={control}
-//                   render={({ field }) => (
-//                     <Button
-//                       size={"sm"}
-//                       variant={"success"}
-//                       className="justify-self-end ml-auto"
-//                       type="button"
-//                       disabled={!field.value}
-//                       onClick={() => {
-//                         const nextIdx = field.value - 1;
-//                         field.value + 1 <= questions.length &&
-//                           field.onChange(nextIdx);
-//                       }}
-//                     >
-//                       PREV
-//                     </Button>
-//                   )}
-//                 />
-//                 <Controller
-//                   name={`activeQuestionIndex`}
-//                   control={control}
-//                   render={({ field }) => (
-//                     <Button
-//                       size={"sm"}
-//                       variant={"success"}
-//                       className="justify-self-end ml-2"
-//                       type="button"
-//                       disabled={field.value == questions.length - 1}
-//                       onClick={() => {
-//                         const nextIdx = field.value + 1;
+            <div className="flex flex-col items-center px-4 p-2 bg-white border border-gray-200 rounded-lg shadow hover:scale-105 transition-transform">
+              <div className="font-bold text-2xl bg-warning/25 text-warning flex items-center justify-center w-12 h-12 rounded-full">
+                <Icon icon="tasks" />
+              </div>
+              <div className="mt-2 text-sm font-semibold  text-gray-900">
+                Attempted{" "}
+                <span className="font-bold">
+                  {assessment?.raw_assesment_data.summary.attempted}{" "}
+                </span>
+              </div>
+            </div>
 
-//                         field.value + 1 <= questions.length &&
-//                           field.onChange(nextIdx);
-//                       }}
-//                     >
-//                       NEXT
-//                     </Button>
-//                   )}
-//                 />
-//               </div>
-//             </div>
+            <div className="flex flex-col items-center px-4 p-2 bg-white border border-gray-200 rounded-lg shadow hover:scale-105 transition-transform">
+              <div className="font-bold text-2xl bg-red-400/25 text-red-500 flex items-center justify-center w-12 h-12 rounded-full">
+                <Icon icon="check" />
+              </div>
+              <div className="mt-2 text-sm font-semibold  text-gray-900">
+                Incorrect{" "}
+                <span className="font-bold">
+                  {assessment?.raw_assesment_data.summary.incorrect}{" "}
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center px-4 p-2 bg-white border border-gray-200 rounded-lg shadow hover:scale-105 transition-transform">
+              <div className="font-bold text-2xl bg-green-400/25 text-success flex items-center justify-center w-12 h-12 rounded-full">
+                <Icon icon="check" />
+              </div>
+              <div className="mt-2 text-sm font-semibold  text-gray-900">
+                Correct{" "}
+                <span className="font-bold">
+                  {assessment?.raw_assesment_data.summary.correct}{" "}
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center px-4 p-2 bg-white border border-gray-200 rounded-lg shadow hover:scale-105 transition-transform">
+              <div className="font-bold text-2xl bg-blue-400/25 text-blue-500 flex items-center justify-center w-12 h-12 rounded-full">
+                <Icon icon="forward" />
+              </div>
+              <div className="mt-2 text-sm font-semibold  text-gray-900">
+                Skipped{" "}
+                <span className="font-bold">
+                  {assessment?.raw_assesment_data.summary.attempted}{" "}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container>
+  ) : (
+    <MCQSubmissionView
+      {...examMetaData}
+      questionSet={questionSet}
+      numberOfQuestions={questionSet?.number_of_questions || 0}
+      assessment={assessment?.raw_user_submission.attempted_questions || []}
+      backLink={backLink || exitLink}
+    />
+  );
+};
 
-//             {isScreenView && (
-//               <div className=" bg-neutral-100/75 min-w-72 md:w-auto w-full h-full px-2 ">
-//                 <MCQQuestionPallet
-//                   answers={answers}
-//                   onQuestionNumberClick={handleQuestionChange}
-//                   activeQuestionIndex={activeIndex}
-//                 />
-//               </div>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     </MathJaxContext>
-//   );
-// };
-
-// export default MCQSubmission;
+export default MCQSubmission;

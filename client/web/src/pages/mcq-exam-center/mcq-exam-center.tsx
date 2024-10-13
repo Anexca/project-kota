@@ -227,7 +227,7 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
   const fetchExam = async () => {
     try {
       const res = await getMCQQuestionById(param.questionId!);
-      // setExamTime(5);
+
       setExamTime(res.data.duration_seconds);
       setQuestionSet(res.data);
       const ques = res.data.raw_exam_data.sections;
@@ -406,8 +406,17 @@ const MCQExamCenter = ({ isOpenMode }: { isOpenMode?: boolean }) => {
 
     try {
       const res = await evaluateMcqExam({ id: param.questionId!, payload });
-      console.log(res);
-    } catch (error) {}
+      navigate(
+        `/${paths.EXAMS}/${paths.MY_SUMBISSIONS}/${paths.MCQ}/${param.questionId}/${paths.SUBMISSION}/${res.data.id}`,
+        { replace: true, state: { categoryId: param.categoryId } }
+      );
+    } catch (error) {
+      toast({
+        title: "Something went wrong.",
+        variant: "destructive",
+        description: "Sorry there is some problem in processing your request.",
+      });
+    }
   };
   const { incompleteExam, markedForReview } = useMemo(() => {
     let incompleteExam = 0;

@@ -65,7 +65,7 @@ const MCQMobileHeader = ({
             mobileViewHeader && "origin-top  !visible !scale-100 !opacity-100"
           )}
         >
-          <div className=" p-6 py-4">
+          <div className=" p-6 py-4 pt-16">
             <button
               onClick={() => setMobileViewHeader(!mobileViewHeader)}
               aria-label="humburger"
@@ -90,7 +90,7 @@ const MCQMobileHeader = ({
               ></div>
             </button>
           </div>
-          <div className=" flex justify-center   gap-2 w-full flex-1 overflow-hidden">
+          <div className=" flex justify-center pb-2 gap-2 w-full flex-1 overflow-hidden">
             <MCQQuestionPallet
               activeSection={activeSection}
               answers={answers}
