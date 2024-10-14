@@ -395,11 +395,13 @@ func (e *ExamGenerationService) sortExamsByUpdatedAt(exams []*ent.GeneratedExam)
 func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Context, latestExams []*ent.GeneratedExam, ex *ent.Exam, userId string) ([]*models.GeneratedExamOverview, error) {
 	generatedExamOverviewList := make([]*models.GeneratedExamOverview, 0, len(latestExams))
 
+	allUserAttempts, err := e.examAttemptRepository.GetByUserId(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, generatedExam := range latestExams {
-		userAttempts, err := e.examAttemptRepository.GetByExam(ctx, generatedExam.ID, userId)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get user attempts: %w", err)
-		}
+		userAttempts := e.GetUserExamAttempt(allUserAttempts, generatedExam.ID)
 
 		overview := e.buildGeneratedExamOverview(generatedExam, ex.Edges.Setting, userAttempts)
 		overview.ExamName = ex.Name
@@ -417,6 +419,18 @@ func (e *ExamGenerationService) buildGeneratedExamOverviewList(ctx context.Conte
 	}
 
 	return generatedExamOverviewList, nil
+}
+
+func (e *ExamGenerationService) GetUserExamAttempt(userAttempts []*ent.ExamAttempt, examId int) []*ent.ExamAttempt {
+	var userExamAttempts []*ent.ExamAttempt
+
+	for _, attempt := range userAttempts {
+		if attempt.Edges.Generatedexam.ID == examId {
+			userExamAttempts = append(userExamAttempts, attempt)
+		}
+	}
+
+	return userExamAttempts
 }
 
 func (e *ExamGenerationService) buildGeneratedExamOverview(generatedExam *ent.GeneratedExam, examSettings *ent.ExamSetting, examAttempts []*ent.ExamAttempt) *models.GeneratedExamOverview {

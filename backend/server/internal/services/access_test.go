@@ -123,6 +123,7 @@ func TestGetAccessibleExamsForUser_Success(t *testing.T) {
 
 	// Mock subscription exams
 	subscription := &ent.Subscription{
+		ID: 1,
 		Edges: ent.SubscriptionEdges{
 			Exams: []*ent.SubscriptionExam{
 				{
@@ -138,7 +139,10 @@ func TestGetAccessibleExamsForUser_Success(t *testing.T) {
 			},
 		},
 	}
-	mockSubscriptionRepo.On("GetById", ctx, userSubscription.Edges.Subscription.ID).Return(subscription, nil)
+
+	var subscriptions []*ent.Subscription
+	subscriptions = append(subscriptions, subscription)
+	mockSubscriptionRepo.On("GetAll", ctx).Return(subscriptions, nil)
 
 	// Mock available exams
 	exams := []*ent.Exam{
@@ -178,6 +182,7 @@ func TestGetAccessibleExamsForUser_NoAccessibleExams(t *testing.T) {
 
 	// Mock subscription exams with no matching exams
 	subscription := &ent.Subscription{
+		ID: 1,
 		Edges: ent.SubscriptionEdges{
 			Exams: []*ent.SubscriptionExam{
 				{
@@ -188,7 +193,7 @@ func TestGetAccessibleExamsForUser_NoAccessibleExams(t *testing.T) {
 			},
 		},
 	}
-	mockSubscriptionRepo.On("GetById", ctx, userSubscription.Edges.Subscription.ID).Return(subscription, nil)
+	mockSubscriptionRepo.On("GetAll", ctx).Return([]*ent.Subscription{subscription}, nil)
 
 	// Mock available exams that do not match subscription exams
 	exams := []*ent.Exam{

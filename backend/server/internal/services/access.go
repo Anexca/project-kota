@@ -69,13 +69,18 @@ func (a *AccessService) GetAccessibleExamsForUser(ctx context.Context, exams []*
 		return nil, err
 	}
 
+	subscriptions, err := a.subscriptionRepository.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
 	var accessibleExams []*ent.Exam
 
 	for _, userSubscription := range userSubscriptions {
 		if userSubscription.StartDate.Before(now) && userSubscription.EndDate.After(now) {
 
-			subscription, err := a.subscriptionRepository.GetById(ctx, userSubscription.Edges.Subscription.ID)
+			subscription, err := a.GetSubscriptionById(subscriptions, userSubscription.Edges.Subscription.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -94,4 +99,14 @@ func (a *AccessService) GetAccessibleExamsForUser(ctx context.Context, exams []*
 	}
 
 	return accessibleExams, nil
+}
+
+func (a *AccessService) GetSubscriptionById(subscriptions []*ent.Subscription, subscriptionId int) (*ent.Subscription, error) {
+	for _, subscription := range subscriptions {
+		if subscription.ID == subscriptionId {
+			return subscription, nil
+		}
+	}
+
+	return nil, &ent.NotFoundError{}
 }
