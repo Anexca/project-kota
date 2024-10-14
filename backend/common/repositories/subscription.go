@@ -21,7 +21,11 @@ func NewSubscriptionRepository(dbClient *ent.Client) *SubscriptionRepository {
 
 // GetAll retrieves all subscriptions.
 func (s *SubscriptionRepository) GetAll(ctx context.Context) ([]*ent.Subscription, error) {
-	return s.dbClient.Subscription.Query().All(ctx)
+	return s.dbClient.Subscription.Query().
+		WithExams(func(seq *ent.SubscriptionExamQuery) {
+			seq.WithExam()
+		}).
+		All(ctx)
 }
 
 // GetById retrieves a subscription by its ID, including related exams.
