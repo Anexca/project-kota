@@ -108,7 +108,7 @@ func prepareRequest(ctx context.Context, url, accessKey, prompt string, model co
 
 func sendRequest(req *http.Request) (string, error) {
 	client := &http.Client{
-		Timeout: 2 * time.Minute,
+		Timeout: 30 * time.Minute,
 	}
 
 	resp, err := client.Do(req)

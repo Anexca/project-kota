@@ -69,8 +69,8 @@ func InitServer(redisClient *redis.Client, dbClient *ent.Client, supabaseClient 
 		Addr:         fmt.Sprintf(":%d", NewServer.port),
 		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  30 * time.Minute,
+		WriteTimeout: 30 * time.Minute,
 		ErrorLog:     logger,
 	}
 
