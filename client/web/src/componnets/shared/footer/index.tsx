@@ -8,7 +8,7 @@ const Footer = () => {
         <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
           © 2024{" "}
           <Link to="https://pseudotest.pro/" className="hover:underline">
-            PsuedoTest
+            PseudoTest
           </Link>
           . All Rights Reserved.
         </span>
