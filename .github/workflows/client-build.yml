@@ -1,0 +1,19 @@
+name: "Build Web Client"
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "client/web/**"
+      - ".github/**"
+
+jobs:
+  build_web_client:
+    name: Build Web Client - ${{ github.ref == 'refs/heads/main' && 'Prod' || 'Dev' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build -- ${{ github.ref == 'refs/heads/main' && '--mode=prod' || '--mode=dev' }}
+        working-directory: ./client/web
