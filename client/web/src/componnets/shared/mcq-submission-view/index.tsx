@@ -186,7 +186,9 @@ const MCQSubmissionView = ({
                             <span>Explanation</span>
                           </AccordionTrigger>
                           <AccordionContent>
-                            {questions[activeIndex].explanation}
+                            <MarkdownRender
+                              children={questions[activeIndex].explanation}
+                            />
                           </AccordionContent>
                         </AccordionItem>
                       </Accordion>
