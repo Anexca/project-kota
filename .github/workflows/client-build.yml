@@ -1,7 +1,7 @@
 name: "Build Web Client"
 
 on:
-  push:
+  pull_request:
     branches:
       - main
       - dev
