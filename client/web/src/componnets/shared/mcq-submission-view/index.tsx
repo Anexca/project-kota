@@ -13,6 +13,12 @@ import MCQMobileHeader from "../mcq-mobile-header";
 import MCQQuestionPallet from "../mcq-question-pallet";
 import { ReadMore } from "../read-more-content";
 import OptionList from "./options-list";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../accordian";
 
 const MCQSubmissionView = ({
   answers,
@@ -119,7 +125,7 @@ const MCQSubmissionView = ({
               </div>
               <div className="flex-1 flex flex-col md:flex-row md:overflow-hidden">
                 {contentInfo && (
-                  <div className="md:w-1/2 min-w-[50%] overflow-auto p-4 pt-0 md:pt-4  text-pretty font-medium border-r-0 border-b md:border-b-0 md:border-r">
+                  <div className="md:w-1/2 min-w-[50%] md:overflow-auto p-4 pt-0 md:pt-4  text-pretty font-medium border-r-0 border-b md:border-b-0 md:border-r">
                     {contentInfo?.instructions && (
                       <MarkdownRender className="font-semibold mb-2 pt-4 md:pt-0">
                         {contentInfo.instructions}
@@ -136,7 +142,7 @@ const MCQSubmissionView = ({
                     )}
                   </div>
                 )}
-                <div className="md:max-h-[70vh] h-full flex flex-col p-4 flex-1">
+                <div className="md:max-h-[70vh] h-full flex flex-col p-4 flex-1 overflow-auto">
                   {!!questions.length && (
                     <>
                       <p className="items-start text-start pb-2">
@@ -145,7 +151,7 @@ const MCQSubmissionView = ({
                         />
                       </p>
 
-                      <div className=" mb-4 flex gap-2">
+                      <div className="flex gap-2">
                         {attemptedCurrent && (
                           <span className="font-semibold text-sm">
                             Time Taken{" "}
@@ -173,6 +179,17 @@ const MCQSubmissionView = ({
                           </Chip>
                         </span>
                       </div>
+
+                      <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value={`item-exp`}>
+                          <AccordionTrigger>
+                            <span>Explanation</span>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            {questions[activeIndex].explanation}
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
 
                       <OptionList
                         selected={
