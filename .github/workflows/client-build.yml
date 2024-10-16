@@ -6,7 +6,7 @@ on:
       - main
       - dev
     paths:
-      - "client/web/**"
+      - "client/**"
       - ".github/**"
 
 jobs:
