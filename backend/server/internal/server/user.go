@@ -91,6 +91,12 @@ func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var constraintError *ent.ConstraintError
+		if errors.As(err, &constraintError) {
+			s.HandleError(w, err, "provided phone number is already in use", http.StatusBadRequest)
+			return
+		}
+
 		s.HandleError(w, err, err.Error(), http.StatusInternalServerError)
 		return
 	}
