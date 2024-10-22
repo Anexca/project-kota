@@ -17,7 +17,6 @@ import (
 	commonRepositories "common/repositories"
 	commonServices "common/services"
 
-	goaway "github.com/TwiN/go-away"
 	"github.com/redis/go-redis/v9"
 
 	"server/internal/interfaces"
@@ -323,17 +322,17 @@ func (e *ExamAssesmentService) AssessDescriptiveExam(ctx context.Context, genera
 		return
 	}
 
-	if e.profanityService.IsProfane(content) {
-		err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
-			"profanity_check": "detected",
-			"profane_content": goaway.ExtractProfanity(content),
-		}, Remarks: fmt.Sprintf("profanities detected in content, %v", goaway.ExtractProfanity(content))})
-		if err != nil {
-			log.Printf("Error updating status %v", err)
-		}
+	// if e.profanityService.IsProfane(content) {
+	// 	err = e.updateAssessment(ctx, assessmentId, commonRepositories.AssessmentModel{Status: constants.ASSESSMENT_REJECTED, RawAssessmentData: map[string]interface{}{
+	// 		"profanity_check": "detected",
+	// 		"profane_content": goaway.ExtractProfanity(content),
+	// 	}, Remarks: fmt.Sprintf("profanities detected in content, %v", goaway.ExtractProfanity(content))})
+	// 	if err != nil {
+	// 		log.Printf("Error updating status %v", err)
+	// 	}
 
-		return
-	}
+	// 	return
+	// }
 
 	prompt := fmt.Sprintf(`
 			Evaluate the following "%s" based on the topic: “%s”.
