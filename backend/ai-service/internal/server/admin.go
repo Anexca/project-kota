@@ -2,7 +2,9 @@ package server
 
 import (
 	"common/ent"
+	"context"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -33,6 +35,23 @@ func (s *Server) GenerateExamQuestionAndPopulateCache(w http.ResponseWriter, r *
 	}
 
 	err = s.WriteJson(w, http.StatusOK, &Response{Data: generatedExamData})
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
+}
+
+func (s *Server) GenerateAllDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
+	go func() {
+		questions, err := s.examService.GenerateAllDescriptiveQuestions(context.Background())
+		if err != nil {
+			log.Println("something went wrong, ", err)
+			return
+		}
+
+		log.Printf("generated %d questions\n", len(questions))
+	}()
+
+	err := s.WriteJson(w, http.StatusOK, &Response{Message: "exam generation started successfully"})
 	if err != nil {
 		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
 	}

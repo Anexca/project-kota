@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	commonConstants "common/constants"
@@ -149,6 +150,34 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 
 	log.Println("Completed populating exam question cache.")
 	return nil
+}
+
+var rwMutex = &sync.RWMutex{}
+
+func (q *ExamService) GenerateAllDescriptiveQuestions(ctx context.Context) ([]*models.GenerateQuestionResponse, error) {
+	rwMutex.Lock()
+	defer rwMutex.Unlock()
+
+	descriptiveExams, err := q.examRepository.GetActiveByType(ctx, commonConstants.ExamTypeDescriptive)
+	if err != nil {
+		return nil, err
+	}
+
+	var descriptiveExamsIds []*models.GenerateQuestionResponse
+
+	for _, descriptiveExam := range descriptiveExams {
+		generatedExam, err := q.GenerateExamQuestionAndPopulateCache(ctx, descriptiveExam.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		descriptiveExamsIds = append(descriptiveExamsIds, generatedExam)
+
+		// Sleep before processing the next exam
+		time.Sleep(30 * time.Second)
+	}
+
+	return descriptiveExamsIds, nil
 }
 
 func (q *ExamService) GenerateExamQuestionAndPopulateCache(ctx context.Context, examId int) (*models.GenerateQuestionResponse, error) {
