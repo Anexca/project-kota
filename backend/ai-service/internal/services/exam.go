@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	commonConstants "common/constants"
@@ -151,7 +152,12 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 	return nil
 }
 
+var rwMutex = &sync.RWMutex{}
+
 func (q *ExamService) GenerateAllDescriptiveQuestions(ctx context.Context) ([]*models.GenerateQuestionResponse, error) {
+	rwMutex.Lock()
+	defer rwMutex.Unlock()
+
 	descriptiveExams, err := q.examRepository.GetActiveByType(ctx, commonConstants.ExamTypeDescriptive)
 	if err != nil {
 		return nil, err
