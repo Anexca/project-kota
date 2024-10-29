@@ -29,6 +29,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(middlewares.RequireAdminKeyMiddleware())
 		r.Route("/generate", func(r chi.Router) {
 			r.Post("/exam/{id}", s.GenerateExamQuestionAndPopulateCache)
+			r.Post("/all/descriptive", s.GenerateAllDescriptiveQuestions)
 		})
 	})
 
