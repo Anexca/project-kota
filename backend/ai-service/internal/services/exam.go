@@ -151,6 +151,29 @@ func (q *ExamService) PopulateExamQuestionCache(ctx context.Context) error {
 	return nil
 }
 
+func (q *ExamService) GenerateAllDescriptiveQuestions(ctx context.Context) ([]*models.GenerateQuestionResponse, error) {
+	descriptiveExams, err := q.examRepository.GetActiveByType(ctx, commonConstants.ExamTypeDescriptive)
+	if err != nil {
+		return nil, err
+	}
+
+	var descriptiveExamsIds []*models.GenerateQuestionResponse
+
+	for _, descriptiveExam := range descriptiveExams {
+		generatedExam, err := q.GenerateExamQuestionAndPopulateCache(ctx, descriptiveExam.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		descriptiveExamsIds = append(descriptiveExamsIds, generatedExam)
+
+		// Sleep before processing the next exam
+		time.Sleep(30 * time.Second)
+	}
+
+	return descriptiveExamsIds, nil
+}
+
 func (q *ExamService) GenerateExamQuestionAndPopulateCache(ctx context.Context, examId int) (*models.GenerateQuestionResponse, error) {
 	exam, err := q.examRepository.GetById(ctx, examId)
 	if err != nil {

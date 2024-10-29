@@ -37,3 +37,16 @@ func (s *Server) GenerateExamQuestionAndPopulateCache(w http.ResponseWriter, r *
 		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
 	}
 }
+
+func (s *Server) GenerateAllDescriptiveQuestions(w http.ResponseWriter, r *http.Request) {
+	questions, err := s.examService.GenerateAllDescriptiveQuestions(r.Context())
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	err = s.WriteJson(w, http.StatusOK, &Response{Data: questions})
+	if err != nil {
+		s.HandleError(w, err, "something went wrong", http.StatusInternalServerError)
+	}
+}
