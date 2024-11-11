@@ -3,7 +3,7 @@ module ai-service
 go 1.23.0
 
 require (
-	cloud.google.com/go/vertexai v0.13.1
+	cloud.google.com/go/vertexai v0.13.2
 	entgo.io/ent v0.14.1
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-playground/validator/v10 v10.22.1
