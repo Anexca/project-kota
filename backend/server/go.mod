@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	entgo.io/ent v0.14.1
-	github.com/cashfree/cashfree-pg/v4 v4.2.4
+	github.com/cashfree/cashfree-pg/v4 v4.3.3
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/cors v1.2.1
 	github.com/go-playground/validator/v10 v10.22.1
@@ -31,7 +31,6 @@ require (
 )
 
 require (
-	github.com/TwiN/go-away v1.6.13
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
