@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	entgo.io/ent v0.14.1
-	github.com/TwiN/go-away v1.6.13
+	github.com/TwiN/go-away v1.6.14
 	github.com/alicebob/miniredis/v2 v2.33.0
 	github.com/google/uuid v1.6.0
 	github.com/mattn/go-sqlite3 v1.14.24
@@ -30,6 +30,6 @@ require (
 	github.com/yuin/gopher-lua v1.1.1 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/mod v0.20.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.20.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
