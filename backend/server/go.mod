@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	entgo.io/ent v0.14.1
-	github.com/cashfree/cashfree-pg/v4 v4.3.1
+	github.com/cashfree/cashfree-pg/v4 v4.3.6
 	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-chi/cors v1.2.1
 	github.com/go-playground/validator/v10 v10.23.0
